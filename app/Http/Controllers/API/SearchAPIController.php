@@ -21,13 +21,15 @@ class SearchAPIController extends AppBaseController
             return $this->sendError("instructor query param is requrid", 400);
         }
 
-        $result = User::leftJoin("profiles", 'users.id', '=', "profiles.user_id")
-            ->where(function ($query) use ($searchString) {
-                $query->where('profiles.instagram_handle', 'LIKE', $searchString . '%');
-                $query->orWhere('first_name', 'LIKE', $searchString . '%');
-                $query->orWhere('last_name', 'LIKE', $searchString . '%');
-            })
-            ->whereHas(
+        $searchStringArr = preg_split('/\s+/', $searchString, -1, PREG_SPLIT_NO_EMPTY);
+
+        $result = User::leftJoin("profiles", 'users.id', '=', "profiles.user_id");
+
+        foreach($searchStringArr as $searchString) {
+            $result->search($searchString);
+        }
+
+        $result = $result->whereHas(
                 'roles',
                 function ($q) {
                     $q->where('name', USER::ROLE_INSTRUCTOR);

@@ -45,8 +45,10 @@ return [
 		'auth_token' => env('TWILIO_AUTH_TOKEN'), // optional when using username and password
 		'account_sid' => env('TWILIO_ACCOUNT_SID'),
 		'from' => env('TWILIO_FROM'), // optional
-		'api_sid' => env('TWILIO_API_SID'),
+        'api_sid' => env('TWILIO_API_SID'),
         'api_secret' => env('TWILIO_API_SECRET'),
+//        'video_small_group_minute_price' => env('TWILIO_SMALL_GROUP_VIDEO_ROOM_PRICE'),
+//        'video_group_minute_price' => env('TWILIO_GROUP_VIDEO_ROOM_PRICE'),
 	],
 	'instagram' => [
 		'client_id' => env('INSTAGRAM_KEY'),

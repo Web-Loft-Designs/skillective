@@ -39,10 +39,10 @@ class ContactUsAPIController extends AppBaseController
 			return $this->sendError('Please, enter valid email');
 		}
 
-		(new User)->forceFill([
-			'name' => 'Their name',
-			'email' => 'louis@skillective.com',
-		])->notify(new GuestBecomeInstructor($guest_email));
+		$administrators = $this->userRepository->getAdministrators();
+		foreach ($administrators as $administrator) {
+			$administrator->notify(new GuestBecomeInstructor($guest_email));
+		}
 
 		$this->sendResponse('ok');
 	}
