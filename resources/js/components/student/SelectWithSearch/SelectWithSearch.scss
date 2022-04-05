@@ -1,0 +1,133 @@
+.select-with-search {
+    /deep/ .v-select {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        color: #444444;
+
+        .vs__selected-options {
+            padding: 0;
+        }
+
+        .vs__selected {
+            position: absolute;
+            overflow: hidden;
+            max-width: calc(100% - 8px);
+            white-space: nowrap;
+            padding: 9px 14px 10px 14px;
+            margin: 0;
+        }
+
+        .vs__search {
+            border-radius: 3px 0 0 3px;
+            padding: 9px 0 10px 14px;
+            margin: 0 7px 0 0;
+            outline: none;
+
+            &::placeholder {
+                color: #666666;
+            }
+        }
+
+        .vs__dropdown-toggle {
+            border: 1px solid #DDDDDD;
+            border-radius: 3px;
+            padding: 0;
+            box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+            transition: box-shadow .25s;
+
+            &:focus-within {
+                box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+            }
+        }
+
+        .vs__dropdown-menu {
+            border: 1px solid #DDDDDD;
+            border-radius: 0 0 3px 3px;
+            padding: 8px 0;
+            overflow: hidden;
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.03), 0px 10px 30px rgba(0, 0, 0, 0.03);
+            border-top: none;
+            z-index: 10;
+            top: calc(100% - 3px);
+            min-width: 145px;
+        }
+
+        .vs__dropdown-option {
+            padding: 7px 14px;
+            white-space: initial;
+
+            &--highlight {
+                background: #f4f4f4;
+                color: #444444;
+            }
+        }
+
+        .vs__actions {
+            padding: 0;
+            position: relative;
+
+            &::after {
+                content: "";
+                width: 0;
+                height: 0;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 6px solid #4A4A4A;
+                position: absolute;
+                top: 19px;
+                right: 19px;
+                transition: transform .25s;
+            }
+        }
+
+        .vs__clear {
+            display: flex;
+            margin: 1px 4px 0 0;
+            padding: 4px;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+            transition: box-shadow .25s;
+            outline: none;
+
+            &:hover {
+                background: #f4f4f4;
+            }
+
+            &:focus {
+                box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+            }
+        }
+
+        .vs__open-indicator {
+            margin-right: 18px;
+            opacity: 0;
+        }
+
+        .vs__no-options {
+            display: block;
+            padding: 7px 14px;
+            text-align: left;
+        }
+    }
+
+    &--small {
+        /deep/ .v-select {
+            font-size: 14px;
+            line-height: 21px;
+
+            .vs__selected, .vs__search {
+                padding: 5px 9px 7px;
+            }
+
+            .vs__actions {
+                &::after {
+                    top: 14px;
+                    right: 13px;
+                }
+            }
+        }
+    }
+}

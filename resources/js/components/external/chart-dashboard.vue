@@ -1,0 +1,480 @@
+<template>
+  <div class="chart-component" :class="{ 'chart-component-v2': !isDashboard }">
+    <div class="chart-component-top" v-if="isDashboard">
+      <h2>Total income</h2>
+      <div>
+        <label>Period</label>
+        <select v-model="selectedYear">
+          <option value="" :selected="'' == selectedYear">All Time</option>
+          <option
+            v-for="year in yearOptions"
+            :selected="year == selectedYear"
+            :value="year"
+          >
+            {{ year }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="chart-component-body">
+      <div class="top">
+        <span class="total">${{ reversedMessage }}</span>
+        <span class="item-wrapper">
+          <span class="item">
+            <span class="operator">=</span>
+            <span class="value">
+              <span>Earned</span>
+              <span>${{ totalEarned.toFixed(2) }}</span>
+            </span>
+          </span>
+          <span class="item">
+            <span class="operator">+</span>
+            <span class="value">
+              <span>Booked</span>
+              <span>${{ totalBooked.toFixed(2) }}</span>
+            </span>
+          </span>
+        </span>
+      </div>
+      <div class="set-goal-top" v-if="!isDashboard">
+        <a href="#" @click.prevent="modalOpen()"
+          ><img src="/images/goal.svg" alt="" /> Set a goal</a
+        >
+      </div>
+      <div class="middle">
+        <bar-chart
+          style="height: 292px"
+          :chart-data="datacollection"
+          :options="option"
+        ></bar-chart>
+        <!--<line-chart :class="{'chart-little':!isDashboard}" :chart-data="datacollection" :options="option" style="height: 332px;"></line-chart>-->
+      </div>
+
+      <div class="bottom" v-if="isDashboard">
+        <p>
+          <a href="/instructor/incomes">Incomes</a> |
+          <a href="/instructor/payouts">Payouts</a>
+        </p>
+        <a href="#" @click.prevent="modalOpen()"
+          ><img src="/images/goal.svg" alt="" /> {{ setGoalText }}</a
+        >
+      </div>
+    </div>
+    <magnific-popup-modal
+      @close="clearFormAndClosePopup"
+      class="modal-set-goal"
+      :show="false"
+      :config="{
+        closeOnBgClick: true,
+        showCloseBtn: true,
+        enableEscapeKey: false,
+      }"
+      ref="modal3"
+    >
+      <set-goal-popup
+        @goalUpdated="getGoal()"
+        :modal-window="this.$refs.modal3"
+      ></set-goal-popup>
+    </magnific-popup-modal>
+  </div>
+</template>
+
+
+<script>
+import $ from "jquery";
+import barChart from "../../BarChartInstructor";
+import MagnificPopupModal from "./MagnificPopupModal";
+import siteAPI from "../../mixins/siteAPI.js";
+import skillectiveHelper from "../../mixins/skillectiveHelper.js";
+
+export default {
+  components: {
+    barChart,
+    MagnificPopupModal,
+  },
+  mixins: [siteAPI, skillectiveHelper],
+  props: [
+    "isDashboard",
+    "dateChart",
+    "initialGoalValue",
+    "initialGoalColor",
+    "yearOfRegistration",
+  ],
+  data() {
+    return {
+      datacollection: {},
+      dataEarned: [],
+      dataBooked: [],
+      totalEarned: 0,
+      totalBooked: 0,
+      incomes: [],
+      selectedYear: new Date().getFullYear(),
+      datasetLabel: [
+        "",
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+        "",
+      ],
+      option: {},
+      goal_value: null,
+      goal_color: null,
+      goalValueArry: [],
+      yearOptions: [],
+    };
+  },
+  created() {
+    this.goal_value =
+      this.initialGoalValue != undefined
+        ? this.initialGoalValue
+        : this.goal_value;
+    this.goal_color =
+      this.initialGoalColor != undefined
+        ? this.initialGoalColor
+        : this.goal_color;
+    this.buildYearOptions();
+  },
+  mounted() {
+    this.fillData();
+    this.getIncomes();
+
+    this.$root.$on("goalUpdated", (goal) => {
+      this.goal_value = goal.goal_value;
+      this.goal_color = goal.goal_color;
+    });
+  },
+  computed: {
+    reversedMessage: function () {
+      let temp = this.totalEarned + this.totalBooked;
+      return temp.toFixed(2);
+    },
+    setGoalText: function () {
+      return this.goal_value > 0 ? "Update Goal" : "Set a Goal";
+    },
+  },
+  watch: {
+    selectedYear() {
+      this.getIncomes();
+    },
+    incomes() {
+      this.dataEarned = [];
+      this.dataBooked = [];
+      this.datasetLabel = [];
+      this.totalEarned = 0;
+      this.totalBooked = 0;
+      this.goalValueArry = [];
+      var flag = false;
+      var dataYear = moment(this.incomes[0].startDate).format("YYYY");
+
+      this.incomes.forEach((item) => {
+        if (dataYear === moment(item.startDate).format("YYYY")) {
+          flag = false;
+        } else {
+          flag = true;
+        }
+      });
+      this.incomes.forEach((item) => {
+        if (this.incomes.length === 1) {
+          this.datasetLabel.push(moment(item.startDate).format("YYYY"));
+        } else {
+          if (flag) {
+            this.datasetLabel.push(moment(item.startDate).format("YYYY"));
+          } else {
+            this.datasetLabel.push(moment(item.startDate).format("MMM"));
+          }
+        }
+        this.totalEarned = this.totalEarned + item.amountEarned;
+        this.totalBooked = this.totalBooked + item.amountBooked;
+        if (this.goal_value !== 0) {
+          this.goalValueArry.push(this.goal_value);
+        } else {
+          this.goalValueArry.push(null);
+        }
+        this.dataEarned.push(item.amountEarned);
+        if (item.amountBooked === 0) {
+          this.dataBooked.push(null);
+        } else {
+          this.dataBooked.push(item.amountBooked);
+        }
+      });
+      this.fillData();
+    },
+    dateChart() {
+      this.dataEarned = [];
+      this.dataBooked = [];
+      this.datasetLabel = [];
+      this.totalEarned = 0;
+      this.totalBooked = 0;
+      this.goalValueArry = [];
+      var flag = false;
+      var dataYear = moment(this.dateChart[0].startDate).format("YYYY");
+      this.dateChart.forEach((item) => {
+        if (dataYear === moment(item.startDate).format("YYYY")) {
+          flag = false;
+        } else {
+          flag = true;
+        }
+      });
+      this.dateChart.forEach((item) => {
+        if (this.dateChart.length === 1) {
+          this.datasetLabel.push(moment(item.startDate).format("YYYY"));
+        } else {
+          if (flag) {
+            this.datasetLabel.push(moment(item.startDate).format("YYYY"));
+          } else {
+            this.datasetLabel.push(moment(item.startDate).format("MMM"));
+          }
+        }
+        this.totalEarned = this.totalEarned + item.amountEarned;
+        this.totalBooked = this.totalBooked + item.amountBooked;
+        this.dataEarned.push(item.amountEarned);
+        if (this.goal_value !== 0) {
+          this.goalValueArry.push(this.goal_value);
+        } else {
+          this.goalValueArry.push(null);
+        }
+        if (item.amountBooked === 0) {
+          this.dataBooked.push(null);
+        } else {
+          this.dataBooked.push(item.amountBooked);
+        }
+      });
+      this.incomes.forEach((item) => {
+        if (dataYear === moment(item.startDate).format("YYYY")) {
+          flag = false;
+        } else {
+          flag = true;
+        }
+      });
+      this.incomes.forEach((item) => {
+        if (this.incomes.length === 1) {
+          this.datasetLabel.push(moment(item.startDate).format("YYYY"));
+        } else {
+          if (flag) {
+            this.datasetLabel.push(moment(item.startDate).format("YYYY"));
+          } else {
+            this.datasetLabel.push(moment(item.startDate).format("MMM"));
+          }
+        }
+        this.totalEarned = this.totalEarned + item.amountEarned;
+        this.totalBooked = this.totalBooked + item.amountBooked;
+        this.dataEarned.push(item.amountEarned);
+        if (item.amountBooked === 0) {
+          this.dataBooked.push(null);
+        } else {
+          this.dataBooked.push(item.amountBooked);
+        }
+      });
+      this.fillData();
+    },
+  },
+  methods: {
+    buildYearOptions() {
+      var currentYear = new Date().getFullYear();
+      for (var y = currentYear; y >= parseInt(this.yearOfRegistration); y--) {
+        this.yearOptions.push(y);
+      }
+    },
+    getGoal() {
+      axios
+        .get("/api/instructor/goal", {})
+        .then((response) => {
+          this.updateGoalData(response.data.data);
+        })
+        .catch((error) => {});
+    },
+    updateGoalData(goalData) {
+      this.goal_value = goalData.goal_value;
+      this.goal_color = goalData.goal_color;
+      this.goalValueArry = [];
+      this.incomes.map((item) => {
+        if (this.goal_value !== null) {
+          if (this.goal_value !== 0) {
+            this.goalValueArry.push(this.goal_value);
+          } else {
+            this.goalValueArry.push(null);
+          }
+        }
+      });
+      this.fillData();
+    },
+    modalOpen() {
+      this.$refs.modal3.open();
+      this.$root.$emit("goalFormOpen");
+    },
+    getIncomes() {
+      var _api = "/api/instructor/incomes";
+      if (this.selectedYear != "") _api += "/" + this.selectedYear;
+      this.apiGet(_api);
+    },
+    componentHandleGetResponse(responseData) {
+      this.incomes = responseData.data;
+    },
+    convertTo: function (n, d) {
+      if (n > 999) {
+        var x = ("" + n).length,
+          p = Math.pow,
+          d = p(10, d);
+        x -= x % 3;
+        return Math.round((n * d) / p(10, x)) / d + " kMGTPE"[x / 3];
+      } else {
+        return n;
+      }
+    },
+    clearFormAndClosePopup() {},
+    fillData() {
+      window.colorCustom = this.goal_color;
+      var bar_ctx = document.getElementById("bar-chart").getContext("2d");
+      var data = [];
+      var dataMax = 0;
+      var labels = [];
+      this.dataEarned.map((item) => {
+        data.push(item.count);
+        labels.push(item.range);
+        if (dataMax < item.count) {
+          dataMax = item.count;
+        }
+      });
+      if (dataMax < 100) {
+        dataMax = 100;
+      } else if (dataMax < 1000) {
+        dataMax = 1000;
+      } else if (dataMax > 1000) {
+        dataMax = 1000;
+      }
+
+      this.option = {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {
+          display: false,
+        },
+        showDatapoints: true,
+        tooltips: {
+          enabled: false,
+        },
+
+        scales: {
+          yAxes: [
+            {
+              display: true,
+              drawTicks: false,
+              gridLines: {
+                drawTicks: false,
+                drawBorder: false,
+                zeroLineBorderDashOffset: 0,
+                borderDash: [1, 3],
+              },
+              ticks: {
+                padding: 0,
+                fontColor: "#aaaaaa",
+                fontSize: 14,
+                min: 0,
+                fontFamily: "Hind Vadodara",
+                steps: 10,
+                callback: (value, index, values) => {
+                  if (value === 0) {
+                    return "";
+                  } else {
+                    return "$" + this.convertTo(value, 2);
+                  }
+                },
+              },
+            },
+          ],
+          xAxes: [
+            {
+              fontColor: "#444",
+              fontSize: 14,
+              fontFamily: "Hind Vadodara",
+              gridLines: {
+                color: "rgba(0, 0, 0, 0)",
+              },
+              maxBarThickness: 30,
+              stacked: true,
+              ticks: {
+                padding: 1,
+                fontColor: "#444",
+                fontSize: 14,
+                fontFamily: "Hind Vadodara",
+              },
+            },
+          ],
+        },
+        onAnimationComplete: function () {
+          var ctx = this.chart.ctx;
+          ctx.font = this.scale.font;
+          ctx.fillStyle = this.scale.textColor;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "bottom";
+          this.datasets.forEach(function (dataset) {
+            dataset.bars.forEach(function (bar) {
+              ctx.fillText(bar.value, bar.x, bar.y + 20);
+            });
+          });
+        },
+      };
+
+      let earnedSum = this.dataEarned.reduce((a, b) => a + b, 0),
+        bookedSum = this.dataBooked.reduce((a, b) => a + b, 0);
+
+      const booked = {
+        label: "$",
+        borderColor: "#8ada00",
+        backgroundColor: "#8ada00",
+        pointBackgroundColor: "#8ada00",
+        pointBorderColor: "rgba(255, 255, 255, 0)",
+        pointHoverBackgroundColor: "#8ada00",
+        pointHoverBorderColor: "#8ada00",
+        data: this.dataBooked,
+      };
+
+      const earned = {
+        label: "$",
+        borderColor: "#f5a623",
+        backgroundColor: "#f5a623",
+        pointBackgroundColor: "#f5a623",
+        pointBorderColor: "rgba(255, 255, 255, 0)",
+        pointHoverBackgroundColor: "#f5a623",
+        pointHoverBorderColor: "#f5a623",
+        data: this.dataEarned,
+      };
+
+      this.datacollection = {
+        labels: this.datasetLabel,
+        datasets: [
+          {
+            type: "line",
+            label: "goal",
+            borderColor: this.goal_color,
+            borderWidth: 1,
+            pointRadius: 0,
+            pointHoverRadius: 0,
+            borderDashOffset: 0.3,
+            borderDash: [2, 2, 2, 2, 2],
+            fill: false,
+            data: this.goalValueArry,
+          },
+        ],
+      };
+
+      if (earnedSum > bookedSum) {
+        this.datacollection.datasets.push(booked);
+        this.datacollection.datasets.push(earned);
+      } else {
+        this.datacollection.datasets.push(earned);
+        this.datacollection.datasets.push(booked);
+      }
+    },
+  },
+};
+</script>

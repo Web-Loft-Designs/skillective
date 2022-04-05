@@ -1,0 +1,1 @@
+<p> Your [[lesson_genre]] lesson start in 1 hour at [[lesson_start]] </p>

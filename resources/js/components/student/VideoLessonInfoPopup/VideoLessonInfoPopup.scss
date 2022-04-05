@@ -1,0 +1,212 @@
+// transition animations for .video-lesson-info-popup__popup
+.scalein-enter-active, .scalein-leave-active {
+    transition: opacity .5s, transform .5s;
+    opacity: 1;
+    transform: scale(1);
+}
+.scalein-enter, .scalein-leave-to {
+    opacity: 0;
+    transform: scale(0.75);
+}
+
+// transition animations for .video-lesson-info-popup__backdrop
+.show-enter-active, .show-leave-active {
+    transition: opacity .25s;
+    opacity: 1;
+}
+.show-enter, .show-leave-to {
+    opacity: 0;
+}
+
+
+
+.video-lesson-info-popup {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    bottom: 0;
+    right: 0;
+    width: 100vw;
+    pointer-events: none;
+
+    &__backdrop {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.65);
+        pointer-events: all;
+    }
+
+    &__popup-container {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    &__popup {
+        background: #FFFFFF;
+        box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.07), 0px 25px 50px rgba(0, 0, 0, 0.07);
+        border-radius: 5px;
+        width: 365px;
+        padding: 32px 41px 28px 41px;
+        pointer-events: all;
+        position: relative;
+        max-height: 100%;
+        overflow: auto;
+    }
+    
+    &__content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__heading {
+        margin: 0 0 20px 0;
+        font-family: Poppins;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 22px;
+        line-height: 33px;
+        color: #333333;
+        max-width: 260px;
+    }
+
+    &__close {
+        width: 50px;
+        height: 50px;
+        right: 6px;
+        top: 9px;
+        position: absolute;
+    }
+
+    &__image {
+        width: 120px;
+        height: 75px;
+        border-radius: 5px;
+        object-fit: cover;
+        object-position: center;
+        overflow: hidden;
+        background: #ddd;
+        vertical-align: top;
+        margin-bottom: 15px;
+    }
+
+    &__type {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        color: #444444;
+    }
+
+    &__genres {
+        margin: 10px 0 15px 0;
+    }
+
+    &__genre {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 13px;
+        line-height: 19px;
+        color: #444444;
+        padding: 2px 10px 3px 10px;
+        background: #F4F4F4;
+        border-radius: 2px;
+        display: inline-block;
+    }
+
+    &__row {
+        margin-bottom: 5px;
+        display: flex;
+    }
+
+    &__row-title {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        color: #AAAAAA;
+        width: 91px;
+
+        &--price {
+            width: 48px;
+        }
+    }
+
+    &__row-value {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        color: #444444;
+
+        a {
+            text-decoration: underline;
+            color: #444444;
+            border-radius: 3px;
+        }
+
+        &--price {
+            font-family: Hind Vadodara;
+            font-style: normal;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 24px;
+            color: #444444;
+        }
+    }
+
+    &__button {
+        background: linear-gradient(180deg, #11CF13 0%, #01BD00 100%);
+        border-radius: 3px;
+        border: none;
+        margin: 30px 0 0 0;
+        padding: 11px 0 10px 0;
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 24px;
+        text-align: center;
+        color: #FFFFFF;
+        outline: none;
+        box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+        transition: box-shadow .25s;
+        text-decoration: none;
+
+        &:hover, &:focus {
+            box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+        }
+    }
+
+    &__note {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        color: #444444;
+        margin: 15px 0 20px 0;
+    }
+
+    &__error {
+        font-family: "Hind Vadodara";
+        font-size: 16px;
+        font-weight: 400;
+        color: #db4437;
+        text-align: center;
+    }
+}

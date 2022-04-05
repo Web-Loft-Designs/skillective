@@ -1,0 +1,75 @@
+.time-selector {
+  &:focus-within /deep/ input {
+    box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+  }
+
+  /deep/ input {
+    width: 100%;
+    background: #FFFFFF;
+    border: 1px solid #DDDDDD;
+    border-radius: 3px;
+    padding: 0 13px;
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 24px;
+    color: #444444;
+    height: 45px;
+    outline: none;
+    box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+    transition: box-shadow .25s;
+    text-transform: uppercase;
+  }
+
+  /deep/ .vue__time-picker {
+    width: 100%;
+  }
+
+  /deep/ .controls {
+    display: none;
+  }
+
+  /deep/ .dropdown {
+    width: 100%;
+    border: 1px solid #DDDDDD;
+    border-radius: 0 0 3px 3px;
+    margin-top: -3px;
+    border-top: 0;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.03), 0px 10px 30px rgba(0, 0, 0, 0.03);
+    height: 161px;
+
+    ul {
+      li {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        color: #444444;
+        
+        &.hint {
+          font-size: 12px;
+          line-height: 18px;
+          font-family: Hind Vadodara;
+          font-style: normal;
+          font-weight: normal;
+          color: #aaa;
+        }
+
+        &:not(.hint) {
+          text-transform: uppercase;
+        }
+
+        &.active {
+          background: #8ADA00;
+          color: #fff;
+
+          &:hover {
+            background: #8ADA00;
+          }
+        }
+      }
+    }
+  }
+}

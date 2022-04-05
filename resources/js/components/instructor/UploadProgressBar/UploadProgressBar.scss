@@ -1,0 +1,33 @@
+.upload-progress-bar {
+  &__container {
+    border: 1px solid #DDDDDD;
+    height: 6px;
+    border-radius: 5px;
+    margin-top: 8px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  &__line {
+    background: #09AB14;
+    display: block;
+    width: 0;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: width .25s;
+  }
+
+  &__percent {
+    display: block;
+    text-align: right;
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 21px;
+    color: #444444;
+    display: block;
+  }
+}

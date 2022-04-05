@@ -1,0 +1,205 @@
+.featured-instructors {
+    padding: 56px 30px 116px 30px;
+
+    &__heading {
+        font-family: Poppins;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 28px;
+        line-height: 42px;
+        text-align: center;
+        color: #333333;
+        margin: 0 0 20px 0;
+    }
+
+    /deep/ .slick-slider {
+        padding: 0 60px;
+        position: relative;
+        max-width: 1340px;
+        margin: 0 auto;
+
+        .slick-arrow {
+            z-index: 1;
+            top: calc(50% - 30px);
+            background: none;
+            border: none;
+            min-width: 60px;
+            min-height: 60px;
+            font-size: 0;
+            border-radius: 50%;
+            transition: background-color .25s, box-shadow .25s;
+            padding: 0;
+            position: absolute;
+            background-position: center;
+            background-repeat: no-repeat;
+            outline: none;
+            box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+
+            &.slick-disabled {
+                pointer-events: none;
+            }
+
+            &:hover {
+                background-color: #f4f4f4;        
+            }
+
+            &:focus {
+                box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+            }
+        }
+
+        .slick-next {
+            background-image: url("/images/arrow-next-color.svg");
+            right: 0;
+
+            &.slick-disabled {
+                background-image: url("/images/arrow-next.svg");
+            }
+        }
+
+        .slick-prev {
+            background-image: url("/images/arrow-prev-color.svg");
+            left: 0;
+
+            &.slick-disabled {
+                background-image: url("/images/arrow-prev.svg");
+            }
+        }
+
+        .slick-dots {
+            position: absolute;
+            top: calc(100% + 10px);
+            width: 100%;
+            left: 0;
+        }
+    }
+}
+
+.featured-instructor {
+    text-align: center;
+    padding: 20px 20px 30px 20px;
+    background: #FFFFFF;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    border-radius: 5px;
+    text-decoration: none;
+    outline: none;
+    position: relative;
+    display: block;
+    transition: border-color .25s;
+
+    &__outer {
+        padding: 10px;
+        min-height: 335px;
+    }
+
+    &:hover {
+        border-color: #E9E9E9;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.03), 0px 5px 10px rgba(0, 0, 0, 0.05);
+        z-index: 1;
+    }
+    
+    &__image {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        object-position: center;
+        overflow: hidden;
+        vertical-align: top;
+        margin: 0 auto;
+    }
+
+    &__name {
+        font-family: Poppins;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 18px;
+        line-height: 27px;
+        margin: 15px 0 0 0;
+        color: #333333;
+    }
+
+    &__insta {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        color: #AAAAAA;
+    }
+
+    &__genres {
+        margin-top: 18px;
+    }
+
+    &__genre {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 13px;
+        line-height: 19px;
+        color: #444444;
+        background: #F4F4F4;
+        border-radius: 2px;
+        padding: 3px 7px;
+        margin: 2px;
+        display: inline-block;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .featured-instructors {
+        padding: 40px 0 116px 0;
+
+        /deep/ .slick-slider {
+            padding: 0;
+
+            .slick-arrow {
+                top: 100%;
+            }
+
+            .slick-next {
+                right: 10px;
+            }
+
+            .slick-prev {
+                left: 10px;
+            }
+        }
+    }
+
+    .featured-instructor {
+        padding: 0;
+
+        &:hover {
+            box-shadow: none;
+            border-color: transparent;
+        }
+
+        &__outer {
+            min-height: 262px;
+        }
+
+        &__image {
+            width: 100px;
+            height: 100px;
+        }
+
+        &__name {
+            font-family: Poppins;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 16px;
+            line-height: 24px;
+        }
+
+        &__insta {
+            font-family: Hind Vadodara;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 14px;
+            line-height: 21px;
+        }
+    }
+}

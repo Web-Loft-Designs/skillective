@@ -1,0 +1,60 @@
+.pagination {
+    margin: 0;
+    border-radius: 0;
+    display: block;
+
+    /deep/ .pagination {
+        font-family: Poppins;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        color: #0AAB14;
+        margin: 0;
+        
+        li a {
+            background: transparent;
+            border: none;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            color: #0AAB14;
+            transition: opacity .25s;
+            user-select: none;
+            border-radius: 3px;
+            padding: 0 4px;
+            height: 25px;
+            margin: 10px 9px;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        li.active a {
+            background: linear-gradient(180deg, #11CF13 0%, #01BD00 100%);
+            color: #fff;
+            cursor: pointer;
+            padding: 0 13px;
+            height: 45px;
+            margin: 0;
+            box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+            transition: box-shadow .25s;
+            outline: none;
+            
+            &:hover {
+                box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+                text-decoration: none;
+            }
+
+            &:focus {
+                box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+            }
+        }
+
+        li.disabled a {
+            color: #0AAB14;
+            opacity: 0.2;
+        }
+    }
+}

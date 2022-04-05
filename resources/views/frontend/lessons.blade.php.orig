@@ -1,0 +1,13 @@
+@extends('layouts.app-frontend')
+
+@section('content')
+<div class="wrapper">
+        <lessons-search-results-list
+                :logged-in-as-student="{{ (isset($loggedUserRole) && $loggedUserRole==\App\Models\User::ROLE_STUDENT) ? 'true' : 'false' }}"
+                :current-user-can-book="{{ $currentUserCanBook?'true':'false' }}"
+                :lessons="{{ json_encode($lessons['data']) }}"
+                :lessons-meta="{{ isset($lessons['meta'])?json_encode($lessons['meta']):json_encode([]) }}"
+                :site-genres="{{  json_encode($genres) }}"
+        ></lessons-search-results-list>
+</div>
+@endsection

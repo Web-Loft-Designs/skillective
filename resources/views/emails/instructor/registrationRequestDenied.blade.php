@@ -1,0 +1,1 @@
+<p>We’re sorry, but we were unable to add you as an instructor or Influencer on Skillective at this time.  Thank you for your submission.</p>

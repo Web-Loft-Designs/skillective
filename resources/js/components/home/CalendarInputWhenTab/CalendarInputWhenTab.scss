@@ -1,0 +1,343 @@
+.calendar-input-when-tab {
+  padding: 20px 0 50px 0;
+  text-align: center;
+
+  &__tabs {
+    background: #F4F4F4;
+    border-radius: 30px;
+    padding: 4px 5px;
+    display: inline-block;
+  }
+
+  &__tab {
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    color: #444444;
+    padding: 5px 11px;
+    border-radius: 43px;
+    border: none;
+    background: none;
+    outline: none;
+    
+    &--active {
+      background: linear-gradient(180deg, #11CF13 0%, #01BD00 100%);
+      color: #fff;
+      box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+      transition: box-shadow .25s;
+
+      &:hover, &:focus {
+        box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+      }
+    }
+  }
+
+  &__flexible-days {
+    background: #F4F4F4;
+    border-radius: 5px;
+    max-width: 675px;
+    margin: 20px auto;
+    padding: 30px;
+    text-align: center;
+
+    h2 {
+      font-family: Poppins;
+      font-style: normal;
+      font-weight: 600;
+      font-size: 24px;
+      line-height: 36px;
+      color: #333333;
+      margin: 0 0 26px 0;
+    }
+
+    input {
+      width: 0;
+      height: 0;
+      opacity: 0;
+
+      &:checked + label {
+        background: linear-gradient(180deg, #11CF13 0%, #01BD00 100%);
+        color: #fff;
+      }
+
+      &:focus + label {
+        box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+      }
+    }
+
+    label {
+      display: inline-block;
+      background: #FFFFFF;
+      border-radius: 30px;
+      padding: 10px 20px;
+      font-family: Hind Vadodara;
+      font-style: normal;
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 24px;
+      color: #444444;
+      margin: 0 5px;
+      cursor: pointer;
+      box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+      transition: box-shadow .25s;
+
+      &:hover {
+        box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+      }
+    }
+  }
+
+  &__flexible-months {
+    text-align: center;
+    padding-bottom: 20px;
+
+    h3 {
+      font-family: Poppins;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 18px;
+      line-height: 27px;
+      color: #333333;
+      margin: 0 0 20px 0;
+    }
+  }
+
+  &__flexible-month {
+    border: 1px solid #E4E4E4;
+    box-sizing: border-box;
+    border-radius: 5px;
+    background: none;
+    padding: 23px 0 9px 0;
+    width: 100px;
+    color: #444444;
+    text-align: center;
+    margin: 0 7px;
+    outline: none;
+    box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+    transition: box-shadow .25s;
+    
+    img {
+      display: block;
+      margin: 0 auto 7px auto;
+    }
+
+    span {
+      font-family: Hind Vadodara;
+      font-style: normal;
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    &:hover, &:focus {
+      box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+    }
+
+    &--active {
+      background: linear-gradient(180deg, #11CF13 0%, #01BD00 100%);
+      border-color: transparent;
+      color: #fff;
+    }
+  }
+
+  &__datepicker {
+    border: none;
+    max-width: 680px;
+    width: 100%;
+
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 21px;
+    color: #444444;
+    
+    --green-600: #8ADA00;
+    --green-700: #8ADA00;
+    --green-900: #8ADA00;
+    --green-200: #e2f6bf;
+    --accent-100: #e2f6bf;
+    --accent-900: #444444;
+    --rounded-full: 20px;
+    --shadow-lg: 0px 5px 10px rgba(0, 0, 0, 0.03), 0px 10px 30px rgba(0, 0, 0, 0.03);
+    --shadow: none;
+    --gray-800: #fff;
+    --gray-700: #E4E4E4;
+    --gray-900: #F4F4F4;
+    --gray-200: #f4f4f4;
+
+    & /deep/ .vc-pane {
+      padding: 0 30px;
+    }
+
+    & /deep/ .vc-pane-container {
+      padding: 30px 0;
+    }
+
+    & /deep/ .vc-title {
+      font-family: Hind Vadodara;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 16px;
+      line-height: 24px;
+      color: #444444;
+    }
+
+    & /deep/ .vc-weekday {
+      font-family: Hind Vadodara;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 14px;
+      line-height: 21px;
+      color: #444444;
+      padding: 28px 0 9px 0;
+    }
+
+    & /deep/ .vc-day.is-not-in-month * {
+      opacity: 1;
+      font-family: Hind Vadodara;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 14px;
+      line-height: 21px;
+      color: #AAAAAA !important;
+      background: #fff;
+      border-radius: 0;
+    }
+
+    & /deep/ .vc-weeks, & /deep/ .vc-header  {
+      padding: 0;
+    }
+
+    & /deep/ .vc-day {
+      min-height: 40px;
+    }
+
+    & /deep/ .vc-highlight {
+      width: 40px;
+      height: 40px;
+    }
+
+    & /deep/ .vc-day-content {
+      width: 40px;
+      height: 40px;
+      font-weight: normal;
+    }
+
+    & /deep/ .vc-day-content:hover, & /deep/ .vc-day-content:focus {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    & /deep/ .vc-nav-item {
+      color: #444;
+      box-shadow: none;
+      font-weight: normal;
+    }
+
+    & /deep/ .vc-nav-item.is-active {
+      font-weight: bold;
+    }
+
+    & /deep/ .vc-nav-title {
+      font-family: Hind Vadodara;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 14px;
+      line-height: 21px;
+      color: #444444;
+    }
+
+    & /deep/ .vc-arrow {
+      width: 40px;
+      height: 40px;
+      background-position: center;
+      background-repeat: no-repeat;
+      border: none;
+    }
+
+    & /deep/ .vc-arrow svg {
+      display: none;
+    }
+
+    & /deep/ .vc-arrow.is-left {
+      background-image: url("/images/calendar-arrow-back.svg");
+    }
+
+    & /deep/ .vc-arrow.is-right {
+      background-image: url("/images/calendar-arrow-forward.svg");
+    }
+
+    & /deep/ .vc-arrows-container {
+      padding: 0 30px;
+      top: 22px;
+    }
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .calendar-input-when-tab {
+    padding-bottom: 40px;
+
+    &__datepicker {
+      & /deep/ .vc-pane-container {
+        padding: 0;
+      }
+
+      & /deep/ .vc-pane-layout {
+        display: flex;
+        flex-direction: column;
+        max-width: 280px;
+        margin: 0 auto;
+      }
+
+      & /deep/ .vc-pane {
+        padding: 30px 0 0 0;
+      }
+    }
+
+    &__flexible-days {
+      margin: 20px 10px 30px 10px;
+      max-width: initial;
+    }
+
+    &__flexible-months {
+      padding-bottom: 0;
+
+      h3 {
+        font-family: Poppins;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        margin-bottom: 0;
+      }
+    }
+
+    &__flexible-month {
+      margin: 20px 10px 0 10px;
+    }
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .calendar-input-when-tab {
+    &__flexible-days {
+      h2 {
+        font-family: Poppins;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 27px;
+        margin-bottom: 25px;
+      }
+
+      label {
+        margin: 15px auto 0 auto;
+        display: block;
+        max-width: 160px;
+      }
+    }
+  }
+}

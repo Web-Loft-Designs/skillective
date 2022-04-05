@@ -1,0 +1,118 @@
+.vhd-container.mobile .vhd-calendar-header > .info {
+  display: none !important;
+}
+
+.vhd-container {
+  width: 100% !important;
+}
+
+.vhd-picker {
+  min-height: auto !important;
+}
+
+.vhd-container.mobile .vhd-calendar-header {
+  display: none !important;
+}
+
+.vhd-container.mobile .vhd-calendar .calendar-date .week .day.start-date {
+  border-radius: 2px 0 0 2px !important;
+  background-color: #8ada00 !important;
+  color: #ffffff !important;
+  font-family: "Hind Vadodara"!important;
+  font-size: 14px!important;
+  font-weight: 600!important;
+}
+
+.vhd-calendar .calendar-date .week .day.start-date:before {
+  background-color: #8ada00 !important;
+}
+
+.vhd-calendar .calendar-date .week .day {
+  color: #444;
+  font-family: "Hind Vadodara";
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.vhd-container.mobile .vhd-calendar .calendar-date .week .day.end-date {
+  border-radius: 0 2px 2px 0 !important;
+  background-color: #8ada00 !important;
+  color: #ffffff !important;
+  font-family: "Hind Vadodara"!important;
+  font-size: 14px!important;
+  font-weight: 600!important;
+}
+
+.vhd-calendar .calendar-date .week .day.disabled {
+  color: #aaaaaa!important;
+  font-family: "Hind Vadodara"!important;
+  font-size: 14px!important;
+  font-weight: 400!important;
+}
+
+.vhd-calendar .calendar-week-item {
+  color: #444444 !important;
+  font-family: "Hind Vadodara" !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+
+.vhd-calendar .calendar-month-title {
+  color: #444444 !important;
+  font-family: "Hind Vadodara" !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+
+.vhd-calendar-footer .confirm {
+  color: #0aab14 !important;
+  font-family: "Hind Vadodara" !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+
+.vhd-calendar-footer .reset{
+  color: #aaaaaa !important;
+  font-family: "Hind Vadodara" !important;
+  font-size: 16px !important;
+  font-weight: 600!important;
+}
+
+.vhd-calendar .calendar-date .week .day.end-date:after {
+  background-color: #8ada00 !important;
+}
+
+.vhd-calendar .calendar-date .week .day.in-date-range {
+  background-color: #8ada00 !important;
+  color: #ffffff !important;
+  font-family: "Hind Vadodara"!important;
+  font-size: 14px!important;
+  font-weight: 600!important;
+}
+
+.vhd-input {
+  border-radius: 3px!important;
+  border: 1px solid #ddd!important;
+  background-color: #fff!important;
+  height: 44px!important;
+  padding: 5px 13px!important;
+  color: #444!important;
+  font-family: "Hind Vadodara"!important;
+  font-size: 16px!important;
+  font-weight: 400!important;
+  position: relative!important;
+  min-width: auto!important;
+  width: 100%;
+
+  &:focus {
+    z-index: 1!important;
+    box-shadow: 0 0 6px 0px rgba(17, 207, 19, 1)!important;
+  }
+
+  &::placeholder {
+    color: #aaa!important;
+    font-family: "Hind Vadodara"!important;
+    font-size: 16px!important;
+    font-weight: 400!important;
+  }
+}

@@ -1,0 +1,1 @@
+<p>Congratulations - you are registered to use Skillective! You can now view and book available lessons with some of the best instructors or influencers in the world.</p>

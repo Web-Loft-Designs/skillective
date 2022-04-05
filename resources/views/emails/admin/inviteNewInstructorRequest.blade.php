@@ -1,0 +1,2 @@
+<p>One of [[app_name]] users( [[sender_name]] ) asked you to invite a new Instructor( [[invited_contact]] ) to your platform.  You can send the link provided below to the requested contact or send an invitation right from your admin panel.</p>
+<p>"Become an Instructor" URL for this invitation is: [[registration_url]]</p>

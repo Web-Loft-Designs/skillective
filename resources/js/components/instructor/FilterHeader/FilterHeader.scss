@@ -1,0 +1,310 @@
+.filter-header {
+    position: relative;
+
+    &__heading {
+        font-family: Poppins;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 28px;
+        line-height: 42px;
+        color: #333333;
+        margin: 0;
+    }
+
+    &__filters {
+        display: flex;
+        align-items: flex-end;
+        border-bottom: 1px solid #DDDDDD;
+        padding: 24px 0 20px 0;
+        margin-bottom: 42px;
+    }
+
+    &__col-title {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 21px;
+        margin-bottom: 5px;
+        color: #444444;
+        display: block;
+    }
+
+    &__col {
+        flex: 1;
+        margin-right: 20px;
+
+        &:last-child {
+            margin-right: 0;
+        }
+
+        &--wide {
+            flex: 1;
+        }
+
+        &--semiwide {
+            flex: 1;
+
+            .filter-header__search-input {
+                max-width: 420px;
+            }
+        }
+    }
+
+    &__multiselect {
+        /deep/ .multiselect {
+            position: relative;
+            color: #333;
+
+            &::after {
+                content: "";
+                width: 0;
+                height: 0;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 6px solid #4A4A4A;
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                transition: transform .25s;
+            }
+
+            .multiselect__tags {
+                padding: 9px 14px 10px;
+                border: 1px solid #DDDDDD;
+                box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+                transition: box-shadow .25s;
+                border-radius: 3px;
+                cursor: text;
+
+                &:focus-within {
+                    box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+                }
+            }
+
+            .multiselect__content-wrapper {
+                border: 1px solid #DDDDDD;
+                border-radius: 0 0 3px 3px;
+                padding: 8px 0;
+                overflow: hidden;
+                box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.03), 0px 10px 30px rgba(0, 0, 0, 0.03);
+                border-top: none;
+                z-index: 10;
+                top: calc(100% - 3px);
+                min-width: 145px;
+            }
+
+            .multiselect__input, .multiselect__single {
+                font-family: Hind Vadodara;
+                font-style: normal;
+                font-weight: normal;
+                font-size: 16px;
+                line-height: 24px;
+                margin: 0;
+                padding: 0;
+                border-radius: 0;
+                color: #333;
+                padding-right: 25px;
+
+                &::placeholder {
+                    color: #666666;
+                }
+            }
+
+            .multiselect__select {
+                display: none;
+            }
+
+            .multiselect__tags-wrap {
+                display: flex;
+                flex-wrap: wrap;
+                position: absolute;
+                background: #fff;
+                bottom: calc(100% - 3px);
+                border: 1px solid #ddd;
+                border-radius: 3px 3px 0 0;
+                padding: 7px 14px;
+                border-bottom: none;
+                left: 0;
+                width: 100%;
+            }
+
+            .multiselect__tag {
+                margin: 0 4px 4px 0;
+                font-family: Hind Vadodara;
+                font-style: normal;
+                font-weight: normal;
+                font-size: 14px;
+                border-radius: 3px;
+                background-color: #8ada00;
+            }
+
+            .multiselect__tag-icon {
+                border-radius: 0 3px 3px 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-weight: normal;
+
+                &:hover, &:focus {
+                    background: #db4437;
+                }
+
+                &::after {
+                    color: #fff;
+                    font-size: 22px;
+                }
+            }
+
+            .multiselect__placeholder {
+                font-family: Hind Vadodara;
+                font-style: normal;
+                font-weight: normal;
+                font-size: 16px;
+                line-height: 24px;
+                margin: 0;
+                padding: 0;
+                color: #666666;
+            }
+
+            .multiselect__option {
+                padding: 7px 14px;
+                min-height: auto;
+                font-family: Hind Vadodara;
+                font-style: normal;
+                font-weight: normal;
+                font-size: 16px;
+                line-height: 24px;
+            }
+
+            .multiselect__option--highlight {
+                background: #f4f4f4;
+                color: #333;
+            }
+
+            .multiselect__option--selected {
+                font-weight: normal;
+
+                .option__checkbox {
+                    &::before {
+                        border-color: transparent;
+                    }
+                }
+            }
+
+            .option__checkbox {
+                padding-left: 34px;
+
+                &::before {
+                    border-radius: 3px;
+                    top: 0;
+                    left: 0;
+                    height: 24px;
+                    width: 24px;
+                    border-color: #ddd;
+                }
+
+                &::after {
+                    border-width: 0 2px 2px 0;
+                    left: 8px;
+                    top: 3px;
+                    width: 8px;
+                    height: 13px;
+                }
+            }
+        }
+    }
+
+    &__search-input {
+        border: 1px solid #DDDDDD;
+        box-sizing: border-box;
+        border-radius: 3px;
+        max-width: 560px;
+        width: 100%;
+        outline: none;
+        padding: 0 20px;
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 25px;
+        color: #444444;
+        height: 45px;
+        box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+        transition: box-shadow .25s;
+
+        &::placeholder {
+            color: #666666;
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+        }
+    }
+
+    &__button {
+        background: linear-gradient(180deg, #11CF13 0%, #01BD00 100%);
+        border-radius: 3px;
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 45px;
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 25px;
+        color: #FFFFFF;
+        box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+        transition: box-shadow .25s;
+        padding: 0;
+        text-decoration: none;
+        cursor: pointer;
+        outline: none;
+
+        &:hover, &:focus {
+            box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+        }
+
+        img {
+            margin-right: 8px;
+        }
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .filter-header {
+        &__button {
+            position: absolute;
+            right: 0;
+            top: -2px;
+        }
+
+        &__col {
+            width: 100%;
+            margin: 0 0 15px 0;
+
+            &--wide, &--semiwide {
+                margin-right: 0;
+
+                .filter-header__search-input {
+                    max-width: none;
+                }
+            }
+        }
+
+        &__filters {
+            flex-direction: column;
+            padding: 89px 0 5px 0;
+            margin-bottom: 31px;
+        }
+
+        &__button {
+            width: 100%;
+            top: 66px;
+            position: absolute;
+        }
+    }
+}

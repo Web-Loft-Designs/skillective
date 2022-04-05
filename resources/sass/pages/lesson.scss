@@ -1,0 +1,390 @@
+.lesson-info-block {
+    display: flex;
+    flex-wrap: wrap;
+    text-align: left;
+    align-items: flex-start;
+    @media (min-width: 993px) {
+        padding-right: 64px;
+    }
+
+    .avatar-block {
+        flex: 0 0 40%;
+        max-width: 40%;
+        width: 100%;
+        padding: 0 10px;
+
+        & > div {
+            display: table;
+        }
+
+        p {
+            text-align: center;
+
+            a {
+                color: #444;
+                word-break: break-all;
+                text-align: center;
+                font-size: 14px;
+            }
+        }
+
+        h3 {
+            text-align: center;
+
+            a {
+                color: #444;
+                word-break: break-all;
+                text-align: center;
+                font-size: 15px;
+            }
+        }
+    }
+
+    .content-block {
+        flex: 0 0 60%;
+        max-width: 60%;
+        width: 100%;
+    }
+
+    ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+
+    h3 {
+        color: #444444;
+        font-family: "Hind Vadodara";
+        font-size: 17px;
+        font-weight: 600;
+        margin-bottom: 0;
+
+        img {
+            padding-right: 6px;
+        }
+    }
+
+    li {
+        color: #aaaaaa;
+        font-family: "Hind Vadodara";
+        font-size: 15px;
+        font-weight: 400;
+        margin-bottom: 30px;
+    }
+
+    p {
+        color: #444444;
+        font-family: "Hind Vadodara";
+        font-size: 15px;
+        font-weight: 400;
+        display: block;
+    }
+
+    .location-li {
+        max-width: 145px;
+    }
+
+    .map {
+        margin-top: 10px;
+        flex: 0 0 100%;
+        max-width: 100%;
+        width: 100%;
+
+        img {
+            max-width: 100%;
+        }
+    }
+
+    .avatar-img {
+        width: 110px;
+        height: 110px;
+        border-radius: 100%;
+        background-size: cover;
+        background-position: center center;
+        margin: 0 auto 10px;
+    }
+}
+
+.lesson-page {
+    background-color: #ffffff;
+    padding: 70px 0;
+
+    .avatar-block {
+        a {
+            color: #444;
+        }
+    }
+}
+
+.lesson-right {
+    @media (min-width: 993px) {
+        padding-left: 64px;
+        border-left: 1px solid #d8d8d8;
+    }
+    box-shadow: none;
+
+    h3 {
+        color: #333333;
+        font-family: Poppins;
+        font-size: 22px;
+        font-weight: 400;
+        text-align: left;
+        margin-bottom: 11px;
+        padding-left: 9px;
+    }
+
+    p {
+        color: #444444;
+        font-family: "Hind Vadodara";
+        font-size: 16px;
+        font-weight: 400;
+        margin-bottom: 20px;
+    }
+
+    a {
+        color: #0aab14;
+        font-family: "Hind Vadodara";
+        font-size: 16px;
+        font-weight: 600;
+    }
+}
+
+.map-item {
+    width: 100%;
+    height: 280px;
+}
+
+.w-25 {
+    flex: 0 0 25%;
+    max-width: 25%;
+
+    @media (max-width: 586px) {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+.custom-padding {
+    padding: 0 10px !important;
+}
+
+.payment-option {
+    padding: 0 10px 10px;
+
+    .w-50 {
+        @media (max-width: 993px) {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+
+    .w-25 {
+        flex: 0 0 25%;
+        max-width: 25%;
+
+        @media (max-width: 993px) {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        @media (max-width: 586px) {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+
+    &.active {
+        .payment-option-header label::before {
+            border: 8px solid #8ada00;
+        }
+    }
+
+    .payment-option-body {
+        padding: 0 30px 30px;
+
+        input.mastercard {
+            background: url("../../images/mastercard.svg") no-repeat
+                calc(100% - 15px) center;
+            background-size: 38px;
+            padding-right: 50px;
+        }
+    }
+
+    .payment-option-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        padding: 25px 30px;
+        min-height: 80px;
+        cursor: pointer;
+
+        img {
+            pointer-events: none;
+            max-width: 100%;
+        }
+
+        label {
+            position: relative;
+            padding-left: 40px;
+            z-index: 1;
+            color: #444444;
+            font-family: "Hind Vadodara";
+            font-size: 19px;
+            font-weight: 600;
+            pointer-events: none;
+            padding-right: 15px;
+            margin-bottom: 0;
+
+            &::before {
+                content: "";
+                display: block;
+                width: 22px;
+                height: 22px;
+                border: 1px solid #ccc;
+                background-color: #fff;
+                position: absolute;
+                top: 5px;
+                left: 0;
+                border-radius: 100%;
+                transition: all 0.25s ease;
+            }
+        }
+
+        input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+    }
+
+    & > div {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05),
+            0 2px 4px rgba(0, 0, 0, 0.03);
+        border-radius: 5px;
+        border: 1px solid #e9e9e9;
+        background-color: #ffffff;
+        width: 100%;
+    }
+}
+
+.lesson-success {
+    h3 {
+        color: #333333;
+        font-family: Poppins;
+        font-size: 22px;
+        font-weight: 400;
+        margin-bottom: 14px;
+    }
+
+    .btn-secondary {
+        padding: 0;
+        color: #0aab14;
+        font-family: "Hind Vadodara";
+        font-size: 16px;
+        font-weight: 600;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 40px;
+        border-radius: 3px;
+        background-color: #f4f4f4;
+    }
+
+    ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+
+        li {
+            margin-bottom: 50px;
+            padding-left: 100px;
+            position: relative;
+
+            .img-circle {
+                width: 70px;
+                height: 70px;
+                background-color: #f4f4f4;
+                border-radius: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                left: 0;
+            }
+
+            p {
+                margin-bottom: 0;
+                color: #444444;
+                font-family: "Hind Vadodara";
+                font-size: 16px;
+                font-weight: 400;
+            }
+
+            a {
+                color: #0aab14;
+                font-family: "Hind Vadodara";
+                font-size: 16px;
+                font-weight: 600;
+            }
+        }
+    }
+
+    p {
+        color: #444444;
+        font-family: "Hind Vadodara";
+        font-size: 16px;
+        font-weight: 400;
+        margin-bottom: 50px;
+
+        strong {
+            color: #444444;
+            font-family: "Hind Vadodara";
+            font-size: 16px;
+            font-weight: 600;
+        }
+    }
+}
+
+.no-lessons-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    span {
+        font-family: Poppins;
+        font-style: normal;
+        font-weight: Bold;
+        text-align: center;
+        display: block;
+        font-size: 22px;
+        line-height: 42px;
+        color: #333;
+    }
+
+    p {
+      display: block;
+    }
+
+    a {
+        background: linear-gradient(180deg, #11cf13 0%, #01bd00 100%);
+        border-radius: 3px;
+        border: none;
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 25px;
+        padding: 10px;
+        width: 220px;
+        color: #fff;
+        text-decoration: none;
+        margin-bottom: 8px;
+        text-align: center;
+        margin-top: 22px;
+    }
+}

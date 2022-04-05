@@ -1,0 +1,102 @@
+.order-summary {
+  background: #FFFFFF;
+  border: 1px solid #E9E9E9;
+  box-sizing: border-box;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.03), 0px 5px 10px rgba(0, 0, 0, 0.05);
+  border-radius: 5px;
+  margin-bottom: 100px;
+
+  &__heading {
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 19px;
+    line-height: 28px;
+    color: #444444;
+    padding: 18px 20px;
+    margin: 0;
+    border-bottom: 1px solid #DDDDDD;
+  }
+
+  &__table {
+    padding: 20px 20px 30px 20px;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__key {
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    color: #888888;
+  }
+
+  &__value {
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 24px;
+    color: #444444;
+  }
+
+  &__spacer {
+    border-bottom: 2px dotted #404554;
+    opacity: 0.3;
+    flex: 1;
+    margin: 0 10px 5px 6px;
+  }
+
+  &__bottom {
+    padding: 20px 20px 30px 20px;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    border-top: 1px solid #DDDDDD;
+  }
+
+  &__checkout {
+    background: linear-gradient(180deg, #11CF13 0%, #01BD00 100%);
+    border-radius: 3px;
+    border: none;
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 25px;
+    padding: 10px;
+    width: 100%;
+    color: #fff;
+    text-decoration: none;
+    margin-bottom: 8px;
+    box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+    transition: box-shadow .25s;
+    outline: none;
+
+    &:hover, &:focus {
+      box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+    }
+  }
+
+  &__continue {
+    color: #09C60A;
+    text-decoration: none;
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 21px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+}

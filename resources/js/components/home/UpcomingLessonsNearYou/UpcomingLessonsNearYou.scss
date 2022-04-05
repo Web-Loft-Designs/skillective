@@ -1,0 +1,315 @@
+.upcoming-lessons-near-you {
+    background: #f4f4f4;
+    padding: 80px 30px;
+
+    &__heading {
+        font-family: Poppins;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 28px;
+        color: #333333;
+        line-height: 42px;
+        max-width: 1340px;
+        margin: 0 auto 9px auto;
+        padding: 0 75px;
+    }
+
+    &__view-all {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 24px;
+        color: #0AAB14;
+        display: block;
+        max-width: 1340px;
+        margin: 4px auto 0 auto;
+        padding: 0 75px;
+        outline: none;
+    }
+
+    /deep/ .slick-slider {
+        padding: 0 60px;
+        position: relative;
+        max-width: 1340px;
+        margin: 0 auto;
+
+        .slick-arrow {
+            z-index: 1;
+            top: calc(50% - 30px);
+            background: none;
+            border: none;
+            min-width: 60px;
+            min-height: 60px;
+            font-size: 0;
+            border-radius: 50%;
+            transition: background-color 0.25s;
+            padding: 0;
+            position: absolute;
+            background-position: center;
+            background-repeat: no-repeat;
+            outline: none;
+
+            &.slick-disabled {
+                pointer-events: none;
+            }
+
+            &:hover {
+                background-color: #fff;
+            }
+        }
+
+        .slick-next {
+            background-image: url("/images/arrow-next-color.svg");
+            right: 0;
+
+            &.slick-disabled {
+                background-image: url("/images/arrow-next.svg");
+            }
+        }
+
+        .slick-prev {
+            background-image: url("/images/arrow-prev-color.svg");
+            left: 0;
+
+            &.slick-disabled {
+                background-image: url("/images/arrow-prev.svg");
+            }
+        }
+
+        .slick-dots {
+            position: absolute;
+            top: calc(100% + 10px);
+            width: 100%;
+            left: 0;
+        }
+    }
+}
+
+.nearby-lesson {
+    text-decoration: none;
+    outline: none;
+    position: relative;
+    display: block;
+    background: #ffffff;
+    border: 1px solid #e9e9e9;
+    box-sizing: border-box;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.03), 0px 5px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+    height: 324px;
+    margin: 25px auto 0 auto;;
+    transition: height .25s, margin-top .25s;
+    max-width: 270px;
+
+    &__image-container {
+        margin: 0 auto;
+        width: 110px;
+        height: 110px;
+        position: relative;
+    }
+
+    &__upfront {
+        position: absolute;
+        top: 0;
+        background: linear-gradient(0deg, rgba(10, 171, 20, 0.8), rgba(10, 171, 20, 0.8)), url(Image.png);
+        border-radius: 65px;
+        width: 100%;
+        height: 100%;
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 20px;
+        color: #FFFFFF;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity .25s;
+    }
+
+    &:hover {
+        height: 374px;
+        margin-top: 0;
+
+        .nearby-lesson__book-lesson {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+        }
+
+        .nearby-lesson__upfront {
+            opacity: 80%;
+        }
+    }
+
+    &__outer {
+        padding: 15px;
+        height: 401px;
+    }
+
+    &__body {
+        padding: 20px 10px 22px 10px;
+        text-align: center;
+    }
+
+    &__image {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        object-position: center;
+        overflow: hidden;
+        background: #ddd;
+        vertical-align: top;
+    }
+
+    &__insta {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 19px;
+        line-height: 28px;
+        color: #444444;
+        margin: 10px 0 0 0;
+    }
+
+    &__name {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        color: #444444;
+    }
+
+    &__footer {
+        position: relative;
+        border-top: 1px solid #dddddd;
+        padding: 15px;
+    }
+
+    &__genre {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 24px;
+        color: #444444;
+        margin-bottom: 10px;
+    }
+
+    &__price {
+        position: absolute;
+        right: 15px;
+        top: 12px;
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 19px;
+        line-height: 28px;
+        color: #222222;
+    }
+
+    &__subprice {
+        top: 34px;
+        right: 15px;
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 12px;
+        line-height: 18px;
+        color: #AAAAAA;
+        position: absolute;
+    }
+
+    &__date {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 21px;
+        color: #444444;
+    }
+
+    &__location {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 21px;
+        color: #444444;
+    }
+
+    &__book-lesson {
+        width: 100%;
+        background: linear-gradient(180deg, #11CF13 0%, #01BD00 100%);
+        border-radius: 3px;
+        padding: 0;
+        border: none;
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 24px;
+        color: #FFFFFF;
+        height: 36px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 15px;
+        pointer-events: none;
+        opacity: 0;
+        transform: scale(0.5);
+        transition: transform .25s, opacity .25s;
+    }
+}
+
+@media screen and (max-width: 1100px) { 
+    .upcoming-lessons-near-you {
+        &__view-all, &__heading {
+            text-align: center;
+        }
+    }
+
+    .nearby-lesson {
+        height: 374px;
+        margin-top: 0;
+
+        .nearby-lesson__book-lesson {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+        }
+    }
+}
+
+@media screen and (max-width: 800px) { 
+    .upcoming-lessons-near-you {
+        padding: 40px 30px 48px 30px;
+
+        /deep/ .slick-slider {
+            padding: 0;
+    
+            .slick-arrow {
+                top: calc(100% + 17px);
+            }
+    
+            .slick-next {
+                right: 10px;
+            }
+    
+            .slick-prev {
+                left: 10px;
+            }
+        }
+
+        &__view-all {
+            margin-top: 33px;
+        }
+
+        &__heading {
+            padding: 0;
+        }
+    }
+}

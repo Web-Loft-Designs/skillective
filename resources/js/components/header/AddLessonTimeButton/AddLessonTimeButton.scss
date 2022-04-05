@@ -1,0 +1,19 @@
+.add-lesson-time-button {
+    background: #8ada00;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-family: "Hind Vadodara";
+    font-size: 16px;
+    font-weight: 400;
+}
+
+@media screen and (max-width: 1100px) {
+    .add-lesson-time-button {
+        background: none;
+        
+        &:hover {
+            color: #0AAB14;
+        }
+    }
+}

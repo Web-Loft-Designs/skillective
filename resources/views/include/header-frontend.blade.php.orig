@@ -1,0 +1,13 @@
+@if (!\Request::is('/'))  
+  <new-header :logo-src="'{{ asset('images/logo.png') }}'">
+    <template v-slot:right>
+      @if (!isDashboardPage())
+        @include('include/menu/header-menu-guest')
+      @elseif(Auth::user())
+        @include('include/menu/header-menu-login')
+      @endif
+      @include('include/menu/profile-menu')
+      <cart-icon v-if="{{ (isset($loggedUserRole) && $loggedUserRole==\App\Models\User::ROLE_STUDENT) ? 'true' : 'false' }}"></cart-icon>
+    </template>
+  </new-header>
+@endif

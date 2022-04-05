@@ -1,0 +1,40 @@
+.instructor-my-shop {
+    &__container {
+        max-width: 1250px;
+        margin: 0 auto;
+        padding: 50px 40px 0 40px;
+    }
+
+    &__footer {
+        margin: -5px 0 0 0;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        padding: 0 0 100px 0;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .instructor-my-shop {
+        &__footer {
+            margin: 40px 0 0 0;
+        }
+    }
+}
+
+@media screen and (max-width: 640px) {
+    .instructor-my-shop {
+        &__container {
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+    }
+}
+
+@media screen and (max-width: 550px) {
+    .instructor-my-shop {
+        &__container {
+            padding-top: 30px;
+        }
+    }
+}

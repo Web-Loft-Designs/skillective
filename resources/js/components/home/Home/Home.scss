@@ -1,0 +1,39 @@
+.home {
+    background: #fff;
+
+    &__top-banner {
+        padding: 84px 28px 70px 28px;
+        background: url("/images/home-green-banner.jpg");
+        background-position: center;
+        background-size: cover;
+    }
+
+    &__banner-heading {
+        font-family: Poppins;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 35px;
+        line-height: 120%;
+        text-align: center;
+        color: #ffffff;
+        text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+        max-width: 867px;
+        margin: 0 auto;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .home {
+        &__top-banner {
+            padding: 40px 28px;
+        }
+
+        &__banner-heading {
+            font-family: Poppins;
+            font-style: normal;
+            font-weight: 600;
+            font-size: 24px;
+            line-height: 120%;
+        }
+    }
+}

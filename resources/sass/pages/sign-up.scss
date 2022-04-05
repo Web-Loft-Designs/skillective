@@ -1,0 +1,618 @@
+.register-banner {
+  position: relative;
+  z-index: 1;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  padding: 60px 0;
+
+  &.register-banner-v2 {
+    background-position: center top;
+
+    &::before {
+      display: none;
+    }
+
+    @media (min-width: 1200px) {
+      .col-md-6:first-child {
+        padding-right: 67px;
+      }
+    }
+
+
+    .page-title {
+      color: #111111;
+      margin-bottom: 20px;
+      margin-top: 65px;
+    }
+
+    p {
+      opacity: 0.5;
+      color: #444444;
+      font-family: "Hind Vadodara";
+      font-size: 19px;
+      font-weight: 400;
+      margin-bottom: 70px;
+    }
+
+    a.link-underline {
+      color: #444444;
+    }
+
+    ul:not(.multiselect__content) {
+      li {
+        color: #333333;
+      }
+    }
+  }
+
+  .container {
+    max-width: 1180px;
+  }
+
+  @media (max-width: 993px) {
+    .container {
+      max-width: 800px;
+    }
+  }
+
+  &::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-color: #222222;
+    opacity: 0.75;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .page-title {
+    color: #fff;
+    font-family: "Poppins";
+    font-size: 35px;
+    font-weight: 600;
+    margin-bottom: 70px;
+    margin-top: 120px;
+    line-height: 1.8;
+
+    @media (max-width: 993px) {
+      font-size: 30px;
+      margin-top: 60px;
+    }
+
+    @media (max-width: 767px) {
+      margin-top: 0;
+    }
+  }
+
+  a.link-underline {
+    color: #fff;
+    font-family: "Hind Vadodara";
+    font-size: 19px;
+    font-weight: 400;
+    text-dicoration: none;
+    position: relative;
+
+    &::before {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 2px;
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 0;
+      background-color: #8ada00;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .col-md-6:first-child {
+      padding-right: 75px;
+    }
+
+    .col-md-6:last-child {
+      padding-left: 35px;
+    }
+  }
+
+  .multiselect__tags-wrap {
+    display: none !important;
+  }
+
+  ul:not(.multiselect__content) {
+    margin: 0 0 70px;
+    padding: 0;
+    list-style: none;
+
+    li {
+      color: #fff;
+      font-family: Poppins;
+      font-size: 22px;
+      font-weight: 400;
+      margin-bottom: 40px;
+      position: relative;
+      padding-left: 100px;
+
+      @media (max-width: 993px) {
+        font-size: 18px;
+      }
+
+      img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        max-width: 64px;
+      }
+
+      strong {
+        font-family: Poppins;
+        font-weight: 700;
+      }
+    }
+  }
+}
+
+.multiselect__tags {
+  border-color: #ddd;
+}
+
+.multiselect__select {
+  height: 42px;
+
+  &::before {
+    border-color: rgb(68, 68, 68) transparent transparent;
+    top: 69%;
+  }
+}
+
+.option__checkbox {
+  padding-left: 30px;
+  position: relative;
+  z-index: 1;
+
+  &::before {
+    content: "";
+    display: block;
+    height: 25px;
+    width: 25px;
+    background-color: #fff;
+    border: 1px solid #cccccc;
+    position: absolute;
+    top: -3px;
+    left: 0;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: 0px;
+    width: 9px;
+    height: 16px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg) scale(0);
+    transition: all 0.25s ease;
+  }
+}
+
+.multiselect__option--selected {
+  .option__checkbox::after {
+    transform: rotate(45deg) scale(1);
+  }
+
+  .option__checkbox::before {
+    background-color: #8ada00;
+    border: 1px solid #8ada00;
+  }
+}
+
+.vdp-datepicker {
+  input {
+    background-image: url("../../images/date-picker.png");
+    background-size: 18px 20px;
+    background-position: calc(100% - 15px) center;
+    background-repeat: no-repeat;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    height: 44px;
+    padding: 5px 13px;
+    color: #444;
+    font-family: "Hind Vadodara";
+    font-size: 16px;
+    font-weight: 400;
+    display: block;
+    width: 100%;
+    line-height: 1.6;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    box-shadow: none;
+
+    &:focus {
+      z-index: 1;
+      box-shadow: 0 0 6px 0 rgba(17, 207, 19, 1);
+    }
+
+    &::placeholder {
+      color: #aaa;
+      font-family: "Hind Vadodara";
+      font-size: 16px;
+      font-weight: 400;
+    }
+  }
+}
+
+.label-w-100 {
+  flex: 0 0 100%;
+  max-width: 100%;
+  width: 100%;
+  padding: 0 15px;
+
+  label {
+    color: #444;
+    font-family: "Hind Vadodara";
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+}
+
+.w-50 {
+  width: 50%;
+  flex: 0 0 50%;
+  max-width: 50%;
+}
+
+.register-banner-wrapper {
+  @media (max-width: 767px) {
+    margin-top: 40px;
+  }
+
+  @media (min-width: 400px) {
+    .first-name {
+      padding-right: 0;
+      flex: 0 0 50%;
+      max-width: 50%;
+      width: 100%;
+
+      .form-control {
+        border-radius: 3px 0 0 3px;
+      }
+    }
+  }
+
+  .input-city {
+    flex: 0 0 50%;
+    max-width: 50%;
+    width: 100%;
+
+    @media (max-width: 992px) and (min-width: 767px) {
+      & {
+        flex: 0 0 100%;
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 520px) {
+      & {
+        flex: 0 0 100%;
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+  }
+
+  @media (max-width: 520px) {
+    .w-50 {
+      flex: 0 0 100%;
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+
+  .input-state {
+    flex: 0 0 25%;
+    max-width: 25%;
+    width: 100%;
+
+    @media (max-width: 992px) and (min-width: 767px) {
+      & {
+        flex: 0 0 50%;
+        max-width: 50%;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 520px) {
+      & {
+        flex: 0 0 100%;
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+  }
+
+  .input-zip {
+    flex: 0 0 25%;
+    max-width: 25%;
+    width: 100%;
+
+    @media (max-width: 992px) and (min-width: 767px) {
+      & {
+        flex: 0 0 50%;
+        max-width: 50%;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 520px) {
+      & {
+        flex: 0 0 100%;
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+  }
+
+  @media (min-width: 400px) {
+    .last-name {
+      padding-left: 0;
+      flex: 0 0 50%;
+      max-width: 50%;
+      width: 100%;
+
+      .form-control {
+        border-radius: 0 3px 3px 0;
+        border-left: 0;
+      }
+    }
+  }
+}
+
+.slider-genres {
+  background-color: #fff;
+  padding: 60px 0;
+
+  @media (max-width: 676px) {
+    padding: 40px 0;
+  }
+
+  .container {
+    max-width: 1205px;
+  }
+
+  .slick-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0;
+    border-radius: 0;
+    background-color: transparent;
+    z-index: 8;
+    width: 26px;
+    height: 16px;
+    background-size: contain;
+    background-position: center center;
+    border: 0;
+    box-shadow: none;
+
+    &.slick-prev {
+      background-image: url("../../images/arrow-prev.svg");
+      left: -55px;
+
+      &:hover {
+        background-image: url("../../images/arrow-prev-color.svg");
+      }
+    }
+
+    &.slick-next {
+      background-image: url("../../images/arrow-next.svg");
+      right: -55px;
+
+      &:hover {
+        background-image: url("../../images/arrow-next-color.svg");
+      }
+    }
+
+    @media (max-width: 1310px) {
+      &.slick-prev {
+        left: -30px;
+      }
+
+      &.slick-next {
+        right: -30px;
+      }
+    }
+
+    @media (max-width: 590px) {
+      &.slick-prev {
+        top: -30px;
+        left: auto;
+        right: 50px;
+      }
+
+      &.slick-next {
+        top: -30px;
+        right: 12px;
+      }
+    }
+  }
+
+  @media (max-width: 1310px) {
+    .slider {
+      max-width: calc(100% - 80px);
+      margin: 0 auto;
+    }
+  }
+
+  .section-title {
+    color: #333;
+    font-family: "Poppins";
+    font-size: 28px;
+    font-weight: 600;
+    padding: 0 12px;
+  }
+
+
+  @media (max-width: 590px) {
+    .slider {
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      margin-bottom: 17px;
+      padding-right: 89px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .section-title {
+      margin-bottom: 17px;
+      padding-right: 89px;
+      font-size: 24px;
+    }
+  }
+
+  .item {
+    position: relative;
+    padding: 12px;
+
+    .wrap {
+      text-decoration: none;
+      width: 100%;
+      padding-bottom: 100%;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center center;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      background-color: #fff;
+      display: block;
+
+      &::before {
+        content: "";
+        display: block;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.9) 100%);
+        z-index: 2;
+        border-radius: 5px;
+      }
+
+      span {
+        position: absolute;
+        bottom: 15px;
+        left: 0;
+        display: block;
+        width: 100%;
+        text-align: center;
+        color: #fff;
+        font-family: "Hind Vadodara";
+        font-size: 16px;
+        font-weight: 600;
+        z-index: 4
+      }
+    }
+  }
+}
+
+.single-testimonial {
+  background-size: auto 100%;
+  background-position: right center;
+  background-repeat: no-repeat;
+  background-color: rgba(244,244,244,1);
+  padding: 130px 0;
+  position: relative;
+  z-index: 1;
+
+  &.single-testimonial-inverse {
+    background-position: left center;
+
+    &::before {
+      width: 100%;
+      left: 0;
+      background: -moz-linear-gradient(left, rgba(244,244,244,0) 0%, rgba(244,244,244,0) 29%, rgba(244,244,244,1) 45%, rgba(244,244,244,1) 100%); /* FF3.6-15 */
+      background: -webkit-linear-gradient(left, rgba(244,244,244,0) 0%,rgba(244,244,244,0) 29%,rgba(244,244,244,1) 45%,rgba(244,244,244,1) 100%); /* Chrome10-25,Safari5.1-6 */
+      background: linear-gradient(to right, rgba(244,244,244,0) 0%,rgba(244,244,244,0) 29%,rgba(244,244,244,1) 45%,rgba(244,244,244,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00f4f4f4', endColorstr='#f4f4f4',GradientType=1 );
+
+      @media (min-width: 1700px) {
+        background: -moz-linear-gradient(left, rgba(244,244,244,0) 0%, rgba(244,244,244,0) 27%, rgba(244,244,244,1) 30%, rgba(244,244,244,1) 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(left, rgba(244,244,244,0) 0%,rgba(244,244,244,0) 27%,rgba(244,244,244,1) 30%,rgba(244,244,244,1) 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to right, rgba(244,244,244,0) 0%,rgba(244,244,244,0) 27%,rgba(244,244,244,1) 30%,rgba(244,244,244,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00f4f4f4', endColorstr='#f4f4f4',GradientType=1 );
+      }
+    }
+  }
+
+  @media (max-width: 767px) {
+    background-image: none !important;
+    padding: 20px 0
+  }
+
+  @media (max-width: 1440px) {
+    background-position: right center;
+  }
+
+  &::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: -moz-linear-gradient(left, rgba(244,244,244,1) 0%, rgba(244,244,244,1) 55%, rgba(244,244,244,0) 71%, rgba(244,244,244,0) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(left, rgba(244,244,244,1) 0%,rgba(244,244,244,1) 55%,rgba(244,244,244,0) 71%,rgba(244,244,244,0) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right, rgba(244,244,244,1) 0%,rgba(244,244,244,1) 55%,rgba(244,244,244,0) 71%,rgba(244,244,244,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f4f4f4', endColorstr='#00f4f4f4',GradientType=1 );
+  }
+
+  .container {
+    max-width: 1180px;
+  }
+
+  p {
+    color: #444;
+    font-family: "Hind Vadodara";
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 35px;
+    margin-bottom: 35px;
+  }
+
+  .name {
+    color: #444;
+    font-family: "Hind Vadodara";
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 23px;
+    display: block;
+  }
+
+  .position {
+    color: #aaa;
+    font-family: "Hind Vadodara";
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  .testimonial-item {
+    position: relative;
+    background-image: url("../../images/dots-icon.svg");
+    background-repeat: no-repeat;
+    background-size: 44px 34px;
+    background-position: left 10px;
+    padding-left: 90px;
+  }
+}

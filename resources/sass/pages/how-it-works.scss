@@ -1,0 +1,119 @@
+.how--it {
+    padding-top: 50px;
+    display: flex;
+    background-color: #f4f4f4;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 0;
+}
+
+.how--it .title {
+    color: #111;
+    font-size: 35px;
+    line-height: 52px;
+    font-weight: bold;
+    font-family: "Poppins";
+}
+
+.instruction--outer {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    padding-top: 40px;
+    padding-bottom: 80px;
+    .title {
+        color: #333;
+        font-size: 28px;
+        line-height: 42px;
+        font-weight: 500;
+        margin: 0;
+    }
+}
+
+.instruction-inner {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.intruction--item {
+    width: 100%;
+    padding: 24px 30px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    margin: 10px 0;
+
+    .instruction--longtitle {
+        font-size: 22px;
+        line-height: 33px;
+        color: #333;
+        font-weight: normal;
+    }
+
+    .instruction--content {
+        span {
+            color: #01bd00;
+            font-family: "Poppins";
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 24px;
+            padding-right: 20px;
+        }
+    }
+}
+
+.videos--outer{
+    background-color: #fff;
+    padding: 60px 0;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+
+    
+    .videos--inner{
+        width: 60%;
+        
+        .title{
+            font-weight: 500;
+            font-size: 28px;
+            font-family: "Poppins";
+            line-height: 42px;
+            color: #333;
+        }
+    }
+
+    .videos-content{
+        width: 100%;
+        padding-top: 30px;
+        display: flex;
+        flex-direction: column;
+
+        .video--title{
+            margin-top: 10px;
+            margin-bottom: 40px;
+            font-size: 22px;
+            line-height: 33px;
+            color: #333;
+            font-family: "Poppins";
+        }
+    }
+}
+
+@media screen and (max-width: 768px){
+    .videos--outer{
+        padding: 60px 24px;
+        .videos--inner{
+            width: 100%;
+        }
+    }
+
+    .instruction--outer {
+        width: 100%;
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+}

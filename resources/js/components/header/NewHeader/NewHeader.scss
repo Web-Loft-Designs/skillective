@@ -1,0 +1,142 @@
+.new-header {
+    padding: 15px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    background: #fff;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.05);
+
+    &--no-shadow {
+        box-shadow: none;
+    }
+
+    &__logo {
+        padding: 10px 15px 0 15px;
+        border-radius: 3px;
+        text-decoration: none;
+        display: block;
+
+        img {
+            vertical-align: top;
+        }
+
+        span {
+            display: block;
+            font-family: Hind Vadodara;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 10px;
+            line-height: 15px;
+            color: #888888;
+            white-space: nowrap;
+        }
+    }
+
+    &__slot-center {
+        position: relative;
+        flex: 1;
+    }
+
+    &__slot-right {
+        display: flex;
+        align-items: center;
+
+        .drop-menu {
+            z-index: 1000;
+            margin-top: 9px;
+        }
+
+        .img-circle {
+            width: 40px;
+            background: #ddd;
+            overflow: hidden;
+            height: 40px;
+            object-fit: cover;
+        }
+
+        .user-menu-wrapper {
+            padding: 0;
+        }
+
+        .user-menu-item {
+            padding: 0;
+
+            &:hover,
+            &:focus {
+                background: none;
+            }
+        }
+
+        .nav {
+            margin-right: 0;
+            min-height: 0;
+        }
+
+        .nav > li > a {
+            font-family: Hind Vadodara;
+            font-style: normal;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 24px;
+            color: #888888;
+            margin: 0 15px;
+            padding: 0;
+        }
+
+        .nav > li > a:hover {
+            background: none;
+            text-decoration: underline;
+        }
+
+        .nav > li > a:focus {
+            background: none;
+        }
+
+        .header-name {
+            white-space: nowrap;
+            padding-left: 0;
+        }
+    }
+}
+
+@media screen and (max-width: 1400px) {
+    .new-header {
+        &__slot-center {
+            position: initial;
+        }
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .new-header {
+        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.05);
+        height: 56px;
+        padding: 0 20px;
+
+        &--no-shadow {
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        &__logo {
+            padding: 0;
+            display: flex;
+            align-items: center;
+
+            a {
+                height: 16px;
+                display: block;
+            }
+
+            img {
+                height: 16px;
+            }
+
+            span {
+                display: none;
+            }
+        }
+    }
+}

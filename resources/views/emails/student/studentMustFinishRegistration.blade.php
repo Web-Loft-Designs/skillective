@@ -1,0 +1,2 @@
+<p>Welcome, we are so excited you’re here! On the Skillective platform you will find the top talent, teachers and influencers in each genre available for bookings. This innovative platform makes real-time learning readily available to those who share a common passion.</p>
+<p>Click <a href="[[link]]">here</a> to finish your account setup and start booking your favorite instructor or influencer.</p>

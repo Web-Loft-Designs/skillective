@@ -1,0 +1,88 @@
+@import url(https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900);/* Slider */
+@import url(https://fonts.googleapis.com/css?family=Hind+Vadodara:300,400,500,600,700);
+
+#select-media-devices{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#select-media-devices div{
+    border: none;    
+}
+
+#select-media-devices .card-block{
+    padding: 30px 40px;
+    width: 500px;
+    height: 330px;
+}
+
+#select-media-devices .card-title{
+    font-family: "Poppins";
+    color: #333;
+    font-size: 22px;
+    line-height: 33px;
+    font-style: normal;
+    font-weight: normal;
+    margin: 0;
+}
+
+#select-media-devices button{
+    width: 100%;
+    padding: 10px 0;
+    font-family: "Hind Vadodara";
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px;
+    color: #fff;
+    background: linear-gradient(180deg, #11CF13 0%, #01BD00 100%);
+    border-radius: 3px;
+    border: none;
+    margin-top: 20px;
+}
+
+#select-media-devices button:hover{
+    background: linear-gradient(180deg, #0ea510 0%, #038202 100%)
+}
+
+#select-media-devices .form-group{
+    margin-top: 16px;
+    width: 100%;
+}
+
+#select-media-devices label{
+    font-family: "Hind Vadodara";
+    color: #444;
+    line-height: 21px;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    padding-bottom: 5px;
+    display: block;
+}
+
+#select-media-devices select{
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 16px;
+    font-family: "Hind Vadodara";
+    font-style: normal;
+    font-weight: normal;
+    background-image: url(/images/arrow-select.svg?bdc5369909dedbe5dbe3d64fd9384be8);
+    background-position: calc(100% - 15px) center;
+    background-repeat: no-repeat;
+    color: #aaa;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border-radius: 3px;
+}
+
+#select-media-devices select:focus{
+    z-index: 1;
+    box-shadow: 0 0 6px 0px #11cf13;
+    outline: none;
+}

@@ -1,0 +1,135 @@
+// transition animations for .filter-popup__popup
+.show-enter-active, .show-leave-active {
+  transition: opacity .25s, transform .25s;
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+.show-enter, .show-leave-to {
+  opacity: 0;
+  transform: scale(0.75) translateY(-50px);
+}
+
+
+
+.filter-popup {
+  position: relative;
+
+  &__button {
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 24px;
+    color: #444444;
+    padding: 10px 20px 11px;
+    background: #F6F6F6;
+    border: 1px solid #DDDDDD;
+    border-radius: 30px;
+    margin-right: 10px;
+    outline: none;
+    box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+    transition: box-shadow .25s, color .25s;
+
+    &:focus {
+      box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+    }
+
+    &:hover {
+      color: #0AAB14;
+    }
+
+    &--active {
+      border-color: #0AAB14;
+    }
+  }
+
+  &__popup {
+    background: #FFFFFF;
+    border: 1px solid #DDDDDD;
+    box-shadow: 0px 18px 50px rgba(0, 0, 0, 0.17);
+    border-radius: 15px;
+    top: calc(100% + 10px);
+    left: 0;
+    width: 400px;
+    position: absolute;
+    z-index: 20;
+  }
+
+  &__body {
+    padding: 30px;
+  }
+
+  &__actions {
+    display: flex;
+    padding: 20px 30px;
+    border-top: 1px solid #F4F4F4;
+  }
+
+  &__clear-btn {
+    font-family: Poppins;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 24px;
+    color: #888888;
+    padding: 0;
+    border: none;
+    background: none;
+    flex: 1;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: color .25s;
+    
+    &:hover {
+      color: #0AAB14;
+    }
+  }
+
+  &__save-btn {
+    flex: 1;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(180deg, #11CF13 0%, #01BD00 100%);
+    border-radius: 3px;
+    font-family: Poppins;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 24px;
+    border: none;
+    color: #FFFFFF;
+    outline: none;
+    box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+    transition: box-shadow .25s;
+
+    &:hover, &:focus {
+      box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+    }
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .filter-popup {
+    position: initial;
+
+    &__popup {
+      top: 57px;
+      max-width: 100%;
+    }
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .filter-popup {
+    width: 100%;
+
+    &__button {
+      width: 100%;
+      margin: 0;
+    }
+  }
+}

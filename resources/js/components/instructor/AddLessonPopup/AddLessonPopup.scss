@@ -1,0 +1,425 @@
+// transition animations for .add-lesson-popup__popup
+.scalein-enter-active, .scalein-leave-active {
+    transition: opacity .5s, transform .5s;
+    opacity: 1;
+    transform: scale(1);
+}
+.scalein-enter, .scalein-leave-to {
+    opacity: 0;
+    transform: scale(0.75);
+}
+
+// transition animations for .add-lesson-popup__backdrop
+.show-enter-active, .show-leave-active {
+    transition: opacity .25s;
+    opacity: 1;
+}
+.show-enter, .show-leave-to {
+    opacity: 0;
+}
+
+
+
+.add-lesson-popup {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    bottom: 0;
+    right: 0;
+    width: 100vw;
+    pointer-events: none;
+
+    &__backdrop {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.65);
+        pointer-events: all;
+    }
+
+    &__popup-container {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    &__popup {
+        background: #FFFFFF;
+        box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.07), 0px 25px 50px rgba(0, 0, 0, 0.07);
+        border-radius: 5px;
+        width: 500px;
+        padding: 30px 40px 40px 40px;
+        pointer-events: all;
+        position: relative;
+        max-height: 100%;
+        overflow: auto;
+    }
+    
+    &__content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__heading {
+        margin: 0 0 20px 0;
+        font-family: Poppins;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 22px;
+        line-height: 33px;
+        color: #333333;
+        max-width: 260px;
+    }
+
+    &__close {
+        width: 24px;
+        height: 24px;
+        right: 20px;
+        top: 18px;
+        position: absolute;
+    }
+
+    &__button {
+        margin: 21px 0 0;
+    }
+
+    &__row-title {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 21px;
+        color: #444444;
+        display: block;
+        margin: 15px 0 5px 0; 
+
+        &:first-of-type {
+            margin-top: 0;
+        } 
+    }
+
+    &__or {
+        margin: 20px 0 -20px;
+        text-align: center;
+        font-family: Poppins;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 22px;
+        line-height: 33px;
+        color: #333333;
+    }
+
+    &__upload {
+        background-color: transparent;
+        box-sizing: border-box;
+        border-radius: 5px;
+        padding: 8px 95px 8px 83px;
+        position: relative;
+        outline: none;
+        transition: background-color .25s;
+        text-align: left;
+
+        &::before {
+            border: 1px dashed #DDDDDD;
+            border-radius: 5px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            content: "";
+            z-index: 1;
+            background: #fff;
+            pointer-events: none;
+        }
+
+        &:hover {
+            background-color: rgba(10, 171, 20, 0.1);
+        }
+
+        input {
+            opacity: 0;
+            z-index: -1;
+            position: absolute;
+            
+            &:focus + label {
+                box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+            }
+        }
+
+        label {
+            border-radius: 5px;
+            box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+            transition: box-shadow .25s, background-color .25s;
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            z-index: 1;
+            font-size: 0;
+            background-color: transparent;
+            cursor: pointer;
+            
+            &:hover {
+                background-color: rgba(10, 171, 20, 0.1);
+            }
+        }
+
+        &--uploaded {
+            .add-lesson-popup__upload-image {
+                border: none;
+                background: #09AB14;
+                overflow: auto;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-position: center;
+                    object-fit: cover;
+                    border-radius: 4px;
+                }
+            }
+        }
+    }
+
+    &__upload-actions {
+        position: absolute;
+        right: 0;
+        display: flex;
+        align-items: center;
+        padding-right: 10px;
+        top: 0;
+        height: 100%;
+        z-index: 2;
+        pointer-events: none;
+
+        button {
+            border-radius: 50%;
+            padding: 7px;
+            margin: 3px;
+            outline: none;
+            border: none;
+            background-color: transparent;
+            font-size: 0;
+            transition: background-color .25s, box-shadow .25s;
+            box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+            pointer-events: all;
+
+            &:hover {
+                background-color: rgba(10, 171, 20, 0.1);
+            }
+
+            &:focus {
+                box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+            }
+        }
+
+        img {
+            vertical-align: top;
+        }
+    }
+
+    &__upload-image {
+        left: 8px;
+        top: 8px;
+        position: absolute;
+        border: 1px dashed #0AAB14;
+        box-sizing: border-box;
+        border-radius: 5px;
+        width: 56px;
+        height: calc(100% - 16px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2;
+        pointer-events: none;
+
+        img {
+            vertical-align: top;
+            width: 30px;
+            user-select: none;  
+        }
+
+        span {
+            font-family: Hind Vadodara;
+            font-style: normal;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 21px;
+            color: #fff;
+            position: absolute;
+        }
+    }
+
+    &__upload-title {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 21px;
+        margin: 3px 0 4px 0;    
+        color: #0AAB14;
+        display: block;
+        user-select: none;
+        position: relative;
+        z-index: 2;
+        pointer-events: none;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    &__upload-formats {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 12px;
+        line-height: 18px;
+        color: #888888;
+        display: block;
+        user-select: none;
+        margin-bottom: 10px;
+        position: relative;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    &__input-price {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        input {
+            padding: 0 14px 0 44px;
+            height: 45px;
+            border: 1px solid #DDDDDD;
+            border-radius: 3px;
+            box-sizing: border-box;
+            font-family: Hind Vadodara;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 16px;
+            line-height: 24px;
+            color: #444444;
+            box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+            transition: box-shadow .25s;
+            outline: none;
+            margin: -1px;
+            width: 133px;
+
+            &::placeholder {
+                color: #AAAAAA;
+            }
+
+            &:focus {
+                box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+            }
+        }
+
+        &::before {
+            content: "$";
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-family: Hind Vadodara;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 16px;
+            line-height: 24px;
+            color: #444444;
+            opacity: 0.5;
+            background: #EEEEEE;
+            border-right: 1px solid #DDDDDD;
+            box-sizing: border-box;
+            border-radius: 2px 0px 0px 2px;
+            width: 30px;
+            height: 43px;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+        }
+    }
+
+    &__input-price-info {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 21px;
+        color: #444444;
+        margin-left: 14px;
+    }
+
+    &__input-desc {
+        padding: 10px 14px;
+        box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+        transition: box-shadow .25s;
+        outline: none;
+        border: 1px solid #DDDDDD;
+        box-sizing: border-box;
+        border-radius: 3px;
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        color: #444;
+        width: 100%;
+        height: 70px;
+        resize: none;
+
+        &::placeholder {
+            color: #AAAAAA;
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+        }
+    }
+
+    &__input-text {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 24px;
+        color: #444444;
+        padding: 10px 14px 11px 14px;
+        border: 1px solid #DDDDDD;
+        box-sizing: border-box;
+        border-radius: 3px;
+        box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+        transition: box-shadow .25s;
+        outline: none;
+
+        &::placeholder {
+            color: #AAAAAA;
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+        }
+    }
+
+    &__note {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 21px;
+        color: #444444;
+        margin: 20px 0 5px;
+        display: block;
+    }
+}

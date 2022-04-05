@@ -1,0 +1,289 @@
+.calendar-input-where-tab {
+    &__header {
+        padding: 24px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__heading {
+        font-family: Poppins;
+        margin: 0;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 18px;
+        line-height: 27px;
+        color: #333333;
+    }
+
+    &__loading {
+        margin-bottom: 60px;
+    }
+
+    &__switch-virtual {
+        border: none;
+        background: #f4f4f4;
+        border-radius: 30px;
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 20px;
+        color: #444444;
+        padding: 9px 15px;
+        outline: none;
+        box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+        transition: box-shadow .25s;
+
+        &:hover {
+            background: linear-gradient(180deg, #11cf13 0%, #01bd00 100%);
+            color: #fff;
+        }
+
+        &:hover, &:focus {
+            box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+        }
+    }
+
+    &__explore-nearby {
+        display: flex;
+        padding: 15px 40px;
+        border: none;
+        background: #F4F4F4;
+        width: 100%;
+        align-items: center;
+        outline: none;
+        box-shadow: inset 0 0 0 0 rgba(138, 218, 0, 0.5);
+        transition: box-shadow .25s;
+        margin-bottom: 290px;
+
+        &:focus {
+            box-shadow: inset 0 0 0 4px rgba(138, 218, 0, 0.5);
+        }
+
+        img {
+            background: #DFEFC3;
+            vertical-align: top;
+            margin-right: 20px;
+            padding: 13px;
+            border-radius: 5px;
+        }
+
+        span {
+            font-family: Poppins;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 28px;
+            color: #333333;
+            text-align: left;
+        }
+
+        /deep/ .anim-loader {
+            margin: 0 23px;
+            padding: 0;
+        }
+    }
+
+    &__result {
+        display: flex;
+        width: 100%;
+        padding: 4px 40px;
+        outline: none;
+        background: none;
+        border: none;
+        align-items: center;
+
+        &:hover, &:focus {
+            background: #f4f4f4;
+
+            .calendar-input-where-tab__pin {
+                background: #fff;
+            }
+        }
+    }
+
+    &__pin {
+        background: #f4f4f4;
+        border-radius: 5px;
+        vertical-align: top;
+        padding: 6px;
+        margin-right: 12px;
+    }
+
+    &__name {
+        width: 40%;
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 24px;
+        color: #222222;
+        width: 30%;
+        text-align: left;
+    }
+
+    &__count {
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 24px;
+        color: #aaaaaa;
+        flex: 1;
+        text-align: left;
+
+        a {
+            color: #0aab14;
+            font-weight: 600;
+        }
+    }
+
+    &__empty {
+        font-family: Poppins;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 18px;
+        line-height: 27px;
+        color: #333333;
+        padding: 40px;
+        text-align: center;
+        margin-bottom: 65px;
+    }
+
+    &__more {
+        margin: 28px 40px 30px 40px;
+        display: block;
+        background: #f4f4f4;
+        border-radius: 3px;
+        font-family: Hind Vadodara;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 24px;
+        text-align: center;
+        padding: 8px;
+        color: #0aab14;
+        text-decoration: none;
+        outline: none;
+        box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+        transition: box-shadow .25s;
+
+        &:hover, &:focus {
+            box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+        }
+    }
+
+    &__virtual-blank {
+        height: 417px;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+        margin-top: -33px;
+    }
+
+    &__virtual-blank-content {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+
+        img {
+            max-width: 140px;
+            display: block;
+            margin: 0 auto 8px auto;
+        }
+
+        span {
+            font-family: Hind Vadodara;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 16px;
+            line-height: 24px;
+            color: #dddddd;
+        }
+
+        button {
+            outline: none;
+            font-family: Hind Vadodara;
+            font-style: normal;
+            font-weight: 500;
+            background: none;
+            border: none;
+            padding: none;
+            font-size: 16px;
+            text-align: center;
+            color: #0aab14;
+            text-decoration: underline;
+        }
+    }
+}
+
+@media screen and (max-width: 580px) {
+    .calendar-input-where-tab {
+        &__header {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 20px;
+        }
+
+        &__switch-virtual {
+            margin-top: 15px;
+        }
+
+        &__name {
+            font-family: Hind Vadodara;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 21px;
+            width: 50%;
+        }
+
+        &__count {
+            font-family: Hind Vadodara;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 21px;
+        }
+
+        &__ping {
+            margin-right: 8px;
+        }
+
+        &__more {
+            margin: 18px 20px 20px 20px;
+        }
+
+        &__result {
+            padding: 4px 20px;
+        }
+
+        &__virtual-blank {
+            height: 290px;
+        }
+
+        &__virtual-blank-content {
+            img {
+                width: 90px;
+                height: 90px;
+            }
+
+            span {
+                font-family: Hind Vadodara;
+                font-style: normal;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 21px;
+            }
+
+            button {
+                font-family: Hind Vadodara;
+                font-style: normal;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 21px;
+            }
+        }
+    }
+}
