@@ -31,21 +31,21 @@ class ContactUsAPIController extends AppBaseController
 		$this->userRepository = $userRepository;
 	}
 
-	public function becomeInstructor(Request $request)
-	{
-		$guest_email = $request->input('email');
+    public function becomeInstructor(Request $request)
+    {
+        $guest_email = $request->input('email');
 
-		if (!$guest_email) {
-			return $this->sendError('Please, enter valid email');
-		}
+        if (!$guest_email) {
+            return $this->sendError('Please, enter valid email');
+        }
 
-		$administrators = $this->userRepository->getAdministrators();
-		foreach ($administrators as $administrator) {
-			$administrator->notify(new GuestBecomeInstructor($guest_email));
-		}
+        (new User)->forceFill([
+            'name' => 'Their name',
+            'email' => 'louis@skillective.com',
+        ])->notify(new GuestBecomeInstructor($guest_email));
 
-		$this->sendResponse('ok');
-	}
+        $this->sendResponse('ok');
+    }
 
 	public function send(ContactUsAPIRequest $request)
 	{
