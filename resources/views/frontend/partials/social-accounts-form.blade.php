@@ -30,7 +30,7 @@ if (isset($currentUser->social)){
         {{--</div>--}}
     {{--@endif--}}
 
-    <p class="login-box-msg mb-1">Social media accounts</p>
+    <p class="login-box-msg mb-1">Enable login through Facebook and Google</p>
     @if ($facebookAccount)
         <div class="form-group">
             <form method="post" action="{{ route('social.detach',['provider' => 'facebook']) }}" id="detach-facebook">
