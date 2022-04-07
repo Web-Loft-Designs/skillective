@@ -49,7 +49,7 @@ class InstagramLoader
     {
 		$ownMedia = [];
         try{
-			$url = sprintf('https://graph.instagram.com/me/media?fields=thumbnail_url,media_url,media_type&access_token=%s', $accessToken);
+			$url = sprintf('https://graph.instagram.com/me/media?limit=100&fields=thumbnail_url,media_url,media_type&access_token=%s', $accessToken);
 			$mediaList = $this->_makeRequest($url); // [{media_url, media_type, id}]
 			if (isset($mediaList->data) && is_array($mediaList->data)){
 				Log::channel('instagram')->info("Response Media List", $mediaList->data);
