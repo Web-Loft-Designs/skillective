@@ -73,7 +73,7 @@ class User extends Authenticatable implements HasMedia, Transformable
 		'submerchantStatusChanged'
 	];
 
-    public function scopeSearchFromNameInstagram($query, $searchString)
+    public function scopeSearch($query, $searchString)
     {
         return $query->where(function ($query) use ($searchString) {
             $query->where('first_name', 'LIKE', $searchString . '%');

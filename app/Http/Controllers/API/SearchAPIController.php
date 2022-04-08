@@ -14,6 +14,7 @@ class SearchAPIController extends AppBaseController
 {
     public function autocompleteInstructor(Request $request)
     {
+
         $searchString = $request->input('instructor');
 
         if (!$searchString) {
@@ -25,16 +26,18 @@ class SearchAPIController extends AppBaseController
         $result = User::leftJoin("profiles", 'users.id', '=', "profiles.user_id");
 
         foreach($searchStringArr as $searchString) {
-            $result->searchFromNameInstagram($searchString);
+            $result->search($searchString);
         }
 
         $result = $result->whereHas(
-            'roles',
-            function ($q) {
-                $q->where('name', USER::ROLE_INSTRUCTOR);
-            }
-        )
+                'roles',
+                function ($q) {
+                    $q->where('name', USER::ROLE_INSTRUCTOR);
+                }
+            )
             ->with(['roles'])->get();
+
+
 
         return $this->sendResponse($result);
     }
@@ -106,7 +109,7 @@ class SearchAPIController extends AppBaseController
 
 
 
-        // TODO
+        // TODO 
         // Use another function to get users from city count
 
         foreach ($result as $key => $value) {
