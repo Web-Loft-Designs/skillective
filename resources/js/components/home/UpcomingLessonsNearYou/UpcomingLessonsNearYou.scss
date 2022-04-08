@@ -28,7 +28,7 @@
         outline: none;
     }
 
-    /deep/ .slick-slider {
+    >>> .slick-slider {
         padding: 0 60px;
         position: relative;
         max-width: 1340px;
@@ -288,7 +288,7 @@
     .upcoming-lessons-near-you {
         padding: 40px 30px 48px 30px;
 
-        /deep/ .slick-slider {
+        >>> .slick-slider {
             padding: 0;
 
             .slick-arrow {

@@ -79,7 +79,7 @@
             text-align: left;
         }
 
-        /deep/ .anim-loader {
+        >>> .anim-loader {
             margin: 0 23px;
             padding: 0;
         }

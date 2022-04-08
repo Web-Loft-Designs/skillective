@@ -14,11 +14,11 @@
   }
 
   &--show-map {
-    /deep/ .lesson {
+    >>> .lesson {
       width: calc(50% - 44px);
     }
   }
-  
+
   &__container {
     padding: 110px 0 0 0;
     display: flex;
@@ -88,7 +88,7 @@
       margin-right: 10px;
     }
 
-    & /deep/ .select-with-search {
+    & >>> .select-with-search {
       width: 160px;
     }
   }
@@ -134,7 +134,7 @@
         z-index: 1;
       }
 
-      /deep/ .lesson {
+      >>> .lesson {
         width: calc(33.3% - 20px);
       }
 
@@ -174,7 +174,7 @@
     margin-top: 277px;
 
     &--show-map {
-      /deep/ .lesson {
+      >>> .lesson {
         width: calc(50% - 28px);
       }
     }
@@ -201,7 +201,7 @@
     }
 
     &--show-map {
-      /deep/ .lesson {
+      >>> .lesson {
         width: 100%;
       }
     }
@@ -213,7 +213,7 @@
     &__header {
       flex-direction: column;
 
-      /deep/ .green-toggle {
+      >>> .green-toggle {
         justify-content: space-between;
       }
     }
