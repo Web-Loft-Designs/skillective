@@ -14,28 +14,27 @@ class SearchAPIController extends AppBaseController
 {
     public function autocompleteInstructor(Request $request)
     {
-
         $searchString = $request->input('instructor');
 
         if (!$searchString) {
             return $this->sendError("instructor query param is requrid", 400);
         }
 
-        $result = User::leftJoin("profiles", 'users.id', '=', "profiles.user_id")
-            ->where(function ($query) use ($searchString) {
-                $query->where('profiles.instagram_handle', 'LIKE', $searchString . '%');
-                $query->orWhere('first_name', 'LIKE', $searchString . '%');
-                $query->orWhere('last_name', 'LIKE', $searchString . '%');
-            })
-            ->whereHas(
-                'roles',
-                function ($q) {
-                    $q->where('name', USER::ROLE_INSTRUCTOR);
-                }
-            )
+        $searchStringArr = preg_split('/\s+/', $searchString, -1, PREG_SPLIT_NO_EMPTY);
+
+        $result = User::leftJoin("profiles", 'users.id', '=', "profiles.user_id");
+
+        foreach($searchStringArr as $searchString) {
+            $result->searchFromNameInstagram($searchString);
+        }
+
+        $result = $result->whereHas(
+            'roles',
+            function ($q) {
+                $q->where('name', USER::ROLE_INSTRUCTOR);
+            }
+        )
             ->with(['roles'])->get();
-
-
 
         return $this->sendResponse($result);
     }
@@ -107,7 +106,7 @@ class SearchAPIController extends AppBaseController
 
 
 
-        // TODO 
+        // TODO
         // Use another function to get users from city count
 
         foreach ($result as $key => $value) {
