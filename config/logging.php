@@ -45,6 +45,11 @@ return [
 			'path' => storage_path('logs/braintree.log'),
 		],
 
+        'twilio' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/twilio.log'),
+        ],
+
 		'instagram' => [
 			'driver' => 'single',
 			'path' => storage_path('logs/instagram.log'),

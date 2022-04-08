@@ -219,7 +219,7 @@ function getCityValidationRules($request)
 function getCityValidationMessages()
 {
 	return [
-		'city.is_real_city_in_us'			=> "Wrong City name or City State"
+		'city.is_real_city_in_us' => "Wrong City name or City State"
 	];
 }
 
