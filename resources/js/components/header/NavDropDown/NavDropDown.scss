@@ -40,8 +40,8 @@
 
         &::after {
             content: "";
-            width: 0; 
-            height: 0; 
+            width: 0;
+            height: 0;
             border-left: 5px solid transparent;
             border-right: 5px solid transparent;
             border-top: 5px solid #888;
@@ -61,7 +61,7 @@
             padding: 0;
             outline: none;
 
-            &:focus /deep/ .profile-menu__image, &:hover /deep/ .profile-menu__image {
+            &:focus >>> .profile-menu__image, &:hover >>> .profile-menu__image {
                 box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
             }
         }
@@ -85,7 +85,7 @@
         right: 5px;
         top: 36px;
 
-        /deep/ li {
+        >>> li {
             border-bottom: 1px solid #E4E4E4;
 
             a {
@@ -102,7 +102,7 @@
                 outline: none;
                 box-shadow: inset 0 0 0 0 rgba(138, 218, 0, 0.5);
                 transition: box-shadow .25s, color .25s;
-    
+
                 &:hover {
                     color: #0AAB14;
                 }

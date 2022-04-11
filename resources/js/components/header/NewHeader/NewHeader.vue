@@ -3,22 +3,22 @@
     'new-header': true,
     'new-header--no-shadow': noShadow,
   }">
-    <a href="/" class="new-header__logo">
-      <img :src="logoSrc || 'images/logo.png'" />
-      <span>** Stay tuned for full platform & App launch fall 2021</span>
+    <a href='/' class='new-header__logo'>
+      <img :src="'images/logo-old.png'" />
+      <!--      <span>** Stay tuned for full platform & App launch fall 2021</span>-->
     </a>
-    <div class="new-header__slot-center">
-      <slot name="center"></slot>
+    <div class='new-header__slot-center'>
+      <slot name='center'></slot>
     </div>
-    <div class="new-header__slot-right">
-      <slot name="right"></slot>
+    <div class='new-header__slot-right'>
+      <slot name='right'></slot>
     </div>
   </header>
 </template>
 
 <script>
 export default {
-  name: "NewHeader",
+  name: 'NewHeader',
   data() {
     return {
       noShadow: false,
@@ -29,12 +29,12 @@ export default {
   },
   methods: {
     setNoShadow(b) {
-      this.noShadow = b;
-    }
-  }
+      this.noShadow = b
+    },
+  },
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang='scss' scoped>
 @import "./NewHeader.scss";
 </style>

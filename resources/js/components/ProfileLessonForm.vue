@@ -98,8 +98,10 @@
               class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
               :class="{ 'has-error': errors.date }"
             >
+
               <label>Date from </label>
               <!--<datepicker :monday-first="false" :typeable="true" :input-class="'mask-input'" v-model="fields.date" name="date" :placeholder="'mm/dd/yyyy'" :format="'MM/dd/yyyy'"></datepicker>-->
+
               <dropdown-datepicker
                 v-if='isDateInputInit'
                 display-format='mdy'
@@ -113,6 +115,7 @@
 
               <span class='help-block' v-if='errors.date'>
                 <strong>{{errors.date[0]}}</strong>
+
               </span>
             </div>
 
@@ -927,6 +930,7 @@ export default {
     this.$root.$on('lessonUpdateInit', (lesson) => {
       const parser = new DOMParser()
       const currentLocation = parser.parseFromString(lesson.location, 'text/html').body.textContent
+
       this.fields = {
         id: lesson.id,
         genre: lesson.genre_id,
@@ -943,6 +947,7 @@ export default {
         description: lesson.description,
         count_booked: lesson.count_booked,
       }
+
       this.isDateInputInit = true
 
       setTimeout(() => {
