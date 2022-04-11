@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\Lesson;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Genre;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class SearchAPIController extends AppBaseController
 {
@@ -19,6 +20,19 @@ class SearchAPIController extends AppBaseController
         if (!$searchString) {
             return $this->sendError("instructor query param is requrid", 400);
         }
+
+        $result = User::leftJoin("profiles", 'users.id', '=', "profiles.user_id")
+            ->where(function ($query) use ($searchString) {
+                $query->where('profiles.instagram_handle', 'LIKE', $searchString . '%');
+                $query->orWhere('first_name', 'LIKE', $searchString . '%');
+                $query->orWhere('last_name', 'LIKE', $searchString . '%');
+            })
+            ->whereHas(
+                'roles',
+                function ($q) {
+                    $q->where('name', USER::ROLE_INSTRUCTOR);
+                }
+            )->with(['roles'])->get();
 
         $searchStringArr = preg_split('/\s+/', $searchString, -1, PREG_SPLIT_NO_EMPTY);
 
@@ -49,84 +63,48 @@ class SearchAPIController extends AppBaseController
             return $this->sendError("genre query param is requrid", 400);
         }
 
-        $result = Genre::where('title', 'LIKE', $searchString . '%')
-            ->get();
-
+        $result = Genre::where('title', 'LIKE', $searchString . '%')->get();
 
         return $this->sendResponse($result);
     }
 
     public function autocompleteLocations(Request $request)
     {
-
         $searchString = $request->input('location');
-
-        if (!$searchString) {
-            return $this->sendError("genre query param is requrid", 400);
-        }
-
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s');
 
-        $result = DB::table('lessons')->select(["city", DB::raw("count(city) as city_count")])->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) <= lessons.start")->where('lesson_type', 'in_person')->where('city', 'LIKE',  $searchString . '%')->groupBy('city')->get();
-
-
-        $result = json_decode(json_encode($result), true);
-
-        $instructorsCity = User::leftJoin("profiles", 'users.id', '=', "profiles.user_id")
-            ->select(['users.id', 'profiles.city', 'profiles.user_id'])
-            ->whereHas(
-                'roles',
-                function ($q) {
-                    $q->where('name', USER::ROLE_INSTRUCTOR);
-                }
-            )
-            ->where('status', 'active')
-            ->where('profiles.city', 'LIKE', '%' . $searchString . '%')
-            ->get();
-
-
-        $instructorsCity = json_decode(json_encode($instructorsCity), true);
-
-
-
-        foreach ($instructorsCity as $key => $value) {
-
-
-            $citys = array_column($result, 'city');
-
-
-            $isExist = array_search($value['profile']['city'], $citys);
-
-            if ($isExist === 0 || $isExist > 0) {
-            } else {
-
-                array_push($result, array('city' => $value['profile']['city'], 'city_count' => 0));
-            }
+        if (!$searchString) {
+            return $this->sendError("location query param is requrid", 400);
         }
 
+        $countLessons = Lesson::where('lesson_type', 'in_person')
+            ->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) <= lessons.start")
+            ->where('city', 'LIKE',  $searchString . '%')
+            ->groupBy('city')
+            ->count();
 
+        $countInstructorLive = User::where('status', 'active')
+            ->whereHas('roles', function ($q) {
+                $q->where('name', USER::ROLE_INSTRUCTOR);
+            })
+            ->whereHas('profile', function ($q) use ($searchString) {
+                $q->where('city', 'LIKE', '%' . $searchString . '%');
+            })
+            ->count();
 
-        // TODO
-        // Use another function to get users from city count
+        $countInstructorWork = User::where('status', 'active')
+            ->whereHas('roles', function ($q) {
+                $q->where('name', USER::ROLE_INSTRUCTOR);
+            })
+            ->whereHas('lessons', function ($q) use ($searchString) {
+                $q->where('city', 'LIKE', '%' . $searchString . '%');
+            })
+            ->count();
 
-        foreach ($result as $key => $value) {
-
-            $instrucotrsCount = User::leftJoin("profiles", 'users.id', '=', "profiles.user_id")
-                ->select(['users.id', 'profiles.city', 'profiles.user_id'])
-                ->whereHas(
-                    'roles',
-                    function ($q) {
-                        $q->where('name', USER::ROLE_INSTRUCTOR);
-                    }
-                )
-                ->where('status', 'active')
-                ->where('profiles.city', $value['city'])
-                ->groupBy('profiles.city')
-                ->count();
-
-            $result[$key]['instructors_count'] = $instrucotrsCount;
-        }
-
-        return $this->sendResponse($result);
+        return $this->sendResponse([
+            'city' => $searchString,
+            'city_count' => $countLessons,
+            'instructors_count' => $countInstructorLive + $countInstructorWork,
+        ]);
     }
 }
