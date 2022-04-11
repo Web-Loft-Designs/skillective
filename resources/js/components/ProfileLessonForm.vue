@@ -98,7 +98,10 @@
               class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
               :class="{ 'has-error': errors.date }"
             >
-              <label>Date</label>
+
+              <label>Date from </label>
+              <!--<datepicker :monday-first="false" :typeable="true" :input-class="'mask-input'" v-model="fields.date" name="date" :placeholder="'mm/dd/yyyy'" :format="'MM/dd/yyyy'"></datepicker>-->
+
               <dropdown-datepicker
                 v-if='isDateInputInit'
                 display-format='mdy'
@@ -112,6 +115,45 @@
 
               <span class='help-block' v-if='errors.date'>
                 <strong>{{errors.date[0]}}</strong>
+
+              </span>
+            </div>
+
+            <div class='col-12 form-group has-feedback'>
+              <toggle-button
+                :value='isOvernight'
+                :color="{ checked: '#a94442', unchecked: '#01bd00' }"
+                :sync='true'
+                :labels="{
+                  checked: 'Disable overnight',
+                  unchecked: 'Enable overnight',
+                }"
+                @change='toggleOvernight'
+                :font-size='14'
+                :height='38'
+                :width='186'
+              />
+            </div>
+
+            <div
+              class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
+              :class="{ 'has-error': errors.date }"
+              v-if='isOvernight'
+            >
+              <label>Date to</label>
+              <dropdown-datepicker
+                v-if='isDateInputInit'
+                display-format='mdy'
+                v-model='fields.date_to'
+                submit-format='yyyy-mm-dd'
+                key='sombun5'
+                ref='datepickerTo'
+                :minYear='2021'
+                maxDate='2030-01-01'
+              ></dropdown-datepicker>
+
+              <span class='help-block' v-if='errors.date_to'>
+                <strong>{{errors.date_to[0]}}</strong>
               </span>
             </div>
             <div
@@ -886,7 +928,8 @@ export default {
     })
 
     this.$root.$on('lessonUpdateInit', (lesson) => {
-      let currentLocation = lesson.location.replace(/<br\s*[\/]?>/gi, '\n')
+      const parser = new DOMParser()
+      const currentLocation = parser.parseFromString(lesson.location, 'text/html').body.textContent
 
       this.fields = {
         id: lesson.id,
