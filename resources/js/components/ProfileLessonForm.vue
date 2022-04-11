@@ -99,7 +99,7 @@
               :class="{ 'has-error': errors.date }"
             >
 
-              <label>Date from </label>
+              <label>Date</label>
               <!--<datepicker :monday-first="false" :typeable="true" :input-class="'mask-input'" v-model="fields.date" name="date" :placeholder="'mm/dd/yyyy'" :format="'MM/dd/yyyy'"></datepicker>-->
 
               <dropdown-datepicker
@@ -119,21 +119,21 @@
               </span>
             </div>
 
-            <div class='col-12 form-group has-feedback'>
-              <toggle-button
-                :value='isOvernight'
-                :color="{ checked: '#a94442', unchecked: '#01bd00' }"
-                :sync='true'
-                :labels="{
-                  checked: 'Disable overnight',
-                  unchecked: 'Enable overnight',
-                }"
-                @change='toggleOvernight'
-                :font-size='14'
-                :height='38'
-                :width='186'
-              />
-            </div>
+            <!--            <div class='col-12 form-group has-feedback'>-->
+            <!--              <toggle-button-->
+            <!--                :value='isOvernight'-->
+            <!--                :color="{ checked: '#a94442', unchecked: '#01bd00' }"-->
+            <!--                :sync='true'-->
+            <!--                :labels="{-->
+            <!--                  checked: 'Disable overnight',-->
+            <!--                  unchecked: 'Enable overnight',-->
+            <!--                }"-->
+            <!--                @change='toggleOvernight'-->
+            <!--                :font-size='14'-->
+            <!--                :height='38'-->
+            <!--                :width='186'-->
+            <!--              />-->
+            <!--            </div>-->
 
             <div
               class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
