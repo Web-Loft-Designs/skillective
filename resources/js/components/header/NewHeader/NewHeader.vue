@@ -4,7 +4,7 @@
     'new-header--no-shadow': noShadow,
   }">
     <a href='/' class='new-header__logo'>
-      <img :src="'images/logo-old.png'" />
+      <img :src="logoSrc || 'images/logo.png'" />
       <!--      <span>** Stay tuned for full platform & App launch fall 2021</span>-->
     </a>
     <div class='new-header__slot-center'>
