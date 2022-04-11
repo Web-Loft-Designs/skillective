@@ -21,19 +21,6 @@ class SearchAPIController extends AppBaseController
             return $this->sendError("instructor query param is requrid", 400);
         }
 
-        $result = User::leftJoin("profiles", 'users.id', '=', "profiles.user_id")
-            ->where(function ($query) use ($searchString) {
-                $query->where('profiles.instagram_handle', 'LIKE', $searchString . '%');
-                $query->orWhere('first_name', 'LIKE', $searchString . '%');
-                $query->orWhere('last_name', 'LIKE', $searchString . '%');
-            })
-            ->whereHas(
-                'roles',
-                function ($q) {
-                    $q->where('name', USER::ROLE_INSTRUCTOR);
-                }
-            )->with(['roles'])->get();
-
         $searchStringArr = preg_split('/\s+/', $searchString, -1, PREG_SPLIT_NO_EMPTY);
 
         $result = User::leftJoin("profiles", 'users.id', '=', "profiles.user_id");
@@ -47,16 +34,13 @@ class SearchAPIController extends AppBaseController
             function ($q) {
                 $q->where('name', USER::ROLE_INSTRUCTOR);
             }
-        )
-            ->with(['roles'])->get();
+        )->with(['roles'])->get();
 
         return $this->sendResponse($result);
     }
 
-
     public function autocompleteGenres(Request $request)
     {
-
         $searchString = $request->input('genre');
 
         if (!$searchString) {
