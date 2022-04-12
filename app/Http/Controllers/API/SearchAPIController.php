@@ -66,28 +66,28 @@ class SearchAPIController extends AppBaseController
             ->groupBy('city')
             ->count();
 
-        $countInstructorLive = User::where('status', 'active')
+        $countInstructor = User::where('status', 'active')
             ->whereHas('roles', function ($q) {
                 $q->where('name', USER::ROLE_INSTRUCTOR);
             })
-            ->whereHas('profile', function ($q) use ($searchString) {
-                $q->where('city', 'LIKE', '%' . $searchString . '%');
+            ->where(function($q) use ($searchString) {
+                $q->whereHas('profile', function ($q) use ($searchString) {
+                    $q->where('city', 'LIKE', '%' . $searchString . '%');
+                })
+                ->orWhereHas('lessons', function ($q) use ($searchString) {
+                    $q->where('city', 'LIKE', '%' . $searchString . '%');
+                });
             })
+            ->groupBy('id')
             ->count();
 
-        $countInstructorWork = User::where('status', 'active')
-            ->whereHas('roles', function ($q) {
-                $q->where('name', USER::ROLE_INSTRUCTOR);
-            })
-            ->whereHas('lessons', function ($q) use ($searchString) {
-                $q->where('city', 'LIKE', '%' . $searchString . '%');
-            })
-            ->count();
+        dump('Lesson: ' . $countLessons);
+        dd('Instruct: ' . $countInstructor);
 
         return $this->sendResponse([
             'city' => $searchString,
             'city_count' => $countLessons,
-            'instructors_count' => $countInstructorLive + $countInstructorWork,
+            'instructors_count' => $countInstructorLive,
         ]);
     }
 }
