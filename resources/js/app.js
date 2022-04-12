@@ -4,6 +4,8 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+import vuetify from '../../src/plugins/vuetify'
+
 if (typeof Object.assign != "function") {
     Object.assign = function(target) {
         "use strict";
@@ -561,6 +563,7 @@ const slickSingle = (window.slickSingle = {
 var app = new Vue({
     el: "#app",
     store,
+    vuetify,
     directives: { Sticky },
     data() {
         return {
