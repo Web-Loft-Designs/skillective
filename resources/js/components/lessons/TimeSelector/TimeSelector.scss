@@ -1,9 +1,9 @@
 .time-selector {
-  &:focus-within /deep/ input {
+  &:focus-within >>> input {
     box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
   }
 
-  /deep/ input {
+  >>> input {
     width: 100%;
     background: #FFFFFF;
     border: 1px solid #DDDDDD;
@@ -22,15 +22,15 @@
     text-transform: uppercase;
   }
 
-  /deep/ .vue__time-picker {
+  >>> .vue__time-picker {
     width: 100%;
   }
 
-  /deep/ .controls {
+  >>> .controls {
     display: none;
   }
 
-  /deep/ .dropdown {
+  >>> .dropdown {
     width: 100%;
     border: 1px solid #DDDDDD;
     border-radius: 0 0 3px 3px;
@@ -47,7 +47,7 @@
         font-size: 16px;
         line-height: 24px;
         color: #444444;
-        
+
         &.hint {
           font-size: 12px;
           line-height: 18px;
