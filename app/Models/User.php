@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -73,13 +74,21 @@ class User extends Authenticatable implements HasMedia, Transformable
 		'submerchantStatusChanged'
 	];
 
-    public function scopeSearchFromNameInstagram($query, $searchString)
+    /**
+     * @param Builder $query
+     * @param string $searchString
+     *
+     * @return Builder
+     */
+    public function scopeSearchFromNameInstagram(Builder $query, string $searchString): Builder
     {
-        return $query->where(function ($query) use ($searchString) {
-            $query->where('first_name', 'LIKE', $searchString . '%');
-            $query->orWhere('last_name', 'LIKE', $searchString . '%');
-            $query->orWhere('profiles.instagram_handle', 'LIKE', $searchString . '%');
-        });
+        return $query->where(static function (Builder $subQuery) use ($searchString) {
+            $subQuery->where('first_name', 'LIKE', "{$searchString}%")
+                ->orWhere('last_name', 'LIKE', "{$searchString}%")
+                ->orWhereHas('profile', static function (Builder $relationQuery) use ($searchString) {
+                    $relationQuery->where('instagram_handle', 'LIKE', "{$searchString}%");
+                });
+            });
     }
 
 	public function routeNotificationForTwilio()

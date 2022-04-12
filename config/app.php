@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'debug' => env('APP_DEBUG', true),
+    'debug' => env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -267,8 +267,8 @@ return [
 
 		'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 		'BraintreeProcessor' => App\Facades\BraintreeProcessor::class,
-        'InstagramLoader' => App\Facades\InstagramLoader::class,
-        'TwilioVideo' => \App\Facades\TwilioVideo::class
+		'InstagramLoader' => App\Facades\InstagramLoader::class,
+        'TwilioVideo' => \App\Facades\TwilioVideo::class,
     ],
 
 ];
