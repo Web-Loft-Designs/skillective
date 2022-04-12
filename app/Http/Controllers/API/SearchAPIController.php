@@ -16,6 +16,7 @@ class SearchAPIController extends AppBaseController
     public function autocompleteInstructor(Request $request)
     {
         $searchString = $request->input('instructor');
+        $searchString = trim($searchString, '@');
 
         if (!$searchString) {
             return $this->sendError("instructor query param is requrid", 400);
