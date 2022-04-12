@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Lesson;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Genre;
@@ -16,6 +17,7 @@ class SearchAPIController extends AppBaseController
     public function autocompleteInstructor(Request $request)
     {
         $searchString = $request->input('instructor');
+        $searchString = trim($searchString, '@');
 
         if (!$searchString) {
             return $this->sendError("instructor query param is requrid", 400);
@@ -23,18 +25,16 @@ class SearchAPIController extends AppBaseController
 
         $searchStringArr = preg_split('/\s+/', $searchString, -1, PREG_SPLIT_NO_EMPTY);
 
-        $result = User::leftJoin("profiles", 'users.id', '=', "profiles.user_id");
+        $userQuery = User::with(['profile', 'roles']);
 
         foreach($searchStringArr as $searchString) {
-            $result->searchFromNameInstagram($searchString);
+            $userQuery->searchFromNameInstagram($searchString);
         }
 
-        $result = $result->whereHas(
-            'roles',
-            function ($q) {
-                $q->where('name', USER::ROLE_INSTRUCTOR);
-            }
-        )->with(['roles'])->get();
+        $result = $userQuery->whereHas('roles', static function (Builder $query) {
+                $query->where('name', USER::ROLE_INSTRUCTOR);
+            })
+            ->get();
 
         return $this->sendResponse($result);
     }
