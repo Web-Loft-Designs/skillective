@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\Lesson;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Genre;
@@ -57,38 +58,67 @@ class SearchAPIController extends AppBaseController
         $searchString = $request->input('location');
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s');
 
-        if (!$searchString) {
-            return $this->sendError("location query param is requrid", 400);
+        $lessonsCollection = Lesson::select([
+            'instructor_id',
+            'city'
+        ])
+            ->whereRaw("CONVERT_TZ('{$nowOnServer}', 'GMT', lessons.timezone_id) <= lessons.start")
+            ->where('lesson_type', 'in_person')
+            ->where('city', 'LIKE', $searchString . '%')
+            ->get();
+
+        $lessonsCountByCity = $lessonsCollection->groupBy(static function(Lesson $lesson) {
+            return $lesson->city;
+        })
+            ->map
+            ->count();
+
+        $instructorIdsByLessons = $lessonsCollection
+            ->groupBy(static function(Lesson $lesson) {
+                return $lesson->city;
+            })
+            ->map(static function(Collection $lessonCollection) {
+                return $lessonCollection->pluck('instructor_id')->unique();
+            });
+
+        $instructorIdsByCity = User::with('profile')
+            ->select(['id'])
+            ->where('status', 'active')
+            ->whereHas('roles', static function (Builder $subQuery) {
+                $subQuery->where('name', USER::ROLE_INSTRUCTOR);
+            })
+            ->whereHas('profile', static function (Builder $subQuery) use ($searchString) {
+                $subQuery->where('city', 'LIKE', "%{$searchString}%");
+            })
+            ->get()
+            ->groupBy(static function(User $user) {
+                return $user->profile->city;
+            })
+            ->map(static function(Collection $userCollection) {
+                return $userCollection->pluck('id')->unique();
+            });
+
+        $cities = $lessonsCountByCity
+            ->union($instructorIdsByCity)
+            ->keys()
+            ->toArray();
+
+        $result = [];
+        foreach ($cities as $city) {
+            $instructorsCount = count(
+                array_unique(array_merge(
+                    optional($instructorIdsByCity->get($city))->toArray() ?? [],
+                    optional($instructorIdsByLessons->get($city))->toArray() ?? []
+                ))
+            );
+
+            $result[] = [
+                'city' => $city,
+                'city_count' => $lessonsCountByCity->get($city, 0),
+                'instructors_count' => $instructorsCount
+            ];
         }
 
-        $countLessons = Lesson::where('lesson_type', 'in_person')
-            ->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) <= lessons.start")
-            ->where('city', 'LIKE',  $searchString . '%')
-            ->groupBy('city')
-            ->count();
-
-        $countInstructorLive = User::where('status', 'active')
-            ->whereHas('roles', function ($q) {
-                $q->where('name', USER::ROLE_INSTRUCTOR);
-            })
-            ->whereHas('profile', function ($q) use ($searchString) {
-                $q->where('city', 'LIKE', '%' . $searchString . '%');
-            })
-            ->count();
-
-        $countInstructorWork = User::where('status', 'active')
-            ->whereHas('roles', function ($q) {
-                $q->where('name', USER::ROLE_INSTRUCTOR);
-            })
-            ->whereHas('lessons', function ($q) use ($searchString) {
-                $q->where('city', 'LIKE', '%' . $searchString . '%');
-            })
-            ->count();
-
-        return $this->sendResponse([
-            'city' => $searchString,
-            'city_count' => $countLessons,
-            'instructors_count' => $countInstructorLive + $countInstructorWork,
-        ]);
+        return $this->sendResponse($result);
     }
 }
