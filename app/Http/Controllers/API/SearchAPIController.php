@@ -64,7 +64,7 @@ class SearchAPIController extends AppBaseController
         $searchString = $request->input('location');
 
         if (!$searchString) {
-            return $this->sendError("genre query param is requrid", 400);
+            return $this->sendError("location query param is requrid", 400);
         }
 
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s');
