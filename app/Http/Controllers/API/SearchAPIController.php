@@ -56,6 +56,11 @@ class SearchAPIController extends AppBaseController
     public function autocompleteLocations(Request $request)
     {
         $searchString = $request->input('location');
+
+        if (!$searchString) {
+            return $this->sendError("location query param is requrid", 400);
+        }
+
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s');
 
         $lessonsCollection = Lesson::select([
