@@ -12,7 +12,7 @@
         margin: 0 0 20px 0;
     }
 
-    /deep/ .slick-slider {
+    >>> .slick-slider {
         padding: 0 60px;
         position: relative;
         max-width: 1340px;
@@ -40,7 +40,7 @@
             }
 
             &:hover {
-                background-color: #f4f4f4;        
+                background-color: #f4f4f4;
             }
 
             &:focus {
@@ -98,7 +98,7 @@
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.03), 0px 5px 10px rgba(0, 0, 0, 0.05);
         z-index: 1;
     }
-    
+
     &__image {
         width: 120px;
         height: 120px;
@@ -152,7 +152,7 @@
     .featured-instructors {
         padding: 40px 0 116px 0;
 
-        /deep/ .slick-slider {
+        >>> .slick-slider {
             padding: 0;
 
             .slick-arrow {

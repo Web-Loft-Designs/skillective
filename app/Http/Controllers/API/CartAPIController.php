@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
+use App\Http\Requests\API\CheckoutRequest;
 use Illuminate\Http\Request;
 use App\Models\PromoCode;
 use App\Models\Cart;
@@ -150,7 +151,7 @@ class CartAPIController extends AppBaseController
 
         if (Auth::user() == null) {
             $input = $request->except(['payment_method_token', 'payment_method_nonce']);
-            $srr = new StudentRegisterRequest($input);
+            $srr = new CheckoutRequest($input);
             $student = UserRegistrator::registerInactiveStudent($srr);
             $cart = $this->cartRepository->getUserCart(null, json_encode($guest_cart));
         } else {

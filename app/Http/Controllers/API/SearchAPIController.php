@@ -9,15 +9,16 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Genre;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class SearchAPIController extends AppBaseController
 {
     public function autocompleteInstructor(Request $request)
     {
         $searchString = $request->input('instructor');
+        $searchString = trim($searchString, '@');
 
         if (!$searchString) {
             return $this->sendError("instructor query param is requrid", 400);
@@ -25,36 +26,29 @@ class SearchAPIController extends AppBaseController
 
         $searchStringArr = preg_split('/\s+/', $searchString, -1, PREG_SPLIT_NO_EMPTY);
 
-        $result = User::leftJoin("profiles", 'users.id', '=', "profiles.user_id");
+        $userQuery = User::with(['profile', 'roles']);
 
         foreach($searchStringArr as $searchString) {
-            $result->searchFromNameInstagram($searchString);
+            $userQuery->searchFromNameInstagram($searchString);
         }
 
-        $result = $result->whereHas(
-            'roles',
-            function ($q) {
-                $q->where('name', USER::ROLE_INSTRUCTOR);
-            }
-        )
-            ->with(['roles'])->get();
+        $result = $userQuery->whereHas('roles', static function (Builder $query) {
+                $query->where('name', USER::ROLE_INSTRUCTOR);
+            })
+            ->get();
 
         return $this->sendResponse($result);
     }
 
-
     public function autocompleteGenres(Request $request)
     {
-
         $searchString = $request->input('genre');
 
         if (!$searchString) {
             return $this->sendError("genre query param is requrid", 400);
         }
 
-        $result = Genre::where('title', 'LIKE', $searchString . '%')
-            ->get();
-
+        $result = Genre::where('title', 'LIKE', $searchString . '%')->get();
 
         return $this->sendResponse($result);
     }

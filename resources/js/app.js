@@ -31,7 +31,7 @@ import Vue from "vue";
 require("./bootstrap");
 require("url-search-params-polyfill");
 
-window.Vue = require("vue");
+window.Vue = require("vue").default;
 
 import Vuex from 'vuex';
 Vue.use(Vuex);
@@ -75,7 +75,7 @@ Vue.use(ToggleButton);
 import VueHotelDatepicker from "@northwalker/vue-hotel-datepicker";
 
 if (window.jQuery == undefined) {
-    window.jQuery = require("jquery");
+    window.jQuery = require("jquery").default;
 }
 
 import Multiselect from "vue-multiselect";
@@ -106,7 +106,7 @@ Vue.component(VueCountdown.name, VueCountdown);
 // vue extensions
 
 import ReadMore from 'vue-read-more';
- 
+
 Vue.use(ReadMore);
 
 import VCalendar from 'v-calendar';

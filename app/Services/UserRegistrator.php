@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Http\Requests\StudentSmallRegisterRequest;
 use App\Models\User;
 use App\Models\Invitation;
 use App\Models\Profile;
@@ -97,20 +98,20 @@ class UserRegistrator {
 		return $student;
 	}
 
-	// student must finish registration
-	public function registerInactiveStudent(StudentRegisterRequest $request)
-	{
-		$inputData = $request->all();
+    // student must finish registration
+    public function registerInactiveStudent($request)
+    {
+        $inputData = $request->all();
 
-		$pass = Str::random(60);
-		$inputData['password'] = $pass;
-		$inputData['password_confirm'] = $pass;
-		$inputData['finish_registration_token'] = Str::random(60);
+        $pass = Str::random(60);
+        $inputData['password'] = $pass;
+        $inputData['password_confirm'] = $pass;
+        $inputData['finish_registration_token'] = Str::random(60);
 
-		event(new Registered($student = $this->createStudent($inputData, User::STATUS_APPROVED)));
+        event(new Registered($student = $this->createStudent($inputData, User::STATUS_APPROVED)));
 
-		return $student;
-	}
+        return $student;
+    }
 
 	/**
 	 * Create a new user instance after a valid registration.

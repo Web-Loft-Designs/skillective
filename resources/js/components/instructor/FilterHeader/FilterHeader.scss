@@ -52,7 +52,7 @@
     }
 
     &__multiselect {
-        /deep/ .multiselect {
+        >>> .multiselect {
             position: relative;
             color: #333;
 
