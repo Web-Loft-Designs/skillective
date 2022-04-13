@@ -79,14 +79,14 @@ class SearchAPIController extends AppBaseController
             ->get();
 
         $lessonsCountByCity = $lessonsCollection->groupBy(static function(Lesson $lesson) {
-            return $lesson->city;
+            return ucwords($lesson->city);
         })
             ->map
             ->count();
 
         $instructorIdsByLessons = $lessonsCollection
             ->groupBy(static function(Lesson $lesson) {
-                return $lesson->city;
+                return ucwords($lesson->city);
             })
             ->map(static function(Collection $lessonCollection) {
                 return $lessonCollection->pluck('instructor_id')->unique();
