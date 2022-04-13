@@ -3,18 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\NotifyAPIRequest;
-use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
 use App\Http\Controllers\AppBaseController;
-use Response;
-use Auth;
-use Log;
 use App\Notifications\CustomUserNotification;
-use Notification;
 use App\Models\Profile;
-use App\Models\User;
-
-use Twilio\Rest\Client;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 /**
  * Class BookingAPIController
@@ -23,7 +18,6 @@ use Twilio\Rest\Client;
 
 class NotificationsAPIController extends AppBaseController
 {
-
     /** @var  UserRepository */
     private $userRepository;
 
