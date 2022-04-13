@@ -65,7 +65,7 @@ class InstructorFilterByLocationCriteria implements CriteriaInterface
             })
             ->get()
             ->groupBy(static function(User $user) {
-                return $user->profile->city;
+                return ucwords($user->profile->city);
             })
             ->map(static function(Collection $userCollection) {
                 return $userCollection->pluck('id')->unique();
