@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\Lesson;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Genre;
@@ -57,73 +59,73 @@ class SearchAPIController extends AppBaseController
 
     public function autocompleteLocations(Request $request)
     {
-
         $searchString = $request->input('location');
 
         if (!$searchString) {
-            return $this->sendError("genre query param is requrid", 400);
+            return $this->sendError("location query param is requrid", 400);
         }
 
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s');
 
-        $result = DB::table('lessons')->select(["city", DB::raw("count(city) as city_count")])->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) <= lessons.start")->where('lesson_type', 'in_person')->where('city', 'LIKE',  $searchString . '%')->groupBy('city')->get();
-
-
-        $result = json_decode(json_encode($result), true);
-
-        $instructorsCity = User::leftJoin("profiles", 'users.id', '=', "profiles.user_id")
-            ->select(['users.id', 'profiles.city', 'profiles.user_id'])
-            ->whereHas(
-                'roles',
-                function ($q) {
-                    $q->where('name', USER::ROLE_INSTRUCTOR);
-                }
-            )
-            ->where('status', 'active')
-            ->where('profiles.city', 'LIKE', '%' . $searchString . '%')
+        $lessonsCollection = Lesson::select([
+            'instructor_id',
+            'city'
+        ])
+            ->whereRaw("CONVERT_TZ('{$nowOnServer}', 'GMT', lessons.timezone_id) <= lessons.start")
+            ->where('lesson_type', 'in_person')
+            ->where('city', 'LIKE', $searchString . '%')
             ->get();
 
+        $lessonsCountByCity = $lessonsCollection->groupBy(static function(Lesson $lesson) {
+            return $lesson->city;
+        })
+            ->map
+            ->count();
 
-        $instructorsCity = json_decode(json_encode($instructorsCity), true);
+        $instructorIdsByLessons = $lessonsCollection
+            ->groupBy(static function(Lesson $lesson) {
+                return $lesson->city;
+            })
+            ->map(static function(Collection $lessonCollection) {
+                return $lessonCollection->pluck('instructor_id')->unique();
+            });
 
+        $instructorIdsByCity = User::with('profile')
+            ->select(['id'])
+            ->where('status', 'active')
+            ->whereHas('roles', static function (Builder $subQuery) {
+                $subQuery->where('name', USER::ROLE_INSTRUCTOR);
+            })
+            ->whereHas('profile', static function (Builder $subQuery) use ($searchString) {
+                $subQuery->where('city', 'LIKE', "%{$searchString}%");
+            })
+            ->get()
+            ->groupBy(static function(User $user) {
+                return $user->profile->city;
+            })
+            ->map(static function(Collection $userCollection) {
+                return $userCollection->pluck('id')->unique();
+            });
 
+        $cities = $lessonsCountByCity
+            ->union($instructorIdsByCity)
+            ->keys()
+            ->toArray();
 
-        foreach ($instructorsCity as $key => $value) {
+        $result = [];
+        foreach ($cities as $city) {
+            $instructorsCount = count(
+                array_unique(array_merge(
+                    optional($instructorIdsByCity->get($city))->toArray() ?? [],
+                    optional($instructorIdsByLessons->get($city))->toArray() ?? []
+                ))
+            );
 
-
-            $citys = array_column($result, 'city');
-
-
-            $isExist = array_search($value['profile']['city'], $citys);
-
-            if ($isExist === 0 || $isExist > 0) {
-            } else {
-
-                array_push($result, array('city' => $value['profile']['city'], 'city_count' => 0));
-            }
-        }
-
-
-
-        // TODO
-        // Use another function to get users from city count
-
-        foreach ($result as $key => $value) {
-
-            $instrucotrsCount = User::leftJoin("profiles", 'users.id', '=', "profiles.user_id")
-                ->select(['users.id', 'profiles.city', 'profiles.user_id'])
-                ->whereHas(
-                    'roles',
-                    function ($q) {
-                        $q->where('name', USER::ROLE_INSTRUCTOR);
-                    }
-                )
-                ->where('status', 'active')
-                ->where('profiles.city', $value['city'])
-                ->groupBy('profiles.city')
-                ->count();
-
-            $result[$key]['instructors_count'] = $instrucotrsCount;
+            $result[] = [
+                'city' => $city,
+                'city_count' => $lessonsCountByCity->get($city, 0),
+                'instructors_count' => $instructorsCount
+            ];
         }
 
         return $this->sendResponse($result);
