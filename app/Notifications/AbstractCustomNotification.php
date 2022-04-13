@@ -23,13 +23,9 @@ abstract class AbstractCustomNotification extends Notification
      * @var \App\Models\CustomNotification
      */
 	private $customNotification;
-
     protected $content = [];
-
     protected $vars = [];
-
     protected $methods;
-
     protected $notifiable;
 
     /**
@@ -63,6 +59,7 @@ abstract class AbstractCustomNotification extends Notification
     {
         $mailContent    = Placeholders::parse($this->methods['mail']['content'], $this->getVars());
         $this->content['mail'] = $mailContent;
+        $this->content['var'] = $this->getVars();
     }
 
     protected function generateSMSContent()
@@ -132,8 +129,8 @@ abstract class AbstractCustomNotification extends Notification
             ->subject($this->methods['mail']['data']['subject'])
             ->markdown('emails.abstract', [
                 'view' => $this->content['mail'],
-                'first_name' => $notifiable->first_name,
-                'last_name' => $notifiable->last_name,
+                'sender_first_name' => $this->content['var']['sender_first_name'],
+                'sender_last_name' => $this->content['var']['sender_last_name'],
             ]);
     }
 
