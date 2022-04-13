@@ -8,12 +8,12 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Log;
 use NotificationChannels\Twilio\TwilioChannel;
 use Twilio\Rest\Client;
 use App\Channels\WhatsAppChannel;
 use NotificationChannels\Twilio\TwilioSmsMessage;
 use Tylercd100\Placeholders\Facades\Placeholders;
-use Log;
 
 abstract class AbstractCustomNotification extends Notification
 {
@@ -130,7 +130,11 @@ abstract class AbstractCustomNotification extends Notification
 
         return (new MailMessage)
             ->subject($this->methods['mail']['data']['subject'])
-            ->markdown('emails.abstract', ['view' => $this->content['mail']]);
+            ->markdown('emails.abstract', [
+                'view' => $this->content['mail'],
+                'first_name' => $notifiable->first_name,
+                'last_name' => $notifiable->last_name,
+            ]);
     }
 
     public function toTwilio($notifiable)
