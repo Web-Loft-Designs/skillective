@@ -217,11 +217,11 @@ class Lesson extends Model implements Transformable
 
 	public function book($user_repository, $request, $paymentMethodNonce, $student)
 	{
-		
+
 		if(Auth::user() != null){
 			$user_repository->updateUserData(Auth::user()->id, $request);
 		}
-		
+
 
 		if ($paymentMethodNonce) {
 			$device_data = $request->input('device_data', null);
@@ -240,7 +240,7 @@ class Lesson extends Model implements Transformable
 		if (!$paymentMethod) {
 			throw new \Exception('Payment method not found');
 		}
-		
+
 		$booking = new Booking();
 		$booking->lesson_id = $request->input('lesson_id', '');;
 		$booking->special_request	= $request->input('special_request', '');
@@ -251,7 +251,7 @@ class Lesson extends Model implements Transformable
 		$booking->payment_method_token	= $paymentMethod['token'];
 		$booking->payment_method_type	= $paymentMethod['type'];
 
-	
+
 		$service_fee = $booking->getBookingServiceFeeAmount($this->spot_price);
 		$virtual_fee = $booking->getBookingVirtualFeeAmount($this);
 		$booking->service_fee = $service_fee;
@@ -287,7 +287,7 @@ class Lesson extends Model implements Transformable
 				$student->instructors()->attach($this->instructor);
 			}
 		}
-		
+
 		return $booking;
 	}
 
@@ -358,7 +358,27 @@ class Lesson extends Model implements Transformable
 			'timezone_id' => $lessonRequest->timezone_id,
 			'description' => $lessonRequest->instructor_note
 		];
-		
+
 		return $this->create($input);
 	}
+
+    public function getStartLocalTimeAttribute()
+    {
+        return (string) Carbon::createFromFormat('Y-m-d H:i:s', $this->start, $this->timezone_id)
+            ->setTimezone($this->getLocalClientTz());
+    }
+
+    public function getEndLocalTimeAttribute()
+    {
+        return (string) Carbon::createFromFormat('Y-m-d H:i:s', $this->end, $this->timezone_id)
+            ->setTimezone($this->getLocalClientTz());
+    }
+
+    private function getLocalClientTz()
+    {
+        $ip = file_get_contents("http://ipecho.net/plain");
+        $url = 'http://ip-api.com/json/'.$ip;
+        $tz = file_get_contents($url);
+        return json_decode($tz,true)['timezone'];
+    }
 }

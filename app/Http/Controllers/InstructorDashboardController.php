@@ -2,26 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Lesson;
 use App\Repositories\BookingRepository;
 use Illuminate\Http\Request;
-use Auth;
-use Cookie;
 use App\Repositories\LessonRepository;
 use App\Repositories\GenreRepository;
 use App\Repositories\UserRepository;
-use App\Models\Profile;
-use Log;
-use App\Notifications\YouMayBeInterestedInLessonNotification;
-use TwilioVideo;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Log;
 
 class InstructorDashboardController extends Controller
 {
     /**
      * Show the application dashboard.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application|\Illuminate\View\View
      */
     public function index(Request $request, LessonRepository $lessonRepo, GenreRepository $genreRepository, UserRepository $userRepository, BookingRepository $bookingRepository)
     {
@@ -41,13 +36,13 @@ class InstructorDashboardController extends Controller
 				'type' => 'all',
 				'sort' => 'date'
 			]);
- 			
+
 			$lessonRepo->setPresenter("App\\Presenters\\LessonDashboardPresenter");
-			
+
 			$lessons = $lessonRepo->presentResponse($lessonRepo->getDashboardInstructorLessons($request, Auth::user()->id));
 
 		}catch (\Exception $e){
-			
+
 			Log::error('getInstructorBookings : ' . $e->getMessage());
 			$lessons = ['data'=>[]];
 		}
@@ -70,7 +65,7 @@ class InstructorDashboardController extends Controller
 		if($upcomingLessons){
 			$vars['upcomingLessons'] = $upcomingLessons;
 		}
-		
+
         if ($upcomingLesson && Cookie::get('hiddenUpcomingLessonId')!=$upcomingLesson['id']){
 			$vars['upcomingLesson'] = $lessonRepo->presentResponse($upcomingLesson)['data'];
 		}
