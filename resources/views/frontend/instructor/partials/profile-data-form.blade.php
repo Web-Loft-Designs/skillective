@@ -29,7 +29,7 @@
         @endif
         </h2>
         <p><span>{{ $userProfileData['full_name'] }}</span> | <span>
-                {{ $userProfileData['profile']['full_address'] }}
+                {{ $userProfileData['profile']['address'] }}
             </span></p>
         <div class="d-flex align-items-center">
             <p><strong>{{ $userProfileData['total_count_lessons'] }}</strong> Lessons Held</p>
