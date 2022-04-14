@@ -41,14 +41,14 @@ class InstructorFilterByLocationCriteria implements CriteriaInterface
             ->get();
 
         $lessonsCountByCity = $lessonsCollection->groupBy(static function(Lesson $lesson) {
-            return $lesson->city;
+            return ucwords($lesson->city);
         })
             ->map
             ->count();
 
         $instructorIdsByLessons = $lessonsCollection
             ->groupBy(static function(Lesson $lesson) {
-                return $lesson->city;
+                return ucwords($lesson->city);
             })
             ->map(static function(Collection $lessonCollection) {
                 return $lessonCollection->pluck('instructor_id')->unique();
@@ -65,7 +65,7 @@ class InstructorFilterByLocationCriteria implements CriteriaInterface
             })
             ->get()
             ->groupBy(static function(User $user) {
-                return $user->profile->city;
+                return ucwords($user->profile->city);
             })
             ->map(static function(Collection $userCollection) {
                 return $userCollection->pluck('id')->unique();
