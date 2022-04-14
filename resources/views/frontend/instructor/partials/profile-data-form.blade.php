@@ -28,9 +28,10 @@
             <favorite-instructor v-bind:instructor-id="{{ $userProfileData['id'] }}" v-bind:is-favorite="{{ Auth::user()->hasOwnFavoriteInstructor($userProfileData['id']) ? 'true' : 'false' }}"></favorite-instructor>
         @endif
         </h2>
-        <p><span>{{ $userProfileData['full_name'] }}</span> | <span>
-                {{ $userProfileData['profile']['address'] }}
-            </span></p>
+        <p>{{ $userProfileData['full_name'] }} <br/>
+           {{ $userProfileData['profile']['city'] }} <br/>
+           {{ $userProfileData['profile']['state'] }}
+        </p>
         <div class="d-flex align-items-center">
             <p><strong>{{ $userProfileData['total_count_lessons'] }}</strong> Lessons Held</p>
             <?php
