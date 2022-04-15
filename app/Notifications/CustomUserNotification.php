@@ -5,13 +5,9 @@ namespace App\Notifications;
 use App\Models\CustomNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Models\User;
-use Log;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Log;
 use NotificationChannels\Twilio\TwilioChannel;
 use App\Channels\WhatsAppChannel;
-use NotificationChannels\Twilio\TwilioSmsMessage;
-
-//use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Bus\Queueable;
 
 class CustomUserNotification extends AbstractCustomNotification implements ShouldQueue
@@ -19,11 +15,8 @@ class CustomUserNotification extends AbstractCustomNotification implements Shoul
 	use Queueable;
 
 	private $customMessage;
-
 	private $sender;
-
 	private $use_methods;
-
 	public $tries = 1;
 
 	public function __construct($message, $sender, $use_methods)
@@ -52,7 +45,7 @@ class CustomUserNotification extends AbstractCustomNotification implements Shoul
 
 					return $item;
 				})->toArray();
-			//			Log::info('$deliveryChannels', $deliveryChannels);
+			//Log::info('$deliveryChannels', $deliveryChannels);
 			return $deliveryChannels;
 		}
 		return [];
@@ -66,10 +59,6 @@ class CustomUserNotification extends AbstractCustomNotification implements Shoul
 			'sender_last_name'	=> $this->sender->last_name
 		];
 	}
-
-	/**
-	 * @return \App\Models\CustomNotification
-	 */
 
 	protected function getCustomNotificationClass(): CustomNotification
 	{
