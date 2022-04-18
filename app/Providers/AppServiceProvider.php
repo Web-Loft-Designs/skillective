@@ -192,14 +192,14 @@ class AppServiceProvider extends ServiceProvider
 			$request = request()->only($parameters);
 			$timeFrom	= data_get($request, 'time_from');
 			$timeTo = data_get($request, 'time_to');
-			$dateFrom = data_get($request, 'date');
-			$dateTo = data_get($request, 'date_to');
             $lessonId	= (int) data_get($request, 'lesson_id');
             $timezone = data_get($request, 'timezone_id');
-            $start	= Carbon::createFromFormat('Y-m-d H:i:s', "$dateFrom $timeFrom");
-            $end = Carbon::createFromFormat('Y-m-d H:i:s', "$dateTo $timeTo");
 
-            if (!$timeTo || !$timeFrom) return true;
+            if ((!$timeTo || !$timeFrom) || ($timeFrom == 'Invalid date' || $timeTo == 'Invalid date')) return true;
+
+            $start	= Carbon::createFromFormat('Y-m-d H:i:s', $date . ' ' . $timeFrom);
+            $end = Carbon::createFromFormat('Y-m-d H:i:s', $date . ' ' . $timeTo);
+
 			if($timezone) $start->setTimezone($timezone);
             if($timezone) $end->setTimezone($timezone);
 
@@ -209,7 +209,7 @@ class AppServiceProvider extends ServiceProvider
 
 				$userLessons = Auth::user()->lessons()
 					->whereRaw(" ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) ")
-					->whereRaw("DATE(start) = '" . $start->format('Y-m-d') . "'")
+					->whereRaw("DATE(start) = '" . $start . "'")
 					->whereRaw("(
                             (start >= '" . $start . "' AND start < '" . $end . "')
                             OR (end > '" . $start . "' AND end <= '" . $end . "')
