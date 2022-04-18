@@ -30,11 +30,11 @@
                   :key='key'
                   :value='genre.id'
                 >
-                  {{genre.title}}
+                  {{ genre.title }}
                 </option>
               </select>
               <span class='help-block' v-if='errors.genre'>
-                <strong>{{errors.genre[0]}}</strong>
+                <strong>{{ errors.genre[0] }}</strong>
               </span>
             </div>
             <div
@@ -48,17 +48,17 @@
                   :value='lessonTypeName'
                   :key='lessonTypeName'
                 >
-                  {{lessonTypeTitle}}
+                  {{ lessonTypeTitle }}
                 </option>
               </select>
               <span class='help-block' v-if='errors.lesson_type'>
-                <strong>{{errors.lesson_type[0]}}</strong>
+                <strong>{{ errors.lesson_type[0] }}</strong>
               </span>
             </div>
             <div
               class='form-group col-12 has-feedback'
               :class="{ 'has-error': errors.location }"
-              v-if="fields.lesson_type == 'in_person'"
+              v-if="fields.lesson_type === 'in_person'"
             >
               <label>Location</label>
               <input
@@ -70,13 +70,13 @@
                 ref='lessonLocation'
               />
               <span class='help-block' v-if='errors.location'>
-                <strong>{{errors.location[0]}}</strong>
+                <strong>{{ errors.location[0] }}</strong>
               </span>
             </div>
             <div
               class='col-12 form-group has-feedback'
               :class="{ 'has-error': errors.timezone_id }"
-              v-if="fields.lesson_type == 'virtual'"
+              v-if="fields.lesson_type === 'virtual'"
             >
               <label>Time Zone</label>
               <select class='form-control' v-model='fields.timezone_id'>
@@ -86,11 +86,11 @@
                   :value='key'
                   :key='key'
                 >
-                  {{value}}
+                  {{ value }}
                 </option>
               </select>
               <span class='help-block' v-if='errors.timezone_id'>
-                <strong>{{errors.timezone_id[0]}}</strong>
+                <strong>{{ errors.timezone_id[0] }}</strong>
               </span>
             </div>
 
@@ -114,7 +114,7 @@
               ></dropdown-datepicker>
 
               <span class='help-block' v-if='errors.date'>
-                <strong>{{errors.date[0]}}</strong>
+                <strong>{{ errors.date[0] }}</strong>
 
               </span>
             </div>
@@ -153,7 +153,7 @@
               ></dropdown-datepicker>
 
               <span class='help-block' v-if='errors.date_to'>
-                <strong>{{errors.date_to[0]}}</strong>
+                <strong>{{ errors.date_to[0] }}</strong>
               </span>
             </div>
             <div
@@ -175,7 +175,7 @@
                 @open="clearTimepicker('timeFrom')"
               ></vue-timepicker>
               <span class='help-block' v-if='errors.time_from'>
-                <strong>{{errors.time_from[0]}}</strong>
+                <strong>{{ errors.time_from[0] }}</strong>
               </span>
             </div>
 
@@ -198,7 +198,7 @@
               ></vue-timepicker>
 
               <span class='help-block' v-if='errors.time_to'>
-                <strong>{{errors.time_to[0]}}</strong>
+                <strong>{{ errors.time_to[0] }}</strong>
               </span>
             </div>
 
@@ -254,7 +254,7 @@
                 <option value='240'>4 hours</option>
               </select>
               <span class='help-block' v-if='errors.time_interval'>
-                <strong>{{errors.time_interval[0]}}</strong>
+                <strong>{{ errors.time_interval[0] }}</strong>
               </span>
             </div>
 
@@ -264,9 +264,9 @@
               v-if='isTimeIntervals && !fields.id'
             >
               <label> Num </label>
-              <input type='number' disabled class='form-control' :value='num' />
+              <input type='number' disabled class='form-control' :value='num'/>
               <span class='help-block' v-if='numError'>
-                <strong>{{numError}}</strong>
+                <strong>{{ numError }}</strong>
               </span>
             </div>
 
@@ -286,7 +286,7 @@
                 <option value='month'>Monthly</option>
               </select>
               <span class='help-block' v-if='errors.recurrence_frequencies'>
-                <strong>{{errors.recurrence_frequencies[0]}}</strong>
+                <strong>{{ errors.recurrence_frequencies[0] }}</strong>
               </span>
             </div>
 
@@ -305,14 +305,14 @@
                 maxDate='2030-01-01'
               ></dropdown-datepicker>
               <span class='help-block' v-if='errors.recurrence_until'>
-                <strong>{{errors.recurrence_until[0]}}</strong>
+                <strong>{{ errors.recurrence_until[0] }}</strong>
               </span>
             </div>
 
             <div
               class='form-group col-lg-9 col-sm-9 col-12 has-feedback'
               :class="{
-                disabled: fields.count_booked == 1,
+                disabled: fields.count_booked === 1,
                 'has-error': errors.spot_price,
               }"
             >
@@ -326,14 +326,14 @@
                     step='0.01'
                     class='form-control'
                     v-model='fields.spot_price'
-                    :disabled='fields.count_booked == 1'
+                    :disabled='fields.count_booked === 1'
                   />
                 </span>
                 <span class='per-lesson'>Per lesson</span>
               </div>
 
               <span class='maw-200 help-block' v-if='errors.spot_price'>
-                <strong>{{errors.spot_price[0]}}</strong>
+                <strong>{{ errors.spot_price[0] }}</strong>
               </span>
             </div>
 
@@ -342,11 +342,11 @@
               :class="{ 'has-error': errors.spots_count }"
             >
               <span class='private-lesson'>
-                <span v-if='fields.spots_count == 1'>
-                  <img src='../../images/man-user.svg' alt />
+                <span v-if='fields.spots_count === 1'>
+                  <img src='../../images/man-user.svg' alt/>
                 </span>
                 <span v-if='fields.spots_count > 1'>
-                  <img src='../../images/multiple-users-silhouette.svg' alt />
+                  <img src='../../images/multiple-users-silhouette.svg' alt/>
                 </span>
               </span>
               <label>Max students</label>
@@ -354,14 +354,12 @@
                 @input='replaceInput'
                 class='form-control'
                 min='1'
-                max='100'
+                max='50'
                 v-model.number='fields.spots_count'
                 type='number'
               />
-
-              <!--<input type="number" min="1" max="3" step="1" class="form-control" name="spots_count" value="" v-model="fields.spots_count">-->
               <span class='help-block' v-if='errors.spots_count'>
-                <strong>{{errors.spots_count[0]}}</strong>
+                <strong>{{ errors.spots_count[0] }}</strong>
               </span>
             </div>
 
@@ -376,7 +374,7 @@
                 v-model='fields.description'
               ></textarea>
               <span class='help-block' v-if='errors.description'>
-                <strong>{{errors.description[0]}}</strong>
+                <strong>{{ errors.description[0] }}</strong>
               </span>
             </div>
 
@@ -387,9 +385,9 @@
               </span>
             </div>
             <div class='col-12'>
-              <div v-if='errorText' class='has-error'>{{errorText}}</div>
+              <div v-if='errorText' class='has-error'>{{ errorText }}</div>
               <div v-if='successText' class='has-success'>
-                {{successText}}
+                {{ successText }}
               </div>
             </div>
 
@@ -417,7 +415,7 @@
                 v-if='fields.id'
                 class='btn btn-primary btn-block'
                 :class="{
-                  'cancel-lesson': students.length == 0,
+                  'cancel-lesson': students.length === 0,
                 }"
               >
                 Cancel lesson
@@ -430,21 +428,15 @@
   </div>
 </template>
 
-<style>
-.pac-container {
-  z-index: 10000 !important;
-}
-</style>
-
 <script>
 import MaskedInput from 'vue-masked-input'
 import siteAPI from '../mixins/siteAPI.js'
 import skillectiveHelper from '../mixins/skillectiveHelper.js'
 import MagnificPopupModal from './external/MagnificPopupModal'
-
-require('jquery.maskedinput/src/jquery.maskedinput')
 import DropdownDatepicker from 'vue-dropdown-datepicker'
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
+
+require('jquery.maskedinput/src/jquery.maskedinput')
 
 const ct = require('countries-and-timezones')
 
@@ -489,9 +481,6 @@ export default {
     }
   },
   computed: {
-    computedFields: function() {
-      return Object.assign({}, this.fields)
-    },
     num: function() {
       if (
         this.fields.date &&
@@ -546,7 +535,7 @@ export default {
 
   watch: {
     fields: {
-      handler(value, oldValue) {
+      handler(value) {
         if (value.date && (value.date !== value.oldValue) && !this.isOvernight) {
           value.date_to = value.date
         }
@@ -564,19 +553,13 @@ export default {
             }
             if (value.lesson_type === 'in_person') {
               setTimeout(() => {
-                var thisComponent = this
-                var autocomplete = this.initializeLocationField(
-                  this.$refs['lessonLocation'],
+                const autocomplete = this.initializeLocationField(
+                  this.$refs.lessonLocation,
                   ['address'],
                 )
-                google.maps.event.addListener(
-                  autocomplete,
-                  'place_changed',
-                  function(e) {
-                    thisComponent.fields.location =
-                      thisComponent.$refs['lessonLocation'].value
-                  },
-                )
+                google.maps.event.addListener(autocomplete, 'place_changed', () => {
+                  this.fields.location = this.$refs.lessonLocation.value
+                })
               }, 1)
             }
           }
@@ -614,28 +597,6 @@ export default {
     toggleTimeInervals() {
       this.isTimeIntervals = !this.isTimeIntervals
     },
-    toggleOvernight() {
-      this.isOvernight = !this.isOvernight
-
-      setTimeout(() => {
-        if (this.isOvernight) {
-          const tomorrow = new Date()
-          tomorrow.setFullYear(this.$refs.datepicker.year)
-          tomorrow.setMonth(this.$refs.datepicker.month - 1)
-          tomorrow.setDate(this.$refs.datepicker.day)
-          tomorrow.setDate(tomorrow.getDate() + 1)
-
-          this.$refs.datepickerTo.year = tomorrow.getFullYear()
-          this.$refs.datepickerTo.month = tomorrow.getMonth() + 1
-          this.$refs.datepickerTo.day = tomorrow.getDate()
-
-          this.fields.date_to = moment(tomorrow).format('YYYY-MM-DD')
-        } else {
-          if (moment(this.fields.date))
-            this.fields.date_to = moment(this.fields.date).format('YYYY-MM-DD')
-        }
-      }, 1)
-    },
     toggleReccuring() {
       this.isReccuring = !this.isReccuring
     },
@@ -643,11 +604,7 @@ export default {
       this.apiDelete('/api/lesson/' + lesson)
     },
     replaceInput() {
-      if (this.fields.spots_count > 100) {
-        setTimeout(() => {
-          this.fields.spots_count = '100'
-        }, 20)
-      }
+      this.fields.spots_count > 50 && (this.fields.spots_count = 50)
     },
     clearTimepicker(input) {
       if (!input) {
@@ -658,11 +615,9 @@ export default {
       this.$refs[input].minute = ''
       this.$refs[input].apm = ''
     },
-    timeFormChange(e) {
+    timeFormChange() {
       if (moment(this.fields.time_from)) {
-        this.fields.time_to = moment(this.fields.time_from, ['h:mm a'])
-        .add('30', 'minutes')
-        .format('h:mm a')
+        this.fields.time_to = moment(this.fields.time_from, ['h:mm a']).add('30', 'minutes').format('h:mm a')
       }
     },
     onSubmit() {
@@ -711,7 +666,7 @@ export default {
 
       setTimeout(() => {
         if (this.fields.date) {
-          this.isOvernight = this.fields.date != this.fields.date_to
+          this.isOvernight = this.fields.date !== this.fields.date_to
         } else {
           this.isOvernight = false
           this.initDateFrom()
@@ -720,16 +675,16 @@ export default {
 
       this.formGenres = _.cloneDeep(this.userGenres)
       if (this.fields.genre !== null) {
-        var _inFormGenres = false
-        for (var i = 0; i < this.formGenres.length; i++)
-          if (this.fields.genre == this.formGenres[i].id) {
+        let _inFormGenres = false
+        for (let i = 0; i < this.formGenres.length; i++)
+          if (this.fields.genre === this.formGenres[i].id) {
             _inFormGenres = true
             break
           }
 
         if (!_inFormGenres)
-          for (i = 0; i < this.siteGenres.length; i++)
-            if (this.fields.genre == this.siteGenres[i].id) {
+          for (let i = 0; i < this.siteGenres.length; i++)
+            if (this.fields.genre === this.siteGenres[i].id) {
               this.formGenres.push(this.siteGenres[i])
               break
             }
@@ -768,7 +723,7 @@ export default {
       google.maps.event.addListener(
         autocomplete,
         'place_changed',
-        function(e) {
+        function() {
           thisComponent.fields.location = thisComponent.$refs[_ref].value
         },
       )
@@ -776,7 +731,7 @@ export default {
   },
   created: function() {
     this.timeOptions = this.getTimeOptions()
-    const tzs = {
+    this.timeZomeOptions = {
       'America/New_York': 'America/New_York UTC-05:00',
       'America/Indiana/Indianapolis': 'America/Indiana/Indianapolis UTC-05:00',
       'America/Chicago': 'America/Chicago UTC-05:00',
@@ -869,11 +824,6 @@ export default {
       'Pacific/Tongatapu': 'Pacific/Tongatapu UTC+13:00',
       'Pacific/Apia': 'Pacific/Apia UTC+13:00',
     }
-
-    this.timeZomeOptions = tzs
-
-    // window.usTimezones != undefined ? window.usTimezones : [];
-    // getAllTimezones() getTimezonesForCountry('US'); ; example https://www.npmjs.com/package/countries-and-timezones#getalltimezones
     this.formGenres = this.userGenres
     this.lessonTypes =
       window.lessonTypes !== undefined ? window.lessonTypes : []
@@ -979,8 +929,8 @@ export default {
       setTimeout(() => {
         (this.fields.time_to = moment(lesson.end, [
           'YYYY-MM-DD HH:mm:ss',
-        ]).format('h:mm a')),
-          this.openPopup()
+        ]).format('h:mm a'))
+        this.openPopup()
       }, 1)
     })
   },
