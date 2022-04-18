@@ -190,36 +190,38 @@ class AppServiceProvider extends ServiceProvider
 
 		Validator::extend('no_lessons_this_time', function ($attribute, $date, $parameters) {
 			$request = request()->only($parameters);
-			$time_from	= data_get($request, 'time_from');
-			$time_to = data_get($request, 'time_to');
-            $lesson_id	= (int) data_get($request, 'lesson_id');
+			$timeFrom	= data_get($request, 'time_from');
+			$timeTo = data_get($request, 'time_to');
+			$dateFrom = data_get($request, 'date');
+			$dateTo = data_get($request, 'date_to');
+            $lessonId	= (int) data_get($request, 'lesson_id');
             $timezone = data_get($request, 'timezone_id');
-            $start	= \DateTime::createFromFormat('Y-m-d H:i:s', "$date $time_from");
-            $end = \DateTime::createFromFormat('Y-m-d H:i:s', "$date $time_to");
+            $start	= Carbon::createFromFormat('Y-m-d H:i:s', "$dateFrom $timeFrom");
+            $end = Carbon::createFromFormat('Y-m-d H:i:s', "$dateTo $timeTo");
 
-            if (!$time_to || !$time_from) return true;
-			if($timezone) $start->setTimezone(new \DateTimeZone($timezone));
-            if($timezone) $end->setTimezone(new \DateTimeZone($timezone));
+            if (!$timeTo || !$timeFrom) return true;
+			if($timezone) $start->setTimezone($timezone);
+            if($timezone) $end->setTimezone($timezone);
 
 			if ($start && $end) {
-				$start_from	= $start->format('Y-m-d H:i:s');
-				$end_to	= $end->format('Y-m-d H:i:s');
+				$start = $start->format('Y-m-d H:i:s');
+				$end = $end->format('Y-m-d H:i:s');
 
 				$userLessons = Auth::user()->lessons()
 					->whereRaw(" ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) ")
 					->whereRaw("DATE(start) = '" . $start->format('Y-m-d') . "'")
 					->whereRaw("(
-                            (start >= '" . $start_from . "' AND start < '" . $end_to . "')
-                            OR (end > '" . $start_from . "' AND end <= '" . $end_to . "')
-                            OR (start < '" . $start_from . "' AND end > '" . $end_to . "')
+                            (start >= '" . $start . "' AND start < '" . $end . "')
+                            OR (end > '" . $start . "' AND end <= '" . $end . "')
+                            OR (start < '" . $start . "' AND end > '" . $end . "')
                         )");
 
 				$userLessons->whereNull('deleted_at');
 
-				if ($lesson_id) $userLessons->where('id', '!=', $lesson_id);
+				if ($lessonId) $userLessons->where('id', '!=', $lessonId);
 
 				return ($userLessons->count() == 0);
-			} else if(!$time_from || $time_to) {
+			} else if(!$timeFrom || $timeTo) {
                 return true;
             }
 
