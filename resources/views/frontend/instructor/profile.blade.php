@@ -60,9 +60,13 @@ $booking_fees_description = getCurrentPageMetaValue($dashboardPage, 'booking_fee
 
                 <div class="aligner-top row">
                     <div class="card-section-info col-12 col-lg-12 padding-r-30 padding-r-30">
+                        <?php
+                            Log::info($userProfileData)
+                        ?>
                         <instructor-video-lessons
                             :instructor-id="'{{ addslashes($userProfileData['id']) }}'"
-                            :can-book="{{ (!isset($loggedUserRole) || $loggedUserRole==\App\Models\User::ROLE_STUDENT) ? 'true' : 'false' }}"
+                            :can-book="{{ $loggedUserRole==\App\Models\User::ROLE_STUDENT ? 'true' : 'false' }}"
+                            :user-role = "{{ json_encode($loggedUserRole) }}"
                         ></instructor-video-lessons>
                     </div>
                 </div>

@@ -1,6 +1,9 @@
 <template>
   <div class='instructor-video-lessons'>
-    <h2 class='instructor-video-lessons__heading'><a :href="'instructor/my-shop'">{{instructorName}}'s Pre-Recorded Lessons</a></h2>
+    <h2 class='instructor-video-lessons__heading'>
+      <a :href="'/instructor/my-shop'" v-if="userRole==='Instructor'">{{instructorName}}'s Pre-Recorded Lessons</a>
+      <span v-else>{{instructorName}}'s Pre-Recorded Lessons</span>
+    </h2>
     <anim-loader v-if='isLoading' />
     <video-lessons-list
       v-else
@@ -8,7 +11,7 @@
       :collapsed-lessons='collapsedLessons'
       card-button='more-info'
       popup-button='add-to-cart'
-      :logged-in-as-student='loggedInAsStudent'
+      :logged-in-as-student='canBook'
     />
   </div>
 </template>
@@ -36,13 +39,21 @@ export default {
       type: Boolean,
       default: false,
     },
+    canBook: {
+      type: Boolean,
+      default: false,
+    },
+    userRole: {
+      type: String,
+      default: '',
+    },
   },
   created() {
     const arr = window.location.href.split('/')
     this.myProfile = arr[arr.length - 1] === 'profile'
   },
   async mounted() {
-    const lessons = await lessonService.instructorLessonsById(
+    let lessons = await lessonService.instructorLessonsById(
       this.instructorId,
     )
     this.instructorName = lessons[0].instructor.first_name
