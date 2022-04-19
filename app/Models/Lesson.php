@@ -376,9 +376,10 @@ class Lesson extends Model implements Transformable
 
     private function getLocalClientTz()
     {
-        $ip = file_get_contents("http://ipecho.net/plain");
-        $url = 'http://ip-api.com/json/'.$ip;
-        $tz = file_get_contents($url);
-        return json_decode($tz,true)['timezone'];
+//        $ip = file_get_contents("http://ipecho.net/plain");
+//        $url = 'http://ip-api.com/json/'.$ip;
+//        $tz = file_get_contents($url);
+//        return json_decode($tz,true)['timezone'];
+        return 'UTC';
     }
 }
