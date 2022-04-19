@@ -6,6 +6,7 @@
     $dashboardPage = getCurrentPage('instructor/dashboard');
     $booking_fees_description = getCurrentPageMetaValue($dashboardPage, 'booking_fees_description');
     ?>
+
     <div class="profile-section">
         <div class="inner">
             <div class="profile-info">
