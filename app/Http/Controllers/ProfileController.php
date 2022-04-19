@@ -101,7 +101,10 @@ class ProfileController extends Controller
 			'userProfileData'	=> $userData,
 			'siteGenres' => $this->genreRepository->presentResponse($this->genreRepository->getSiteGenres())['data'],
 			'userMedia'	=> $user->getGalleryMedia(),
-			'invitedInstructors' => $invitedInstructors
+			'invitedInstructors' => $invitedInstructors,
+            'authUserIsAdmin' => (Auth::user() && Auth::user()->hasRole('Admin')),
+            'dashboardPage' => getCurrentPage('instructor/dashboard'),
+            'booking_fees_description' => getCurrentPageMetaValue($dashboardPage, 'booking_fees_description'),
 		];
 
 		if(Auth::user()){
