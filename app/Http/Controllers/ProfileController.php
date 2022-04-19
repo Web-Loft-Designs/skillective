@@ -95,6 +95,7 @@ class ProfileController extends Controller
 		$userData['isStudent']			 = !$isInstructor;
 
 		$template = $isInstructor ? 'instructor' : 'student';
+        $dashboardPage = getCurrentPage('instructor/dashboard');
 
 		$vars = [
 			'page_title'		=> ($isInstructor ? 'Instructor': 'Client') . " Profile",
@@ -103,7 +104,7 @@ class ProfileController extends Controller
 			'userMedia'	=> $user->getGalleryMedia(),
 			'invitedInstructors' => $invitedInstructors,
             'authUserIsAdmin' => (Auth::user() && Auth::user()->hasRole('Admin')),
-            'dashboardPage' => getCurrentPage('instructor/dashboard'),
+            'dashboardPage' => $dashboardPage,
             'booking_fees_description' => getCurrentPageMetaValue($dashboardPage, 'booking_fees_description'),
 		];
 
