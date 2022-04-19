@@ -367,10 +367,11 @@
               class='form-group col-12 has-feedback'
               :class="{ 'has-error': errors.description }"
             >
-              <label>Description</label>
+              <label>What I am teaching, offering or sharing</label>
               <textarea
                 class='form-control'
                 name='description'
+                placeholder='provide a description'
                 v-model='fields.description'
               ></textarea>
               <span class='help-block' v-if='errors.description'>

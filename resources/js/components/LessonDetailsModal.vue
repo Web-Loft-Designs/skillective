@@ -1,144 +1,110 @@
 <template>
   <div>
-    <div class="d-flex flex-wrap" v-if="selectedLesson != null">
-      <!-- <div class="col-md-6 col-12 p-0 map-wrap" v-if="selectedLesson.lat && selectedLesson.lng">
-        <google-map-single
-          :current-user-can-book="currentUserCanBook"
-          :dataid="'name'"
-          :center="{
-                                    lat: selectedLesson.lat,
-                                    lng: selectedLesson.lng
-                                }"
-          :marker="[{
-                                position: {
-                                    latitude: selectedLesson.lat,
-                                    longitude: selectedLesson.lng,
-
-                                },
-                                 content: selectedLesson.content,
-                                 id: selectedLesson.id
-                            }]"
-        ></google-map-single>
-      </div> -->
+    <div class='d-flex flex-wrap' v-if='selectedLesson != null'>
       <div :class="{ 'col-12 content-modal': true, 'col-md-12': true }">
-        <h2 class="d-flex align-items-center">
+        <h2 class='d-flex align-items-center'>
           {{ selectedLesson.title }}
-          <!-- <span class="private-title">
-            <span v-if="selectedLesson.spots_count == 1">
-              <img src="../../images/man-user.svg" alt />
-            </span>
-            <span v-if="selectedLesson.spots_count > 1">
-              <img src="../../images/multiple-users-silhouette.svg" alt />
-            </span>
-          </span>-->
         </h2>
-
-        <span class="lesson-type"
-          >Lesson Type:
-          {{ getLessonTypeName(selectedLesson.lesson_type) }}</span
-        >
-        <p class="price">{{ selectedLesson.fullDate }}</p>
+        <span class='lesson-type'>
+          Lesson Type: {{ getLessonTypeName(selectedLesson.lesson_type) }}
+        </span>
+        <p class='price'>{{ selectedLesson.fullDate }}</p>
         <div
-          class="avatar-stack"
-          v-if="selectedLesson.students.length > 0 && studentList === true"
+          class='avatar-stack'
+          v-if='selectedLesson.students.length > 0 && studentList === true'
         >
-          <span
-            v-for="(student, index) in selectedLesson.students.slice(
-              0,
-              countAvatarsToShow
-            )"
-          >
+          <span v-for='student in selectedLesson.students.slice(0,countAvatarsToShow)'>
             <img
-              :src="student.profile.image"
-              :alt="student.full_name"
-              :title="student.full_name"
+              :src='student.profile.image'
+              :alt='student.full_name'
+              :title='student.full_name'
             />
           </span>
-          <span v-if="countLessonStudents > countAvatarsToShow">
-            <img src="/images/ava_1.png" alt />
+          <span v-if='countLessonStudents > countAvatarsToShow'>
+            <img src='/images/ava_1.png' alt/>
             <span>{{ countAvatarsToShow - countAvatarsToShow }}+</span>
           </span>
         </div>
-
         <p
-          class="location"
-          v-if="selectedLesson.lesson_type != 'virtual'"
-          v-html="selectedLesson.location"
+          class='location'
+          v-if="selectedLesson.lesson_type !== 'virtual'"
+          v-html='selectedLesson.location'
         ></p>
-        <p v-if="selectedLesson.description">
-          Note: <br />
+        <p v-if='selectedLesson.description'>
+          Note: <br/>
           {{ selectedLesson.description }}
         </p>
         <p>
           <strong>${{ selectedLesson.spot_price }}</strong> per lesson
         </p>
         <a
-          v-if="selectedLesson.students.length > 0 && studentList === true"
-          @click.prevent="notifyClients()"
-          href="#"
-          class="btn-green"
-          >Notify clients</a
+          v-if='selectedLesson.students.length > 0 && studentList === true'
+          @click.prevent='notifyClients()'
+          href='#'
+          class='btn-green'
         >
+          Notify clients
+        </a>
         <a
-          v-if="
+          v-if='
             selectedLesson.count_booked < 2 &&
-            selectedLesson.is_cancelled != 1 &&
+            selectedLesson.is_cancelled !== 1 &&
             studentList === true
-          "
-          @click.prevent="editLesson(selectedLesson)"
-          class="btn-green"
-          href="#"
-          >Edit lesson</a
+          '
+          @click.prevent='editLesson(selectedLesson)'
+          class='btn-green'
+          href='#'
         >
+          Edit lesson
+        </a>
         <a
-          v-if="selectedLesson.is_cancelled != 1 && studentList === true"
-          @click.prevent="cancelLesson(selectedLesson)"
+          v-if='selectedLesson.is_cancelled !== 1 && studentList === true'
+          @click.prevent='cancelLesson(selectedLesson)'
           :class="{
             'cancel-lesson':
-              selectedLesson.students.length == 0 || studentList === false,
+              selectedLesson.students.length === 0 || studentList === false,
           }"
-          href="#"
-          >Cancel lesson</a
+          href='#'
         >
+          Cancel lesson
+        </a>
         <a
-          v-if="studentCancel === true"
-          @click.prevent="cancelRequestLesson(selectedLesson)"
+          v-if='studentCancel === true'
+          @click.prevent='cancelRequestLesson(selectedLesson)'
           :class="{
             'cancel-lesson':
-              selectedLesson.students.length == 0 || studentList === false,
+              selectedLesson.students.length === 0 || studentList === false,
           }"
-          href="#"
-          >Request Cancel</a
+          href='#'
         >
-
-        <p class="booking-request-title">Booking request (optional)</p>
+          Request Cancel
+        </a>
+        <p class='booking-request-title'>What I want to learn</p>
         <textarea
-          class="booking-request-area"
-          placeholder="Special request"
-          v-model="specialRequestText"
+          class='booking-request-area'
+          placeholder='notes on what you hope to gain or other instructions'
+          v-model='specialRequestText'
         ></textarea>
-
         <loader-button
           v-if="currentUserCanBook && studentList === 'booking-button'"
-          :isLoading="loggedInAsStudent && isLoading"
-          text="Add to cart"
-          @click="addToCart(selectedLesson)"
+          :isLoading='loggedInAsStudent && isLoading'
+          text='Add to cart'
+          @click='addToCart(selectedLesson)'
         />
-
-        <div v-if="errorText" class="has-error">{{ errorText }}</div>
-        <div v-if="successText" class="has-success">{{ successText }}</div>
+        <div v-if='errorText' class='has-error'>{{ errorText }}</div>
+        <div v-if='successText' class='has-success'>{{ successText }}</div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import siteAPI from "../mixins/siteAPI.js";
-import skillectiveHelper from "../mixins/skillectiveHelper.js";
-import MagnificPopupModal from "./external/MagnificPopupModal";
-import { getTimezone } from "countries-and-timezones";
-import { mapActions, mapMutations, mapGetters } from "vuex";
-import LoaderButton from "./cart/LoaderButton/LoaderButton.vue";
+import siteAPI from '../mixins/siteAPI.js'
+import skillectiveHelper from '../mixins/skillectiveHelper.js'
+import MagnificPopupModal from './external/MagnificPopupModal'
+import {getTimezone} from 'countries-and-timezones'
+import {mapActions, mapGetters} from 'vuex'
+import LoaderButton from './cart/LoaderButton/LoaderButton.vue'
 
 export default {
   components: {
@@ -147,13 +113,13 @@ export default {
   },
   mixins: [siteAPI, skillectiveHelper],
   props: [
-    "lessonDetails",
-    "modalWindow",
-    "showNotifyBtn",
-    "studentList",
-    "studentCancel",
-    "currentUserCanBook",
-    "loggedInAsStudent",
+    'lessonDetails',
+    'modalWindow',
+    'showNotifyBtn',
+    'studentList',
+    'studentCancel',
+    'currentUserCanBook',
+    'loggedInAsStudent',
   ],
   data() {
     return {
@@ -161,97 +127,92 @@ export default {
       selectedLesson: null,
       countAvatarsToShow: 7,
       countLessonStudents: 0,
-      specialRequestText: "",
-    };
+      specialRequestText: '',
+    }
   },
   computed: {
     isLoading() {
-      return this.isCartLoading();
+      return this.isCartLoading()
     },
   },
   methods: {
-    ...mapActions(["addItemToCartAtStart"]),
-    ...mapGetters(["isCartLoading"]),
-    addToCart: async function (lesson) {
+    ...mapActions(['addItemToCartAtStart']),
+    ...mapGetters(['isCartLoading']),
+    addToCart: async function(lesson) {
       if (this.loggedInAsStudent) {
         const result = await this.addItemToCartAtStart({
           lessonId: lesson.id,
-          specialRequest: this.specialRequestText || "",
-        });
+          specialRequest: this.specialRequestText || '',
+        })
 
         if (result.isError) {
-          this.errorText = result.message;
+          this.errorText = result.message
         } else {
-          this.closeModal();
-          this.$root.$emit("showMiniCart");
+          this.closeModal()
+          this.$root.$emit('showMiniCart')
         }
       } else {
-        window.location.href = "/login";
+        window.location.href = '/login'
       }
     },
-    closeModal: function () {
-      this.selectedLesson = null;
-      this.countLessonStudents = 0;
-      this.clearSubmittedForm();
-      this.modalWindow.close();
+    closeModal: function() {
+      this.selectedLesson = null
+      this.countLessonStudents = 0
+      this.clearSubmittedForm()
+      this.modalWindow.close()
     },
-    notifyClients: function () {
-      this.$emit("notification", this.selectedLesson.students);
-      this.closeModal();
+    notifyClients: function() {
+      this.$emit('notification', this.selectedLesson.students)
+      this.closeModal()
     },
     updateLessonDetails() {
-      this.showLoader = false;
-      this.apiGet("/api/lesson/" + this.lessonDetails.id);
-      // this.selectedLesson = this.lessonDetails;
-
-      this.showLoader = true;
+      this.apiGet('/api/lesson/' + this.lessonDetails.id)
     },
     editLesson(lesson) {
-      this.closeModal();
-      this.$root.$emit("lessonUpdateInit", lesson);
+      this.closeModal()
+      this.$root.$emit('lessonUpdateInit', lesson)
     },
     componentHandleGetResponse(responseData) {
-      this.selectedLesson = responseData.data.data;
-      this.selectedLesson.content = responseData.data.data;
-      this.selectedLesson.title = this.selectedLesson.genre.title;
+      this.selectedLesson = responseData.data.data
+      this.selectedLesson.content = responseData.data.data
+      this.selectedLesson.title = this.selectedLesson.genre.title
       this.selectedLesson.fullDate =
-        moment(this.selectedLesson.start).format("MMM") +
-        " " +
-        moment(this.selectedLesson.start).format("DD") +
-        ", " +
-        moment(this.selectedLesson.start).format("hh:mma") +
-        " - " +
-        moment(this.selectedLesson.end).format("hh:mma") +
-        " " +
-        this.selectedLesson.timezone_abbrev;
+        moment(this.selectedLesson.start).format('MMM') +
+        ' ' +
+        moment(this.selectedLesson.start).format('DD') +
+        ', ' +
+        moment(this.selectedLesson.start).format('hh:mma') +
+        ' - ' +
+        moment(this.selectedLesson.end).format('hh:mma') +
+        ' ' +
+        this.selectedLesson.timezone_abbrev
 
-      this.countLessonStudents = this.selectedLesson.students.length;
-      this.modalWindow.open();
+      this.countLessonStudents = this.selectedLesson.students.length
+      this.modalWindow.open()
     },
     cancelLesson(lesson) {
-      this.apiDelete("/api/lesson/" + lesson.id);
+      this.apiDelete('/api/lesson/' + lesson.id)
     },
     cancelRequestLesson(lesson) {
-      this.apiDelete("/api/student/booking/" + lesson.id);
+      this.apiDelete('/api/student/booking/' + lesson.id)
     },
-    componentHandleDeleteResponse(responseData) {
-      this.$emit("lessons-cancelled", this.selectedLesson.id);
-      this.selectedLesson.is_cancelled = true;
-      this.showNotifyClientsBtn = false;
+    componentHandleDeleteResponse() {
+      this.$emit('lessons-cancelled', this.selectedLesson.id)
+      this.selectedLesson.is_cancelled = true
+      this.showNotifyClientsBtn = false
       setTimeout(() => {
-        this.closeModal();
-      }, 1000);
+        this.closeModal()
+      }, 1000)
     },
   },
-  created: function () {
-    this.updateLessonDetails();
-    // this.selectedLesson = this.lessonDetails;
-    this.showNotifyClientsBtn = this.showNotifyBtn;
+  created: function() {
+    this.updateLessonDetails()
+    this.showNotifyClientsBtn = this.showNotifyBtn
   },
   watch: {
-    lessonDetails: function () {
-      this.updateLessonDetails();
+    lessonDetails: function() {
+      this.updateLessonDetails()
     },
   },
-};
+}
 </script>
