@@ -47,6 +47,8 @@ class Controller extends BaseController
 				}
 				session()->put('current_page', $currentPath);
 			}
+
+            view()->share( 'loggedUserRole', null );
 		}else{
 			if ( session()->has('current_page') )
 				session()->forget(['current_page', 'prev_page']);
