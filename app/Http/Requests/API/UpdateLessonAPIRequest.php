@@ -11,7 +11,7 @@ class UpdateLessonAPIRequest extends CreateLessonAPIRequest
 	{
 		$rules = parent::rules($request);
 
-		$rules['date']			= ['required', 'date_format:Y-m-d', 'future_date', 'no_lessons_this_time:time_from,time_to,id,date,date_to,timezone_id']; // TODO: remove future date validation. date >= lesson.date
+		$rules['date']			= ['required', 'date_format:Y-m-d', 'future_date', 'no_lessons_this_time'];
 		$rules['spots_count']	= ['required', 'integer', 'min:1', 'max:100']; // TODO: min to be >= than count booked spots
 
 		return $rules;

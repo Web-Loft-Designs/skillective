@@ -31,27 +31,21 @@ class CreateLessonAPIRequest extends APIRequest
      */
     public function rules(Request $request)
     {
-		$availableGenresIds	= Genre::select('id')->get()->pluck('id')->toArray();
-
 		$formats = [];
 		for ($m = 0; $m<60; $m += Lesson::TIME_INTERVAL){
 			$formats[] = 'H:' . sprintf('%02d', $m) . ':00';
 		}
 		$formats = implode(',', $formats);
 
-		$lesson_type = $request->input('lesson_type', null);
-
         $rules = [
-			'genre'			=> ['required', Rule::in( $availableGenresIds )],
-            'lesson_type'   => ['required', 'in:in_person,virtual,in_person_client'],
+			'genre'			=> ['required', Rule::in(Genre::pluck('id'))],
+            'lesson_type'   => ['required', Rule::in(array_keys(Lesson::getLessonTypes()))],
             'location'		=> ['required_if:lesson_type,in_person', 'nullable', 'is_exact_address'],
-            'timezone_id'   => ['required_if:lesson_type,virtual', 'nullable', "valid_timezone:$lesson_type"],
+            'timezone_id'   => ['required_if:lesson_type,virtual', 'nullable', "valid_timezone:lesson_type"],
             'time_from'		=> ['required', 'date_multi_format:' . $formats],
             'time_to'		=> ['required', 'date_multi_format:' . $formats],
-			'date'			=> ['required', 'date_format:Y-m-d', 'future_date',
-                'no_lessons_this_time:time_from,time_to,id,date,date_to,timezone_id,lesson_id'],
-			'date_to'		=> ['required', 'date_format:Y-m-d', 'future_date',
-                'no_lessons_this_time:time_from,time_to,id,date,date_to,timezone_id,lesson_id'],
+			'date'			=> ['required', 'date_format:Y-m-d', 'future_date', 'no_lessons_this_time'],
+			'date_to'		=> ['required', 'date_format:Y-m-d', 'future_date', 'no_lessons_this_time'],
 			'spots_count'	=> ['required', 'integer', 'min:1', 'max:100'],
 			'spot_price'	=> ['required', 'numeric', 'min:1'],
 		];
