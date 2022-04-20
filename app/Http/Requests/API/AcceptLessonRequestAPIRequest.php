@@ -29,8 +29,8 @@ class AcceptLessonRequestAPIRequest extends APIRequest
 
         $rules = [
 			'genre'			=> ['required', Rule::in( $availableGenresIds )],
-			'date'			=> ['required', 'date_format:Y-m-d', 'future_date', 'no_lessons_this_time:time_from,time_to,id,date,date_to,timezone_id'],
-			'date_to'		=> ['required', 'date_format:Y-m-d', 'future_date', 'no_lessons_this_time:time_from,time_to,id,date,_date_to,timezone_id'],
+			'date'			=> ['required', 'date_format:Y-m-d', 'future_date', 'no_lessons_this_time'],
+			'date_to'		=> ['required', 'date_format:Y-m-d', 'future_date', 'no_lessons_this_time'],
 			'time_from'		=> ['required', 'date_multi_format:' . $formats],
 			'time_to'		=> ['required', 'date_multi_format:' . $formats],
 			'count_participants'	=> ['required', 'integer', 'min:1', 'max:50'],
