@@ -61,7 +61,7 @@ class CartAPIController extends AppBaseController
 
         $cartItems = $this->cartRepository->getUserCart($student_id, null);
 
-        if (count($cartItems) > 0) {
+        if (is_array($cartItems) && count($cartItems) > 0) {
             return  $this->sendResponse(true);
         } else {
             return  $this->sendResponse(false);
