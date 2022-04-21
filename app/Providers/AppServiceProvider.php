@@ -151,25 +151,22 @@ class AppServiceProvider extends ServiceProvider
 
 			if($lessonType == 'in_person_client') return true;
 
-            if ($location) {
+            if (!empty($location) && empty($timezoneId)) {
 				$lessonLocationDetails = getLocationDetails($location);
-
 				if ($lessonLocationDetails['timezone_id']) {
 					if (strtotime($value . ' ' . $timeFrom) > strtotime(\Carbon\Carbon::now($lessonLocationDetails['timezone_id'])->format('Y-m-d H:i:s'))) {
 						return true;
-					} else {
-						return false;
 					}
 				} else {
 					return true; // location validation will prevent passing validation in this case
 				}
-			} else if (!$location && $timezoneId) {
+			} else if (empty($location) && !empty($timezoneId)) {
 				if (strtotime($value . ' ' . $timeFrom) > strtotime(\Carbon\Carbon::now($timezoneId)->format('Y-m-d H:i:s'))) {
 					return true;
-				} else {
-					return false;
 				}
-			}
+			} else if(empty($location) && empty($timezoneId)) {
+                return true;
+            }
 
 			return false;
 		});
