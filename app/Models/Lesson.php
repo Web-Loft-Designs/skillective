@@ -364,14 +364,18 @@ class Lesson extends Model implements Transformable
 
     public function getStartLocalTimeAttribute()
     {
-        return (string) Carbon::createFromFormat('Y-m-d H:i:s', $this->start, $this->timezone_id)
-            ->setTimezone($this->getLocalClientTz());
+//        return (string) Carbon::createFromFormat('Y-m-d H:i:s', $this->start, $this->timezone_id)
+//            ->setTimezone($this->getLocalClientTz());
+
+        return $this->start;
     }
 
     public function getEndLocalTimeAttribute()
     {
-        return (string) Carbon::createFromFormat('Y-m-d H:i:s', $this->end, $this->timezone_id)
-            ->setTimezone($this->getLocalClientTz());
+//        return (string) Carbon::createFromFormat('Y-m-d H:i:s', $this->end, $this->timezone_id)
+//            ->setTimezone($this->getLocalClientTz());
+
+        return $this->end;
     }
 
     private function getLocalClientTz()
