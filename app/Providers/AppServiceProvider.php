@@ -147,7 +147,7 @@ class AppServiceProvider extends ServiceProvider
             $timezoneId = data_get($request, 'timezone_id');
 
             // time validation will prevent passing validation in this case
-            if ((!$timeFrom || !$timeTo) && ($timeFrom == 'Invalid date' || $timeTo == 'Invalid date')) return true;
+            if ((!$timeFrom || !$timeTo) || ($timeFrom == 'Invalid date' || $timeTo == 'Invalid date')) return true;
 
 			if($lessonType == 'in_person_client') return true;
 
