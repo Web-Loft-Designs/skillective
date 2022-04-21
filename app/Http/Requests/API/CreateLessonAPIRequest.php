@@ -57,8 +57,8 @@ class CreateLessonAPIRequest extends APIRequest
 		return [
             'date.required' => 'Please enter a Month and/or Date',
             'date_to.required' => 'Please enter a Month and/or Date',
-			'date.future_date' => 'Select future date',
-			'date_to.future_date' => 'Select future date',
+			'date.future_date' => 'Please enter Month and / or Date in the future.',
+			'date_to.future_date' => 'Please enter Month and / or Date in the future.',
 			'time_from.date_multi_format' => 'Please enter a Start time',
 			'time_to.date_multi_format' => 'Please enter a End time',
 			'date.no_lessons_this_time' => 'Overlaps with some other lesson',
