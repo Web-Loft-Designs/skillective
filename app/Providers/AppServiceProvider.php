@@ -214,8 +214,10 @@ class AppServiceProvider extends ServiceProvider
 
 				if ($lessonId) $userLessons->where('id', '!=', $lessonId);
 
+                dd($userLessons->count());
+
 				return ($userLessons->count() == 0);
-			} else if(!$timeFrom || $timeTo) {
+			} else if(!$timeFrom || !$timeTo) {
                 return true;
             }
 
