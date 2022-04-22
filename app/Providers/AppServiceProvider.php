@@ -194,28 +194,27 @@ class AppServiceProvider extends ServiceProvider
             $start	= Carbon::createFromFormat('Y-m-d H:i:s', $date . ' ' . $timeFrom);
             $end = Carbon::createFromFormat('Y-m-d H:i:s', $date . ' ' . $timeTo);
 
-			if($timezone) $start->setTimezone($timezone);
-            if($timezone) $end->setTimezone($timezone);
+//			if($timezone) $start->setTimezone($timezone);
+//            if($timezone) $end->setTimezone($timezone);
 
-			if ($start && $end) {
+            if ($start && $end) {
 				$start = $start->format('Y-m-d H:i:s');
 				$end = $end->format('Y-m-d H:i:s');
 
 				$userLessons = Auth::user()->lessons()
-					->whereRaw(" ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) ")
+					->whereRaw(" ( is_cancelled is NULL OR is_cancelled=0 ) ")
 					->whereRaw("DATE(start) = '" . $start . "'")
 					->whereRaw("(
                             (start >= '" . $start . "' AND start < '" . $end . "')
                             OR (end > '" . $start . "' AND end <= '" . $end . "')
                             OR (start < '" . $start . "' AND end > '" . $end . "')
-                        )");
-
-				$userLessons->whereNull('deleted_at');
+                        )")
+                    ->whereNull('deleted_at');
 
 				if ($lessonId) $userLessons->where('id', '!=', $lessonId);
 
 				return ($userLessons->count() == 0);
-			} else if(!$timeFrom || $timeTo) {
+			} else if(!$timeFrom || !$timeTo) {
                 return true;
             }
 
