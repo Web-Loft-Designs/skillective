@@ -39,6 +39,7 @@
             ?>
             @if ($userProfileData['isInstructor']==true && ( !Auth::user() || $loggedInStudent ) )
                 <request-lesson-form
+                        :instructor-name="{{ json_encode($userProfileData['full_name']) }}"
                         :show-create-btn="true"
                         :user-genres="{{  json_encode($userProfileData['genres']) }}"
                         :site-genres="{{  json_encode($siteGenres) }}"
