@@ -17,9 +17,16 @@
         </button>
       </span>
     </div>
-    <div class='modal fade' id='exampleModalCenter' tabindex='0' role='dialog'
-         aria-labelledby='exampleModalCenterTitle' aria-hidden='true'>
-      <div class='modal-dialog modal-dialog-centered' role='document'>
+    <div class='modal fade'
+         id='exampleModalCenter'
+         tabindex='0'
+         role='dialog'
+         aria-labelledby='exampleModalCenterTitle'
+         aria-hidden='true'
+    >
+      <div class='modal-dialog modal-dialog-centered'
+           role='document'
+      >
         <div class='modal-content'>
           <div class='modal-header'>
             <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
@@ -35,8 +42,26 @@
             </span>
           </div>
           <div class='modal-footer'>
-            <button type='button' class='btn btn-primary'>Join client list</button>
+            <button type='button'
+                    data-dismiss='modal'
+                    aria-label='Close'
+                    class='btn btn-primary'
+                    data-toggle='modal'
+                    data-target='.bd-example-modal-sm'
+                    @click='successJoinedToClient'
+            >
+              Join client list
+            </button>
           </div>
+        </div>
+      </div>
+    </div>
+    <div class='modal fade bd-example-modal-sm' id='myModal2' tabindex='-1' role='dialog'
+         aria-labelledby='mySmallModalLabel'
+         aria-hidden='true'>
+      <div class='modal-dialog modal-sm'>
+        <div class='modal-content p-10'>
+          Congratulations! You have been added to the instructor’s list of clients
         </div>
       </div>
     </div>
@@ -533,8 +558,15 @@ export default {
     tooltipContent() {
       return `Click here to add your contact info to ${this.instructorName}'s Client List so you can be notified when clases, privates or workshops become available.`
     },
+    successJoinedToClient() {
+      setTimeout(() => {
+        $('#myModal2').modal({
+          backdrop: false,
+        })
+        $('#myModal2').modal('hide')
+      }, 4_000)
+    },
     replaceInput() {
-      //                console.log(this.fields.spots_count)
       if (this.fields.spots_count > 100) {
         setTimeout(() => {
           this.fields.spots_count = '100'
