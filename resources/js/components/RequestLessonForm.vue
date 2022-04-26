@@ -106,10 +106,7 @@
                   />
                   <span v-if='$v.modalData.last_name.$dirty && !$v.modalData.last_name.required'>Last name can't be empty</span>
                 </div>
-                <div
-                  class='form-group has-feedback'
-                  :class="{'has-error': ($v.modalData.instagram_handle.$dirty && !$v.modalData.instagram_handle.required)}"
-                >
+                <div class='form-group'>
                   <label>Instagram Handle</label>
                   <input
                     type='text'
@@ -118,9 +115,7 @@
                     value=''
                     v-model='modalData.instagram_handle'
                     placeholder='@instagram_name'
-                    :class="{'is-invalid': ($v.modalData.instagram_handle.$dirty && !$v.modalData.instagram_handle.required)}"
                   />
-                  <span v-if='$v.modalData.instagram_handle.$dirty && !$v.modalData.instagram_handle.required'>Last name can't be empty</span>
                 </div>
                 <div
                   class='form-group input-zip has-feedback'
@@ -138,23 +133,24 @@
                   <span v-if='$v.modalData.zip.$dirty && !$v.modalData.zip.required'>ZIP code can't be empty</span>
                   <span v-else-if='$v.modalData.zip.$dirty && !$v.modalData.zip.numeric'>ZIP code must be numeric</span>
                 </div>
-                <div
-                  class='form-group w-50 has-feedback'
-                  :class="{'has-error': ($v.modalData.dob.$dirty && !$v.modalData.dob.required)}"
-                >
-                  <label>Date of Birth</label>
-                  <dropdown-datepicker
-                    :max-year='2021'
-                    :minYear='1940'
-                    display-format='mdy'
-                    v-model='modalData.dob'
-                    submit-format='yyyy-mm-dd'
-                  ></dropdown-datepicker>
+<!--                <div-->
+<!--                  class='form-group w-50 has-feedback'-->
+<!--                  :class="{'has-error': ($v.modalData.dob.$dirty && !$v.modalData.dob.required)}"-->
+<!--                >-->
+<!--                  <label>Date of Birth</label>-->
+<!--                  <dropdown-datepicker-->
+<!--                    :max-year='2021'-->
+<!--                    :minYear='1940'-->
+<!--                    display-format='mdy'-->
+<!--                    v-model='modalData.dob'-->
+<!--                    submit-format='yyyy-mm-dd'-->
+<!--                  ></dropdown-datepicker>-->
 
-                  <span v-if='$v.modalData.dob.$dirty && !$v.modalData.dob.required'>Date of Birth can't be empty</span>
-                </div>
+<!--                  <span v-if='$v.modalData.dob.$dirty && !$v.modalData.dob.required'>Date of Birth can't be empty</span>-->
+<!--                </div>-->
+
                 <div
-                  class='form-group w-50 has-feedback'
+                  class='form-group w-50'
                   :class="{'has-error': ($v.modalData.gender.$dirty && !$v.modalData.gender.required)}"
                 >
                   <label>Gender</label>
@@ -188,6 +184,20 @@
                 </div>
                 <div
                   class='form-group w-50'
+                  :class="{'has-error': ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required)}"
+                >
+                  <label>Phone number</label>
+                  <masked-input
+                    class='form-control'
+                    v-model='modalData.mobile_phone'
+                    :placeholder="'+1 (___) ___ ____'"
+                    mask='\+1 (111) 111 1111'
+                    :class="{'is-invalid': ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required)}"
+                  />
+                  <span v-if='$v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required'>Phone number can't be empty</span>
+                </div>
+                <div
+                  class='form-group'
                   :class="{'has-error': ($v.modalData.email.$dirty && !$v.modalData.email.required) || ($v.modalData.email.$dirty && !$v.modalData.email.email)}"
                 >
                   <label>Email</label>
@@ -202,19 +212,19 @@
                   <span v-if='$v.modalData.email.$dirty && !$v.modalData.email.required'>Email can't be empty</span>
                   <span v-else-if='$v.modalData.email.$dirty && !$v.modalData.email.email'>Error email format</span>
                 </div>
-                <div
-                  class='form-group w-50 has-feedback'
-                  :class="{'has-error': ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required)}"
-                >
-                  <label>Phone number</label>
-                  <masked-input
-                    class='form-control'
-                    v-model='modalData.mobile_phone'
-                    :placeholder="'+1 (___) ___ ____'"
-                    mask='\+1 (111) 111 1111'
-                    :class="{'is-invalid': ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required)}"
-                  />
-                  <span v-if='$v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required'>Phone number can't be empty</span>
+                <div class='form-group checkbox-wrapper'>
+                  <div class='field'>
+                    <label for='newsletter'>
+                      <input
+                        v-model='modalData.newsletter'
+                        type='checkbox'
+                        id='newsletter'
+                      />
+                      <span class='checkmark'></span>
+                      I would like to receive the Monthly Newsletter
+                    </label>
+                  </div>
+                  <span v-if='$v.modalData.mobile_phone.$dirty && !modalData.accept_terms'>Please accept terms of service</span>
                 </div>
                 <div
                   class='form-group checkbox-wrapper has-feedback'
@@ -655,17 +665,13 @@ export default {
     modalData: {
       first_name: {required},
       last_name: {required},
-      email: {email, required},
-      address: {required},
-      city: {required},
-      state: {required},
       zip: {required, numeric},
-      dob: {required},
+      // dob: {required},
       gender: {required},
+      email: {email, required},
       mobile_phone: {required},
       accept_terms: {checked: v => v},
-      instagram_handle: {required},
-    }
+    },
   },
   data() {
     return {
@@ -673,15 +679,13 @@ export default {
         first_name: '',
         last_name: '',
         email: '',
-        address: '',
-        city: '',
-        state: '',
         zip: '',
-        dob: '',
+        // dob: '',
         gender: '',
         mobile_phone: '',
-        accept_terms: false,
         instagram_handle: '',
+        newsletter: true,
+        accept_terms: false,
       },
       fields: {
         id: null,
@@ -772,9 +776,10 @@ export default {
           zip: this.modalData.zip,
           email: this.modalData.email,
           mobile_phone: this.modalData.mobile_phone,
+          newsletter: this.modalData.newsletter,
         }
         console.log(data)
-        // await this.createToClientList(this.modalData)
+        await this.createToClientList(data)
       } catch (e) {
         console.log(e)
       }
