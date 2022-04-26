@@ -4,8 +4,6 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-import vuetify from '../../src/plugins/vuetify'
-
 if (typeof Object.assign != "function") {
     Object.assign = function(target) {
         "use strict";
@@ -27,8 +25,11 @@ if (typeof Object.assign != "function") {
         return target;
     };
 }
+import Vue from 'vue'
+import vuetify from '../../src/plugins/vuetify'
+import {Vuelidate} from 'vuelidate'
 
-import Vue from "vue";
+Vue.use(Vuelidate)
 
 require("./bootstrap");
 require("url-search-params-polyfill");

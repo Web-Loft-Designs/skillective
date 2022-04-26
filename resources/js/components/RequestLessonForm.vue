@@ -18,7 +18,7 @@
       </span>
     </div>
     <div
-      v-if='!loggedInStudent'
+      v-if='loggedInStudent'
       class='modal fade'
       id='exampleModalCenter'
       tabindex='0'
@@ -63,7 +63,7 @@
       class='modal fade'
       tabindex='-1'
       role='dialog'
-      v-if='loggedInStudent'
+      v-else
       id='exampleModalCenter'
     >
       <div class='modal-dialog' role='document'>
@@ -92,7 +92,7 @@
                     <strong>{{ errors.first_name[0] }}</strong>
                   </span>
                 </div>
-                <div class="invalid-feedback">
+                <div class='invalid-feedback'>
                   Please choose a username.
                 </div>
                 <div
@@ -201,20 +201,18 @@
                 </div>
                 <div
                   class='form-group w-50 has-feedback'
-                  :class="{ 'has-error': errors.email }"
+                  :class="{'has-error': ($v.email.$dirty && !$v.email.required) || ($v.email.$dirty && !$v.email.email)}"
                 >
                   <label>Email</label>
                   <input
                     type='email'
                     class='form-control'
-                    required
                     name='email'
-                    value=''
-                    v-model='modalData.email'
+                    v-model.trim='modalData.email'
                     placeholder='Email'
                   />
-                  <span class='help-block' v-if='errors.email'>
-                    <strong>{{ errors.email[0] }}</strong>
+                  <span class='help-block'>
+                    <strong>Error</strong>
                   </span>
                 </div>
                 <div
@@ -631,33 +629,6 @@
   </div>
 </template>
 
-<style lang='scss'>
-.modal-open .modal {
-  overflow-y: hidden;
-}
-
-.modal-open, .modal {
-  padding-right: 0 !important
-}
-.form-title {
-  font-size: 25px;
-  text-align: center;
-
-}
-.btn {
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-
-.modal-body {
-  font-size: 14px;
-}
-
-.tooltip {
-  font-size: 10px;
-}
-</style>
-
 <script>
 import MaskedInput from 'vue-masked-input'
 import siteAPI from '../mixins/siteAPI.js'
@@ -668,9 +639,11 @@ require('jquery.maskedinput/src/jquery.maskedinput')
 import DropdownDatepicker from 'vue-dropdown-datepicker'
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
 import {mapActions} from 'vuex'
+import {email, required} from 'vuelidate/lib/validators'
 
 $(function() {
-  $('[data-toggle="tooltip"]').tooltip()
+  $('[data-toggle="tooltip"]')
+    .tooltip()
 })
 
 const ct = require('countries-and-timezones')
@@ -696,6 +669,20 @@ export default {
     'lessonBlockMinPrice',
     'instructorName',
   ],
+  validations: {
+    first_name: {},
+    last_name: {},
+    email: {email, required},
+    address: {},
+    city: {},
+    state: {},
+    zip: {},
+    dob: {},
+    gender: {},
+    mobile_phone: {},
+    accept_terms: {},
+    instagram_handle: {},
+  },
   data() {
     return {
       modalData: {
@@ -748,10 +735,12 @@ export default {
       if (this.selectRange !== null) {
         this.fields.date = this.selectRange.startStr
         this.fields.date_to = this.selectRange.startStr
-        this.fields.time_from = moment(this.selectRange.startStr).format(
-          'H:mm:ss',
-        )
-        this.fields.time_to = moment(this.selectRange.endStr).format('H:mm:ss')
+        this.fields.time_from = moment(this.selectRange.startStr)
+          .format(
+            'H:mm:ss',
+          )
+        this.fields.time_to = moment(this.selectRange.endStr)
+          .format('H:mm:ss')
         this.$refs.modal.open()
       }
     },
@@ -770,11 +759,8 @@ export default {
       }
 
       let countSpots =
-        moment(moment(this.fields.time_from, ['h:mm A'])).diff(
-          moment(this.fields.time_to, ['h:mm A']),
-        ) /
-        60000 /
-        30
+        moment(moment(this.fields.time_from, ['h:mm A']))
+          .diff(moment(this.fields.time_to, ['h:mm A'])) / 60000 / 30
 
       if (
         Math.abs(Number(this.lessonBlockMinPrice) * Number(countSpots)) >
@@ -789,6 +775,10 @@ export default {
   methods: {
     ...mapActions(['addToClientList', 'createToClientList']),
     async joinClientList() {
+      if (this.$v.$invalid) {
+        this.$v.$touch()
+        return
+      }
       try {
         const data = {
           instructor_id: this.instructorId,
@@ -797,7 +787,7 @@ export default {
           instagram_handle: this.modalData.instagram_handle,
           zip: this.modalData.zip,
           email: this.modalData.email,
-          mobile_phone: this.modalData.mobile_phone
+          mobile_phone: this.modalData.mobile_phone,
         }
         console.log(data)
         // await this.createToClientList(this.modalData)
@@ -812,8 +802,10 @@ export default {
       try {
         await this.addToClientList(this.instructorId)
         setTimeout(() => {
-          $('#myModal2').modal('hide')
-          $('.modal-backdrop').remove()
+          $('#myModal2')
+            .modal('hide')
+          $('.modal-backdrop')
+            .remove()
         }, 4000)
       } catch (e) {
         console.log(e)
@@ -837,15 +829,19 @@ export default {
     },
     timeFormChange() {
       if (moment(this.fields.time_from)) {
-        this.fields.time_to = moment(this.fields.time_from, ['h:mm a']).add('30', 'minutes').format('h:mm a')
+        this.fields.time_to = moment(this.fields.time_from, ['h:mm a'])
+          .add('30', 'minutes')
+          .format('h:mm a')
       }
     },
     onSubmit() {
       if (moment(this.fields.date))
-        this.fields.date = moment(this.fields.date).format('YYYY-MM-DD')
+        this.fields.date = moment(this.fields.date)
+          .format('YYYY-MM-DD')
 
       if (moment(this.fields.date_to))
-        this.fields.date_to = moment(this.fields.date_to).format('YYYY-MM-DD')
+        this.fields.date_to = moment(this.fields.date_to)
+          .format('YYYY-MM-DD')
 
       if (this.fields.lesson_type === 'virtual') {
         this.fields.count_participants = 1
@@ -854,13 +850,15 @@ export default {
       if (moment(this.fields.time_from)) {
         this.fields.time_from = moment(this.fields.time_from, [
           'h:mm A',
-        ]).format('HH:mm:ss')
+        ])
+          .format('HH:mm:ss')
       }
 
       if (moment(this.fields.time_to)) {
-        this.fields.time_to = moment(this.fields.time_to, ['h:mm A']).format(
-          'HH:mm:ss',
-        )
+        this.fields.time_to = moment(this.fields.time_to, ['h:mm A'])
+          .format(
+            'HH:mm:ss',
+          )
       }
       if (this.fields.id > 0)
         this.apiPost(
@@ -1092,14 +1090,18 @@ export default {
       this.fields = {
         id: lessonRequest.id,
         genre: lessonRequest.genre_id,
-        date: moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss']).format(
-          'YYYY-MM-DD',
-        ),
-        date_to: moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss']).format(
-          'YYYY-MM-DD',
-        ),
-        time_from: moment(lessonRequest.start).format('h:mm a'),
-        time_to: moment(lessonRequest.end).format('h:mm a'),
+        date: moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
+          .format(
+            'YYYY-MM-DD',
+          ),
+        date_to: moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
+          .format(
+            'YYYY-MM-DD',
+          ),
+        time_from: moment(lessonRequest.start)
+          .format('h:mm a'),
+        time_to: moment(lessonRequest.end)
+          .format('h:mm a'),
         count_participants: lessonRequest.count_participants + '',
         lesson_price: lessonRequest.lesson_price,
         location: lessonRequest.location,
@@ -1111,23 +1113,29 @@ export default {
 
       setTimeout(() => {
         this.$refs.datepicker.year = Number(
-          moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss']).format('YYYY'),
+          moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
+            .format('YYYY'),
         )
         this.$refs.datepicker.month = Number(
-          moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss']).format('MM'),
+          moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
+            .format('MM'),
         )
         this.$refs.datepicker.day = Number(
-          moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss']).format('DD'),
+          moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
+            .format('DD'),
         )
 
         this.$refs.datepickerTo.year = Number(
-          moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss']).format('YYYY'),
+          moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
+            .format('YYYY'),
         )
         this.$refs.datepickerTo.month = Number(
-          moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss']).format('MM'),
+          moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
+            .format('MM'),
         )
         this.$refs.datepickerTo.day = Number(
-          moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss']).format('DD'),
+          moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
+            .format('DD'),
         )
       }, 10)
 
@@ -1145,8 +1153,36 @@ export default {
         Cookies.remove('backToRequestLesson')
         this.openPopup()
       }
-      window.jQuery('.mask-input').mask('99/99/9999')
+      window.jQuery('.mask-input')
+        .mask('99/99/9999')
     }, 100)
   },
 }
 </script>
+
+<style lang='scss'>
+.modal-open .modal {
+  overflow-y: hidden;
+}
+
+.modal-open, .modal {
+  padding-right: 0 !important
+}
+.form-title {
+  font-size: 25px;
+  text-align: center;
+
+}
+.btn {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.modal-body {
+  font-size: 14px;
+}
+
+.tooltip {
+  font-size: 10px;
+}
+</style>
