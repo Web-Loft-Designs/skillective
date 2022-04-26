@@ -172,7 +172,7 @@ class InstructorLessonsAPIController extends AppBaseController
         }
         $input = $this->_prepareInputData($request);
 
-        if (!empty($input['recurrence_until']) && $input['recurrence_frequencies'] != "0") {
+        if ($input['recurrence_until'] && $input['recurrence_frequencies'] != "0") {
 
             $ty = $input['recurrence_frequencies'];
 
@@ -223,7 +223,7 @@ class InstructorLessonsAPIController extends AppBaseController
             return $this->sendResponse($this->lessonRepository->presentResponse($lesson)['data'], 'Lesson saved');
         }
 
-        if (!empty($input['time_interval']) && $input['time_interval'] > 0) {
+        if ($input['time_interval'] && $input['time_interval'] > 0) {
             $lesson = $this->createLessonsByInterval($input);
 
             return $this->sendResponse($this->lessonRepository->presentResponse($lesson)['data'], 'Lesson saved');

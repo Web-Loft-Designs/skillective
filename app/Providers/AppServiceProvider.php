@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Socialite\Two\FacebookProvider;
 use Illuminate\Support\Facades\Validator;
@@ -19,6 +18,10 @@ use App\Observers\LessonRequestObserver;
 use App\Repositories\UserRepository;
 use App;
 use Illuminate\Support\Facades\Auth;
+use Log;
+use DateTime;
+use DateTimeZone;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 
 class AppServiceProvider extends ServiceProvider
@@ -57,9 +60,8 @@ class AppServiceProvider extends ServiceProvider
 
 		Validator::extend('is_exact_address', function ($attribute, $value, $parameters) {
 			$locationDetails = getLocationDetails($value);
-            $timezoneId = data_get($locationDetails, 'timezone_id');
-            $locationType = data_get($locationDetails, 'location_type');
-			return ($timezoneId != null && in_array($locationType, ['ROOFTOP', 'RANGE_INTERPOLATED', 'GEOMETRIC_CENTER', 'APPROXIMATE']));
+
+			return ($locationDetails['timezone_id'] != null && in_array($locationDetails['location_type'], ['ROOFTOP', 'RANGE_INTERPOLATED', 'GEOMETRIC_CENTER', 'APPROXIMATE'])); // require exact location
 		});
 
 		Validator::extend('is_approximate_address', function ($attribute, $value, $parameters) {
@@ -77,11 +79,11 @@ class AppServiceProvider extends ServiceProvider
 		Validator::extend('validate_min_profile_price', function ($attribute, $value, $parameters) {
 
 			$instructorId = $parameters[0];
-			$start = Carbon::parse($parameters[1]);
-			$end = Carbon::parse($parameters[2]);
-			Log::info($instructorId);
-			Log::info($start);
-			Log::info($end);
+			$start = \Carbon\Carbon::parse($parameters[1]);
+			$end = \Carbon\Carbon::parse($parameters[2]);
+			\Log::info($instructorId);
+			\Log::info($start);
+			\Log::info($end);
 
 			$instructor = User::find($instructorId);
 			if ($instructor == null) {
@@ -96,8 +98,8 @@ class AppServiceProvider extends ServiceProvider
 
 			$countSpots = ceil($end->diffInMinutes($start) / 30);
 
-			Log::info($countSpots);
-			Log::info($minPrice);
+			\Log::info($countSpots);
+			\Log::info($minPrice);
 
 			return (strtotime($parameters[1]) !== false && strtotime($parameters[2]) !== false && $minPrice > 0) ? ($minPrice * $countSpots <= $value) : true;
 		});
@@ -108,7 +110,10 @@ class AppServiceProvider extends ServiceProvider
 		});
 
 		Validator::extend('valid_timezone', function ($attribute, $value, $parameters) {
-            if($parameters[0] == 'in_person') return true;
+			if($parameters[0] == 'in_person'){
+				return true;
+			}
+
 			return in_array($value, \DateTimeZone::listIdentifiers());
 		});
 
@@ -138,38 +143,44 @@ class AppServiceProvider extends ServiceProvider
 			return ($user != null && $user->checkCurrentPassword($value));
 		});
 
-		Validator::extend('future_date', function ($attribute, $value) {
-            $request = request();
-            $timeFrom = data_get($request, 'time_from');
-            $timeTo = data_get($request, 'time_to');
-            $lessonType = data_get($request, 'lesson_type');
-            $location = data_get($request, 'location');
-            $timezoneId = data_get($request, 'timezone_id');
+        Validator::extend('future_date', static function (string $attribute, string $value, array $parameters) {
+            $request = Request::capture();
 
-            // time validation will prevent passing validation in this case
-            if ((!$timeFrom || !$timeTo) || ($timeFrom == 'Invalid date' || $timeTo == 'Invalid date')) return true;
+            if (
+                !$request->time_to ||
+                !$request->time_from ||
+                strtotime('today ' . $request->time_to) === false ||
+                strtotime('today ' . $request->time_from) === false) {
+                return true; // time validation will prevent passing validation in this case
+            }
 
-			if($lessonType == 'in_person_client') return true;
-
-            if (!empty($location) && empty($timezoneId)) {
-				$lessonLocationDetails = getLocationDetails($location);
-				if ($lessonLocationDetails['timezone_id']) {
-					if (strtotime($value . ' ' . $timeFrom) > strtotime(\Carbon\Carbon::now($lessonLocationDetails['timezone_id'])->format('Y-m-d H:i:s'))) {
-						return true;
-					}
-				} else {
-					return true; // location validation will prevent passing validation in this case
-				}
-			} else if (empty($location) && !empty($timezoneId)) {
-				if (strtotime($value . ' ' . $timeFrom) > strtotime(\Carbon\Carbon::now($timezoneId)->format('Y-m-d H:i:s'))) {
-					return true;
-				}
-			} else if(empty($location) && empty($timezoneId)) {
+            if ($request->lesson_type === 'in_person_client') {
                 return true;
             }
 
-			return false;
-		});
+            if ($request->location) {
+                $lessonLocationDetails = getLocationDetails($request->location);
+                if ($lessonLocationDetails['timezone_id']) {
+                    if (strtotime($value . ' ' . $request->time_from) > strtotime(Carbon::now($lessonLocationDetails['timezone_id'])->format('Y-m-d H:i:s'))) {
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                return true; // location validation will prevent passing validation in this case
+            }
+
+            if (!$request->timezone_id) {
+                return true; // location validation will prevent passing validation in this case
+            }
+
+            if (strtotime($value . ' ' . $request->time_from) > strtotime(Carbon::now($request->timezone_id)->format('Y-m-d H:i:s'))) {
+                return true;
+            }
+
+            return false;
+        });
 
 		Validator::extend('date_multi_format', function ($attribute, $value, $formats) {
 			// iterate through all formats
@@ -182,44 +193,53 @@ class AppServiceProvider extends ServiceProvider
 			return false;
 		});
 
-		Validator::extend('no_lessons_this_time', function ($attribute, $date) {
-			$request = request();
-			$timeFrom	= data_get($request, 'time_from');
-			$timeTo = data_get($request, 'time_to');
-            $lessonId = (int) data_get($request, 'lesson_id');
-            $timezone = data_get($request, 'timezone_id');
+        Validator::extend('no_lessons_this_time', static function (string $attribute, string $date, array $parameters) {
+            $request = Request::capture();
 
-            if ((!$timeFrom || !$timeTo) || ($timeFrom == 'Invalid date' || $timeTo == 'Invalid date')) return true;
+            $timeFrom = $request->input($parameters[0]);
+            $timeTo = $request->input($parameters[1]);
 
-            $start	= Carbon::createFromFormat('Y-m-d H:i:s', $date . ' ' . $timeFrom);
-            $end = Carbon::createFromFormat('Y-m-d H:i:s', $date . ' ' . $timeTo);
-
-//			if($timezone) $start->setTimezone($timezone);
-//            if($timezone) $end->setTimezone($timezone);
-
-            if ($start && $end) {
-				$start = $start->format('Y-m-d H:i:s');
-				$end = $end->format('Y-m-d H:i:s');
-
-				$userLessons = Auth::user()->lessons()
-					->whereRaw(" ( is_cancelled is NULL OR is_cancelled=0 ) ")
-					->whereRaw("DATE(start) = '" . $start . "'")
-					->whereRaw("(
-                            (start >= '" . $start . "' AND start < '" . $end . "')
-                            OR (end > '" . $start . "' AND end <= '" . $end . "')
-                            OR (start < '" . $start . "' AND end > '" . $end . "')
-                        )")
-                    ->whereNull('deleted_at');
-
-				if ($lessonId) $userLessons->where('id', '!=', $lessonId);
-
-				return ($userLessons->count() == 0);
-			} else if(!$timeFrom || !$timeTo) {
+            if (!$timeTo || !$timeFrom) {
                 return true;
             }
 
-			return false;
-		});
+            $dateTimeZone = $request->input($parameters[5]) ? new DateTimeZone($request->input($parameters[5])): null;
+
+            $startDateTime = DateTime::createFromFormat(
+                'Y-m-d H:i:s',
+                "{$request->input($parameters[3])} {$timeFrom}",
+                $dateTimeZone
+            );
+
+            $endDateTime = DateTime::createFromFormat(
+                'Y-m-d H:i:s',
+                "{$request->input($parameters[4])} {$timeTo}",
+                $dateTimeZone
+            );
+
+            if (!$startDateTime || !$endDateTime) {
+                return false;
+            }
+
+            $startDateTimeString = $startDateTime->format('Y-m-d H:i:s');
+            $endDateTimeString = $endDateTime->format('Y-m-d H:i:s');
+
+            $userLessons = Auth::user()->lessons()
+                ->whereRaw(" ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) ")
+                ->whereRaw("DATE(start) = '" . $startDateTime->format('Y-m-d') . "'")
+                ->whereRaw("(
+                    (start >= '" . $startDateTimeString . "' AND start < '" . $endDateTimeString . "') OR
+                    (end > '" . $startDateTimeString . "' AND end <= '" . $endDateTimeString . "') OR
+                    (start < '" . $startDateTimeString . "' AND end > '" . $endDateTimeString . "')
+                )");
+
+            $lesson_id = $request->input($parameters[2]);
+            if ($lesson_id) {
+                $userLessons->where('id', '!=', $lesson_id);
+            }
+
+            return $userLessons->count() === 0;
+        });
 
 		User::observe(UserObserver::class);
 		Booking::observe(BookingObserver::class);
