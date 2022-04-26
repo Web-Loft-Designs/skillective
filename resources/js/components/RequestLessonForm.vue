@@ -77,44 +77,38 @@
                 </div>
                 <div
                   class='form-group first-name has-feedback'
-                  :class="{ 'has-error': errors.first_name }"
+                  :class="{'has-error': ($v.modalData.first_name.$dirty && !$v.modalData.first_name.required)}"
                 >
                   <input
                     type='text'
                     class='form-control'
-                    required
                     name='first_name'
-                    value=''
                     v-model='modalData.first_name'
                     placeholder='First Name'
+                    :class="{'is-invalid': ($v.modalData.first_name.$dirty && !$v.modalData.first_name.required)}"
                   />
-                  <span class='help-block' v-if='errors.first_name'>
-                    <strong>{{ errors.first_name[0] }}</strong>
-                  </span>
+                  <span v-if='$v.modalData.first_name.$dirty && !$v.modalData.first_name.required'>First name can't be empty</span>
                 </div>
                 <div class='invalid-feedback'>
                   Please choose a username.
                 </div>
                 <div
                   class='form-group last-name has-feedback'
-                  :class="{ 'has-error': errors.last_name }"
+                  :class="{'has-error': ($v.modalData.last_name.$dirty && !$v.modalData.last_name.required)}"
                 >
                   <input
                     type='text'
                     class='form-control'
-                    required
                     name='last_name'
-                    value=''
                     v-model='modalData.last_name'
                     placeholder='Last Name'
+                    :class="{'is-invalid': ($v.modalData.last_name.$dirty && !$v.modalData.last_name.required)}"
                   />
-                  <span class='help-block' v-if='errors.last_name'>
-                    <strong>{{ errors.last_name[0] }}</strong>
-                  </span>
+                  <span v-if='$v.modalData.last_name.$dirty && !$v.modalData.last_name.required'>Last name can't be empty</span>
                 </div>
                 <div
                   class='form-group has-feedback'
-                  :class="{ 'has-error': errors.instagram_handle }"
+                  :class="{'has-error': ($v.modalData.instagram_handle.$dirty && !$v.modalData.instagram_handle.required)}"
                 >
                   <label>Instagram Handle</label>
                   <input
@@ -124,33 +118,29 @@
                     value=''
                     v-model='modalData.instagram_handle'
                     placeholder='@instagram_name'
-                    required
+                    :class="{'is-invalid': ($v.modalData.instagram_handle.$dirty && !$v.modalData.instagram_handle.required)}"
                   />
-                  <span class='help-block' v-if='errors.instagram_handle'>
-                    <strong>{{ errors.instagram_handle[0] }}</strong>
-                  </span>
+                  <span v-if='$v.modalData.instagram_handle.$dirty && !$v.modalData.instagram_handle.required'>Last name can't be empty</span>
                 </div>
                 <div
                   class='form-group input-zip has-feedback'
-                  :class="{ 'has-error': errors.zip }"
+                  :class="{'has-error': ($v.modalData.zip.$dirty && !$v.modalData.zip.required) || ($v.modalData.zip.$dirty && !$v.modalData.zip.numeric)}"
                 >
                   <label>ZIP</label>
                   <input
                     type='text'
                     class='form-control'
                     name='zip'
-                    value=''
-                    v-model='modalData.zip'
+                    v-model.number='modalData.zip'
                     placeholder='ZIP code'
-                    required
+                    :class="{'is-invalid': ($v.modalData.zip.$dirty && !$v.modalData.zip.required)}"
                   />
-                  <span class='help-block' v-if='errors.zip'>
-                    <strong>{{ errors.zip[0] }}</strong>
-                  </span>
+                  <span v-if='$v.modalData.zip.$dirty && !$v.modalData.zip.required'>ZIP code can't be empty</span>
+                  <span v-else-if='$v.modalData.zip.$dirty && !$v.modalData.zip.numeric'>ZIP code must be numeric</span>
                 </div>
                 <div
                   class='form-group w-50 has-feedback'
-                  :class="{ 'has-error': errors.dob }"
+                  :class="{'has-error': ($v.modalData.dob.$dirty && !$v.modalData.dob.required)}"
                 >
                   <label>Date of Birth</label>
                   <dropdown-datepicker
@@ -161,13 +151,11 @@
                     submit-format='yyyy-mm-dd'
                   ></dropdown-datepicker>
 
-                  <span class='help-block' v-if='errors.dob'>
-                    <strong>{{ errors.dob[0] }}</strong>
-                  </span>
+                  <span v-if='$v.modalData.dob.$dirty && !$v.modalData.dob.required'>Date of Birth can't be empty</span>
                 </div>
                 <div
                   class='form-group w-50 has-feedback'
-                  :class="{ 'has-error': errors.gender }"
+                  :class="{'has-error': ($v.modalData.gender.$dirty && !$v.modalData.gender.required)}"
                 >
                   <label>Gender</label>
                   <div class='radio-wrapper'>
@@ -178,6 +166,7 @@
                         type='radio'
                         id='male'
                         value='male'
+                        :class="{'is-invalid': ($v.modalData.gender.$dirty && !$v.modalData.gender.required)}"
                       />
                       <span class='checkmark'></span>
                       Male
@@ -189,50 +178,47 @@
                         type='radio'
                         id='female'
                         value='female'
+                        :class="{'is-invalid': ($v.modalData.gender.$dirty && !$v.modalData.gender.required)}"
                       />
                       <span class='checkmark'></span>
                       Female
                     </label>
                   </div>
-
-                  <span class='help-block' v-if='errors.gender'>
-                    <strong>{{ errors.gender[0] }}</strong>
-                  </span>
+                  <span v-if='$v.modalData.gender.$dirty && !$v.modalData.gender.required'>You need to select gender</span>
                 </div>
                 <div
-                  class='form-group w-50 has-feedback'
-                  :class="{'has-error': ($v.email.$dirty && !$v.email.required) || ($v.email.$dirty && !$v.email.email)}"
+                  class='form-group w-50'
+                  :class="{'has-error': ($v.modalData.email.$dirty && !$v.modalData.email.required) || ($v.modalData.email.$dirty && !$v.modalData.email.email)}"
                 >
                   <label>Email</label>
                   <input
                     type='email'
-                    class='form-control'
                     name='email'
                     v-model.trim='modalData.email'
                     placeholder='Email'
+                    class='form-control'
+                    :class="{'is-invalid': ($v.modalData.email.$dirty && !$v.modalData.email.required) || ($v.modalData.email.$dirty && !$v.modalData.email.email)}"
                   />
-                  <span class='help-block'>
-                    <strong>Error</strong>
-                  </span>
+                  <span v-if='$v.modalData.email.$dirty && !$v.modalData.email.required'>Email can't be empty</span>
+                  <span v-else-if='$v.modalData.email.$dirty && !$v.modalData.email.email'>Error email format</span>
                 </div>
                 <div
                   class='form-group w-50 has-feedback'
-                  :class="{ 'has-error': errors.mobile_phone }"
+                  :class="{'has-error': ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required)}"
                 >
                   <label>Phone number</label>
                   <masked-input
-                    :class="'form-control'"
+                    class='form-control'
                     v-model='modalData.mobile_phone'
                     :placeholder="'+1 (___) ___ ____'"
                     mask='\+1 (111) 111 1111'
+                    :class="{'is-invalid': ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required)}"
                   />
-                  <span class='help-block' v-if='errors.mobile_phone'>
-                    <strong>{{ errors.mobile_phone[0] }}</strong>
-                  </span>
+                  <span v-if='$v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required'>Phone number can't be empty</span>
                 </div>
                 <div
                   class='form-group checkbox-wrapper has-feedback'
-                  :class="{ 'has-error': errors.accept_terms }"
+                  :class="{'has-error': $v.modalData.mobile_phone.$dirty && !modalData.accept_terms}"
                 >
                   <div class='field'>
                     <label for='accept-terms'>
@@ -241,17 +227,13 @@
                         type='checkbox'
                         id='accept-terms'
                         :value='1'
-                        required
                       />
                       <span class='checkmark'></span>
                       I agree to the
                       <a href='/terms' target='_blank'>terms of service</a>
                     </label>
                   </div>
-
-                  <span class='help-block' v-if='errors.accept_terms'>
-                    <strong>{{ errors.accept_terms[0] }}</strong>
-                  </span>
+                  <span v-if='$v.modalData.mobile_phone.$dirty && !modalData.accept_terms'>Please accept terms of service</span>
                 </div>
                 <div class='form-group'>
                   <button type='submit' class='btn btn-success btn-block'>ADD ME TO THEIR LIST :-)</button>
@@ -639,7 +621,7 @@ require('jquery.maskedinput/src/jquery.maskedinput')
 import DropdownDatepicker from 'vue-dropdown-datepicker'
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
 import {mapActions} from 'vuex'
-import {email, required} from 'vuelidate/lib/validators'
+import {email, required, numeric} from 'vuelidate/lib/validators'
 
 $(function() {
   $('[data-toggle="tooltip"]')
@@ -670,18 +652,20 @@ export default {
     'instructorName',
   ],
   validations: {
-    first_name: {},
-    last_name: {},
-    email: {email, required},
-    address: {},
-    city: {},
-    state: {},
-    zip: {},
-    dob: {},
-    gender: {},
-    mobile_phone: {},
-    accept_terms: {},
-    instagram_handle: {},
+    modalData: {
+      first_name: {required},
+      last_name: {required},
+      email: {email, required},
+      address: {required},
+      city: {required},
+      state: {required},
+      zip: {required, numeric},
+      dob: {required},
+      gender: {required},
+      mobile_phone: {required},
+      accept_terms: {checked: v => v},
+      instagram_handle: {required},
+    }
   },
   data() {
     return {
@@ -1161,9 +1145,9 @@ export default {
 </script>
 
 <style lang='scss'>
-.modal-open .modal {
-  overflow-y: hidden;
-}
+//.modal-open .modal {
+//  overflow-y: hidden;
+//}
 
 .modal-open, .modal {
   padding-right: 0 !important
