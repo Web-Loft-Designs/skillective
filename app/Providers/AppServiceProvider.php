@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Socialite\Two\FacebookProvider;
 use Illuminate\Support\Facades\Validator;
@@ -198,12 +199,13 @@ class AppServiceProvider extends ServiceProvider
 
             $timeFrom = $request->input($parameters[0]);
             $timeTo = $request->input($parameters[1]);
+            $timeZone = $request->input($parameters[5]);
 
-            if (!$timeTo || !$timeFrom) {
+            if (!$timeTo || !$timeFrom || !$timeZone) {
                 return true;
             }
 
-            $dateTimeZone = $request->input($parameters[5]) ? new DateTimeZone($request->input($parameters[5])): null;
+            $dateTimeZone = new DateTimeZone($timeZone);
 
             $startDateTime = DateTime::createFromFormat(
                 'Y-m-d H:i:s',
@@ -225,12 +227,11 @@ class AppServiceProvider extends ServiceProvider
             $endDateTimeString = $endDateTime->format('Y-m-d H:i:s');
 
             $userLessons = Auth::user()->lessons()
-                ->whereRaw(" ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) ")
-                ->whereRaw("DATE(start) = '" . $startDateTime->format('Y-m-d') . "'")
+                ->whereRaw("(lessons.is_cancelled is NULL OR lessons.is_cancelled=0)")
                 ->whereRaw("(
-                    (start >= '" . $startDateTimeString . "' AND start < '" . $endDateTimeString . "') OR
-                    (end > '" . $startDateTimeString . "' AND end <= '" . $endDateTimeString . "') OR
-                    (start < '" . $startDateTimeString . "' AND end > '" . $endDateTimeString . "')
+                    (start >= CONVERT_TZ('{$startDateTimeString}', '{$timeZone}', timezone_id) AND start < CONVERT_TZ('{$endDateTimeString}', '{$timeZone}', timezone_id)) OR
+                    (end > CONVERT_TZ('{$startDateTimeString}', '{$timeZone}', timezone_id) AND end <= CONVERT_TZ('{$endDateTimeString}', '{$timeZone}', timezone_id)) OR
+                    (start < CONVERT_TZ('{$startDateTimeString}', '{$timeZone}', timezone_id) AND end > CONVERT_TZ('{$endDateTimeString}', '{$timeZone}', timezone_id))
                 )");
 
             $lesson_id = $request->input($parameters[2]);
