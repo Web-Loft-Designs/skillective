@@ -107,12 +107,17 @@ class AppServiceProvider extends ServiceProvider
 
         Validator::extend('virtual_min_price', function ($attribute, $value, $parameters)
         {
-            $minPrice = (float) data_get(auth()->user(), 'profile.virtual_min_price');
+            $lessonType = request('lesson_type');
 
-            if(empty($minPrice) && $value < 1) return false;
-            else if(!empty($minPrice) && $value < $minPrice) return false;
+            if ($lessonType == 'virtual') {
+                $minPrice = (float) data_get(auth()->user(), 'profile.virtual_min_price');
+                if (empty($minPrice) && $value < 1) return false;
+                else if (!empty($minPrice) && $value < $minPrice) return false;
+            } else if ($value < 1) {
+                return false;
+            }
 
-            return (true);
+            return true;
         });
 
 		Validator::extend('max_words', function ($attribute, $value, $parameters) {
