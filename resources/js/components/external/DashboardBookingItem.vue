@@ -638,10 +638,10 @@ export default {
 			}
 		},
 		lessonStart: function() {
-			return moment(this.lesson.start).format('MMMM DD h:mm A')
+			return moment(this.lesson.start_prepared ?? this.lesson.).format('MMMM DD h:mm A')
 		},
 		lessonEnd: function() {
-			return moment(this.lesson.end).format('MMMM DD h:mm A')
+			return moment(this.lesson.end_prepared ?? this.lesson.end).format('MMMM DD h:mm A')
 		},
 	},
 	watch: {

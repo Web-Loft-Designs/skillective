@@ -219,16 +219,16 @@ export default {
             let _tzOffset = isDstObserved ? lessonTimeZoneObj.dstOffset * 60 * 1000 : lessonTimeZoneObj.utcOffset * 60 * 1000;
 
             let dummyStart = new Date(item.start.replace(/\s/, "T")).getTime() - userTzOffset - _tzOffset;
-            item.start = moment(dummyStart).format("YYYY-MM-DD HH:mm:ss");
+            item.start_prepared = moment(dummyStart).format("YYYY-MM-DD HH:mm:ss");
 
             let dummyEnd = new Date(item.end.replace(/\s/, "T")).getTime() - userTzOffset - _tzOffset;
-            item.end = moment(dummyEnd).format("YYYY-MM-DD HH:mm:ss");
+            item.end_prepared = moment(dummyEnd).format("YYYY-MM-DD HH:mm:ss");
 
             return item;
         });
 
       const groups = bookings.reduce((groups, lesson) => {
-        const date = moment(lesson.start).format("MM/DD/YY");
+        const date = moment(lesson.start_prepared).format("MM/DD/YY");
 
         if (!groups[date]) {
           groups[date] = [];
