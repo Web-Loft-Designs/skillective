@@ -55,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
 		Validator::extend('valid_limit', function ($attribute, $value, $parameters) {
 			return in_array($value, array_keys(UserGeoLocation::getAvailableLimits()));
 		});
-		
+
 		Validator::extend('is_exact_address', function ($attribute, $value, $parameters) {
 			$locationDetails = getLocationDetails($value);
 
@@ -102,6 +102,16 @@ class AppServiceProvider extends ServiceProvider
 			return (strtotime($parameters[1]) !== false && strtotime($parameters[2]) !== false && $minPrice > 0) ? ($minPrice * $countSpots <= $value) : true;
 		});
 
+        Validator::extend('virtual_min_price', function ($attribute, $value, $parameters)
+        {
+            $minPrice = (float) data_get(auth()->user(), 'profile.virtual_min_price');
+
+            if(empty($minPrice) && $value < 1) return false;
+            else if(!empty($minPrice) && $value < $minPrice) return false;
+
+            return (true);
+        });
+
 		Validator::extend('max_words', function ($attribute, $value, $parameters) {
 			$countWords = str_word_count($value);
 			return ($countWords <= $parameters[0]);
@@ -111,7 +121,7 @@ class AppServiceProvider extends ServiceProvider
 			if($parameters[0] == 'in_person'){
 				return true;
 			}
-			
+
 			return in_array($value, \DateTimeZone::listIdentifiers());
 		});
 
@@ -205,13 +215,13 @@ class AppServiceProvider extends ServiceProvider
 			if($timezone){
 				$start->setTimezone(new \DateTimeZone($timezone));
 			}
-			
+
 			$end		= \DateTime::createFromFormat('Y-m-d H:i:s', "$date $time_to");
 
 			if($timezone){
 				$end->setTimezone(new \DateTimeZone($timezone));
 			}
-			
+
 
 			if ($start && $end) {
 				$start_from	= $start->format('Y-m-d H:i:s');
@@ -219,7 +229,7 @@ class AppServiceProvider extends ServiceProvider
 				$userLessons = Auth::user()->lessons()
 					->whereRaw(" ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) ")
 					->whereRaw("DATE(start) = '" . $start->format('Y-m-d') . "'")
-					->whereRaw("( 
+					->whereRaw("(
 								   	(start >= '" . $start_from . "' AND start < '" . $end_to . "')
 								   	OR (end > '" . $start_from . "' AND end <= '" . $end_to . "')
 								   	OR (start < '" . $start_from . "' AND end > '" . $end_to . "')
