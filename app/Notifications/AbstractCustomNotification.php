@@ -8,12 +8,12 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Log;
 use NotificationChannels\Twilio\TwilioChannel;
 use Twilio\Rest\Client;
 use App\Channels\WhatsAppChannel;
 use NotificationChannels\Twilio\TwilioSmsMessage;
 use Tylercd100\Placeholders\Facades\Placeholders;
-use Log;
 
 abstract class AbstractCustomNotification extends Notification
 {
@@ -23,13 +23,9 @@ abstract class AbstractCustomNotification extends Notification
      * @var \App\Models\CustomNotification
      */
 	private $customNotification;
-
     protected $content = [];
-
     protected $vars = [];
-
     protected $methods;
-
     protected $notifiable;
 
     /**
@@ -63,6 +59,7 @@ abstract class AbstractCustomNotification extends Notification
     {
         $mailContent    = Placeholders::parse($this->methods['mail']['content'], $this->getVars());
         $this->content['mail'] = $mailContent;
+        $this->content['var'] = $this->getVars();
     }
 
     protected function generateSMSContent()
@@ -130,7 +127,11 @@ abstract class AbstractCustomNotification extends Notification
 
         return (new MailMessage)
             ->subject($this->methods['mail']['data']['subject'])
-            ->markdown('emails.abstract', ['view' => $this->content['mail']]);
+            ->markdown('emails.abstract', [
+                'view' => $this->content['mail'],
+                'sender_first_name' => data_get($this->content['var'], 'sender_first_name'),
+                'sender_last_name' => data_get($this->content['var'], 'sender_last_name'),
+            ]);
     }
 
     public function toTwilio($notifiable)

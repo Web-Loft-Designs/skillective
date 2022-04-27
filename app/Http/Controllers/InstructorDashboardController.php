@@ -2,21 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Lesson;
 use App\Repositories\BookingRepository;
 use Illuminate\Http\Request;
+use Auth;
+use Cookie;
 use App\Repositories\LessonRepository;
 use App\Repositories\GenreRepository;
 use App\Repositories\UserRepository;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cookie;
-use Illuminate\Support\Facades\Log;
+use App\Models\Profile;
+use Log;
+use App\Notifications\YouMayBeInterestedInLessonNotification;
+use TwilioVideo;
 
 class InstructorDashboardController extends Controller
 {
     /**
      * Show the application dashboard.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application|\Illuminate\View\View
+     * @return \Illuminate\Http\Response
      */
     public function index(Request $request, LessonRepository $lessonRepo, GenreRepository $genreRepository, UserRepository $userRepository, BookingRepository $bookingRepository)
     {
