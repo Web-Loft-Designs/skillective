@@ -7,8 +7,8 @@ use App\Http\Requests\API\RemoveStudentInstructorsAPIRequest;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Support\Facades\Auth;
 use Response;
-use Auth;
 use Log;
 
 
@@ -107,12 +107,13 @@ class StudentInstructorsAPIController extends AppBaseController
 		if (empty($instructor)) {
 			return $this->sendError('Instructor not found');
 		}
-
 		if ($instructor->hasRole($this->userRepository->model()::ROLE_INSTRUCTOR)) {
-			if (!Auth::user()->hasOwnInstructor($instructorId))
-				Auth::user()->instructors()->attach( $instructorId, ['is_favorite' => true] );
-			else // make just favorite
-				Auth::user()->instructors()->updateExistingPivot( $instructorId, ['is_favorite' => true], false );
+            if(Auth::user()) {
+                if (!Auth::user()->hasOwnInstructor($instructorId))
+                    Auth::user()->instructors()->attach($instructorId, ['is_favorite' => true]);
+                else // make just favorite
+                    Auth::user()->instructors()->updateExistingPivot($instructorId, ['is_favorite' => true], false);
+            }
 		}
 
 		return $this->sendResponse(true, 'Instructor added to your favorites');
