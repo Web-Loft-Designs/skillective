@@ -1,24 +1,27 @@
 <template>
   <div id='lesson-form-container'>
     <div class='d-grid gap-2 d-md-block'>
-      <button class='btn btn-success'
-              v-if='showCreateBtn'
-              type='button'
-              @click='openPopup'>Request Time
+      <button
+        class='btn btn-success'
+        v-if='showCreateBtn'
+        type='button'
+        @click='openPopup'
+      >
+        Request Time
       </button>
       <span data-toggle='modal' data-target='#exampleModalCenter'>
-        <button class='btn btn-success btn-sm text-wrap'
-                type='button'
-                data-toggle='tooltip'
-                data-placement='bottom'
-                :title='tooltipContent()'
+        <button
+          class='btn btn-success btn-sm text-wrap'
+          type='button'
+          data-toggle='tooltip'
+          data-placement='bottom'
+          :title='tooltipContent()'
         >
           Add me to {{ instructorName }}'s Client List
         </button>
       </span>
     </div>
     <div
-      v-if='loggedInStudent'
       class='modal fade'
       id='exampleModalCenter'
       tabindex='0'
@@ -26,8 +29,9 @@
       aria-labelledby='exampleModalCenterTitle'
       aria-hidden='true'
     >
-      <div class='modal-dialog modal-dialog-centered'
-           role='document'
+      <div
+        class='modal-dialog modal-dialog-centered'
+        role='document'
       >
         <div class='modal-content'>
           <div class='modal-header'>
@@ -50,7 +54,7 @@
               aria-label='Close'
               class='btn btn-success btn-sm'
               data-toggle='modal'
-              data-target='.bd-example-modal-sm'
+              data-target='.popup1 .popup2'
               @click='successJoinedToClient'
             >
               Join client list
@@ -60,11 +64,26 @@
       </div>
     </div>
     <div
-      class='modal fade'
+      class='modal fade bd-example-modal-sm popup1'
+      id='myModal2'
       tabindex='-1'
       role='dialog'
-      v-else
+      aria-labelledby='mySmallModalLabel'
+      aria-hidden='true'
+      v-if='loggedInStudent'
+    >
+      <div class='modal-dialog modal-sm'>
+        <div class='modal-content p-10'>
+          Congratulations! You have been added to the instructor’s list of clients
+        </div>
+      </div>
+    </div>
+    <div
+      class='modal fade popup2'
+      tabindex='-1'
+      role='dialog'
       id='exampleModalCenter'
+      v-else
     >
       <div class='modal-dialog' role='document'>
         <div class='modal-content'>
@@ -132,55 +151,6 @@
                   />
                   <span v-if='$v.modalData.zip.$dirty && !$v.modalData.zip.required'>ZIP code can't be empty</span>
                   <span v-else-if='$v.modalData.zip.$dirty && !$v.modalData.zip.numeric'>ZIP code must be numeric</span>
-                </div>
-<!--                <div-->
-<!--                  class='form-group w-50 has-feedback'-->
-<!--                  :class="{'has-error': ($v.modalData.dob.$dirty && !$v.modalData.dob.required)}"-->
-<!--                >-->
-<!--                  <label>Date of Birth</label>-->
-<!--                  <dropdown-datepicker-->
-<!--                    :max-year='2021'-->
-<!--                    :minYear='1940'-->
-<!--                    display-format='mdy'-->
-<!--                    v-model='modalData.dob'-->
-<!--                    submit-format='yyyy-mm-dd'-->
-<!--                  ></dropdown-datepicker>-->
-
-<!--                  <span v-if='$v.modalData.dob.$dirty && !$v.modalData.dob.required'>Date of Birth can't be empty</span>-->
-<!--                </div>-->
-
-                <div
-                  class='form-group w-50'
-                  :class="{'has-error': ($v.modalData.gender.$dirty && !$v.modalData.gender.required)}"
-                >
-                  <label>Gender</label>
-                  <div class='radio-wrapper'>
-                    <label class='radio-item' for='male'>
-                      <input
-                        v-model='modalData.gender'
-                        name='gender'
-                        type='radio'
-                        id='male'
-                        value='male'
-                        :class="{'is-invalid': ($v.modalData.gender.$dirty && !$v.modalData.gender.required)}"
-                      />
-                      <span class='checkmark'></span>
-                      Male
-                    </label>
-                    <label class='radio-item' for='female'>
-                      <input
-                        v-model='modalData.gender'
-                        name='gender'
-                        type='radio'
-                        id='female'
-                        value='female'
-                        :class="{'is-invalid': ($v.modalData.gender.$dirty && !$v.modalData.gender.required)}"
-                      />
-                      <span class='checkmark'></span>
-                      Female
-                    </label>
-                  </div>
-                  <span v-if='$v.modalData.gender.$dirty && !$v.modalData.gender.required'>You need to select gender</span>
                 </div>
                 <div
                   class='form-group w-50'
@@ -252,15 +222,6 @@
               <div v-if='errorText' class='has-error'>{{ errorText }}</div>
             </form>
           </div>
-        </div>
-      </div>
-    </div>
-    <div class='modal fade bd-example-modal-sm' id='myModal2' tabindex='-1' role='dialog'
-         aria-labelledby='mySmallModalLabel'
-         aria-hidden='true'>
-      <div class='modal-dialog modal-sm'>
-        <div class='modal-content p-10'>
-          Congratulations! You have been added to the instructor’s list of clients
         </div>
       </div>
     </div>
@@ -666,8 +627,6 @@ export default {
       first_name: {required},
       last_name: {required},
       zip: {required, numeric},
-      // dob: {required},
-      gender: {required},
       email: {email, required},
       mobile_phone: {required},
       accept_terms: {checked: v => v},
@@ -680,8 +639,6 @@ export default {
         last_name: '',
         email: '',
         zip: '',
-        // dob: '',
-        gender: '',
         mobile_phone: '',
         instagram_handle: '',
         newsletter: true,
