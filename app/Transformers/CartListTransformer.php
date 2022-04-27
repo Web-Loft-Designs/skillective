@@ -2,10 +2,9 @@
 
 namespace App\Transformers;
 
-use Carbon\Carbon;
 use League\Fractal\TransformerAbstract;
 use App\Models\Cart;
-use Illuminate\Support\Facades\Log;
+use Log;
 
 /**
  * Class BookingInListTransformer.
@@ -43,8 +42,8 @@ class CartListTransformer extends TransformerAbstract
 						'image' => $lesson->instructor->profile->getImageUrl(),
 						'full_name' => $lesson->instructor->getName(),
 					],
-					'start' => $lesson->start_local_time,
-					'end' => $lesson->end_local_time,
+					'start' => $lesson->start->format('Y-m-d H:i:s'),
+					'end' => $lesson->end->format('Y-m-d H:i:s'),
 					'timezone_id' => getTimezoneAbbrev($lesson->timezone_id),
 					'timezone_id_name' => $lesson->timezone_id,
 					'spots_count' => $lesson->spots_count,
@@ -82,7 +81,7 @@ class CartListTransformer extends TransformerAbstract
 					'title' => $lesson->title,
 					'price' => $lesson->price,
 					'duration' => $lesson->duration,
-					'start' => $lesson->start_local_time,
+					'start' => $lesson->created_at->format('Y-m-d H:i:s'),
 					'instructor' => [
 						'id' => $lesson->instructor->id,
 						'first_name' => $lesson->instructor->first_name,

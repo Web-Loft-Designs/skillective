@@ -93,7 +93,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import MagnificPopupModal from "./MagnificPopupModal";
 import siteAPI from "../../mixins/siteAPI.js";
-import { getTimezone } from "countries-and-timezones";
+import countriesAndTimezones from "countries-and-timezones";
 var FileSaver = require("file-saver");
 
 export default {
@@ -186,7 +186,7 @@ export default {
         const cont = document.querySelector(".fc-view-container");
 
         const buttonUp = document.createElement("button");
-        buttonUp.classList.add("fc-button--arrow"); 
+        buttonUp.classList.add("fc-button--arrow");
         buttonUp.classList.add("fc-button--up");
 
         buttonUp.innerHTML = "Expand";
@@ -255,7 +255,7 @@ export default {
               item.title = item.genre.title;
          let userTzOffset = new Date().getTimezoneOffset() * 60 * 1000;
 
-              let lessonTimeZoneObj = getTimezone(item.timezone_id_name);
+              let lessonTimeZoneObj = countriesAndTimezones.getTimezone(item.timezone_id_name);
 
               var jan = new Date(0, 1);
               var jul = new Date(6, 1);
