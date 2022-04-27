@@ -105,6 +105,16 @@ class AppServiceProvider extends ServiceProvider
 			return (strtotime($parameters[1]) !== false && strtotime($parameters[2]) !== false && $minPrice > 0) ? ($minPrice * $countSpots <= $value) : true;
 		});
 
+        Validator::extend('virtual_min_price', function ($attribute, $value, $parameters)
+        {
+            $minPrice = (float) data_get(auth()->user(), 'profile.virtual_min_price');
+
+            if(empty($minPrice) && $value < 1) return false;
+            else if(!empty($minPrice) && $value < $minPrice) return false;
+
+            return (true);
+        });
+
 		Validator::extend('max_words', function ($attribute, $value, $parameters) {
 			$countWords = str_word_count($value);
 			return ($countWords <= $parameters[0]);
