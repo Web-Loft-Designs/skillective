@@ -588,7 +588,7 @@ export default {
         this.$refs.modal.open();
       } else {
         Cookies.set("backToRequestLesson", this.instructorId);
-        window.location = "/login";
+        // window.location = "/login";
       }
     },
     clearFormAndClosePopup() {

@@ -49,10 +49,6 @@
     padding: 0 5px 0 8px;
     color: #FFFFFF;
 
-    span {
-      margin-bottom: 2px;
-    }
-
     &::after {
       content: "";
       width: 25px;
@@ -76,10 +72,6 @@
     align-items: center;
     padding: 0 8px 0 5px;
     color: #FFFFFF;
-
-    span {
-      margin-bottom: 2px;
-    }
 
     &::before {
       content: "";

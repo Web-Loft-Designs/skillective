@@ -1,18 +1,6 @@
 <template>
   <div class="global-shop">
     <div class="global-shop__container">
-      <!-- <div class="global-shop__header">
-        <input
-          type="text"
-          placeholder="Enter the question"
-          class="global-shop__search-field"
-          v-model="searchText"
-        />
-        <button class="global-shop__search-button" @click="goSearch()">
-          <img src="/images/search-icon-white.svg" />
-          <span>Search</span>
-        </button>
-      </div> -->
 
       <div class="global-shop__content">
         <div class="global-shop__content-header">
@@ -27,7 +15,7 @@
           <anim-loader v-if="isLoading" />
           <video-lessons-list
             v-else
-            :logged-in-as-student="loggedInAsStudent"
+            :can-book="canBook"
             :lessons="lessons"
             show-instructor-info
             card-button="more-info"
@@ -63,7 +51,7 @@ export default {
     AnimLoader,
   },
   props: {
-    loggedInAsStudent: {
+    canBook: {
         type: Boolean,
         default: false,
     },

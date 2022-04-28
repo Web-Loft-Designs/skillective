@@ -205,12 +205,19 @@
           :class="{ 'has-error': errors.about_me }"
         >
           <label>About me</label>
-          <textarea
+          <!-- <textarea
             class="form-control"
             name="about_me"
             placeholder="about you"
             v-model="fields.about_me"
-          ></textarea>
+          ></textarea> -->
+
+          <text-editor
+            name="about_me"
+            placeholder="About you"
+            v-model="fields.about_me"
+          />
+
           <span class="help-block" v-if="errors.about_me">
             <strong>{{ errors.about_me[0] }}</strong>
           </span>
@@ -305,6 +312,8 @@
 </template>
 
 <script>
+import TextEditor from "./profile/TextEditor/TextEditor.vue";
+
 import siteAPI from "../mixins/siteAPI.js";
 import MaskedInput from "vue-masked-input";
 require("jquery.maskedinput/src/jquery.maskedinput");
@@ -313,6 +322,7 @@ export default {
   components: {
     MaskedInput,
     DropdownDatepicker,
+    TextEditor,
   },
   mixins: [siteAPI],
   props: {

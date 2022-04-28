@@ -14,10 +14,10 @@
             <template v-slot:button>Sign up</template>
             <template v-slot:default>
                 <li><a href="{!! route('student.register') !!}">Sign up as a client</a></li>
-                <li><a href="/#become-an-instructor">Sign up as an instructor</a></li>
+                <li><a href="{!! route('instructor.register') !!}">Sign up as an instructor</a></li>
             </template>
         </nav-drop-down>
-        
+
         <li><a href="#" class="open-login-popup-link">Login</a></li>
     @endif
 </nav-links>

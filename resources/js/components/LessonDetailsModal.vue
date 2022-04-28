@@ -67,7 +67,7 @@
         ></p>
         <p v-if="selectedLesson.description">
           Note: <br />
-          {{ selectedLesson.description }}
+          <content-viewer :content="selectedLesson.description" />
         </p>
         <p>
           <strong>${{ selectedLesson.spot_price }}</strong> per lesson
@@ -120,7 +120,7 @@
 
         <loader-button
           v-if="currentUserCanBook && studentList === 'booking-button'"
-          :isLoading="loggedInAsStudent && isLoading"
+          :isLoading="isLoading"
           text="Add to cart"
           @click="addToCart(selectedLesson)"
         />
@@ -137,13 +137,15 @@ import siteAPI from "../mixins/siteAPI.js";
 import skillectiveHelper from "../mixins/skillectiveHelper.js";
 import MagnificPopupModal from "./external/MagnificPopupModal";
 import { getTimezone } from "countries-and-timezones";
-import { mapActions, mapMutations, mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import LoaderButton from "./cart/LoaderButton/LoaderButton.vue";
+import ContentViewer from "./profile/ContentViewer/ContentViewer.vue"
 
 export default {
   components: {
     MagnificPopupModal,
     LoaderButton,
+    ContentViewer
   },
   mixins: [siteAPI, skillectiveHelper],
   props: [
@@ -173,20 +175,16 @@ export default {
     ...mapActions(["addItemToCartAtStart"]),
     ...mapGetters(["isCartLoading"]),
     addToCart: async function (lesson) {
-      if (this.loggedInAsStudent) {
-        const result = await this.addItemToCartAtStart({
-          lessonId: lesson.id,
-          specialRequest: this.specialRequestText || "",
-        });
+      const result = await this.addItemToCartAtStart({
+        lessonId: lesson.id,
+        specialRequest: this.specialRequestText || "",
+      });
 
-        if (result.isError) {
-          this.errorText = result.message;
-        } else {
-          this.closeModal();
-          this.$root.$emit("showMiniCart");
-        }
+      if (result.success || (result.data && result.data.success)) {
+        this.closeModal();
+        this.$root.$emit("showMiniCart");
       } else {
-        window.location.href = "/login";
+        this.errorText = result.message;
       }
     },
     closeModal: function () {

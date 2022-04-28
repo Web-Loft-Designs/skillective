@@ -12,12 +12,18 @@
       ref="modal"
     >
       <div class="modal-add-lesson">
-        <form method="post" @keypress.enter.prevent @submit.prevent="onSubmit">
+        <form method="post" @submit.prevent="onSubmit">
           <div class="row">
             <h2 v-if="!fields.id" class="login-box-msg col-12">
               Add Lesson Time
             </h2>
             <h2 v-else class="login-box-msg col-12">Edit Lesson</h2>
+
+            <div class="form-group col-12" v-if="fields.id">
+              <label>Share link</label>
+              <copy-input :value="shareLink" readonly />
+            </div>
+
             <div
               class="col-12 form-group has-feedback"
               :class="{ 'has-error': errors.genre }"
@@ -235,36 +241,59 @@
                 :width="166"
               />
             </div>
-            <div
-              class="time-from col-lg-6 col-sm-6 col-12 form-group has-feedback"
-              :class="{ 'has-error': errors.time_from }"
-              v-if="isTimeIntervals && !fields.id"
-            >
-              <label>Time Intervals </label>
-              <select class="form-control" v-model="fields.time_interval">
-                <option value="0">No intervals</option>
-                <option value="30">30 min</option>
-                <option value="60">1 hour</option>
-                <option value="90">1.5 hour</option>
-                <option value="120">2 hours</option>
-                <option value="180">3 hours</option>
-                <option value="240">4 hours</option>
-              </select>
-              <span class="help-block" v-if="errors.time_interval">
-                <strong>{{ errors.time_interval[0] }}</strong>
-              </span>
-            </div>
 
-            <div
-              class="time-to col-lg-6 col-sm-6 col-12 form-group has-feedback"
-              :class="{ 'has-error': numError }"
-              v-if="isTimeIntervals && !fields.id"
-            >
-              <label> Num </label>
-              <input type="number" disabled class="form-control" :value="num" />
-              <span class="help-block" v-if="numError">
-                <strong>{{ numError }}</strong>
-              </span>
+            <div class="time-intervals-dropdowns">
+            
+              <div
+                class="time-from col-lg-6 col-sm-6 col-12 form-group has-feedback"
+                :class="{ 'has-error': errors.time_interval }"
+                v-if="isTimeIntervals && !fields.id"
+              >
+                <label>Time Intervals</label>
+                <select class="form-control" v-model="fields.time_interval">
+                  <option value="0">No intervals</option>
+                  <option value="30">30 min</option>
+                  <option value="60">1 hour</option>
+                  <option value="90">1.5 hour</option>
+                  <option value="120">2 hours</option>
+                  <option value="180">3 hours</option>
+                  <option value="240">4 hours</option>
+                </select>
+                <span class="help-block" v-if="errors.time_interval">
+                  <strong>{{ errors.time_interval[0] }}</strong>
+                </span>
+              </div>
+
+              <div
+                class="time-from col-lg-6 col-sm-6 col-12 form-group has-feedback"
+                :class="{ 'has-error': errors.interval_break }"
+                v-if="isTimeIntervals && !fields.id"
+              >
+                <label>Interval Breaks</label>
+                <select class="form-control" v-model="fields.interval_break">
+                  <option value="0">No breaks</option>
+                  <option value="15">15 min</option>
+                  <option value="30">30 min</option>
+                  <option value="45">45 min</option>
+                  <option value="60">1 hour</option>
+                </select>
+                <span class="help-block" v-if="errors.interval_break">
+                  <strong>{{ errors.interval_break[0] }}</strong>
+                </span>
+              </div>
+
+              <div
+                class="time-to col-lg-6 col-sm-6 col-12 form-group has-feedback"
+                :class="{ 'has-error': numError }"
+                v-if="isTimeIntervals && !fields.id"
+              >
+                <label>Num</label>
+                <input type="number" disabled class="form-control" :value="num" />
+                <span class="help-block" v-if="numError">
+                  <strong>{{ numError }}</strong>
+                </span>
+              </div>
+
             </div>
 
             <div
@@ -367,11 +396,10 @@
               :class="{ 'has-error': errors.description }"
             >
               <label>Description</label>
-              <textarea
-                class="form-control"
+              <text-editor
                 name="description"
                 v-model="fields.description"
-              ></textarea>
+              />
               <span class="help-block" v-if="errors.description">
                 <strong>{{ errors.description[0] }}</strong>
               </span>
@@ -441,6 +469,9 @@ import MagnificPopupModal from "./external/MagnificPopupModal";
 require("jquery.maskedinput/src/jquery.maskedinput");
 import DropdownDatepicker from "vue-dropdown-datepicker";
 import VueTimepicker from "vue2-timepicker/src/vue-timepicker.vue";
+import CopyInput from "./discounts/CopyInput/CopyInput.vue";
+import shareHelper from "../helpers/shareHelper";
+import TextEditor from "./profile/TextEditor/TextEditor.vue";
 
 const ct = require("countries-and-timezones");
 
@@ -450,11 +481,14 @@ export default {
     MagnificPopupModal,
     DropdownDatepicker,
     VueTimepicker,
+    CopyInput,
+    TextEditor
   },
   mixins: [siteAPI, skillectiveHelper],
-  props: ["lesson", "userGenres", "siteGenres", "selectRange"],
+  props: ["lesson", "userGenres", "siteGenres", "selectRange", "instructorId"],
   data() {
     return {
+      shareLink: "",
       fields: {
         genre: null,
         date: "",
@@ -468,6 +502,7 @@ export default {
         price_per: "lesson",
         lesson_type: "in_person",
         time_interval: 0,
+        interval_break: 0,
         timezone_id: "",
         recurrence_until: null,
         recurrence_frequencies: 0,
@@ -504,7 +539,7 @@ export default {
 
         let diffInMinutes = (minutesEnd - minutesStart) / 60;
 
-        let lessonsCount = diffInMinutes / this.fields.time_interval;
+        let lessonsCount = diffInMinutes / (Number(this.fields.time_interval) + Number(this.fields.interval_break));
         return Math.floor(lessonsCount);
       } else {
         return 0;
@@ -527,7 +562,7 @@ export default {
 
         let diffInMinutes = (minutesEnd - minutesStart) / 60;
 
-        let lessonsCount = diffInMinutes / this.fields.time_interval;
+        let lessonsCount = diffInMinutes / (Number(this.fields.time_interval) + Number(this.fields.interval_break));
 
         if (Math.floor(lessonsCount) < 1) {
           return "The specified time interval is not enough for 1 lesson";
@@ -582,6 +617,9 @@ export default {
     },
   },
   methods: {
+    getShareLink() {
+      return shareHelper.buildShareLink(this.instructorId, this.fields.id);
+    },
     initDateFrom() {
       const today = new Date();
 
@@ -978,6 +1016,8 @@ export default {
         ]).format("h:mm a")),
           this.openPopup();
       }, 1);
+
+      this.shareLink = this.getShareLink();
     });
   },
 };

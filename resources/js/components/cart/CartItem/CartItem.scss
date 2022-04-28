@@ -6,6 +6,69 @@
         border-bottom: none;
     }
 
+    &__discount {
+        background: rgba(10, 171, 20, 0.1);
+        border: 1px dashed #DDDDDD;
+        box-sizing: border-box;
+        border-radius: 5px;
+        margin: 0 0 20px;
+        padding: 14px 14px 14px 107px;
+        background-image: url("../../images/percent-large-icon.svg");
+        background-size: 48px;
+        background-position: 29px 19px;
+        background-repeat: no-repeat;
+
+        h6 {
+            font-family: Hind Vadodara;
+            font-style: normal;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 24px;
+            color: #444444;
+            margin: 0 0 5px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            margin: 0 0 10px;
+            font-family: Hind Vadodara;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 16px;
+            line-height: 120%;
+            color: #444444;
+
+            b {
+                font-weight: 500;
+            }
+
+            span {
+                color: #09C60A;
+                font-weight: 600;
+            }
+        }
+
+        a {
+            color: #09C60A;
+            font-family: Hind Vadodara;
+            font-style: normal;
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 21px;
+            text-decoration: none;
+            outline: none;
+
+            &:hover, &:focus {
+                text-decoration: underline;
+            }
+        }
+    }
+
     &__header {
         display: flex;
         align-items: flex-start;
@@ -140,5 +203,14 @@
     &__remove {
         width: 44px;
         height: 44px;
+    }
+}
+
+@media (max-width: 500px) {
+    .cart-item {
+        &__discount {
+            padding: 14px 19px 14px 87px;
+            background-position: 19px 19px;
+        }
     }
 }

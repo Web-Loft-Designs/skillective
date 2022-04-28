@@ -171,11 +171,11 @@
             </p>
 
             <span class="add-lesson-popup__row-title">Note</span>
-            <textarea
+            <text-editor
               class="add-lesson-popup__input-desc"
               placeholder="Enter note"
               v-model="fields.description"
-            ></textarea>
+            />
             <field-errors v-model="errors.description" />
 
             <loader-button
@@ -210,6 +210,7 @@ import instructorService from "../../../services/instructorService";
 import UploadProgressBar from "../UploadProgressBar/UploadProgressBar.vue";
 import DocumentsUploader from "../DocumentsUploader/DocumentsUploader.vue";
 import urlHelper from "../../../helpers/urlHelper";
+import TextEditor from "../../profile/TextEditor/TextEditor.vue";
 
 export default {
   name: "AddLessonPopup",
@@ -219,6 +220,7 @@ export default {
     FieldErrors,
     UploadProgressBar,
     DocumentsUploader,
+    TextEditor
   },
   props: {
     userGenres: {

@@ -1,9 +1,10 @@
 <template>
   <div class="order-summary">
-
     <h2 class="order-summary__heading">Order Summary</h2>
 
-    <div class="order-summary__table">
+    <anim-loader v-if="isLoading" />
+
+    <div v-else class="order-summary__table">
       <div class="order-summary__row">
         <span class="order-summary__key">Number of lessons:</span>
         <span class="order-summary__spacer" />
@@ -12,12 +13,23 @@
       <div class="order-summary__row">
         <span class="order-summary__key">Subtotal:</span>
         <span class="order-summary__spacer" />
-        <span class="order-summary__value">${{ Number(subtotal).toFixed(2) }}</span>
+        <span class="order-summary__value"
+          >${{ Number(subtotal).toFixed(2) }}</span
+        >
+      </div>
+      <div class="order-summary__row">
+        <span class="order-summary__key">Discount:</span>
+        <span class="order-summary__spacer" />
+        <span class="order-summary__value"
+          >${{ Number(discount).toFixed(2) }}</span
+        >
       </div>
       <div class="order-summary__row">
         <span class="order-summary__key">Skillective Fees:</span>
         <span class="order-summary__spacer" />
-        <span class="order-summary__value">${{ Number(skillectiveFees).toFixed(2) }}</span>
+        <span class="order-summary__value"
+          >${{ Number(skillectiveFees).toFixed(2) }}</span
+        >
       </div>
       <div class="order-summary__row">
         <span class="order-summary__key">Total:</span>
@@ -27,29 +39,72 @@
     </div>
 
     <div class="order-summary__bottom">
-      <a class="order-summary__checkout" href="/student/checkout" v-if="showCheckoutButton">Checkout</a>
+      <button
+        class="order-summary__apply-promo"
+        v-if="showApplyPromoButton"
+        @click="emitApplyPromo()"
+      >
+        Apply Promo Code
+      </button>
+      <a
+        class="order-summary__checkout"
+        href="/checkout"
+        v-if="showCheckoutButton"
+        >Checkout</a
+      >
       <a class="order-summary__continue" href="/lessons">Continue shopping</a>
     </div>
-
   </div>
 </template>
 
 <script>
+import AnimLoader from "../AnimLoader/AnimLoader.vue";
 
 export default {
   name: "OrderSummary",
-  props: {
-    numberOfLessons: Number,
-    subtotal: Number,
-    skillectiveFees: Number,
-    showCheckoutButton: Boolean,
+  components: {
+    AnimLoader,
   },
-  computed: {
-    total: function(){
-      return (Number(this.subtotal) + Number(this.skillectiveFees)).toFixed(2)
-    }
-  }
-}
+  props: {
+    isLoading: {
+      type: Boolean,
+      default: false,
+    },
+    numberOfLessons: {
+      type: Number,
+      default: 0,
+    },
+    subtotal: {
+      type: Number,
+      default: 0,
+    },
+    total: {
+      type: Number,
+      default: 0,
+    },
+    discount: {
+      type: Number,
+      default: 0,
+    },
+    skillectiveFees: {
+      type: Number,
+      default: 0,
+    },
+    showCheckoutButton: {
+      type: Boolean,
+      default: false,
+    },
+    showApplyPromoButton: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  methods: {
+    emitApplyPromo() {
+      this.$emit("apply-promo");
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>

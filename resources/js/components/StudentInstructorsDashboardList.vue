@@ -12,10 +12,9 @@
             <th class="w-46" scope="col">-</th>
             <th class="w-46" scope="col">#</th>
             <th class="w-55" scope="col"></th>
-            <th class="w-100px" scope="col">Instagram</th>
-            <th class="w-140" scope="col">Name</th>
-            <th scope="col">Genre</th>
-            <th scope="col"></th>
+            <th class="w-100px" scope="col">Instructor</th>
+            <th class="w-140" scope="col">Genre</th>
+            <th class="w-100px" scope="col"></th>
           </tr>
         </thead>
         <tbody>
@@ -59,7 +58,7 @@
             </td>
             <td class="w-a"><img :src="instructor.profile.image" /></td>
             <td class="width-fix">
-              <div class="width-fix-content">
+              <div class="width-fix-content ">
                 <a
                   v-if="instructor.profile.instagram_handle != null"
                   :href="
@@ -67,12 +66,8 @@
                     instructor.profile.instagram_handle
                   "
                   target="_blank"
-                  >{{ instructor.profile.instagram_handle }}</a
+                  >@{{ instructor.profile.instagram_handle }}</a
                 >
-              </div>
-            </td>
-            <td class="width-fix">
-              <div class="width-fix-content">
                 <a
                   :href="'/profile/' + instructor.id"
                   class="link-to-profile"
@@ -80,10 +75,10 @@
                 >
               </div>
             </td>
-            <td
-              class="cusotm-w"
-              v-html="getUserGenresList(instructor.genres)"
-            ></td>
+            <!-- <td class="cusotm-w"> -->
+            <td>
+              <div class="genres" v-html="getUserGenresList(instructor.genres)"></div>
+            </td>
             <!--<td>-->
             <!--<span v-if="instructor.profile.notification_methods.indexOf('email')!==-1" >email</span>-->
             <!--<span v-if="instructor.profile.notification_methods.indexOf('sms')!==-1" >sms</span>-->

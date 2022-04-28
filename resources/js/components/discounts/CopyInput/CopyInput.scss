@@ -1,0 +1,65 @@
+.copy-input {
+  border: 1px solid #84D589;
+  border-radius: 3px;
+  background: #fff;
+  display: flex;
+  transition: box-shadow .25s;
+  box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+
+  &:focus-within {
+      box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+  }
+
+  input {
+    padding: 9px 0 10px 12px;
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 24px;
+    border: none;
+    color: #0AAB14;
+    outline: none;
+    border-radius: 3px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  button {
+    font-size: 0;
+    margin: -1px -1px -1px 0;
+    background: linear-gradient(180deg, #11CF13 0%, #01BD00 100%);
+    border-radius: 3px;
+    border: none;
+    width: 45px;
+    min-width: 45px;
+    height: 45px;
+    outline: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    transition: min-width .25s;
+
+    img {
+      vertical-align: top;
+      padding: 10px;
+    }
+
+    span {
+      font-family: Hind Vadodara;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 16px;
+      line-height: 24px;
+      color: #fff;
+      padding-bottom: 1px;
+    }
+  }
+
+  &--show-effect {
+    button {
+      min-width: 110px;
+    }
+  }
+}

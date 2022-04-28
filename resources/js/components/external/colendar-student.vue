@@ -43,7 +43,7 @@
         @select="selected"
         @eventClick="dateClick"
         ref="fullCalendar"
-        timezone="UTC"
+        timeZone="UTC"
       ></FullCalendar>
       <magnific-popup-modal
         @close="clearFormAndClosePopup"
@@ -177,16 +177,18 @@ export default {
         calendarApi.scrollToTime(`${newTime}:00:00`);
       }
     },
-    viewRender: function (info) {
-      if (info.view.type === "timeGridWeek") {
-        this.triggerView = "week";
-
-        let calendarApi = this.$refs.fullCalendar.getApi();
-
+    removeUpDownButtons() {
+      const buttons = document.querySelectorAll(".fc-button--arrow");
+      buttons.forEach((item) => {
+        item.remove();
+      }, []);
+    },
+    injectUpDownButtons() {
+      setTimeout(() => {
         const cont = document.querySelector(".fc-view-container");
 
         const buttonUp = document.createElement("button");
-        buttonUp.classList.add("fc-button--arrow"); 
+        buttonUp.classList.add("fc-button--arrow");
         buttonUp.classList.add("fc-button--up");
 
         buttonUp.innerHTML = "Expand";
@@ -195,12 +197,21 @@ export default {
         cont.prepend(buttonUp);
 
         const buttonDown = document.createElement("button");
-       buttonDown.classList.add("fc-button--arrow");
+        buttonDown.classList.add("fc-button--arrow");
         buttonDown.classList.add("fc-button--down");
 
         buttonDown.innerHTML = "Expand";
         buttonDown.addEventListener("click", this.scrollDown);
         cont.appendChild(buttonDown);
+      }, 0);
+    },
+    viewRender: function (info) {
+      if (info.view.type === "timeGridWeek") {
+        this.triggerView = "week";
+
+        let calendarApi = this.$refs.fullCalendar.getApi();
+
+       this.injectUpDownButtons();
 
         calendarApi.scrollTime = "08:00:00";
 
@@ -210,11 +221,7 @@ export default {
       } else {
         this.triggerView = "month";
 
-        const buttons = document.querySelectorAll(".fc-button--arrow");
-
-        buttons.forEach((item) => {
-          item.remove();
-        }, []);
+        this.removeUpDownButtons();
       }
       if (this.triggerOld !== null) {
         if (
@@ -302,6 +309,10 @@ export default {
             this.events = this.events.filter(function (item) {
               return moment().diff(item.end) <= 0;
             });
+
+            if (this.triggerView == "week") {
+              this.injectUpDownButtons();
+            }
 
             let calendarApi = this.$refs.fullCalendar.getApi();
             calendarApi.scrollTime = moment(this.events[0].start).format(

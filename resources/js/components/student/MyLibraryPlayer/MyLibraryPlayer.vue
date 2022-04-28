@@ -99,7 +99,7 @@
               }}</span>
             </div>
             <p class="my-library-player__note">
-              Note:<br />{{ lesson.description }}
+              Note:<br /><content-viewer content={{ lesson.description }} />
             </p>
           </div>
         </div>
@@ -113,12 +113,14 @@ import videojs7 from "vue-videojs7";
 import AnimLoader from "../../cart/AnimLoader/AnimLoader.vue";
 import lessonService from "../../../services/lessonService";
 import urlHelper from "../../../helpers/urlHelper";
+import ContentViewer from "../../profile/ContentViewer/ContentViewer.vue"
 
 export default {
   name: "MyLibraryPlayer",
   components: {
     VideoPlayer: videojs7.videoPlayer,
     AnimLoader,
+    ContentViewer
   },
   props: {
     isInstructor: {

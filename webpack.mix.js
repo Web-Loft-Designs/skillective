@@ -1,4 +1,4 @@
-const mix = require('laravel-mix');
+const mix = require("laravel-mix");
 
 /*
  |--------------------------------------------------------------------------
@@ -12,22 +12,37 @@ const mix = require('laravel-mix');
  */
 
 mix.babelConfig({
-        "presets": [
-            [
-                "@babel/preset-env",
-                {
-                    "useBuiltIns": "entry",
-                    "targets": {
-                        "browsers": ["ie >= 10", "> 1%"]
-                    }
+    presets: [
+        [
+            "@babel/preset-env",
+            {
+                useBuiltIns: "entry",
+                targets: {
+                    browsers: ["ie >= 10", "> 1%"]
                 }
-            ]
+            }
         ]
-    }
-)
+    ]
+});
 
+mix.webpackConfig({
+    devServer: {
+        host: 'localhost',
+        port: 3000,
+    },
+});
 
-mix.js('resources/js/app.js', 'public/js/app.js')
-    .babel('public/js/app.js', 'public/js/app.js')
-   .sass('resources/sass/app.scss', 'public/css')
-   .sass('resources/sass/app-front.scss', 'public/css');
+mix.override(webpackConfig => {
+    webpackConfig.module.rules[2].use[0].options.esModule = false;
+});
+
+mix.js("resources/js/app.js", "js")
+    .vue()
+    .sass("resources/sass/app.scss", "public/css")
+    .options({ processCssUrls: false, uglify: { compress: false } })
+    .sass("resources/sass/app-front.scss", "public/css")
+    .options({ processCssUrls: false, uglify: { compress: false } })
+    .sass("resources/sass/portal.scss", "public/css")
+    .options({ processCssUrls: false, uglify: { compress: false } })
+    .sass("resources/sass/video-lesson.scss", "public/css")
+    .options({ processCssUrls: false, uglify: { compress: false } });

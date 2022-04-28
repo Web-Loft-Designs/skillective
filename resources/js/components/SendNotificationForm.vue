@@ -119,6 +119,7 @@ import FullCalendar from "@fullcalendar/vue";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import shareHelper from "../helpers/shareHelper";
 
 export default {
   props: [
@@ -127,6 +128,7 @@ export default {
     "isStudent",
     "upcomingLesson",
     "upcomingLessons",
+    "instructorId",
   ],
   mixins: [siteAPI],
   data() {
@@ -306,6 +308,7 @@ export default {
     dateClick: function (info) {
       let { location, genre } = info.event.extendedProps;
 
+      const instructorId = info.event.extendedProps.instructor.id;
       this.fields.lesson = info.event;
       var instaName = info.event.extendedProps.instructor.full_name;
       var date = moment(info.event.start).format("MM/DD/YYYY");
@@ -330,7 +333,11 @@ export default {
         "\nTime: " +
         time +
         "\nPrice: " +
-        price;
+        price + (instructorId ? (
+            "\nMore info: " +
+            shareHelper.buildShareLink(instructorId, info.event.id)
+          ) : ""
+        );
       this.fields.lesson_id = info.event.id;
     },
   },

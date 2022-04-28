@@ -26,7 +26,7 @@ Route::group(['middleware' => ['guest']], function () {
 	//	Route::get('user/password/reset/{token}', 'Auth\ApiUserResetPasswordController@showResetForm');
 	//	Route::post('user/password/reset', 'Auth\ApiUserResetPasswordController@reset');
 
-	
+
 
 	Route::post('instructor/remember', 'Auth\InstructorRegisterController@remember'); // registration in social controller after redirect
 
@@ -112,8 +112,6 @@ Route::get('upcoming-lessons', 'LessonsAPIController@upcomingLessons');
 //	/api/lessons?month=2019-08-29 month lessons for 08 month (any day of month accepted)
 
 Route::get('instructor/{instructor}/lessons', 'InstructorLessonsAPIController@index'); // current instructor lessons
-Route::get('instructor/{instructor}/lesson/{lesson}', 'InstructorLessonsAPIController@getLessonById');
-
 
 
 Route::group(['middleware' => ['role:Instructor']], function () {

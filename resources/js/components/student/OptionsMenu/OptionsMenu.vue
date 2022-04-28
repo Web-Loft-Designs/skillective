@@ -3,9 +3,13 @@
         <button @click.prevent="opened = !opened" :class="{
             'options-menu__button': true,
             'options-menu__button--opened': opened,
+            'options-menu__button--squared': squared,
         }">Options</button>
         <transition name="scale">
-            <ul v-if="opened" class="options-menu__list">
+            <ul v-if="opened && options.length" :class="{
+                'options-menu__list': true,
+                'options-menu__list--squared': squared,
+            }">
                 <li v-for="(option, index) in options" :key="index" :class="{
                     'options-menu__item': true,
                     'options-menu__item--red': option.red,
@@ -26,6 +30,10 @@ export default {
             default: () => {
                 return [];
             },
+        },
+        squared: {
+            type: Boolean,
+            default: false,
         },
     },
     methods: {

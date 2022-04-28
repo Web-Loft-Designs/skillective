@@ -7,14 +7,41 @@
         class="cart-item__avatar"
       />
       <div class="cart-item__instructor">
-        <span class="cart-item__insta">@{{ item.lesson.instructor.instagram_handle }}</span>
-        <span class="cart-item__name">{{ item.lesson.instructor.full_name }}</span>
+        <span class="cart-item__insta"
+          >@{{ item.lesson.instructor.instagram_handle }}</span
+        >
+        <span class="cart-item__name">{{
+          item.lesson.instructor.full_name
+        }}</span>
       </div>
       <close-button
         class="cart-item__remove"
-        @click="removeItem(item.id)"
+        @click="removeItem(item)"
         title="Remove"
       />
+    </div>
+
+    <div class="cart-item__discount">
+      <div
+        v-for="(discount, discountIndex) in item.discounts"
+        :key="discountIndex"
+        class="cart-item__discount-inner"
+      >
+        <h6>{{ discount.title }}</h6>
+        <ul v-if="discount.isActivate">
+            <li> <span>{{ generateDiscountAmount(discount) }} discount </span> is applied. </li>
+        </ul>
+        <ul v-else>
+          <li>
+            If you buy more than:
+            <b> {{ generateDiscountTitle(discount) }} </b> from this instructor,
+            you will receive an
+            <span>{{ generateDiscountAmount(discount) }} discount.</span>
+          </li>
+        </ul>
+      </div>
+
+      <a href="/lessons">Continue Shopping</a>
     </div>
 
     <div class="cart-item__body">
@@ -61,16 +88,29 @@
 import CloseButton from "../../student/CloseButton/CloseButton.vue";
 import { mapActions, mapMutations } from "vuex";
 import dateHelper from "../../../helpers/dateHelper";
+import ContentViewer from "../../profile/ContentViewer/ContentViewer.vue";
 
 export default {
   name: "CartItem",
   components: {
-    CloseButton
+    CloseButton,
+    ContentViewer,
   },
   props: {
-    item: Object,
-    note: String,
-    bookingRequest: String,
+    item: {
+      type: Object,
+      default: () => {
+        return {};
+      },
+    },
+    note: {
+      type: String,
+      default: "",
+    },
+    bookingRequest: {
+      type: String,
+      default: "",
+    },
   },
   methods: {
     ...mapActions({
@@ -80,6 +120,24 @@ export default {
     ...mapMutations({
       updateDotNeeded: "updateDotNeeded",
     }),
+    generateDiscountAmount(discount) {
+      if (discount.discount_type === "percent") {
+        return `${discount.discount}%`;
+      } else if (discount.discount_type === "fixed-amount") {
+        return `$${discount.discount}`;
+      }
+    },
+    generateDiscountTitle(discount) {
+      if (discount.lesson_type === "all") {
+        return `${discount.itemsLeft} Any Lessons`;
+      } else if (discount.lesson_type === "virtual") {
+        return `${discount.itemsLeft} Virtual Lessons`;
+      } else if (discount.lesson_type === "pre-recorded") {
+        return `${discount.itemsLeft} Pre-Recorded Lessons`;
+      } else if (discount.lesson_type === "in-person") {
+        return `${discount.itemsLeft} In-Person Lessons`;
+      }
+    },
     getLessonTitle(title, genre) {
       let str = "";
       if (title) {
@@ -111,8 +169,8 @@ export default {
     formatTime(hours, minutes) {
       return dateHelper.formatTime(hours, minutes);
     },
-    async removeItem(id) {
-      await this.removeItemFromCart(id);
+    async removeItem(item) {
+      await this.removeItemFromCart(item.id || item.lesson.id);
       this.updateDotNeeded();
       this.fetchCartTotal();
     },

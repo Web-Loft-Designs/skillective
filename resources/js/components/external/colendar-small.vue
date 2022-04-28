@@ -84,6 +84,7 @@
 
 <script>
 import $ from "jquery";
+import urlHelper from "../../helpers/urlHelper";
 import FullCalendar from "@fullcalendar/vue";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -125,6 +126,7 @@ export default {
       triggerView: "month",
       scrollTime1: "0:00:00",
       selectedEvent: null,
+      lessonIdParsed: false,
     };
   },
   methods: {
@@ -297,9 +299,9 @@ export default {
 
               return item;
             });
-          this.events = this.events.filter(function (item) {
-            return moment().diff(item.end) <= 0;
-          });
+            this.events = this.events.filter(function (item) {
+              return moment().diff(item.end) <= 0;
+            });
 
             this.loader.hide();
             this.loader = null;
@@ -332,6 +334,16 @@ export default {
         '<span class="spot-left">Spots left: ' +
         count +
         "</span>";
+
+      if (!this.lessonIdParsed) {
+        const params = urlHelper.parseQueryParams();
+        if (params.lessonId) {
+          if (params.lessonId == info.event.id) {
+            this.lessonIdParsed = true;
+            this.dateClick(info);
+          }
+        }
+      }
     },
     selectOverlap: function (event) {
       console.log(event);
@@ -347,9 +359,6 @@ export default {
       calendarApi.gotoDate(info.start);
     },
     dateClick: function (info) {
-
-      console.log(info.e);
-
       this.selectedEvent = {
         id: info.event.id,
         lat: info.event.extendedProps.lat,
