@@ -63,7 +63,7 @@
     max-height: 100%;
     overflow: auto;
   }
-  
+
   &__content {
     display: flex;
     flex-direction: column;
@@ -110,7 +110,7 @@
   &__preview {
     margin: 40px 0 0;
 
-    /deep/ canvas {
+    >>> canvas {
       vertical-align: top;
     }
   }

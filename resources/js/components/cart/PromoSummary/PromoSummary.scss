@@ -105,7 +105,7 @@
         &-success {
             width: 100%;
             margin-bottom: 4px;
-  
+
             span {
               color: #0aab14;
               font-size: 12px;
@@ -122,7 +122,7 @@
           }
         }
 
-        /deep/ .anim-loader__bar::after {
+        >>> .anim-loader__bar::after {
             width: 24px;
             height: 24px;
             border-width: 2px;

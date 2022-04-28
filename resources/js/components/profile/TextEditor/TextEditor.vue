@@ -34,7 +34,7 @@
 
 <script>
 import VueTrix from "vue-trix";
-import Trix from "trix";
+// import Trix from "trix";
 import { VEmojiPicker } from "v-emoji-picker";
 import { Chrome } from "vue-color";
 
@@ -83,13 +83,13 @@ export default {
         this.$el.querySelector(
           ".trix-button-group--text-tools .trix-button--icon-palette"
         ).style.backgroundColor = newValue.hex;
-        Trix.config.textAttributes.colored = {
-          style: { color: newValue.hex },
-          parser(element) {
-            return element.style.color === newValue.hex;
-          },
-          inheritable: true,
-        };
+        // Trix.config.textAttributes.colored = {
+        //   style: { color: newValue.hex },
+        //   parser(element) {
+        //     return element.style.color === newValue.hex;
+        //   },
+        //   inheritable: true,
+        // };
       },
     },
   },
@@ -99,17 +99,17 @@ export default {
     },
   },
   mounted() {
-    Trix.config.textAttributes.underline = {
-      tagName: "u",
-      inheritable: true,
-    };
-    Trix.config.textAttributes.colored = {
-      style: { color: this.colors },
-      parser(element) {
-        return element.style.color === this.colors;
-      },
-      inheritable: true,
-    };
+    // Trix.config.textAttributes.underline = {
+    //   tagName: "u",
+    //   inheritable: true,
+    // };
+    // Trix.config.textAttributes.colored = {
+    //   style: { color: this.colors },
+    //   parser(element) {
+    //     return element.style.color === this.colors;
+    //   },
+    //   inheritable: true,
+    // };
   },
   methods: {
     trixInit() {

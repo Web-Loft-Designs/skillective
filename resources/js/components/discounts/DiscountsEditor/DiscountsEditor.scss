@@ -129,7 +129,7 @@
     display: flex;
     justify-content: flex-end;
 
-    /deep/ {
+    >>> {
       .loader-button {
         width: auto;
         min-width: 210px;
@@ -206,7 +206,7 @@
       select {
         padding-right: 10px;
       }
-      
+
       &:focus {
           box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
       }
@@ -317,7 +317,7 @@
       flex-basis: 100%;
       margin: 20px 0 0;
 
-      &--full { 
+      &--full {
         flex-basis: 150px;
         min-width: 150px;
         margin-right: 20px;
@@ -333,7 +333,7 @@
     }
 
     &__notice-table {
-      /deep/ .client-table__scroll {
+      >>> .client-table__scroll {
         margin-right: -40px;
       }
     }
@@ -344,7 +344,7 @@
   .discounts-editor,
   .promos-editor {
     &__item-buttons {
-      /deep/ .loader-button {
+      >>> .loader-button {
         min-width: 0;
         flex: 1;
       }

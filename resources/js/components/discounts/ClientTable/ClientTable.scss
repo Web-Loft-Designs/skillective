@@ -137,7 +137,7 @@
       color: #444444;
     }
 
-    /deep/ .select-with-search {
+    >>> .select-with-search {
       width: 70px;
 
       .vs__dropdown-menu {
