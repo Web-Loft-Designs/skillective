@@ -45,7 +45,7 @@ class InstructorLessonsAPIController extends AppBaseController
             // The client-side application can set only headers allowed in Access-Control-Allow-Headers
             return Response::make('OK', 200, $headers);
         }
-        
+
         if ($instructor == null) {
             $instructor = Auth::user();
         }
@@ -55,7 +55,7 @@ class InstructorLessonsAPIController extends AppBaseController
         return $this->sendResponse($lessons);
     }
 
-    public function getLessonById(Request $request, $lesson)
+    public function getLessonById(Request $request, $instructor, $lesson)
     {
 
         // ALLOW OPTIONS METHOD
@@ -171,7 +171,7 @@ class InstructorLessonsAPIController extends AppBaseController
             return $this->sendError('To add new lesson you must connect a submerchant account to your profile, upload profile image and have at least one media item in gallery', 400);
         }
         $input = $this->_prepareInputData($request);
-        
+
         if ($input['recurrence_until'] && $input['recurrence_frequencies'] != "0") {
 
             $ty = $input['recurrence_frequencies'];
@@ -217,7 +217,7 @@ class InstructorLessonsAPIController extends AppBaseController
                     $__end->addMonth();
                 }
 
-                
+
             }
 
             return $this->sendResponse($this->lessonRepository->presentResponse($lesson)['data'], 'Lesson saved');
