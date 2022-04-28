@@ -55,7 +55,7 @@ class InstructorLessonsAPIController extends AppBaseController
         return $this->sendResponse($lessons);
     }
 
-    public function getLessonById(Request $request, $lesson)
+    public function getLessonById(Request $request, $instructor, $lesson)
     {
 
         // ALLOW OPTIONS METHOD

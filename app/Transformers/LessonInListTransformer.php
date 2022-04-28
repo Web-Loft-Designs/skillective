@@ -69,6 +69,7 @@ class LessonInListTransformer extends TransformerAbstract
             'lesson_type' => $model->lesson_type,
             'room_sid' => $model->room_sid,
             'room_completed' => $model->room_completed,
+            'topic' => $model->topic,
         ];
     }
 }
