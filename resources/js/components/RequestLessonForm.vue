@@ -9,21 +9,20 @@
       >
         Request Time
       </button>
-      <span data-toggle='modal' data-target='#exampleModalCenter'>
-        <button
-          class='btn btn-success btn-sm text-wrap'
-          type='button'
-          data-toggle='tooltip'
-          data-placement='bottom'
-          :title='tooltipContent()'
-        >
-          Add me to {{ instructorName }}'s Client List
-        </button>
-      </span>
+      <button
+        class='btn btn-success btn-sm text-wrap'
+        type='button'
+        data-toggle='tooltip'
+        data-placement='bottom'
+        @click='showJoinModal'
+        :title='tooltipContent()'
+      >
+        Add me to {{instructorName}}'s Client List
+      </button>
     </div>
     <div
-      class='modal fade'
-      id='exampleModalCenter'
+      class='modal'
+      id='joinClient'
       tabindex='0'
       role='dialog'
       aria-labelledby='exampleModalCenterTitle'
@@ -41,8 +40,8 @@
           </div>
           <div class='modal-body'>
             <span>
-              If you want to receive notifications when {{ instructorName }}
-              is near you or you want to be included in all {{ instructorName }}'s
+              If you want to receive notifications when {{instructorName}}
+              is near you or you want to be included in all {{instructorName}}'s
               training classes, clinics, workshops and tutorials please
               join his client list
             </span>
@@ -50,11 +49,8 @@
           <div class='modal-footer'>
             <button
               type='button'
-              data-dismiss='modal'
               aria-label='Close'
               class='btn btn-success btn-sm'
-              data-toggle='modal'
-              data-target='.popup1 .popup2'
               @click='successJoinedToClient'
             >
               Join client list
@@ -64,13 +60,12 @@
       </div>
     </div>
     <div
-      class='modal fade bd-example-modal-sm popup1'
-      id='myModal2'
+      class='modal'
+      id='successAdded'
       tabindex='-1'
       role='dialog'
       aria-labelledby='mySmallModalLabel'
       aria-hidden='true'
-      v-if='loggedInStudent'
     >
       <div class='modal-dialog modal-sm'>
         <div class='modal-content p-10'>
@@ -79,17 +74,16 @@
       </div>
     </div>
     <div
-      class='modal fade popup2'
+      class='modal'
       tabindex='-1'
       role='dialog'
-      id='exampleModalCenter'
-      v-else
+      id='registeredModal'
     >
       <div class='modal-dialog' role='document'>
         <div class='modal-content'>
           <div class='modal-body'>
             <form @submit.prevent='joinClientList' novalidate class='needs-validation'>
-              <h3 class='form-title'>Join {{ instructorName }}'s Client List</h3>
+              <h3 class='form-title'>Join {{instructorName}}'s Client List</h3>
               <div class='d-flex flex-wrap'>
                 <div class='label-w-100'>
                   <label>Complete name</label>
@@ -219,7 +213,7 @@
                   <button type='submit' class='btn btn-success btn-block'>ADD ME TO THEIR LIST :-)</button>
                 </div>
               </div>
-              <div v-if='errorText' class='has-error'>{{ errorText }}</div>
+              <div v-if='errorText' class='has-error'>{{errorText}}</div>
             </form>
           </div>
         </div>
@@ -247,7 +241,7 @@
             lessonRequestAccepted === false
           '
         >
-          <input type='hidden' v-model='fields.instructor_id'/>
+          <input type='hidden' v-model='fields.instructor_id' />
           <div class='row'>
             <h2 class='login-box-msg col-12'>Request a Lesson</h2>
             <div
@@ -267,11 +261,11 @@
                   :key='genre.id'
                   :value='genre.id'
                 >
-                  {{ genre.title }}
+                  {{genre.title}}
                 </option>
               </select>
               <span class='help-block' v-if='errors.genre'>
-                <strong>{{ errors.genre[0] }}</strong>
+                <strong>{{errors.genre[0]}}</strong>
               </span>
             </div>
 
@@ -293,7 +287,7 @@
               ></dropdown-datepicker>
 
               <span class='help-block' v-if='errors.date'>
-                <strong>{{ errors.date[0] }}</strong>
+                <strong>{{errors.date[0]}}</strong>
               </span>
             </div>
             <div
@@ -314,7 +308,7 @@
               ></dropdown-datepicker>
 
               <span class='help-block' v-if='errors.date_to'>
-                <strong>{{ errors.date_to[0] }}</strong>
+                <strong>{{errors.date_to[0]}}</strong>
               </span>
             </div>
             <div
@@ -336,7 +330,7 @@
                 @open="clearTimepicker('timeFrom')"
               ></vue-timepicker>
               <span class='help-block' v-if='errors.time_from'>
-                <strong>{{ errors.time_from[0] }}</strong>
+                <strong>{{errors.time_from[0]}}</strong>
               </span>
             </div>
 
@@ -359,7 +353,7 @@
               ></vue-timepicker>
 
               <span class='help-block' v-if='errors.time_to'>
-                <strong>{{ errors.time_to[0] }}</strong>
+                <strong>{{errors.time_to[0]}}</strong>
               </span>
             </div>
 
@@ -384,11 +378,11 @@
                   :key='lessonTypeName'
                   :value='lessonTypeName'
                 >
-                  {{ lessonTypeTitle }}
+                  {{lessonTypeTitle}}
                 </option>
               </select>
               <span class='help-block' v-if='errors.lesson_type'>
-                <strong>{{ errors.lesson_type[0] }}</strong>
+                <strong>{{errors.lesson_type[0]}}</strong>
               </span>
             </div>
 
@@ -408,7 +402,7 @@
                 :disabled='fieldsDisabled'
               />
               <span class='help-block' v-if='errors.location'>
-                <strong>{{ errors.location[0] }}</strong>
+                <strong>{{errors.location[0]}}</strong>
               </span>
             </div>
 
@@ -429,11 +423,11 @@
                   :value='key'
                   :key='key'
                 >
-                  {{ value }}
+                  {{value}}
                 </option>
               </select>
               <span class='help-block' v-if='errors.timezone_id'>
-                <strong>{{ errors.timezone_id[0] }}</strong>
+                <strong>{{errors.timezone_id[0]}}</strong>
               </span>
             </div>
 
@@ -441,7 +435,7 @@
               class='form-group col-lg-9 col-sm-9 col-12 has-feedback align-end'
               :class="{ 'has-error': errors.lesson_price }"
             >
-              <label v-if='priceError'>{{ priceError }}</label>
+              <label v-if='priceError'>{{priceError}}</label>
               <div class='d-flex'>
                 <span class='dollar-wrapper'>
                   <!--<masked-input class="form-control" v-model="fields.lesson_price" mask="111.11" />-->
@@ -457,7 +451,7 @@
               </div>
 
               <span class='help-block' v-if='errors.lesson_price'>
-                <strong>{{ errors.lesson_price[0] }}</strong>
+                <strong>{{errors.lesson_price[0]}}</strong>
               </span>
             </div>
 
@@ -468,10 +462,10 @@
             >
               <span class='private-lesson'>
                 <span v-if='fields.count_participants === 1'>
-                  <img src='../../images/man-user.svg' alt/>
+                  <img src='../../images/man-user.svg' alt />
                 </span>
                 <span v-if='fields.count_participants > 1'>
-                  <img src='../../images/multiple-users-silhouette.svg' alt/>
+                  <img src='../../images/multiple-users-silhouette.svg' alt />
                 </span>
               </span>
               <label>Max students</label>
@@ -484,7 +478,7 @@
                 type='number'
               />
               <span class='help-block' v-if='errors.count_participants'>
-                <strong>{{ errors.count_participants[0] }}</strong>
+                <strong>{{errors.count_participants[0]}}</strong>
               </span>
             </div>
 
@@ -501,12 +495,12 @@
                 v-model='fields.student_note'
               ></textarea>
               <span class='help-block' v-if='errors.student_note'>
-                <strong>{{ errors.student_note[0] }}</strong>
+                <strong>{{errors.student_note[0]}}</strong>
               </span>
             </div>
             <div v-else class='form-group col-12'>
               <label>Client Note</label>
-              <p>{{ fields.student_note ? fields.student_note : '-' }}</p>
+              <p>{{fields.student_note ? fields.student_note : '-'}}</p>
             </div>
 
             <div
@@ -521,14 +515,14 @@
                 v-model='fields.instructor_note'
               ></textarea>
               <span class='help-block' v-if='errors.instructor_note'>
-                <strong>{{ errors.instructor_note[0] }}</strong>
+                <strong>{{errors.instructor_note[0]}}</strong>
               </span>
             </div>
 
             <div class='col-12'>
-              <div v-if='errorText' class='has-error'>{{ errorText }}</div>
+              <div v-if='errorText' class='has-error'>{{errorText}}</div>
               <div v-if='successText' class='has-success'>
-                {{ successText }}
+                {{successText}}
               </div>
             </div>
 
@@ -596,7 +590,7 @@ import {email, required, numeric} from 'vuelidate/lib/validators'
 
 $(function() {
   $('[data-toggle="tooltip"]')
-    .tooltip()
+  .tooltip()
 })
 
 const ct = require('countries-and-timezones')
@@ -681,11 +675,11 @@ export default {
         this.fields.date = this.selectRange.startStr
         this.fields.date_to = this.selectRange.startStr
         this.fields.time_from = moment(this.selectRange.startStr)
-          .format(
-            'H:mm:ss',
-          )
+        .format(
+          'H:mm:ss',
+        )
         this.fields.time_to = moment(this.selectRange.endStr)
-          .format('H:mm:ss')
+        .format('H:mm:ss')
         this.$refs.modal.open()
       }
     },
@@ -705,7 +699,7 @@ export default {
 
       let countSpots =
         moment(moment(this.fields.time_from, ['h:mm A']))
-          .diff(moment(this.fields.time_to, ['h:mm A'])) / 60000 / 30
+        .diff(moment(this.fields.time_to, ['h:mm A'])) / 60000 / 30
 
       if (
         Math.abs(Number(this.lessonBlockMinPrice) * Number(countSpots)) >
@@ -719,6 +713,18 @@ export default {
   },
   methods: {
     ...mapActions(['addToClientList', 'createToClientList']),
+    showJoinModal() {
+      $('#joinClient').modal('show')
+    },
+    showRegisteredModal() {
+      $('#registeredModal').modal('show')
+    },
+    showSuccessAddedModal() {
+      $('#successAdded').modal('show')
+    },
+    closeJoinModal() {
+      $('#joinClient').modal('hide')
+    },
     async joinClientList() {
       if (this.$v.$invalid) {
         this.$v.$touch()
@@ -745,16 +751,22 @@ export default {
       return `Click here to add your contact info to ${this.instructorName}'s Client List so you can be notified when classes, privates or workshops become available.`
     },
     async successJoinedToClient() {
-      try {
-        await this.addToClientList(this.instructorId)
-        setTimeout(() => {
-          $('#myModal2')
+      this.closeJoinModal()
+      if (this.loggedInStudent) {
+        try {
+          await this.addToClientList(this.instructorId)
+          this.showSuccessAddedModal()
+          setTimeout(() => {
+            $('#successAdded')
             .modal('hide')
-          $('.modal-backdrop')
+            $('.modal-backdrop')
             .remove()
-        }, 4000)
-      } catch (e) {
-        console.log(e)
+          }, 3000)
+        } catch (e) {
+          console.log(e)
+        }
+      } else {
+        this.showRegisteredModal()
       }
     },
     replaceInput() {
@@ -776,18 +788,18 @@ export default {
     timeFormChange() {
       if (moment(this.fields.time_from)) {
         this.fields.time_to = moment(this.fields.time_from, ['h:mm a'])
-          .add('30', 'minutes')
-          .format('h:mm a')
+        .add('30', 'minutes')
+        .format('h:mm a')
       }
     },
     onSubmit() {
       if (moment(this.fields.date))
         this.fields.date = moment(this.fields.date)
-          .format('YYYY-MM-DD')
+        .format('YYYY-MM-DD')
 
       if (moment(this.fields.date_to))
         this.fields.date_to = moment(this.fields.date_to)
-          .format('YYYY-MM-DD')
+        .format('YYYY-MM-DD')
 
       if (this.fields.lesson_type === 'virtual') {
         this.fields.count_participants = 1
@@ -797,14 +809,14 @@ export default {
         this.fields.time_from = moment(this.fields.time_from, [
           'h:mm A',
         ])
-          .format('HH:mm:ss')
+        .format('HH:mm:ss')
       }
 
       if (moment(this.fields.time_to)) {
         this.fields.time_to = moment(this.fields.time_to, ['h:mm A'])
-          .format(
-            'HH:mm:ss',
-          )
+        .format(
+          'HH:mm:ss',
+        )
       }
       if (this.fields.id > 0)
         this.apiPost(
@@ -1037,17 +1049,17 @@ export default {
         id: lessonRequest.id,
         genre: lessonRequest.genre_id,
         date: moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
-          .format(
-            'YYYY-MM-DD',
-          ),
+        .format(
+          'YYYY-MM-DD',
+        ),
         date_to: moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
-          .format(
-            'YYYY-MM-DD',
-          ),
+        .format(
+          'YYYY-MM-DD',
+        ),
         time_from: moment(lessonRequest.start)
-          .format('h:mm a'),
+        .format('h:mm a'),
         time_to: moment(lessonRequest.end)
-          .format('h:mm a'),
+        .format('h:mm a'),
         count_participants: lessonRequest.count_participants + '',
         lesson_price: lessonRequest.lesson_price,
         location: lessonRequest.location,
@@ -1060,28 +1072,28 @@ export default {
       setTimeout(() => {
         this.$refs.datepicker.year = Number(
           moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
-            .format('YYYY'),
+          .format('YYYY'),
         )
         this.$refs.datepicker.month = Number(
           moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
-            .format('MM'),
+          .format('MM'),
         )
         this.$refs.datepicker.day = Number(
           moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
-            .format('DD'),
+          .format('DD'),
         )
 
         this.$refs.datepickerTo.year = Number(
           moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
-            .format('YYYY'),
+          .format('YYYY'),
         )
         this.$refs.datepickerTo.month = Number(
           moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
-            .format('MM'),
+          .format('MM'),
         )
         this.$refs.datepickerTo.day = Number(
           moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
-            .format('DD'),
+          .format('DD'),
         )
       }, 10)
 
@@ -1100,7 +1112,7 @@ export default {
         this.openPopup()
       }
       window.jQuery('.mask-input')
-        .mask('99/99/9999')
+      .mask('99/99/9999')
     }, 100)
   },
 }
@@ -1114,11 +1126,13 @@ export default {
 .modal-open, .modal {
   padding-right: 0 !important
 }
+
 .form-title {
   font-size: 25px;
   text-align: center;
 
 }
+
 .btn {
   font-size: 14px;
   margin-bottom: 8px;
