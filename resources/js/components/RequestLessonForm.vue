@@ -132,7 +132,13 @@
                 </div>
                 <div
                   class='form-group input-zip has-feedback'
-                  :class="{'has-error': ($v.modalData.zip.$dirty && !$v.modalData.zip.required) || ($v.modalData.zip.$dirty && !$v.modalData.zip.numeric)}"
+                  :class="{'has-error':
+                  ($v.modalData.zip.$dirty && !$v.modalData.zip.required)
+                  ||
+                  ($v.modalData.zip.$dirty && !$v.modalData.zip.numeric)
+                  ||
+                  ($v.modalData.zip.$dirty && !$v.modalData.zip.valid)
+                }"
                 >
                   <label>ZIP</label>
                   <input
@@ -141,14 +147,25 @@
                     name='zip'
                     v-model.number='modalData.zip'
                     placeholder='ZIP code'
-                    :class="{'is-invalid': ($v.modalData.zip.$dirty && !$v.modalData.zip.required)}"
+                    :class="{'is-invalid':
+                    ($v.modalData.zip.$dirty && !$v.modalData.zip.required)
+                    ||
+                    ($v.modalData.zip.$dirty && !$v.modalData.zip.numeric)
+                    ||
+                    ($v.modalData.zip.$dirty && !$v.modalData.zip.valid)
+                    }"
                   />
                   <span v-if='$v.modalData.zip.$dirty && !$v.modalData.zip.required'>ZIP code can't be empty</span>
                   <span v-else-if='$v.modalData.zip.$dirty && !$v.modalData.zip.numeric'>ZIP code must be numeric</span>
+                  <span v-else-if='$v.modalData.zip.$dirty && !$v.modalData.zip.valid'>The zip format is invalid</span>
                 </div>
                 <div
                   class='form-group w-50'
-                  :class="{'has-error': ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required)}"
+                  :class="{'has-error':
+                  ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required)
+                  ||
+                  ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.valid)
+                }"
                 >
                   <label>Phone number</label>
                   <masked-input
@@ -156,9 +173,14 @@
                     v-model='modalData.mobile_phone'
                     :placeholder="'+1 (___) ___ ____'"
                     mask='\+1 (111) 111 1111'
-                    :class="{'is-invalid': ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required)}"
+                    :class="{'is-invalid':
+                    ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required
+                    ||
+                    ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.valid))
+                    }"
                   />
                   <span v-if='$v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required'>Phone number can't be empty</span>
+                  <span v-else-if='$v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.valid'>The mobile phone format is invalid</span>
                 </div>
                 <div
                   class='form-group'
@@ -620,9 +642,9 @@ export default {
     modalData: {
       first_name: {required},
       last_name: {required},
-      zip: {required, numeric},
+      zip: {required, numeric, valid: v => /^[0-9]{5}(\-[0-9]{4})?$/.test(v)},
       email: {email, required},
-      mobile_phone: {required},
+      mobile_phone: {required, valid: v => /^((\+1)|(\+37))\s\([0-9]{3}\)\s[0-9]{3}\s[0-9]{4}$/.test(v)},
       accept_terms: {checked: v => v},
     },
   },
@@ -741,7 +763,6 @@ export default {
           mobile_phone: this.modalData.mobile_phone,
           newsletter: this.modalData.newsletter,
         }
-        console.log(data)
         await this.createToClientList(data)
       } catch (e) {
         console.log(e)
