@@ -84,7 +84,7 @@
       <div class='modal-dialog' role='document'>
         <div class='modal-content'>
           <div class='modal-body'>
-            <form @submit.prevent='joinClientList' novalidate class='needs-validation'>
+            <form novalidate class='needs-validation'>
               <h3 class='form-title'>Join {{instructorName}}'s Client List</h3>
               <div class='d-flex flex-wrap'>
                 <div class='label-w-100'>
@@ -234,7 +234,11 @@
                   <span v-if='$v.modalData.mobile_phone.$dirty && !modalData.accept_terms'>Please accept terms of service</span>
                 </div>
                 <div class='form-group'>
-                  <button type='submit' @click='successAddedToInstructorList' class='btn btn-success btn-block'>ADD ME TO THEIR LIST :-)</button>
+                  <loader-button
+                    :isLoading='loadingBtn'
+                    text='ADD ME TO THEIR LIST :-)'
+                    @click='joinClientList'
+                  />
                 </div>
               </div>
               <div v-if='errorText' class='has-error'>{{errorText}}</div>
@@ -611,6 +615,7 @@ import DropdownDatepicker from 'vue-dropdown-datepicker'
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
 import {mapActions} from 'vuex'
 import {email, required, numeric} from 'vuelidate/lib/validators'
+import LoaderButton from './cart/LoaderButton/LoaderButton'
 
 $(function() {
   $('[data-toggle="tooltip"]')
@@ -620,6 +625,7 @@ const ct = require('countries-and-timezones')
 
 export default {
   components: {
+    LoaderButton,
     MaskedInput,
     MagnificPopupModal,
     DropdownDatepicker,
@@ -652,6 +658,7 @@ export default {
   },
   data() {
     return {
+      loadingBtn: false,
       modalData: {
         first_name: '',
         last_name: '',
@@ -754,16 +761,13 @@ export default {
     closeRegisteredModal() {
       $('#registeredModal').modal('hide')
     },
-    successAddedToInstructorList() {
-      this.closeRegisteredModal()
-      this.openRegisteredModal = false
-    },
     async joinClientList() {
       if (this.$v.$invalid) {
         this.$v.$touch()
         return
       }
       try {
+        this.loadingBtn = true
         const data = {
           instructor_id: this.instructorId,
           first_name: this.modalData.first_name,
@@ -775,9 +779,17 @@ export default {
           newsletter: this.modalData.newsletter,
         }
         await this.createToClientList(data)
-      } catch (e) {
-        console.log(e)
+      } catch {
+        this.loadingBtn = false
       }
+      this.loadingBtn = false
+     this.closeForm()
+    },
+    closeForm() {
+      this.openRegisteredModal = false
+      $('#registeredModal').modal('hide')
+      this.modalData = {newsletter: true}
+      this.$v.$reset()
     },
     tooltipContent() {
       return `Click here to add your contact info to ${this.instructorName}'s Client List so you can be notified when classes, privates or workshops become available.`
