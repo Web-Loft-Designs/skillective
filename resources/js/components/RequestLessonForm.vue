@@ -783,7 +783,7 @@ export default {
         this.loadingBtn = false
       }
       this.loadingBtn = false
-     this.closeForm()
+      this.closeForm()
     },
     closeForm() {
       this.openRegisteredModal = false
@@ -798,11 +798,14 @@ export default {
       this.closeJoinModal()
       if (this.loggedInStudent) {
         try {
-          // const data = {
-          //   this.,
-          // }
+          let instructors = []
+          instructors.push(this.instructorId)
+          const data = {
+            required: this.studentId,
+            instructors: instructors,
+          }
           await this.addToClientList(this.instructorId)
-          // await this.addStudentToInstructorList()
+          await this.addStudentToInstructorList(data)
           this.showSuccessAddedModal()
           setTimeout(() => {
             $('#successAdded')
