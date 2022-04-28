@@ -616,7 +616,6 @@ $(function() {
   $('[data-toggle="tooltip"]')
   .tooltip()
 })
-
 const ct = require('countries-and-timezones')
 
 export default {
@@ -639,6 +638,7 @@ export default {
     'showCreateBtn',
     'lessonBlockMinPrice',
     'instructorName',
+    'studentId',
   ],
   validations: {
     modalData: {
@@ -693,12 +693,6 @@ export default {
     }
   },
   watch: {
-    openRegisteredModal() {
-      const HTML = document.querySelector('html')
-      if ($('#registeredModal').modal('show')) {
-        HTML.classList.add('disabled-scroll')
-      }
-    },
     selectRange: function() {
       this.isDateInputInit = true
 
@@ -742,19 +736,13 @@ export default {
       }
     },
   },
-  updated() {
-    console.log('updated')
-  },
-  destroyed() {
-    console.log('destroyed')
-  },
   methods: {
-    ...mapActions(['addToClientList', 'createToClientList']),
+    ...mapActions(['addToClientList', 'createToClientList', 'addStudentToInstructorList']),
     showJoinModal() {
       $('#joinClient').modal('show')
+      console.log(this.studentId)
     },
     showRegisteredModal() {
-      this.openRegisteredModal = true
       $('#registeredModal').modal('show')
     },
     showSuccessAddedModal() {
@@ -798,7 +786,11 @@ export default {
       this.closeJoinModal()
       if (this.loggedInStudent) {
         try {
+          // const data = {
+          //   this.,
+          // }
           await this.addToClientList(this.instructorId)
+          // await this.addStudentToInstructorList()
           this.showSuccessAddedModal()
           setTimeout(() => {
             $('#successAdded')
