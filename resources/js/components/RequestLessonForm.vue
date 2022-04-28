@@ -67,9 +67,11 @@
       aria-labelledby='mySmallModalLabel'
       aria-hidden='true'
     >
-      <div class='modal-dialog modal-sm'>
-        <div class='modal-content p-10'>
-          Congratulations! You have been added to the instructor’s list of clients
+      <div class='modal-dialog'>
+        <div class='modal-content'>
+          <div class='modal-body p-2 h3'>
+            Congratulations! You have been added to the instructor’s list of clients
+          </div>
         </div>
       </div>
     </div>
@@ -210,7 +212,7 @@
                   <span v-if='$v.modalData.mobile_phone.$dirty && !modalData.accept_terms'>Please accept terms of service</span>
                 </div>
                 <div class='form-group'>
-                  <button type='submit' class='btn btn-success btn-block'>ADD ME TO THEIR LIST :-)</button>
+                  <button type='submit' @click='successAddedToInstructorList' class='btn btn-success btn-block'>ADD ME TO THEIR LIST :-)</button>
                 </div>
               </div>
               <div v-if='errorText' class='has-error'>{{errorText}}</div>
@@ -665,9 +667,16 @@ export default {
       lessonRequestAccepted: false,
       fieldsDisabled: false,
       isDateInputInit: false,
+      openRegisteredModal: false,
     }
   },
   watch: {
+    openRegisteredModal() {
+      const HTML = document.querySelector('html')
+      if ($('#registeredModal').modal('show')) {
+        HTML.classList.add('disabled-scroll')
+      }
+    },
     selectRange: function() {
       this.isDateInputInit = true
 
@@ -711,12 +720,19 @@ export default {
       }
     },
   },
+  updated() {
+    console.log('updated')
+  },
+  destroyed() {
+    console.log('destroyed')
+  },
   methods: {
     ...mapActions(['addToClientList', 'createToClientList']),
     showJoinModal() {
       $('#joinClient').modal('show')
     },
     showRegisteredModal() {
+      this.openRegisteredModal = true
       $('#registeredModal').modal('show')
     },
     showSuccessAddedModal() {
@@ -724,6 +740,13 @@ export default {
     },
     closeJoinModal() {
       $('#joinClient').modal('hide')
+    },
+    closeRegisteredModal() {
+      $('#registeredModal').modal('hide')
+    },
+    successAddedToInstructorList() {
+      this.closeRegisteredModal()
+      this.openRegisteredModal = false
     },
     async joinClientList() {
       if (this.$v.$invalid) {
@@ -947,7 +970,7 @@ export default {
       'America/Asuncion': 'America/Asuncion UTC-04:00',
       'America/La_Paz': 'America/La_Paz UTC-04:00',
       'America/Cuiaba': '	America/Cuiaba UTC-04:00',
-      'America/Santiago': '	America/Santiago UTC-04:00',
+      // 'America/Santiago': '	America/Santiago UTC-04:00',
       'America/St_Johns': 'America/St_Johns UTC-03:30',
       'America/Sao_Paulo': '	America/Sao_Paulo UTC-03:00',
       'America/Santiago': '	America/Godthab UTC-03:00',
@@ -1133,6 +1156,10 @@ export default {
 
 }
 
+.disabled-scroll {
+  overflow: hidden;
+}
+
 .btn {
   font-size: 14px;
   margin-bottom: 8px;
@@ -1140,6 +1167,12 @@ export default {
 
 .modal-body {
   font-size: 14px;
+}
+
+#successAdded {
+  .modal-body {
+    font-size: 20px;
+  }
 }
 
 .tooltip {
