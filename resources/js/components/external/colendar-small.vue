@@ -91,7 +91,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import MagnificPopupModal from "./MagnificPopupModal";
 import siteAPI from "../../mixins/siteAPI.js";
-import { getTimezone } from "countries-and-timezones";
+import countriesAndTimezones from "countries-and-timezones";
 var FileSaver = require("file-saver");
 
 export default {
@@ -256,7 +256,7 @@ export default {
 
               let userTzOffset = new Date().getTimezoneOffset() * 60 * 1000;
 
-              let lessonTimeZoneObj = getTimezone(item.timezone_id_name);
+              let lessonTimeZoneObj = countriesAndTimezones.getTimezone(item.timezone_id_name);
 
               var jan = new Date(0, 1);
               var jul = new Date(6, 1);

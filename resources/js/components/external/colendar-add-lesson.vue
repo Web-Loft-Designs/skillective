@@ -165,7 +165,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import MagnificPopupModal from "./MagnificPopupModal";
 import siteAPI from "../../mixins/siteAPI.js";
 import moment from "moment-timezone";
-import { getTimezone } from "countries-and-timezones";
+import countriesAndTimezones from "countries-and-timezones";
 var FileSaver = require("file-saver");
 
 export default {
@@ -381,7 +381,7 @@ export default {
 
             let userTzOffset = new Date().getTimezoneOffset() * 60 * 1000;
 
-            let lessonTimeZoneObj = getTimezone(item.timezone_id_name);
+            let lessonTimeZoneObj = countriesAndTimezones.getTimezone(item.timezone_id_name);
 
             var jan = new Date(0, 1);
             var jul = new Date(6, 1);
@@ -471,11 +471,11 @@ export default {
         count +
         "</span>" +
         `<div class='calendar-tooltip'>
-            <span class='genre' > ${info.event.extendedProps.genre.title} </span> 
-            <span class='type' >  Lesson Type ${info.event.extendedProps.lesson_type} </span> 
-            <span class='note-title'> Note </span> 
+            <span class='genre' > ${info.event.extendedProps.genre.title} </span>
+            <span class='type' >  Lesson Type ${info.event.extendedProps.lesson_type} </span>
+            <span class='note-title'> Note </span>
             <span class='note-content'> ${info.event.extendedProps.description} </span>
-            <span class='price'> Price $${info.event.extendedProps.spot_price} per lesson </span> 
+            <span class='price'> Price $${info.event.extendedProps.spot_price} per lesson </span>
       </div>`;
     },
     eventMouseEnter: function ({ el }) {

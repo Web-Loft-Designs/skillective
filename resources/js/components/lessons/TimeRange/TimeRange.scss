@@ -1,6 +1,6 @@
 .time-range,
 .price-range {
-  /deep/ .vue-slider {
+  >>> .vue-slider {
     .vue-slider-process {
       background-color: #8ADA00;
     }

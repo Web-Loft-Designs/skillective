@@ -54,13 +54,15 @@ class LoadInstagramMediaJob implements ShouldQueue
 						$mediaBasename = basename($m->media_url);
 						$filename = substr($mediaBasename, 0, strpos($mediaBasename, '?'));
 						$mediaExists = $user->media()->where('collection_name', 'instagram')->where('file_name', $filename)->count();
-						if ($mediaExists) continue;
+						
 
-						try{
-							$user->addInstagramMedia( $m->media_url );
-						}catch (Exception $e){
-							Log::error('Load from IG Error: ' . $e->getMessage());
-						}
+                        if (count($mediaBasename) == 0) {
+                            try {
+                                $user->addInstagramMedia($m->media_url);
+                            } catch (Exception $e) {
+                                Log::error('Load from IG Error: ' . $e->getMessage());
+                            }
+                        }
 					}
 				}
 			}

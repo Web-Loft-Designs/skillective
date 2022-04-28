@@ -12,14 +12,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
+Route::post('/create-to-client-list', 'StudentAddClientListAPIController@createToClientList');
+Route::post('/add-to-client-list', 'StudentAddClientListAPIController@addToClientList');
 
 Route::post('/contact-us', 'ContactUsAPIController@send');
 Route::post('/become-instructor', 'ContactUsAPIController@becomeInstructor');
 
 Route::group(['middleware' => ['guest']], function () {
 
-	Route::post('login', 'Auth\FrontendLoginController@login')->name('frontend.login');
+	Route::post('login', '\App\Http\Controllers\Auth\FrontendLoginController@login')->name('frontend.login');
 
 	//	Route::get('user/password/reset', 'Auth\ApiUserForgotPasswordController@showLinkRequestForm');
 	//	Route::post('user/password/email', 'Auth\ApiUserForgotPasswordController@sendResetLinkEmail');

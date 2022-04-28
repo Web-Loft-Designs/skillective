@@ -46,9 +46,9 @@ class CreateLessonAPIRequest extends APIRequest
 			'time_from'		=> ['required', 'date_multi_format:' . $formats],
 			'time_to'		=> ['required', 'date_multi_format:' . $formats],
 			'spots_count'	=> ['required', 'integer', 'min:1', 'max:100'],
-			'spot_price'	=> ['required', 'numeric', 'min:0.99'],
+			'spot_price'	=> ['required', 'numeric', 'virtual_min_price:lesson_type'],
 			'location'		=> ['required_if:lesson_type,in_person', 'nullable', 'is_exact_address'],
-            'timezone_id'      => ['required_if:lesson_type,virtual', 'nullable', "valid_timezone:$lesson_type"],
+            'timezone_id'   => ['required', 'nullable', "valid_timezone:$lesson_type"],
             'lesson_type'   => ['required', 'in:in_person,virtual,in_person_client']
 		];
 
@@ -56,14 +56,23 @@ class CreateLessonAPIRequest extends APIRequest
     }
 
     public function messages() {
+
+        if(request('lesson_type') == 'virtual') {
+            $minPrice = data_get(auth()->user(), 'profile.virtual_min_price');
+            $virtual_min_price = empty($minPrice) ? 1.00 : $minPrice;
+        } else {
+            $virtual_min_price = 1;
+        }
+
+
 		return [
 			'date.future_date' => 'Select future date',
 			'date_to.future_date' => 'Select future date',
 			'time_from.date_multi_format' => 'Wrong time format',
 			'time_to.date_multi_format' => 'Wrong time format',
-			'date.no_lessons_this_time' => 'Overlaps with some other lesson',
-			'date_to.no_lessons_this_time'	 => 'Overlaps with some other lesson',
-			'spot_price.min' => 'Minimum lesson price must be greater than $0.99',
+			'date.no_lessons_this_time' => 'You have already scheduled a lesson at this time.',
+			'date_to.no_lessons_this_time' => 'You have already scheduled a lesson at this time.',
+			'spot_price.virtual_min_price' => 'Minimum lesson price must be greater than ' . number_format($virtual_min_price, 2, null, null) . '$',
 			'spots_count.required' => 'Please enter a number of students',
 			'location.is_exact_address' => 'Lesson location address should be clarified',
 			'timezone_id.valid_timezone' => 'Wrong timezone',

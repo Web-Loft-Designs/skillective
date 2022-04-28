@@ -1,7 +1,7 @@
 @extends('layouts.app-frontend')
 
 @section('content')
-<calendar-input 
+<calendar-input
     always-on-top
     :genres="{{ json_encode($genres) }}"
     ajax-event="lessonsLoadLessons"
@@ -22,7 +22,7 @@
 <lessons
     :genres="{{ json_encode($genres) }}"
     :preloaded-lessons="{{ json_encode($lessons['data']) }}"
-    :can-book="{{ (!isset($loggedUserRole) || $loggedUserRole==\App\Models\User::ROLE_STUDENT) ? 'true' : 'false' }}"
+    :logged-in-as-student="{{ (!isset($loggedUserRole) || $loggedUserRole==\App\Models\User::ROLE_STUDENT) ? 'true' : 'false' }}"
     :meta="{{ isset($lessons['meta'])?json_encode($lessons['meta']):json_encode([]) }}"
 ></lessons>
 @endsection

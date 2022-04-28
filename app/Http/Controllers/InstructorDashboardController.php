@@ -41,13 +41,13 @@ class InstructorDashboardController extends Controller
 				'type' => 'all',
 				'sort' => 'date'
 			]);
- 			
+
 			$lessonRepo->setPresenter("App\\Presenters\\LessonDashboardPresenter");
-			
+
 			$lessons = $lessonRepo->presentResponse($lessonRepo->getDashboardInstructorLessons($request, Auth::user()->id));
 
 		}catch (\Exception $e){
-			
+
 			Log::error('getInstructorBookings : ' . $e->getMessage());
 			$lessons = ['data'=>[]];
 		}
@@ -70,7 +70,7 @@ class InstructorDashboardController extends Controller
 		if($upcomingLessons){
 			$vars['upcomingLessons'] = $upcomingLessons;
 		}
-		
+
         if ($upcomingLesson && Cookie::get('hiddenUpcomingLessonId')!=$upcomingLesson['id']){
 			$vars['upcomingLesson'] = $lessonRepo->presentResponse($upcomingLesson)['data'];
 		}
