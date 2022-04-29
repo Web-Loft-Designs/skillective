@@ -20,6 +20,7 @@
         Add me to {{instructorName}}'s Client List
       </button>
     </div>
+    <!--    modal1-->
     <div
       class='modal'
       id='joinClient'
@@ -59,6 +60,7 @@
         </div>
       </div>
     </div>
+    <!--    modal1-->
     <div
       class='modal'
       id='successAdded'
@@ -75,6 +77,7 @@
         </div>
       </div>
     </div>
+    <!--    modal3-->
     <div
       class='modal'
       tabindex='-1'
@@ -243,6 +246,87 @@
               </div>
               <div v-if='errorText' class='has-error'>{{errorText}}</div>
             </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--    modal4-->
+    <div
+      class='modal'
+      id='successAddedAfterRegistered'
+      tabindex='-1'
+      role='dialog'
+      aria-labelledby='exampleModalCenterTitle'
+      aria-hidden='true'
+    >
+      <div
+        class='modal-dialog modal-dialog-centered'
+        role='document'
+      >
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h5
+              class='modal-title'
+              id='exampleModalLongTitle'
+            >
+              Welcome!
+            </h5>
+            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+              <span aria-hidden='true'>&times;</span>
+            </button>
+          </div>
+          <div class='modal-body text-center'>
+            <span class='text-center'>
+               Thank you for joining my client list. I'll be in touch with upcoming lessons and events. Talk to you soon!
+              <br>
+              <strong>- {{instructorName}}</strong>
+              <br>
+            </span>
+            <span>
+              You should have received an email from Skillective with more details
+            </span>
+          </div>
+          <div class='modal-footer'>
+            <loader-button
+              :isLoading='loadingOtherInstructors'
+              text="Join other Instructor's client lists here"
+              @click='showMoreInstructors'
+            >
+            </loader-button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--    modal5-->
+    <div
+      class='modal'
+      id='otherInstructorsList'
+      tabindex='-1'
+      role='dialog'
+      aria-labelledby='otherInstructorsListTitle'
+      aria-hidden='true'
+    >
+      <div
+        class='modal-dialog modal-dialog-centered'
+        role='document'
+      >
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h5
+              class='modal-title'
+              id='otherInstructorsListTitle'
+            >
+            Would you like to be added to other instructor's client lists?  Check the boxes below
+            </h5>
+            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+              <span aria-hidden='true'>&times;</span>
+            </button>
+          </div>
+          <div class='modal-body'>
+            Content
+          </div>
+          <div class='modal-footer'>
+            <button type='button' class='btn btn-primary'>Save changes</button>
           </div>
         </div>
       </div>
@@ -697,6 +781,7 @@ export default {
       fieldsDisabled: false,
       isDateInputInit: false,
       openRegisteredModal: false,
+      loadingOtherInstructors: false,
     }
   },
   watch: {
@@ -755,11 +840,26 @@ export default {
     showSuccessAddedModal() {
       $('#successAdded').modal('show')
     },
+    showAddedAfterSuccessModal() {
+      $('#successAddedAfterRegistered').modal('show')
+    },
+    showOtherInstructorsListModal() {
+      $('#otherInstructorsList').modal('show')
+    },
     closeJoinModal() {
       $('#joinClient').modal('hide')
     },
+    closeAddedAfterSuccessModal() {
+      $('#successAddedAfterRegistered').modal('hide')
+    },
     closeRegisteredModal() {
       $('#registeredModal').modal('hide')
+    },
+    showMoreInstructors() {
+      this.loadingOtherInstructors = true
+      this.showOtherInstructorsListModal()
+      this.loadingOtherInstructors = false
+      this.closeAddedAfterSuccessModal()
     },
     async joinClientList() {
       if (this.$v.$invalid) {
@@ -779,6 +879,7 @@ export default {
           newsletter: this.modalData.newsletter,
         }
         await this.createToClientList(data)
+        this.showAddedAfterSuccessModal()
       } catch {
         this.loadingBtn = false
       }
@@ -1201,6 +1302,10 @@ export default {
   .modal-body {
     font-size: 20px;
   }
+}
+
+#otherInstructorsListTitle {
+  font-size: 14px;
 }
 
 .tooltip {
