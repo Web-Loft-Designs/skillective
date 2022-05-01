@@ -44,26 +44,36 @@ class InvitationAPIController extends AppBaseController
     {
     	$resultMessage = '';
     	$countInvited = 0;
-
 		$contacts_to_invite = $request->input('contacts_to_invite', '');
-		if (!is_array($contacts_to_invite))
-			$contacts_to_invite = explode(',', $contacts_to_invite);
+
+		if (!is_array($contacts_to_invite)) $contacts_to_invite = explode(',', $contacts_to_invite);
 
     	foreach ($contacts_to_invite as $contactToInvite){
 			$contactToInvite = trim($contactToInvite);
-    		if ($contactToInvite=='') continue;
-			$input = $this->_prepareInputData($contactToInvite);
-			if (!isset($input['invited_email']) && !isset($input['invited_mobile_phone'])){
+
+            if ($contactToInvite=='') continue;
+
+            $input = $this->_prepareInputData($contactToInvite);
+
+            if (!isset($input['invited_email']) && !isset($input['invited_mobile_phone'])){
 				$resultMessage .= ($contactToInvite . ': Can\'t invite user. Invalid contact<br>');
 				continue;
 			}
-			if (isset($input['invited_email']) && $this->userRepository->findByField('email', $input['invited_email'])->count()>0){
-				$resultMessage .= ($contactToInvite . ': Seems this user already has an account on our site<br>');
-				continue;
+
+            if (isset($input['invited_email'])){
+                if($this->userRepository->findByField('email', $input['invited_email'])->count() > 0 ||
+                    Invitation::where('invited_email', $input['invited_email'])->count() > 0) {
+                    $resultMessage .= ($contactToInvite . ': Seems this user already has an account on our site<br>');
+                    continue;
+                }
 			}
-			if (isset($input['invited_mobile_phone']) && $this->profileRepository->findByField('mobile_phone', $input['invited_mobile_phone'])->count()>0){
-				$resultMessage .= ($contactToInvite . ': Seems this user already has an account on our site<br>');
-				continue;
+
+            if (isset($input['invited_mobile_phone'])){
+				if($this->profileRepository->findByField('mobile_phone', $input['invited_mobile_phone'])->count() > 0 ||
+                    Invitation::where('invited_mobile_phone', $input['invited_mobile_phone'])->count() > 0) {
+                    $resultMessage .= ($contactToInvite . ': Seems this user already has an account on our site<br>');
+                    continue;
+                }
 			}
 
 			if (isset($input['invited_mobile_phone']) && $input['invited_mobile_phone']=='+12222222222')
@@ -86,6 +96,7 @@ class InvitationAPIController extends AppBaseController
 				$resultMessage .= ($contactToInvite . ': '.$e->getMessage().'<br>');
 			}
 		}
+
 		$resultMessage .= "{$countInvited} invitations sent.";
 
 		return $this->sendResponse(true, $resultMessage);
@@ -96,26 +107,36 @@ class InvitationAPIController extends AppBaseController
 		$resultMessage = '';
 		$countInvited = 0;
 		$contacts_to_invite = $request->input('contacts_to_invite', '');
-		if (!is_array($contacts_to_invite))
-			$contacts_to_invite = explode(',', $contacts_to_invite);
+
+		if (!is_array($contacts_to_invite)) $contacts_to_invite = explode(',', $contacts_to_invite);
 
 		foreach ($contacts_to_invite as $contactToInvite){
 			$contactToInvite = trim($contactToInvite);
+
 			if ($contactToInvite=='') continue;
+
 			$input = $this->_prepareInputData($contactToInvite);
+
 			if (!isset($input['invited_email']) && !isset($input['invited_mobile_phone'])){
 				$resultMessage .= ($contactToInvite . ': Can\'t invite user. Invalid contact<br>');
 				continue;
 			}
-			if (isset($input['invited_email']) && $this->userRepository->findByField('email', $input['invited_email'])->count()>0){
-				$resultMessage .= ($contactToInvite . ': Seems this user already has an account on our site<br>');
-				continue;
-			}
-			if (isset($input['invited_mobile_phone']) && $this->profileRepository->findByField('mobile_phone', $input['invited_mobile_phone'])->count()>0){
-				$resultMessage .= ($contactToInvite . ': Seems this user already has an account on our site<br>');
-				continue;
+
+			if (isset($input['invited_email'])){
+				if($this->userRepository->findByField('email', $input['invited_email'])->count() > 0 ||
+                    Invitation::where('invited_email', $input['invited_email'])->count() > 0) {
+                    $resultMessage .= ($contactToInvite . ': Seems this user already has an account on our site<br>');
+                    continue;
+                }
 			}
 
+			if (isset($input['invited_mobile_phone'])){
+                if($this->profileRepository->findByField('mobile_phone', $input['invited_mobile_phone'])->count() > 0 ||
+                    Invitation::where('invited_mobile_phone', $input['invited_mobile_phone'])->count() > 0) {
+                    $resultMessage .= ($contactToInvite . ': Seems this user already has an account on our site<br>');
+                    continue;
+                }
+			}
 
 			DB::beginTransaction();
 			try{
@@ -134,6 +155,7 @@ class InvitationAPIController extends AppBaseController
 				$resultMessage .= ($contactToInvite . ': '.$e->getMessage().'<br>');
 			}
 		}
+
 		$resultMessage .= "{$countInvited} invitations sent.";
 
 		return $this->sendResponse(true, $resultMessage);
@@ -141,14 +163,16 @@ class InvitationAPIController extends AppBaseController
 
 	private function _prepareInputData($contact){
 		$input = [
-			'invited_by'			=> Auth::user()->id,
+			'invited_by'			=> auth()->id(),
 			'invited_name'			=> ''
 		];
+
 		if (preg_match("/^{$this->emailRegexp}$/ix", $contact)){
 			$input['invited_email'] = $contact;
-		}elseif (preg_match("/^{$this->phoneRegexp}$/ix", $contact)){
+		} elseif (preg_match("/^{$this->phoneRegexp}$/ix", $contact)) {
 			$input['invited_mobile_phone'] = $contact;
 		}
+
 		return $input;
 	}
 }
