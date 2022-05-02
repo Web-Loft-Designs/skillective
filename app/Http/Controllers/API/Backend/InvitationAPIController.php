@@ -63,7 +63,7 @@ class InvitationAPIController extends AppBaseController
             if (isset($input['invited_email'])){
                 if($this->userRepository->findByField('email', $input['invited_email'])->count() > 0 ||
                     Invitation::where('invited_email', $input['invited_email'])->count() > 0) {
-                    $resultMessage .= ($contactToInvite . ': Seems this user already has an account on our site<br>');
+                    $resultMessage .= ($contactToInvite . ': You have already invited this instructor.<br>');
                     continue;
                 }
 			}
@@ -71,7 +71,7 @@ class InvitationAPIController extends AppBaseController
             if (isset($input['invited_mobile_phone'])){
 				if($this->profileRepository->findByField('mobile_phone', $input['invited_mobile_phone'])->count() > 0 ||
                     Invitation::where('invited_mobile_phone', $input['invited_mobile_phone'])->count() > 0) {
-                    $resultMessage .= ($contactToInvite . ': Seems this user already has an account on our site<br>');
+                    $resultMessage .= ($contactToInvite . ': You have already invited this instructor.<br>');
                     continue;
                 }
 			}
@@ -125,7 +125,7 @@ class InvitationAPIController extends AppBaseController
 			if (isset($input['invited_email'])){
 				if($this->userRepository->findByField('email', $input['invited_email'])->count() > 0 ||
                     Invitation::where('invited_email', $input['invited_email'])->count() > 0) {
-                    $resultMessage .= ($contactToInvite . ': Seems this user already has an account on our site<br>');
+                    $resultMessage .= ($contactToInvite . ': You have already invited this student.<br>');
                     continue;
                 }
 			}
@@ -133,7 +133,7 @@ class InvitationAPIController extends AppBaseController
 			if (isset($input['invited_mobile_phone'])){
                 if($this->profileRepository->findByField('mobile_phone', $input['invited_mobile_phone'])->count() > 0 ||
                     Invitation::where('invited_mobile_phone', $input['invited_mobile_phone'])->count() > 0) {
-                    $resultMessage .= ($contactToInvite . ': Seems this user already has an account on our site<br>');
+                    $resultMessage .= ($contactToInvite . ': You have already invited this student<br>');
                     continue;
                 }
 			}
