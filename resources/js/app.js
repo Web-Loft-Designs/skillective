@@ -26,7 +26,6 @@ if (typeof Object.assign != "function") {
     };
 }
 import Vue from 'vue'
-import vuetify from '../../src/plugins/vuetify'
 import {Vuelidate} from 'vuelidate'
 
 Vue.use(Vuelidate)
@@ -564,7 +563,6 @@ const slickSingle = (window.slickSingle = {
 var app = new Vue({
     el: "#app",
     store,
-    vuetify,
     directives: { Sticky },
     data() {
         return {
