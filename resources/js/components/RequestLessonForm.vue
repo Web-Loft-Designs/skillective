@@ -131,7 +131,6 @@
                     type='text'
                     class='form-control'
                     name='instagram_handle'
-                    value=''
                     v-model='modalData.instagram_handle'
                     placeholder='@instagram_name'
                   />
@@ -190,7 +189,13 @@
                 </div>
                 <div
                   class='form-group'
-                  :class="{'has-error': ($v.modalData.email.$dirty && !$v.modalData.email.required) || ($v.modalData.email.$dirty && !$v.modalData.email.email)}"
+                  :class="{'has-error':
+                  ($v.modalData.email.$dirty && !$v.modalData.email.required)
+                  ||
+                  ($v.modalData.email.$dirty && !$v.modalData.email.email)
+                  ||
+                   storeErrors.email
+                }"
                 >
                   <label>Email</label>
                   <input
@@ -199,10 +204,17 @@
                     v-model.trim='modalData.email'
                     placeholder='Email'
                     class='form-control'
-                    :class="{'is-invalid': ($v.modalData.email.$dirty && !$v.modalData.email.required) || ($v.modalData.email.$dirty && !$v.modalData.email.email)}"
+                    :class="{'is-invalid':
+                    ($v.modalData.email.$dirty && !$v.modalData.email.required)
+                    ||
+                    ($v.modalData.email.$dirty && !$v.modalData.email.email)
+                    ||
+                    storeErrors.email
+                    }"
                   />
                   <span v-if='$v.modalData.email.$dirty && !$v.modalData.email.required'>Email can't be empty</span>
                   <span v-else-if='$v.modalData.email.$dirty && !$v.modalData.email.email'>Error email format</span>
+                  <span v-else-if='storeErrors.email'>{{storeErrors.email[0]}}</span>
                 </div>
                 <div class='form-group checkbox-wrapper'>
                   <div class='field'>
@@ -245,7 +257,6 @@
                   />
                 </div>
               </div>
-              <div v-if='errorText' class='has-error'>{{errorText}}</div>
             </form>
           </div>
         </div>
@@ -437,13 +448,6 @@
                 <strong>{{errors.time_to[0]}}</strong>
               </span>
             </div>
-
-            <!-- <div
-              class="form-group row"
-              v-if="bookingFeesDescription"
-              v-html="bookingFeesDescription"
-            ></div>-->
-
             <div
               class='form-group col-4 has-feedback'
               :class="{ 'has-error': errors.lesson_type }"
@@ -666,7 +670,7 @@ import MagnificPopupModal from './external/MagnificPopupModal'
 require('jquery.maskedinput/src/jquery.maskedinput')
 import DropdownDatepicker from 'vue-dropdown-datepicker'
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
-import {mapActions} from 'vuex'
+import {mapActions, mapState} from 'vuex'
 import {email, required, numeric} from 'vuelidate/lib/validators'
 import LoaderButton from './cart/LoaderButton/LoaderButton'
 
@@ -771,6 +775,7 @@ export default {
     },
   },
   computed: {
+    ...mapState(['storeErrors', 'storeErrorText']),
     priceError: function() {
       if (
         !this.fields.time_from ||
@@ -838,12 +843,14 @@ export default {
           newsletter: this.modalData.newsletter,
         }
         await this.createToClientList(data)
-        this.showAddedAfterSuccessModal()
-      } catch {
+        // this.closeForm()
+        // this.showAddedAfterSuccessModal()
+      } catch (e) {
         this.loadingBtn = false
       }
       this.loadingBtn = false
-      this.closeForm()
+      console.log('text',this.storeErrorText)
+      console.log('errors',this.storeErrors)
     },
     closeForm() {
       this.openRegisteredModal = false
