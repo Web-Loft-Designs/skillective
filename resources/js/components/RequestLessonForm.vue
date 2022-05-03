@@ -13,6 +13,7 @@
         class='btn btn-success btn-sm text-wrap'
         type='button'
         data-toggle='tooltip'
+        v-if='showCreateBtn'
         data-placement='bottom'
         @click='showJoinModal'
         :title='tooltipContent()'
@@ -287,46 +288,14 @@
             </span>
           </div>
           <div class='modal-footer'>
-            <loader-button
-              :isLoading='loadingOtherInstructors'
-              text="Join other Instructor's client lists here"
-              @click='showMoreInstructors'
+            <button
+              type='button'
+              aria-label='Close'
+              class='btn btn-success btn-sm'
+              data-dismiss='modal'
             >
-            </loader-button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!--    modal5-->
-    <div
-      class='modal'
-      id='otherInstructorsList'
-      tabindex='-1'
-      role='dialog'
-      aria-labelledby='otherInstructorsListTitle'
-      aria-hidden='true'
-    >
-      <div
-        class='modal-dialog modal-dialog-centered'
-        role='document'
-      >
-        <div class='modal-content'>
-          <div class='modal-header'>
-            <h5
-              class='modal-title'
-              id='otherInstructorsListTitle'
-            >
-            Would you like to be added to other instructor's client lists?  Check the boxes below
-            </h5>
-            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
-              <span aria-hidden='true'>&times;</span>
+              ОК
             </button>
-          </div>
-          <div class='modal-body'>
-            Content
-          </div>
-          <div class='modal-footer'>
-            <button type='button' class='btn btn-primary'>Save changes</button>
           </div>
         </div>
       </div>
@@ -832,7 +801,6 @@ export default {
     ...mapActions(['addToClientList', 'createToClientList', 'addStudentToInstructorList']),
     showJoinModal() {
       $('#joinClient').modal('show')
-      console.log(this.studentId)
     },
     showRegisteredModal() {
       $('#registeredModal').modal('show')
@@ -849,17 +817,8 @@ export default {
     closeJoinModal() {
       $('#joinClient').modal('hide')
     },
-    closeAddedAfterSuccessModal() {
-      $('#successAddedAfterRegistered').modal('hide')
-    },
     closeRegisteredModal() {
       $('#registeredModal').modal('hide')
-    },
-    showMoreInstructors() {
-      this.loadingOtherInstructors = true
-      this.showOtherInstructorsListModal()
-      this.loadingOtherInstructors = false
-      this.closeAddedAfterSuccessModal()
     },
     async joinClientList() {
       if (this.$v.$invalid) {
@@ -895,6 +854,10 @@ export default {
     tooltipContent() {
       return `Click here to add your contact info to ${this.instructorName}'s Client List so you can be notified when classes, privates or workshops become available.`
     },
+    async addingNotification() {
+      this.apiPost('/api/student/instructor/geo-notifications/' + this.instructorId)
+      this.apiPost('/api/student/instructor/virtual-lesson-notifications/' + this.instructorId)
+    },
     async successJoinedToClient() {
       this.closeJoinModal()
       if (this.loggedInStudent) {
@@ -908,6 +871,7 @@ export default {
           await this.addToClientList(this.instructorId)
           await this.addStudentToInstructorList(data)
           this.showSuccessAddedModal()
+          await this.addingNotification()
           setTimeout(() => {
             $('#successAdded')
             .modal('hide')
