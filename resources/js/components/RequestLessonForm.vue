@@ -72,7 +72,7 @@
     >
       <div class='modal-dialog'>
         <div class='modal-content'>
-          <div class='modal-body p-2 h3'>
+          <div class='modal-body p-5 h3 text-center'>
             Congratulations! You have been added to the instructor’s list of clients
           </div>
         </div>
@@ -202,6 +202,7 @@
                     type='email'
                     name='email'
                     v-model.trim='modalData.email'
+                    @input='changeEmail'
                     placeholder='Email'
                     class='form-control'
                     :class="{'is-invalid':
@@ -671,7 +672,7 @@ import MagnificPopupModal from './external/MagnificPopupModal'
 require('jquery.maskedinput/src/jquery.maskedinput')
 import DropdownDatepicker from 'vue-dropdown-datepicker'
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
-import {mapActions, mapState} from 'vuex'
+import {mapActions, mapState, mapMutations} from 'vuex'
 import {email, required, numeric} from 'vuelidate/lib/validators'
 import LoaderButton from './cart/LoaderButton/LoaderButton'
 
@@ -680,7 +681,6 @@ $(function() {
   .tooltip()
 })
 const ct = require('countries-and-timezones')
-
 
 export default {
   components: {
@@ -806,6 +806,12 @@ export default {
   },
   methods: {
     ...mapActions(['addToClientList', 'createToClientList', 'addStudentToInstructorList']),
+    ...mapMutations(['CLEAR_INPUT']),
+    changeEmail() {
+      if (this.storeErrors) {
+        this.CLEAR_INPUT()
+      }
+    },
     showJoinModal() {
       $('#joinClient').modal('show')
     },
@@ -845,14 +851,14 @@ export default {
           newsletter: this.modalData.newsletter,
         }
         await this.createToClientList(data)
-        // this.closeForm()
-        // this.showAddedAfterSuccessModal()
+        if (!this.storeErrors?.email?.length) {
+          this.closeForm()
+          this.showAddedAfterSuccessModal()
+        }
       } catch (e) {
         this.loadingBtn = false
       }
       this.loadingBtn = false
-      console.log('text',this.storeErrorText)
-      console.log('errors',this.storeErrors)
     },
     closeForm() {
       this.openRegisteredModal = false
@@ -1055,7 +1061,6 @@ export default {
   created: function() {
     this.timeOptions = this.getTimeOptions()
     this.timeZomeOptions = ct.getAllTimezones()
-
 
     const tzs = {
       'America/New_York': 'America/New_York UTC-05:00',
