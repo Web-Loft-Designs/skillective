@@ -122,7 +122,7 @@ class UserRepository extends BaseRepository
 			return $query;
 		});
 
-		
+
 
 		$this->orderBy('featured_instructors.priority', 'desc');
 
@@ -174,7 +174,7 @@ class UserRepository extends BaseRepository
 			$perPage = Cookie::get('adminStudentsPerPage', $defaultPerPage);
 
 		$this->with(['profile', 'roles', 'genres', 'isFeatured']);
-		
+
 		if ($request->filled('limit') && $request->input('limit') > 0)
 			return $this->paginate($request->input('limit'), ['users.*']);
 		else
@@ -430,10 +430,10 @@ class UserRepository extends BaseRepository
 		$this->scopeQuery(function ($query) use ($lesson, $studentsWithFavoriteLessonInstructor) {
 			$rawSelect = '(';
 			if ($lesson->lat && $lesson->lng) {
-				$rawSelect .= " ( 
-                    get_distance_in_miles_between_geo_locations({$lesson->lat},{$lesson->lng}, user_geo_locations.lat, user_geo_locations.lng) <= user_geo_locations.limit ) 
-				    AND user_geo_locations.date_from <='{$lesson->start->format('Y-m-d')}' 
-				    AND user_geo_locations.date_to >='{$lesson->start->format('Y-m-d')}' 
+				$rawSelect .= " (
+                    get_distance_in_miles_between_geo_locations({$lesson->lat},{$lesson->lng}, user_geo_locations.lat, user_geo_locations.lng) <= user_geo_locations.limit )
+				    AND user_geo_locations.date_from <='{$lesson->start->format('Y-m-d')}'
+				    AND user_geo_locations.date_to >='{$lesson->start->format('Y-m-d')}'
 				  ) AND ";
 			}
 
@@ -539,4 +539,13 @@ class UserRepository extends BaseRepository
 
 		return;
 	}
+
+    public function getInstructorFromGenres(object $genres)
+    {
+        return $this->with(['profile', 'genres', 'genres.category', 'roles'])
+            ->whereHas('genres', function($query) use ($genres) {
+                $query->whereIn('genre_id', $genres);
+            })
+            ->get();
+    }
 }
