@@ -4,6 +4,8 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+import vuetify from '../../src/plugins/vuetify'
+
 if (typeof Object.assign != "function") {
     Object.assign = function(target) {
         "use strict";
@@ -25,10 +27,8 @@ if (typeof Object.assign != "function") {
         return target;
     };
 }
-import Vue from 'vue'
-import {Vuelidate} from 'vuelidate'
 
-Vue.use(Vuelidate)
+import Vue from "vue";
 
 require("./bootstrap");
 require("url-search-params-polyfill");
@@ -565,6 +565,7 @@ const slickSingle = (window.slickSingle = {
 var app = new Vue({
     el: "#app",
     store,
+    vuetify,
     directives: { Sticky },
     data() {
         return {

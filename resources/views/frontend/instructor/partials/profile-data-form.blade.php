@@ -36,19 +36,10 @@
             <p><strong>{{ $userProfileData['total_count_lessons'] }}</strong> Lessons Held</p>
             <?php
             $loggedInStudent = ( Auth::user() && Auth::user()->hasRole('Student') );
-            if(Auth::user()){
-                if (Auth::user()->hasRole('Student')) {
-                    $studentId = Auth::user()['id'];
-                }
-            }else{
-                $studentId = null;
-            }
             ?>
             @if ($userProfileData['isInstructor']==true && ( !Auth::user() || $loggedInStudent ) )
                 <request-lesson-form
-                        :instructor-name="{{ json_encode($userProfileData['full_name']) }}"
                         :show-create-btn="true"
-                        student-id="{{$studentId}}"
                         :user-genres="{{  json_encode($userProfileData['genres']) }}"
                         :site-genres="{{  json_encode($siteGenres) }}"
                         :instructor-id="{{ $userProfileData['id'] }}"

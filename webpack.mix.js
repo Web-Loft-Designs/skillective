@@ -1,4 +1,5 @@
-const mix = require('laravel-mix')
+const mix = require('laravel-mix');
+require('vuetifyjs-mix-extension')
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management
@@ -11,22 +12,22 @@ const mix = require('laravel-mix')
  */
 
 mix.babelConfig({
-    'presets': [
-      [
-        '@babel/preset-env',
-        {
-          'useBuiltIns': 'entry',
-          'targets': {
-            'browsers': ['ie >= 10', '> 1%'],
-          },
-        },
-      ],
-    ],
-  },
+        "presets": [
+            [
+                "@babel/preset-env",
+                {
+                    "useBuiltIns": "entry",
+                    "targets": {
+                        "browsers": ["ie >= 10", "> 1%"]
+                    }
+                }
+            ]
+        ]
+    }
 )
 
 
-mix.js('resources/js/app.js', 'public/js/app.js')
-  .sass('resources/sass/app.scss', 'public/css')
-  .sass('resources/sass/app-front.scss', 'public/css')
-  .vue({version: 2})
+mix.js('resources/js/app.js', 'public/js/app.js').vue({version: 2}).vuetify('vuetify-loader')
+    .sass('resources/sass/app.scss', 'public/css')
+    .sass('resources/sass/app-front.scss', 'public/css')
+    .vue({ version: 2 });
