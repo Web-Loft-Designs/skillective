@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Booking;
+use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use InfyOm\Generator\Common\BaseRepository;
@@ -523,8 +524,7 @@ class UserRepository extends BaseRepository
 			'dob',
 			'mobile_phone',
 			'about_me',
-			'gender',
-            'virtual_min_price'
+			'gender'
 		];
 
 		if ($user->hasRole(User::ROLE_STUDENT))
@@ -541,12 +541,54 @@ class UserRepository extends BaseRepository
 		return;
 	}
 
-    public function getInstructorFromGenres(object $genres)
+    public function checkInvitationFromEmail($email)
     {
-        return $this->with(['profile', 'genres', 'genres.category', 'roles'])
-            ->whereHas('genres', function($query) use ($genres) {
-                $query->whereIn('genre_id', $genres);
-            })
-            ->get();
+        if($this->where('email', $email)->exists()) {
+            return 'Seems this user already has an account on our site.';
+        }
+
+        if(Invitation::where('invited_email', $email)->where('invited_by', '!=', auth()->id())->exists()) {
+            return 'Another instructor has already invited this user.';
+        }
+
+        if(Invitation::where('invited_email', $email)->where('invited_by', auth()->id())->exists()) {
+            return 'You have already invited this instructor.';
+        }
+
+        return null;
+    }
+
+    public function checkInvitationFromPhone($phone)
+    {
+        if($this->where('mobile_phone', $phone)->exists()) {
+            return 'Seems this user already has an account on our site.';
+        }
+
+        if(Invitation::where('invited_mobile_phone', $phone)->where('invited_by', '!=', auth()->id())->exists()) {
+            return 'Another instructor has already invited this user.';
+        }
+
+        if(Invitation::where('invited_mobile_phone', $phone)->where('invited_by', auth()->id())->exists()) {
+            return 'You have already invited this instructor.';
+        }
+
+        return null;
+    }
+
+    public function checkInvitationFromInstagram($handle)
+    {
+        if($this->where('instagram_handle', $handle)->exists()) {
+            return 'Seems this user already has an account on our site.';
+        }
+
+        if(Invitation::where('invited_instagram_handle', $handle)->where('invited_by', '!=', auth()->id())->exists()) {
+            return 'Another instructor has already invited this user.';
+        }
+
+        if(Invitation::where('invited_instagram_handle', $handle)->where('invited_by', auth()->id())->exists()) {
+            return 'You have already invited this instructor.';
+        }
+
+        return null;
     }
 }
