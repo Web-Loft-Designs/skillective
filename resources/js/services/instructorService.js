@@ -29,6 +29,70 @@ const instructorService = {
             });
         return response;
     },
+    async createDiscount(fields) {
+        const response = await axios
+            .post("/api/instructor/discount", {
+                ...fields
+            })
+            .catch(e => {
+                console.log(e);
+                return e.response.data;
+            });
+        return response;
+    },
+    async updateDiscount(fields, id) {
+        const response = await axios
+            .put(`/api/instructor/discount/${id}`, {
+                ...fields
+            })
+            .catch(e => {
+                console.log(e);
+                return e.response.data;
+            });
+        return response;
+    },
+    async deleteDiscount(id) {
+        const response = await axios
+            .delete(`/api/instructor/discount/${id}`)
+            .catch(e => {
+                console.log(e);
+                return e.response.data;
+            });
+        return response;
+    },
+    async createPromo(fields, notifyClients) {
+        const response = await axios
+            .post("/api/instructor/promo", {
+                ...fields,
+                notifyClients,
+            })
+            .catch(e => {
+                console.log(e);
+                return e.response.data;
+            });
+        return response;
+    },
+    async updatePromo(fields, id, notifyClients) {
+        const response = await axios
+            .put(`/api/instructor/promo/${id}`, {
+                ...fields,
+                notifyClients
+            })
+            .catch(e => {
+                console.log(e);
+                return e.response.data;
+            });
+        return response;
+    },
+    async deletePromo(id) {
+        const response = await axios
+            .delete(`/api/instructor/promo/${id}`)
+            .catch(e => {
+                console.log(e);
+                return e.response.data;
+            });
+        return response;
+    },
     async editLesson(id, fields, documents) {
         const response = await axios
             .put("/api/instructor/pre-r-lesson/" + id, {

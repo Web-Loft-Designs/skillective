@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Booking;
+use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use InfyOm\Generator\Common\BaseRepository;
@@ -122,7 +123,7 @@ class UserRepository extends BaseRepository
 			return $query;
 		});
 
-		
+
 
 		$this->orderBy('featured_instructors.priority', 'desc');
 
@@ -174,7 +175,7 @@ class UserRepository extends BaseRepository
 			$perPage = Cookie::get('adminStudentsPerPage', $defaultPerPage);
 
 		$this->with(['profile', 'roles', 'genres', 'isFeatured']);
-		
+
 		if ($request->filled('limit') && $request->input('limit') > 0)
 			return $this->paginate($request->input('limit'), ['users.*']);
 		else
@@ -430,10 +431,10 @@ class UserRepository extends BaseRepository
 		$this->scopeQuery(function ($query) use ($lesson, $studentsWithFavoriteLessonInstructor) {
 			$rawSelect = '(';
 			if ($lesson->lat && $lesson->lng) {
-				$rawSelect .= " ( 
-                    get_distance_in_miles_between_geo_locations({$lesson->lat},{$lesson->lng}, user_geo_locations.lat, user_geo_locations.lng) <= user_geo_locations.limit ) 
-				    AND user_geo_locations.date_from <='{$lesson->start->format('Y-m-d')}' 
-				    AND user_geo_locations.date_to >='{$lesson->start->format('Y-m-d')}' 
+				$rawSelect .= " (
+                    get_distance_in_miles_between_geo_locations({$lesson->lat},{$lesson->lng}, user_geo_locations.lat, user_geo_locations.lng) <= user_geo_locations.limit )
+				    AND user_geo_locations.date_from <='{$lesson->start->format('Y-m-d')}'
+				    AND user_geo_locations.date_to >='{$lesson->start->format('Y-m-d')}'
 				  ) AND ";
 			}
 
@@ -540,12 +541,54 @@ class UserRepository extends BaseRepository
 		return;
 	}
 
-    public function getInstructorFromGenres(object $genres)
+    public function checkInvitationFromEmail($email)
     {
-        return $this->with(['profile', 'genres', 'genres.category', 'roles'])
-            ->whereHas('genres', function($query) use ($genres) {
-                $query->whereIn('genre_id', $genres);
-            })
-            ->get();
+        if($this->where('email', $email)->exists()) {
+            return 'Seems this user already has an account on our site.';
+        }
+
+        if(Invitation::where('invited_email', $email)->where('invited_by', '!=', auth()->id())->exists()) {
+            return 'Another instructor has already invited this user.';
+        }
+
+        if(Invitation::where('invited_email', $email)->where('invited_by', auth()->id())->exists()) {
+            return 'You have already invited this instructor.';
+        }
+
+        return null;
+    }
+
+    public function checkInvitationFromPhone($phone)
+    {
+        if($this->where('mobile_phone', $phone)->exists()) {
+            return 'Seems this user already has an account on our site.';
+        }
+
+        if(Invitation::where('invited_mobile_phone', $phone)->where('invited_by', '!=', auth()->id())->exists()) {
+            return 'Another instructor has already invited this user.';
+        }
+
+        if(Invitation::where('invited_mobile_phone', $phone)->where('invited_by', auth()->id())->exists()) {
+            return 'You have already invited this instructor.';
+        }
+
+        return null;
+    }
+
+    public function checkInvitationFromInstagram($handle)
+    {
+        if($this->where('instagram_handle', $handle)->exists()) {
+            return 'Seems this user already has an account on our site.';
+        }
+
+        if(Invitation::where('invited_instagram_handle', $handle)->where('invited_by', '!=', auth()->id())->exists()) {
+            return 'Another instructor has already invited this user.';
+        }
+
+        if(Invitation::where('invited_instagram_handle', $handle)->where('invited_by', auth()->id())->exists()) {
+            return 'You have already invited this instructor.';
+        }
+
+        return null;
     }
 }

@@ -1,23 +1,29 @@
 <template>
-    <div :class="{
-        'lessons': true,
-        'lessons--show-map': showMap,
-    }">
+    <div
+        :class="{
+            lessons: true,
+            'lessons--show-map': showMap
+        }"
+    >
         <div class="lessons__container">
             <div class="lessons__col">
                 <ul class="lessons__choosed-options">
-                    <li v-for="(option, index) in choosedOptions" :key="index">{{ option }}</li>
+                    <li v-for="(option, index) in choosedOptions" :key="index">
+                        {{ option }}
+                    </li>
                 </ul>
-                <h1 v-if="virtualMode" class="lessons__heading">Virtual lessons</h1>
+                <h1 v-if="virtualMode" class="lessons__heading">
+                    Virtual lessons
+                </h1>
                 <h1 v-else class="lessons__heading">In-Person lessons</h1>
                 <additional-lessons-filters />
                 <div class="lessons__header">
                     <div class="lessons__header-sort">
                         <span>Sort by</span>
-                        <select-with-search 
-                            :options="sortOptions" 
+                        <select-with-search
+                            :options="sortOptions"
                             @value-changed="sortChanged($event)"
-                            height="small"
+                            type="small"
                             ref="sortSelect"
                         />
                     </div>
@@ -32,7 +38,8 @@
                 <lessons-list
                     v-else
                     :lessons="lessons"
-                    :logged-in-as-student="loggedInAsStudent"
+                    :can-book="canBook"
+                    v-model="activeLesson"
                 />
                 <div class="lessons__footer">
                     <pagination
@@ -44,7 +51,18 @@
                 </div>
             </div>
             <div class="lessons__col">
-
+                <transition name="slidein">
+                    <div class="lessons__map" v-show="showMap">
+                        <google-map-single
+                            :dataid="'search'"
+                            :center="{ lat: 10, lng: 10 }"
+                            :hoverid="activeLesson"
+                            :marker="computedMarkers"
+                            :current-user-can-book="canBook"
+                            @infoWindowOpen="mapTriggerScroll"
+                        ></google-map-single>
+                    </div>
+                </transition>
             </div>
         </div>
     </div>
@@ -60,6 +78,7 @@ import urlHelper from "../../../helpers/urlHelper";
 import Pagination from "../../student/Pagination/Pagination.vue";
 import AnimLoader from "../../cart/AnimLoader/AnimLoader.vue";
 import lessonService from "../../../services/lessonService";
+import VScrollTo from "vue-scrollto";
 
 export default {
     name: "Lessons",
@@ -69,41 +88,44 @@ export default {
         SelectWithSearch,
         GreenToggle,
         Pagination,
-        AnimLoader,
+        AnimLoader
     },
     props: {
         preloadedLessons: {
             type: Array,
             default: () => {
                 return [];
-            },
+            }
         },
         genres: {
             type: Array,
             default: () => {
                 return [];
-            },
+            }
         },
-        loggedInAsStudent: {
+        canBook: {
             type: Boolean,
-            default: false,
+            default: false
         },
         meta: {
             type: Object,
             default: () => {
                 return {};
-            },
-        },
+            }
+        }
     },
     created() {
-        this.$root.$on("lessonsLoadLessons", (params) => {
+        this.$root.$on("lessonsLoadLessons", params => {
             this.loadLessons(params);
         });
 
         const params = urlHelper.parseQueryParams();
-        urlHelper.updateQueryParams({ 
-            page: params.page == 1 ? null : params.page,
-        }, false);
+        urlHelper.updateQueryParams(
+            {
+                page: params.page == 1 ? null : params.page
+            },
+            false
+        );
     },
     mounted() {
         this.parseChoosedOptions();
@@ -118,35 +140,48 @@ export default {
             sortOptions: [
                 {
                     label: "Lowest price",
-                    value: "spot_price_asc",
+                    value: "spot_price_asc"
                 },
                 {
                     label: "Highest price",
-                    value: "spot_price_desc",
+                    value: "spot_price_desc"
                 },
                 {
                     label: "Lesson (Soonest)",
-                    value: "start_asc",
+                    value: "start_asc"
                 },
                 {
                     label: "Lesson (Latest)",
-                    value: "start_desc",
-                },
+                    value: "start_desc"
+                }
             ],
             lessons: this.preloadedLessons,
+            activeLesson: null,
             isLoading: false,
             pagination: {
                 currentPage: this.meta.pagination.current_page,
-                pageCount: this.meta.pagination.total_pages,
-            },
-        }
+                pageCount: this.meta.pagination.total_pages
+            }
+        };
     },
-    watch: {
-        showMap(newValue) {
-            this.$root.$emit('lessonsToggleMap', newValue);
+    computed: {
+        computedMarkers() {
+            return this.lessons.map(item => {
+                return {
+                    position: {
+                        latitude: item.lat,
+                        longitude: item.lng
+                    },
+                    content: item
+                };
+            });
         }
     },
     methods: {
+        mapTriggerScroll(lessonId) {
+            VScrollTo.scrollTo("[data-id=" + lessonId + "]");
+            this.activeLesson = lessonId;
+        },
         parseChoosedOptions() {
             const params = urlHelper.parseQueryParams();
             this.choosedOptions = [];
@@ -170,7 +205,7 @@ export default {
             }
             if (params.genre) {
                 if (this.genres.length) {
-                    this.genres.map((genre) => {
+                    this.genres.map(genre => {
                         if (genre.id == params.genre) {
                             this.choosedOptions.push(genre.title);
                         }
@@ -187,7 +222,9 @@ export default {
                 flexibleDays = params.flexible_days;
             }
             if (params.flexible_months) {
-                flexibleMonths = dateHelper.filterToFlexibleMonths(params.flexible_months);
+                flexibleMonths = dateHelper.filterToFlexibleMonths(
+                    params.flexible_months
+                );
             }
             if (params.location) {
                 location = params.location;
@@ -198,10 +235,14 @@ export default {
             }
 
             if (dateFrom && dateTo) {
-                this.choosedOptions.push(dateHelper.formatDateWithoutTime(dateFrom, dateTo));
+                this.choosedOptions.push(
+                    dateHelper.formatDateWithoutTime(dateFrom, dateTo)
+                );
             }
             if (flexibleDays && flexibleMonths) {
-                this.choosedOptions.push(dateHelper.formatFlexibleDate(flexibleDays, flexibleMonths));
+                this.choosedOptions.push(
+                    dateHelper.formatFlexibleDate(flexibleDays, flexibleMonths)
+                );
             }
             if (location) {
                 this.choosedOptions.push(location);
@@ -209,18 +250,21 @@ export default {
         },
         async loadLessons(params = {}) {
             this.isLoading = true;
-            const data = await lessonService.lessons({ 
-                page: this.pagination.currentPage, 
-                ...params,
+            const data = await lessonService.lessons({
+                page: this.pagination.currentPage,
+                ...params
             });
             this.pagination.currentPage = data.currentPage;
             this.pagination.pageCount = data.pageCount;
             this.lessons = data.lessons;
             this.isLoading = false;
-            urlHelper.updateQueryParams({ 
-                page: data.currentPage == 1 ? null : data.currentPage,
-                ...params,
-            }, false);
+            urlHelper.updateQueryParams(
+                {
+                    page: data.currentPage == 1 ? null : data.currentPage,
+                    ...params
+                },
+                false
+            );
             this.parseChoosedOptions();
         },
         changePage(pageNum) {
@@ -231,11 +275,11 @@ export default {
             if (event.value != this.sortedBy) {
                 this.sortedBy = event.value;
                 this.loadLessons({
-                    sortedBy: this.sortedBy,
+                    sortedBy: this.sortedBy
                 });
             }
-        },
-    },
+        }
+    }
 };
 </script>
 

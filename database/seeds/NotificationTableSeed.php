@@ -5,44 +5,44 @@ use Tylercd100\Placeholders\Facades\Placeholders;
 
 class NotificationTableSeed extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     * @throws \Throwable
-     */
-    public function run()
-    {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        DB::table('custom_notification_methods')->truncate();
-        DB::table('custom_notifications')->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+	/**
+	 * Run the database seeds.
+	 *
+	 * @return void
+	 * @throws \Throwable
+	 */
+	public function run()
+	{
+		DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+		DB::table('custom_notification_methods')->truncate();
+		DB::table('custom_notifications')->truncate();
+		DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        $defaultVars = [
-        	'app_name',
+		$defaultVars = [
+			'app_name',
 			'app_url',
 			'current_year'
 		];
 
-        $lessonRequestNotificationVars = [
-            'id',
-            'student_name',
-            'instructor_name',
-            'lesson_start',
-            'lesson_end',
-            'lesson_datetime',
-            'count_participants',
-            'lesson_location',
-            'lesson_genre',
-            'lesson_price',
-            'lesson_url',
-            'student_note',
-            'instructor_note',
-            'hours_to_book',
-            'hours_to_accept'
-        ];
+		$lessonRequestNotificationVars = [
+			'id',
+			'student_name',
+			'instructor_name',
+			'lesson_start',
+			'lesson_end',
+			'lesson_datetime',
+			'count_participants',
+			'lesson_location',
+			'lesson_genre',
+			'lesson_price',
+			'lesson_url',
+			'student_note',
+			'instructor_note',
+			'hours_to_book',
+			'hours_to_accept'
+		];
 
-        $bookingNotificationVars = [
+		$bookingNotificationVars = [
 			'id',
 			'student_name',
 			'instructor_name',
@@ -60,35 +60,35 @@ class NotificationTableSeed extends Seeder
 			'lesson_url'
 		];
 
-        $notifications = [
-            [
-                'tag'     => 'reset_password',
-                'data'    => [
-                    'available_vars' => [
-                        'reset_url'
-                    ],
-                ],
-                'methods' => [
-                    [
-                        'method'  => 'mail',
-                        "content" => view("emails.password.apiResetLink")->render(),
-                        'data'    => [
-                            'subject' => 'Password Reset',
-                        ],
-                    ],
-                ],
-            ],
+		$notifications = [
 			[
-			'tag'     => 'contact_us_form_request',
-			'data'    => [
-				'available_vars' => [
-					'first_name',
-					'last_name',
-					'address',
-					'mobile_phone',
-					'email',
-					'reason'
+				'tag'     => 'reset_password',
+				'data'    => [
+					'available_vars' => [
+						'reset_url'
+					],
 				],
+				'methods' => [
+					[
+						'method'  => 'mail',
+						"content" => view("emails.password.apiResetLink")->render(),
+						'data'    => [
+							'subject' => 'Password Reset',
+						],
+					],
+				],
+			],
+			[
+				'tag'     => 'contact_us_form_request',
+				'data'    => [
+					'available_vars' => [
+						'first_name',
+						'last_name',
+						'address',
+						'mobile_phone',
+						'email',
+						'reason'
+					],
 				],
 				'methods' => [
 					[
@@ -100,21 +100,21 @@ class NotificationTableSeed extends Seeder
 					],
 				],
 			],
-            [
-                'tag'     => 'student_registration_confirmation',
-                'data'    => [
-                    'available_vars' => [],
-                ],
-                'methods' => [
-                    [
-                        'method'  => 'mail',
-                        "content" => view("emails.student.registrationConfirmation")->render(),
-                        'data'    => [
-                            'subject' => 'Registration Confirmation',
-                        ],
-                    ],
-                ],
-            ],
+			[
+				'tag'     => 'student_registration_confirmation',
+				'data'    => [
+					'available_vars' => [],
+				],
+				'methods' => [
+					[
+						'method'  => 'mail',
+						"content" => view("emails.student.registrationConfirmation")->render(),
+						'data'    => [
+							'subject' => 'Registration Confirmation',
+						],
+					],
+				],
+			],
 			[
 				'tag'     => 'user_account_suspended',
 				'data'    => [
@@ -149,43 +149,43 @@ class NotificationTableSeed extends Seeder
 					],
 				],
 			],
-            [
-                'tag'     => 'student_registration_for_admins',
-                'data'    => [
-                    'available_vars' => [
-                        'first_name',
-                        'last_name',
-                        'user_url',
-                    ],
-                ],
-                'methods' => [
-                    [
-                        'method'  => 'mail',
-                        "content" => view("emails.student.newRegistrationAdminNotification")->render(),
-                        'data'    => [
-                            'subject' => 'New Client Registered',
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'tag'     => 'instructor_registration_confirmation',
-                'data'    => [
-                    'available_vars' => [
-                        'instructor_name',
-                        'instructor_url',
-                    ],
-                ],
-                'methods' => [
-                    [
-                        'method'  => 'mail',
-                        "content" => view("emails.instructor.registrationRequestConfirmation")->render(),
-                        'data'    => [
-                            'subject' => 'Registration Confirmation',
-                        ],
-                    ],
-                ],
-            ],
+			[
+				'tag'     => 'student_registration_for_admins',
+				'data'    => [
+					'available_vars' => [
+						'first_name',
+						'last_name',
+						'user_url',
+					],
+				],
+				'methods' => [
+					[
+						'method'  => 'mail',
+						"content" => view("emails.student.newRegistrationAdminNotification")->render(),
+						'data'    => [
+							'subject' => 'New Client Registered',
+						],
+					],
+				],
+			],
+			[
+				'tag'     => 'instructor_registration_confirmation',
+				'data'    => [
+					'available_vars' => [
+						'instructor_name',
+						'instructor_url',
+					],
+				],
+				'methods' => [
+					[
+						'method'  => 'mail',
+						"content" => view("emails.instructor.registrationRequestConfirmation")->render(),
+						'data'    => [
+							'subject' => 'Registration Confirmation',
+						],
+					],
+				],
+			],
 			[
 				'tag'     => 'instructor_registration_request_on_review',
 				'data'    => [
@@ -204,57 +204,57 @@ class NotificationTableSeed extends Seeder
 					],
 				],
 			],
-            [
-                'tag'     => 'instructor_registration_for_admins',
-                'data'    => [
-                    'available_vars' => [
+			[
+				'tag'     => 'instructor_registration_for_admins',
+				'data'    => [
+					'available_vars' => [
 						'first_name',
 						'last_name',
 						'user_url',
 					],
-                ],
-                'methods' => [
-                    [
-                        'method'  => 'mail',
-                        "content" => view("emails.instructor.registrationRequestAdminNotification")->render(),
-                        'data'    => [
-                            'subject' => 'New Instructor Registration Request',
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'tag'     => 'instructor_registration_request_denied',
-                'data'    => [
-                    'available_vars' => [],
-                ],
-                'methods' => [
-                    [
-                        'method'  => 'mail',
-                        "content" => view("emails.instructor.registrationRequestDenied")->render(),
-                        'data'    => [
-                            'subject' => 'Instructor Registration Request Denied',
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'tag'     => 'instructor_registration_request_approved',
-                'data'    => [
-                    'available_vars' => [
-                        'link'
-                    ],
-                ],
-                'methods' => [
-                    [
-                        'method'  => 'mail',
-                        "content" => view("emails.instructor.registrationRequestApproved")->render(),
-                        'data'    => [
-                            'subject' => 'Instructor Registration Request Approved',
-                        ],
-                    ],
-                ],
-            ],
+				],
+				'methods' => [
+					[
+						'method'  => 'mail',
+						"content" => view("emails.instructor.registrationRequestAdminNotification")->render(),
+						'data'    => [
+							'subject' => 'New Instructor Registration Request',
+						],
+					],
+				],
+			],
+			[
+				'tag'     => 'instructor_registration_request_denied',
+				'data'    => [
+					'available_vars' => [],
+				],
+				'methods' => [
+					[
+						'method'  => 'mail',
+						"content" => view("emails.instructor.registrationRequestDenied")->render(),
+						'data'    => [
+							'subject' => 'Instructor Registration Request Denied',
+						],
+					],
+				],
+			],
+			[
+				'tag'     => 'instructor_registration_request_approved',
+				'data'    => [
+					'available_vars' => [
+						'link'
+					],
+				],
+				'methods' => [
+					[
+						'method'  => 'mail',
+						"content" => view("emails.instructor.registrationRequestApproved")->render(),
+						'data'    => [
+							'subject' => 'Instructor Registration Request Approved',
+						],
+					],
+				],
+			],
 			// bookings
 			[
 				'tag'     => 'booking_on_review_student_notification',
@@ -499,51 +499,51 @@ class NotificationTableSeed extends Seeder
 				],
 			],
 
-            [
-                'tag'     => 'lesson_request_created',
-                'data'    => [
-                    'available_vars' => $lessonRequestNotificationVars,
-                ],
-                'methods' => [
-                    [
-                        'method'  => 'mail',
-                        "content" => view("emails.lesson_request.lessonRequestCreatedNotification")->render(),
-                        'data'    => [
-                            'subject' => 'You have new Time Request',
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'tag'     => 'lesson_request_approved',
-                'data'    => [
-                    'available_vars' => $lessonRequestNotificationVars,
-                ],
-                'methods' => [
-                    [
-                        'method'  => 'mail',
-                        "content" => view("emails.lesson_request.lessonRequestApprovedNotification")->render(),
-                        'data'    => [
-                            'subject' => 'Time Request has been approved',
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'tag'     => 'lesson_request_cancelled',
-                'data'    => [
-                    'available_vars' => $lessonRequestNotificationVars,
-                ],
-                'methods' => [
-                    [
-                        'method'  => 'mail',
-                        "content" => view("emails.lesson_request.lessonRequestCancelledNotification")->render(),
-                        'data'    => [
-                            'subject' => 'Time Request has been cancelled',
-                        ],
-                    ],
-                ],
-            ],
+			[
+				'tag'     => 'lesson_request_created',
+				'data'    => [
+					'available_vars' => $lessonRequestNotificationVars,
+				],
+				'methods' => [
+					[
+						'method'  => 'mail',
+						"content" => view("emails.lesson_request.lessonRequestCreatedNotification")->render(),
+						'data'    => [
+							'subject' => 'You have new Time Request',
+						],
+					],
+				],
+			],
+			[
+				'tag'     => 'lesson_request_approved',
+				'data'    => [
+					'available_vars' => $lessonRequestNotificationVars,
+				],
+				'methods' => [
+					[
+						'method'  => 'mail',
+						"content" => view("emails.lesson_request.lessonRequestApprovedNotification")->render(),
+						'data'    => [
+							'subject' => 'Time Request has been approved',
+						],
+					],
+				],
+			],
+			[
+				'tag'     => 'lesson_request_cancelled',
+				'data'    => [
+					'available_vars' => $lessonRequestNotificationVars,
+				],
+				'methods' => [
+					[
+						'method'  => 'mail',
+						"content" => view("emails.lesson_request.lessonRequestCancelledNotification")->render(),
+						'data'    => [
+							'subject' => 'Time Request has been cancelled',
+						],
+					],
+				],
+			],
 
 			[
 				'tag'     => 'custom_user_notification',
@@ -624,51 +624,51 @@ class NotificationTableSeed extends Seeder
 					],
 				],
 			],
-            [
-                'tag'     => 'you_may_be_interested_in_virtual_lesson_notification',
-                'data'    => [
-                    'available_vars' => [
-                        'id',
-                        'instructor_id',
-                        'instructor_name',
-                        'instructor_instagram',
-                        'lesson_date',
-                        'lesson_start_time',
-                        'lesson_end_time',
-                        'lesson_start',
-                        'lesson_end',
-                        'lesson_location',
-                        'lesson_timezone',
-                        'lesson_genre',
-                        'spot_price',
-                        'lesson_url',
-                        'instructor_profile_url',
-                    ],
-                ],
-                'methods' => [
-                    [
-                        'method'  => 'mail',
-                        "content" => view("emails.lesson.youMayBeInterestedInVirtualLessonNotification")->render(),
-                        'data'    => [
-                            'subject' => 'New Virtual Lesson of your interest on ' . config('app.name'),
-                        ],
-                    ],
-                    [
-                        'method'  => 'sms',
-                        "content" => "The Skillective Instructor @[[instructor_instagram]] has opened virtual lesson availability. Click [[app_url]]/profile/[[instructor_id]] to view their lesson availability.",
-                        'data'    => [
-                            'subject' => 'New Virtual Lesson of your interest on ' . config('app.name')
-                        ],
-                    ],
-                    [
-                        'method'  => 'whatsapp',
-                        "content" => "Your code is " . "The Skillective Instructor @[[instructor_instagram]] has opened virtual lesson availability. Click [[app_url]]/profile/[[instructor_id]] to view their lesson availability.",
-                        'data'    => [
-                            'subject' => 'New Virtual Lesson of your interest on ' . config('app.name')
-                        ],
-                    ],
-                ],
-            ],
+			[
+				'tag'     => 'you_may_be_interested_in_virtual_lesson_notification',
+				'data'    => [
+					'available_vars' => [
+						'id',
+						'instructor_id',
+						'instructor_name',
+						'instructor_instagram',
+						'lesson_date',
+						'lesson_start_time',
+						'lesson_end_time',
+						'lesson_start',
+						'lesson_end',
+						'lesson_location',
+						'lesson_timezone',
+						'lesson_genre',
+						'spot_price',
+						'lesson_url',
+						'instructor_profile_url',
+					],
+				],
+				'methods' => [
+					[
+						'method'  => 'mail',
+						"content" => view("emails.lesson.youMayBeInterestedInVirtualLessonNotification")->render(),
+						'data'    => [
+							'subject' => 'New Virtual Lesson of your interest on ' . config('app.name'),
+						],
+					],
+					[
+						'method'  => 'sms',
+						"content" => "The Skillective Instructor @[[instructor_instagram]] has opened virtual lesson availability. Click [[app_url]]/profile/[[instructor_id]] to view their lesson availability.",
+						'data'    => [
+							'subject' => 'New Virtual Lesson of your interest on ' . config('app.name')
+						],
+					],
+					[
+						'method'  => 'whatsapp',
+						"content" => "Your code is " . "The Skillective Instructor @[[instructor_instagram]] has opened virtual lesson availability. Click [[app_url]]/profile/[[instructor_id]] to view their lesson availability.",
+						'data'    => [
+							'subject' => 'New Virtual Lesson of your interest on ' . config('app.name')
+						],
+					],
+				],
+			],
 			[
 				'tag'     => 'instructor_invitation',
 				'data'    => [
@@ -819,24 +819,81 @@ class NotificationTableSeed extends Seeder
 					]
 				],
 			],
-        ];
+			[
+				'tag' => 'booking_in_24_hour',
+				'data' => [
+					'available_vars' => [
+						'lesson_genre',
+						'lesson_start'
+					]
+				],
+				'methods' => [
+					[
+						'method' => 'mail',
+						"content" => view("emails.booking.booking_in_24_hour")->render(),
+						'data'    => [
+							'subject' => 'Lesson on Skillective start in 24 hours',
+						],
+					]
+				]
+			],
+			[
+				'tag' => 'booking_in_1_hour',
+				'data' => [
+					'available_vars' => [
+						'lesson_genre',
+						'lesson_start'
+					]
+				],
+				'methods' => [
+					[
+						'method' => 'mail',
+						"content" => view("emails.booking.booking_in_1_hour")->render(),
+						'data'    => [
+							'subject' => 'Lesson on Skillective start in 1 hour',
+						],
+					]
+				]
+			],
+			[
+				'tag' => 'new_promo_code',
+				'data' => [
+					'available_vars' => [
+						'instructor_name',
+						'amount',
+						'lesson_type',
+						'finish',
+						'promo_name'
+					]
+				],
+				'methods' => [
+					[
+						'method' => 'mail',
+						"content" => view("emails.student.promo_code")->render(),
+						'data'    => [
+							'subject' => 'You have a new promo code on Skillective.com!',
+						],
+					]
+				]
+			]
+		];
 
-        foreach ($notifications as $notification) {
-            /** @var \App\Models\CustomNotification $model */
-            $params = array_only($notification, [
+		foreach ($notifications as $notification) {
+			/** @var \App\Models\CustomNotification $model */
+			$params = array_only($notification, [
 				'tag',
 				'data',
 			]);
 			$params['data'] = array_merge($defaultVars, $params['data']);
-            $notificationModel = \App\Models\CustomNotification::updateOrCreate(['tag' => $notification['tag']], $params);
-            foreach ($notification['methods'] as $method => $data) {
-                $data = collect($data);
-                $methodModel = \App\Models\CustomNotificationMethod::query()->updateOrCreate($data->only([
-                        'method',
-                    ])->toArray() + ['custom_notification_id' => $notificationModel->getKey()], $data->toArray());
-                $methodModel->notification()->associate($notificationModel);
-                $methodModel->save();
-            }
-        }
-    }
+			$notificationModel = \App\Models\CustomNotification::updateOrCreate(['tag' => $notification['tag']], $params);
+			foreach ($notification['methods'] as $method => $data) {
+				$data = collect($data);
+				$methodModel = \App\Models\CustomNotificationMethod::query()->updateOrCreate($data->only([
+					'method',
+				])->toArray() + ['custom_notification_id' => $notificationModel->getKey()], $data->toArray());
+				$methodModel->notification()->associate($notificationModel);
+				$methodModel->save();
+			}
+		}
+	}
 }

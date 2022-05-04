@@ -11,7 +11,7 @@
       :collapsed-lessons='collapsedLessons'
       card-button='more-info'
       popup-button='add-to-cart'
-      :logged-in-as-student='canBook'
+      :can-book='canBook'
     />
   </div>
 </template>
@@ -27,21 +27,16 @@ export default {
   components: {
     CollapseTransition,
     VideoLessonsList,
-    AnimLoader,
+    AnimLoader
   },
   props: {
-    instructorId: null,
-    loggedInAsInstructor: {
-      type: Boolean,
-      default: false,
-    },
-    loggedInAsStudent: {
-      type: Boolean,
-      default: false,
+    instructorId: {
+      type: String,
+      default: null
     },
     canBook: {
       type: Boolean,
-      default: false,
+      default: false
     },
     userRole: {
       type: String,

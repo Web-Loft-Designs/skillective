@@ -210,7 +210,7 @@ class User extends Authenticatable implements HasMedia, Transformable
 			'last_name' => $this->last_name,
 			'full_name' => $this->getName(),
 			'email' => $this->getEmail(),
-			'profile' => $this->profile->transform(),
+			'profile' => !empty($this->profile) ? $this->profile->transform(): [],
 			//			'isInstructor' => $this->hasRole(self::ROLE_INSTRUCTOR),
 			//			'isStudent' => $this->hasRole(self::ROLE_STUDENT),
 			'genres' => $this->genres->toArray(),

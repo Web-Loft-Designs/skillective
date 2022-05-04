@@ -1,5 +1,8 @@
 <template>
-    <div class="field-errors">
+    <div :class="{
+        'field-errors': true,
+        [ 'field-errors--align-' + align ]: true,
+    }">
         <span v-for="(error, index) in errors" :key="index" class="field-errors__text">{{ error }}</span>
     </div>
 </template>
@@ -16,6 +19,10 @@ export default {
             default: () => {
                 return [];
             },
+        },
+        align: {
+            type: String,
+            default: "left",
         },
     },
 }

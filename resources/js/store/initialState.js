@@ -8,5 +8,6 @@ export const initialState = {
       fee: 0,
     },
     dotNeeded: false,
+    guestMode: false,
   }
 };

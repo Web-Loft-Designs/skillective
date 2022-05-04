@@ -26,10 +26,10 @@
         "league/fractal": "^0.18.0",
         "maatwebsite/excel": "^3.1",
         "maksimru/eloquent-subquery-magic": "^0.12.0",
-        "microsoft/azure-storage-blob": "^1.5",
-        "microsoft/azure-storage-file": "*",
-        "microsoft/azure-storage-queue": "*",
+        "microsoft/azure-storage-blob": "*",
         "microsoft/azure-storage-table": "*",
+        "microsoft/azure-storage-queue": "*",
+        "microsoft/azure-storage-file": "*",
         "php-ffmpeg/php-ffmpeg": "^0.14.0",
         "php-http/message": "^1.7",
         "predis/predis": "^1.1",
@@ -59,7 +59,11 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/installers": true,
+            "kylekatarnls/update-helper": true
+        }
     },
     "extra": {
         "laravel": {

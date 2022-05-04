@@ -157,6 +157,18 @@
                 <div v-if='listItems.length==0' class='col-12 p-5 mt-5'><h3 class='text-center'>Nothing found</h3></div>
 
             </div>
+            <div class='lessons-pagination-outer'>
+                  <paginate
+                    v-if='pagination.total_pages>1 && listItems.length>0'
+                    v-model='pagination.current_page'
+                    :page-count='pagination.total_pages'
+                    :force-page='pagination.current_page'
+                    :prev-text="'Prev'"
+                    :next-text="'Next'"
+                    :click-handler='paginatorClickCallback'
+                    :container-class="'lessons-pagination'">
+                  </paginate>
+              </div>
         </div>
     </div>
 </template>

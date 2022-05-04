@@ -1,8 +1,7 @@
 <template>
     <div class="my-library">
         <div class="my-library__container">
-
-            <filter-header 
+            <filter-header
                 heading="My Library"
                 :filters="filters"
                 @filter-changed="filterChanged($event)"
@@ -13,8 +12,8 @@
                 <anim-loader v-if="isLoading" />
                 <video-lessons-list
                     v-else
-                    :lessons="lessons" 
-                    :logged-in-as-student="loggedInAsStudent"
+                    :lessons="lessons"
+                    :can-book="canBook"
                     show-instructor-info
                     purchased
                     card-button="watch-student"
@@ -29,7 +28,6 @@
                     :page-count="pageCount"
                 />
             </div>
-
         </div>
     </div>
 </template>
@@ -47,13 +45,13 @@ export default {
         FilterHeader,
         VideoLessonsList,
         Pagination,
-        AnimLoader,
+        AnimLoader
     },
     props: {
-        loggedInAsStudent: {
+        canBook: {
             type: Boolean,
-            default: false,
-        },
+            default: false
+        }
     },
     async mounted() {
         this.isLoading = true;
@@ -63,7 +61,7 @@ export default {
     methods: {
         changePage(pageNum) {
             console.log("changePage", pageNum);
-        },
+        }
     },
     data() {
         return {
@@ -73,7 +71,7 @@ export default {
             button: {
                 type: "link",
                 text: "Shop for Lessons and Tutorials",
-                href: "/globalshop",
+                href: "/globalshop"
             },
             filters: [
                 {
@@ -82,22 +80,22 @@ export default {
                     options: [
                         "Cheerleading",
                         "Cheerleading 2",
-                        "Cheerleading 3",
+                        "Cheerleading 3"
                     ],
-                    placeholder: "Genre",
+                    placeholder: "Genre"
                 },
                 {
                     type: "search",
                     title: "",
                     placeholder: "Enter the question",
-                    length: "wide",
+                    length: "wide"
                 }
             ],
             selectedGenre: "Cheerleading",
-            lessons: [],
-        }
-    },
-}
+            lessons: []
+        };
+    }
+};
 </script>
 
 <style lang="scss" scoped>

@@ -361,29 +361,4 @@ class Lesson extends Model implements Transformable
 
 		return $this->create($input);
 	}
-
-    public function getStartLocalTimeAttribute()
-    {
-//        return (string) Carbon::createFromFormat('Y-m-d H:i:s', $this->start, $this->timezone_id)
-//            ->setTimezone($this->getLocalClientTz());
-
-        return $this->start;
-    }
-
-    public function getEndLocalTimeAttribute()
-    {
-//        return (string) Carbon::createFromFormat('Y-m-d H:i:s', $this->end, $this->timezone_id)
-//            ->setTimezone($this->getLocalClientTz());
-
-        return $this->end;
-    }
-
-    private function getLocalClientTz()
-    {
-        $ip = file_get_contents("http://ipecho.net/plain");
-        $url = 'http://ip-api.com/json/'.$ip;
-        $tz = file_get_contents($url);
-        return json_decode($tz,true)['timezone'];
-        //return 'UTC';
-    }
 }

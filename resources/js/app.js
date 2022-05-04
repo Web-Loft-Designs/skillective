@@ -142,6 +142,8 @@ Vue.component("my-library", require("./components/student/MyLibrary/MyLibrary.vu
 Vue.component("my-library-player", require("./components/student/MyLibraryPlayer/MyLibraryPlayer.vue").default);
 Vue.component("instructor-my-shop", require("./components/instructor/InstructorMyShop/InstructorMyShop.vue").default);
 Vue.component("lessons", require("./components/lessons/Lessons/Lessons.vue").default);
+Vue.component("content-viewer", require("./components/profile/ContentViewer/ContentViewer.vue").default);
+Vue.component("discount-management", require("./components/discounts/DiscountManagement/DiscountManagement.vue").default);
 
 
 

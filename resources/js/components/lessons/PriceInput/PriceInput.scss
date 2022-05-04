@@ -2,6 +2,7 @@
     position: relative;
     display: flex;
     align-items: center;
+    height: 45px;
 
     input {
         padding: 0 14px 0 44px;
@@ -23,6 +24,15 @@
 
         &:focus {
             box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+        }
+
+        &:placeholder {
+            color: #AAAAAA;
+        }
+
+        &:disabled {
+            background-color: transparent;
+            color: #AAAAAA;
         }
     }
 
@@ -47,5 +57,11 @@
         justify-content: center;
         align-items: center;
         display: flex;
+    }
+
+    &--percent-mode {
+        &::before {
+            content: "%";
+        }
     }
 }

@@ -1,0 +1,106 @@
+.discount-management {
+  background: #F4F4F4;
+  
+  &__container {
+    display: flex;
+    justify-content: center;
+    padding: 60px 40px 100px;
+  }
+
+  &__content {
+    flex: 1;
+    max-width: 870px;
+  }
+
+  &__sidebar {
+    flex-basis: 295px;
+  }
+
+  &__title {
+    font-family: Poppins;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 28px;
+    line-height: 42px;
+    color: #333333;
+    margin: 0 0 24px;
+    max-width: 196px;
+  }
+
+  &__tabs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      margin-bottom: 15px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  &__tab {
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 24px;
+    border: none;
+    color: #888888;
+    background: none;
+    padding: 0;
+    transition: color .25s;
+
+    &:hover, &--active {
+      color: #333333;
+    }
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .discount-management {
+    &__sidebar {
+      flex-basis: 240px;
+    }
+  }
+}
+
+@media screen and (max-width: 1050px) {
+  .discount-management {
+    &__content-tab {
+      max-width: calc(100vw - 320px);
+    }
+  }
+}
+
+@media screen and (max-width: 760px) {
+  .discount-management {
+    &__container {
+      padding: 44px 20px 100px;
+      flex-direction: column;
+    }
+
+    &__title {
+      margin-bottom: 20px;
+    }
+
+    &__sidebar {
+      flex-basis: auto;
+      margin-bottom: 30px;
+    }
+
+    &__content-tab {
+      max-width: none;
+    }
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .discount-management {
+    &__content-tab {
+      margin: 0 -5px;
+    }
+  }
+}

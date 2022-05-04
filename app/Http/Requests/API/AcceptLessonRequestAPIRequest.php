@@ -29,8 +29,8 @@ class AcceptLessonRequestAPIRequest extends APIRequest
 
         $rules = [
 			'genre'			=> ['required', Rule::in( $availableGenresIds )],
-			'date'			=> ['required', 'date_format:Y-m-d', 'future_date', 'no_lessons_this_time'],
-			'date_to'		=> ['required', 'date_format:Y-m-d', 'future_date', 'no_lessons_this_time'],
+			'date'			=> ['required', 'date_format:Y-m-d', 'future_date', 'no_lessons_this_time:time_from,time_to,id,date,date_to,timezone_id'],
+			'date_to'		=> ['required', 'date_format:Y-m-d', 'future_date', 'no_lessons_this_time:time_from,time_to,id,date,_date_to,timezone_id'],
 			'time_from'		=> ['required', 'date_multi_format:' . $formats],
 			'time_to'		=> ['required', 'date_multi_format:' . $formats],
 			'count_participants'	=> ['required', 'integer', 'min:1', 'max:50'],
@@ -52,7 +52,8 @@ class AcceptLessonRequestAPIRequest extends APIRequest
 			'date.future_date' => 'Select future date',
 			'time_from.date_multi_format' => 'Wrong time format',
 			'time_to.date_multi_format' => 'Wrong time format',
-			'date.no_lessons_this_time' => 'Overlaps with some other lesson',
+			'date.no_lessons_this_time' => 'You have already scheduled a lesson at this time.',
+			'date_to.no_lessons_this_time' => 'You have already scheduled a lesson at this time.',
 			'location.is_exact_address' => 'Lesson location address should be clarified',
 			'timezone_id.valid_timezone' => 'Wrong timezone',
 			'lesson_type.in' => 'Wrong lesson type',

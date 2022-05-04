@@ -55,26 +55,6 @@ class InstructorLessonsAPIController extends AppBaseController
         return $this->sendResponse($lessons);
     }
 
-    public function getLessonById(Request $request, $lesson)
-    {
-
-        // ALLOW OPTIONS METHOD
-        $headers = [
-            'Access-Control-Allow-Methods'=> 'POST, GET, OPTIONS, PUT, DELETE',
-            'Access-Control-Allow-Headers'=> 'Content-Type, X-Auth-Token, Origin'
-        ];
-        if($request->getMethod() == "OPTIONS") {
-            // The client-side application can set only headers allowed in Access-Control-Allow-Headers
-            return Response::make('OK', 200, $headers);
-        }
-
-        $lessons = Lesson::find($lesson);
-
-        $this->lessonRepository->setPresenter("App\\Presenters\\LessonInListPresenter");
-
-        return $this->sendResponse($lessons);
-    }
-
     public function export(Request $request)
     {
         $this->lessonRepository->setPresenter("App\\Presenters\\LessonInListPresenter");
@@ -172,7 +152,7 @@ class InstructorLessonsAPIController extends AppBaseController
         }
         $input = $this->_prepareInputData($request);
 
-        if (!empty($input['recurrence_until']) && $input['recurrence_frequencies'] != "0") {
+        if ($input['recurrence_until'] && $input['recurrence_frequencies'] != "0") {
 
             $ty = $input['recurrence_frequencies'];
 
@@ -223,7 +203,7 @@ class InstructorLessonsAPIController extends AppBaseController
             return $this->sendResponse($this->lessonRepository->presentResponse($lesson)['data'], 'Lesson saved');
         }
 
-        if (!empty($input['time_interval']) && $input['time_interval'] > 0) {
+        if ($input['time_interval'] && $input['time_interval'] > 0) {
             $lesson = $this->createLessonsByInterval($input);
 
             return $this->sendResponse($this->lessonRepository->presentResponse($lesson)['data'], 'Lesson saved');

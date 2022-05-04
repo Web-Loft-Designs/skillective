@@ -1,13 +1,15 @@
 <template>
     <div :class="{
         'select-with-search': true,
-        'select-with-search--small': height == 'small',
+        'select-with-search--small': type == 'small',
+        'select-with-search--form': type == 'form',
     }">
         <vue-select 
             :options="options" 
             v-model="selectedValue" 
             :placeholder="placeholder" 
             :clearable="false"
+            :disabled="disabled"
         />
     </div>
 </template>
@@ -22,6 +24,9 @@ export default {
         VueSelect,
     },
     props: {
+        value: {
+            default: null,
+        },
         options: {
             type: Array,
             default: () => {
@@ -32,9 +37,13 @@ export default {
             type: String,
             default: "",
         },
-        height: {
+        type: {
             type: String,
             default: null,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
         },
     },
     data() {
@@ -42,12 +51,30 @@ export default {
             selectedValue: this.options[0],
         }
     },
+    mounted() {
+        this.checkValueChanged();
+    },
     watch: {
+        value() {
+            this.checkValueChanged();
+        },
         selectedValue(newValue) {
+            
             this.$emit("value-changed", newValue);
         },
     },
     methods: {
+        checkValueChanged() {
+            
+            if (this.value) {
+                this.options.forEach((op) => {
+                    if ((op.value && op.value == this.value) || (op == this.value)) {
+                        // this.selectedValue = op;
+                        console.log(this.selectedValue)
+                    }
+                });
+            }
+        },
         selectByValue(val) {
             this.options.map((option) => {
                 if (option.value == val) {

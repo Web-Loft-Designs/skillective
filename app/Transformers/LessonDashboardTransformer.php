@@ -2,7 +2,6 @@
 
 namespace App\Transformers;
 
-use Carbon\Carbon;
 use League\Fractal\TransformerAbstract;
 use App\Models\Lesson;
 use App\Models\Booking;
@@ -54,8 +53,8 @@ class LessonDashboardTransformer extends TransformerAbstract
 				]
             ],
             'bookings' => $model->bookings,
-			'start'=> $model->start_local_time,
-			'end'=> $model->end_local_time,
+			'start'=> $model->start->format('Y-m-d H:i:s'),
+			'end'=> $model->end->format('Y-m-d H:i:s'),
 			'timezone_id' => $model->timezone_id,
             'timezone_id_name' => $model->timezone_id,
 			'spots_count'=> $model->spots_count,

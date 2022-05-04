@@ -1,4 +1,4 @@
-// transition animations for .add-lesson-popup__popup
+// transition animations for .confirmation-popup__popup
 .scalein-enter-active, .scalein-leave-active {
   transition: opacity .5s, transform .5s;
   opacity: 1;
@@ -9,7 +9,7 @@
   transform: scale(0.75);
 }
 
-// transition animations for .add-lesson-popup__backdrop
+// transition animations for .confirmation-popup__backdrop
 .show-enter-active, .show-leave-active {
   transition: opacity .25s;
   opacity: 1;
@@ -31,61 +31,61 @@
   pointer-events: none;
 
   &__backdrop {
-      position: absolute;
-      right: 0;
-      top: 0;
-      height: 100%;
-      width: 100%;
-      background: rgba(0, 0, 0, 0.65);
-      pointer-events: all;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.65);
+    pointer-events: all;
   }
 
   &__popup-container {
-      position: absolute;
-      right: 0;
-      top: 0;
-      height: 100%;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
   }
 
   &__popup {
-      background: #FFFFFF;
-      box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.07), 0px 25px 50px rgba(0, 0, 0, 0.07);
-      border-radius: 5px;
-      width: 500px;
-      padding: 30px 40px 40px 40px;
-      pointer-events: all;
-      position: relative;
-      max-height: 100%;
-      overflow: auto;
+    background: #FFFFFF;
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.07), 0px 25px 50px rgba(0, 0, 0, 0.07);
+    border-radius: 5px;
+    width: 500px;
+    padding: 30px 40px 40px 40px;
+    pointer-events: all;
+    position: relative;
+    max-height: 100%;
+    overflow: auto;
   }
   
   &__content {
-      display: flex;
-      flex-direction: column;
+    display: flex;
+    flex-direction: column;
   }
 
   &__heading {
-      margin: 0 0 20px 0;
-      font-family: Poppins;
-      font-style: normal;
-      font-weight: normal;
-      font-size: 22px;
-      line-height: 33px;
-      color: #333333;
-      max-width: 260px;
+    margin: 0 0 20px 0;
+    font-family: Poppins;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 22px;
+    line-height: 33px;
+    color: #333333;
+    max-width: 260px;
   }
 
   &__close {
-      width: 24px;
-      height: 24px;
-      right: 20px;
-      top: 18px;
-      position: absolute;
+    width: 24px;
+    height: 24px;
+    right: 20px;
+    top: 18px;
+    position: absolute;
   }
 
   &__button {
@@ -106,8 +106,8 @@
     outline: none;
     border: none;
 
-    &:focus {
-        box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+    &:hover, &:focus {
+      box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
     }
-}
+  }
 }

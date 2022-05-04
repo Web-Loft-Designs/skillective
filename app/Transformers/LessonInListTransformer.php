@@ -51,8 +51,8 @@ class LessonInListTransformer extends TransformerAbstract
 //					'gender' => $model->instructor->profile->gender,
 				]
 			],
-			'start'=> $model->start_local_time,
-			'end'=> $model->end_local_time,
+			'start'=> $model->start->format('Y-m-d H:i:s'),
+			'end'=> $model->end->format('Y-m-d H:i:s'),
 			'timezone_id' => getTimezoneAbbrev($model->timezone_id),
             'timezone_id_name' => $model->timezone_id,
 			'spots_count'=> $model->spots_count,
@@ -69,6 +69,7 @@ class LessonInListTransformer extends TransformerAbstract
             'lesson_type' => $model->lesson_type,
             'room_sid' => $model->room_sid,
             'room_completed' => $model->room_completed,
+            'topic' => $model->topic,
         ];
     }
 }

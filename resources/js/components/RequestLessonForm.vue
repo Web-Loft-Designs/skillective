@@ -662,6 +662,7 @@
 </template>
 
 <script>
+
 import MaskedInput from 'vue-masked-input'
 import siteAPI from '../mixins/siteAPI.js'
 import skillectiveHelper from '../mixins/skillectiveHelper.js'
@@ -679,6 +680,7 @@ $(function() {
   .tooltip()
 })
 const ct = require('countries-and-timezones')
+
 
 export default {
   components: {
@@ -1004,8 +1006,10 @@ export default {
         }
         this.$refs.modal.open()
       } else {
+
         Cookies.set('backToRequestLesson', this.instructorId)
         window.location = '/login'
+
       }
     },
     clearFormAndClosePopup() {
@@ -1047,9 +1051,11 @@ export default {
       )
     },
   },
+
   created: function() {
     this.timeOptions = this.getTimeOptions()
     this.timeZomeOptions = ct.getAllTimezones()
+
 
     const tzs = {
       'America/New_York': 'America/New_York UTC-05:00',

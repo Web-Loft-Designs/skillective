@@ -229,19 +229,9 @@ class ReportsBuilder {
 			'diff' => $paymentsAmountDiff
 		];
 
-
-		$countVisitsInSelectedPeriod = ReportsBuilder::getCountVisitsInPeriod($selectedPeriodStart, $selectedPeriodEnd);
+        $countVisitsInSelectedPeriod = ReportsBuilder::getCountVisitsInPeriod($selectedPeriodStart, $selectedPeriodEnd);
 		$countVisitsInPreviousPeriod = ReportsBuilder::getCountVisitsInPeriod($previousPeriodStart, $selectedPeriodStart);
 		$countVisitsDiff = getPercentDiff($countVisitsInSelectedPeriod, $countVisitsInPreviousPeriod);
-//
-//		dd($selectedPeriodStart, $selectedPeriodEnd,
-//			$previousPeriodStart, $selectedPeriodStart,
-//			[
-//			'paramName' => 'Visits',
-//			'currentValue' => $countVisitsInSelectedPeriod,
-//			'prevValue' => $countVisitsInPreviousPeriod,
-//			'diff' => $countVisitsDiff
-//		]);
 
 		$widgetData[] = [
 			'paramName' => 'Visits',
@@ -249,7 +239,6 @@ class ReportsBuilder {
 			'prevValue' => $countVisitsInPreviousPeriod,
 			'diff' => $countVisitsDiff
 		];
-//		dd($widgetData);
 
 		return $widgetData;
 	}
