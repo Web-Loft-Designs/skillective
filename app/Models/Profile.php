@@ -16,7 +16,7 @@ class Profile extends Model implements Transformable
     use SoftDeletes;
 
     public $table = 'profiles';
-    
+
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
@@ -39,7 +39,8 @@ class Profile extends Model implements Transformable
 		'gender',
         'lat',
         'lng',
-        'lesson_block_min_price' // for instructors
+        'lesson_block_min_price', // for instructors
+        'virtual_min_price',
 //		'instagram_followers_count'
     ];
 
@@ -64,7 +65,8 @@ class Profile extends Model implements Transformable
 		'gender' => 'string',
         'lat' => 'float',
         'lng' => 'float',
-        'lesson_block_min_price' => 'float'
+        'lesson_block_min_price' => 'float',
+        'virtual_min_price' => 'float',
     ];
 
     /**
@@ -112,7 +114,8 @@ class Profile extends Model implements Transformable
 			'max_allowed_instructor_invites' => $this->max_allowed_instructor_invites,
             'lat' => $this->lat,
             'lng' => $this->lng,
-            'lesson_block_min_price' => $this->lesson_block_min_price==null ? 50 : $this->lesson_block_min_price
+            'lesson_block_min_price' => $this->lesson_block_min_price==null ? 50 : $this->lesson_block_min_price,
+            'virtual_min_price' => $this->virtual_min_price
 		];
 	}
 
@@ -258,7 +261,7 @@ class Profile extends Model implements Transformable
     public function save(array $options = [])
     {
 		$locationDetails = getLocationDetails( "{$this->city}, {$this->state}" );
-		
+
         $this->lat = isset($locationDetails['lat']) ? $locationDetails['lat'] : null;
         $this->lng = isset($locationDetails['lng']) ? $locationDetails['lng'] : null;
 

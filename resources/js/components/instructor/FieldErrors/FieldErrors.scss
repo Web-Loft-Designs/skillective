@@ -7,4 +7,8 @@
     display: block;
     margin: 4px 0;
   }
+
+  &--align-right &__text {
+    text-align: right;
+  }
 }

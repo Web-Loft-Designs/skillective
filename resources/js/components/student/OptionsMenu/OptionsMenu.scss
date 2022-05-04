@@ -31,7 +31,7 @@
         margin: -5px;
         display: block;
         box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
-        transition: box-shadow .25s;
+        transition: box-shadow .25s, background-color .25s;
         outline: none;
 
         &:hover, &--opened {
@@ -40,6 +40,14 @@
 
         &:focus {
             box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+        }
+
+        &--squared {
+            width: 44px;
+            height: 44px;
+            border-radius: 3px;
+            border: 1px solid #DDDDDD;
+            margin: -6px 0;
         }
     }
 
@@ -56,6 +64,11 @@
         border-radius: 8px;
         right: -5px;
         top: 40px;
+
+        &--squared {
+            top: 48px;
+            right: 0;
+        }
     }
 
     &__item {

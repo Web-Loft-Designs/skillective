@@ -5,7 +5,7 @@
               <span class="profile-menu__text">{{ text }}</span>
               <span v-if="subtext && subtext != ' '" class="profile-menu__subtext">{{ subtext }}</span>
             </div>
-            <img :src="img" class="profile-menu__image" />
+            <img :src="profileImageUrl" class="profile-menu__image" alt="Profile image" />
         </template>
         <template v-slot:default>
             <slot></slot>
@@ -22,10 +22,34 @@ export default {
     NavDropDown,
   },
   props: {
-    img: String,
-    text: String,
-    subtext: String,
-    links: Array,
+    img: {
+      type: String,
+      default: "",
+    },
+    text: {
+      type: String,
+      default: "",
+    },
+    subtext: {
+      type: String,
+      default: "",
+    },
+    links: {
+      type: Array,
+      default: () => {
+        return [];
+      },
+    },
+  },
+  data() {
+    return {
+      profileImageUrl: this.img,
+    };
+  },
+  async mounted() {
+    this.$root.$on("updateProfileImage", ({ imageUrl }) => {
+      this.profileImageUrl = imageUrl;
+    });
   },
 }
 </script>

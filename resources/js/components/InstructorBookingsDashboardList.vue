@@ -148,6 +148,8 @@ import siteAPI from "../mixins/siteAPI.js";
 import skillectiveHelper from "../mixins/skillectiveHelper.js";
 import manageVideoLesson from "../mixins/manageVideoLesson.js";
 import $ from "jquery";
+import countriesAndTimezones from "countries-and-timezones";
+import moment from "moment-timezone";
 
 export default {
   mixins: [siteAPI, skillectiveHelper, manageVideoLesson],
@@ -203,8 +205,30 @@ export default {
       this.apiGet("/api/instructor/lessons/meta");
     },
     transformBookings(bookings) {
+        const userTzOffset = new Date().getTimezoneOffset() * 60 * 1000;
+
+        const stdTimezoneOffset = Math.max(
+            (new Date(0, 1).getTimezoneOffset()), (new Date(6, 1).getTimezoneOffset())
+        );
+
+        const isDstObserved = (new Date().getTimezoneOffset()) < stdTimezoneOffset;
+
+        bookings = bookings.map(item => {
+            let lessonTimeZoneObj = countriesAndTimezones.getTimezone(item.timezone_id_name);
+
+            let _tzOffset = isDstObserved ? lessonTimeZoneObj.dstOffset * 60 * 1000 : lessonTimeZoneObj.utcOffset * 60 * 1000;
+
+            let dummyStart = new Date(item.start.replace(/\s/, "T")).getTime() - userTzOffset - _tzOffset;
+            item.start_prepared = moment(dummyStart).format("YYYY-MM-DD HH:mm:ss");
+
+            let dummyEnd = new Date(item.end.replace(/\s/, "T")).getTime() - userTzOffset - _tzOffset;
+            item.end_prepared = moment(dummyEnd).format("YYYY-MM-DD HH:mm:ss");
+
+            return item;
+        });
+
       const groups = bookings.reduce((groups, lesson) => {
-        const date = moment(lesson.start).format("MM/DD/YY");
+        const date = moment(lesson.start_prepared).format("MM/DD/YY");
 
         if (!groups[date]) {
           groups[date] = [];

@@ -6,15 +6,16 @@ use App\Http\Controllers\API\Backend\UsersAPIController;
 use App\Notifications\InstructorRegistrationRequestApproved; // must finish registration
 use App\Models\User;
 use App\Models\Invitation;
+use App\Notifications\InstructorRegistrationRequestDenied;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\API\CancelUsersAPIRequest;
 use Illuminate\Http\Request;
-use Response;
-use Auth;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use App\Jobs\LoadInstagramMediaJob;
 use Illuminate\Support\Str;
 use App\Repositories\InvitationRepository;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class InstructorsAPIController extends UsersAPIController
 {
@@ -44,7 +45,7 @@ class InstructorsAPIController extends UsersAPIController
 	}
 
 	public function toggleFeatured(User $user)
-	{	
+	{
 
 		if (!$user->isFeatured && User::ROLE_INSTRUCTOR) {
 			\DB::table('featured_instructors')->insert([
@@ -64,7 +65,7 @@ class InstructorsAPIController extends UsersAPIController
 	}
 
 	public function setPriority(User $user, Request $request)
-	{	
+	{
 
 		if (User::ROLE_INSTRUCTOR) {
 			\DB::table('featured_instructors')

@@ -1,10 +1,15 @@
 <template>
-    <div class="price-input">
+    <div :class="{
+        'price-input': true,
+        'price-input--percent-mode': percentMode,
+    }">
         <input 
             type="text"
             @input="change"
             @change="change"
             :value="content"
+            :disabled="disabled"
+            ref="priceInput"
         />
     </div>
 </template>
@@ -17,6 +22,14 @@ export default {
             type: Number,
             default: null,
         },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
+        percentMode: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -25,18 +38,33 @@ export default {
     },
     methods: {
         change(event) {
-            let val = event.target.value.trim();
+            const val = event.target.value.trim();
             if (/^[1-9]\d*$|^$/.test(val)) {
-                this.content = Number(val);
+                let num = Number(val);
+                if (this.percentMode && num > 100) {
+                    num = 100;
+                    event.target.value = 100;
+                }
+                this.content = num;
             } else {
                 event.target.value = this.content;
             }
         },
     },
     watch: {
-        content(newValue) {
+        value(newValue) {
+            this.content = newValue;
+        },
+        content(newValue, oldValue) {
             this.$emit("input", newValue);
-        }
+        },
+        percentMode(newValue) {
+            if (newValue) {
+                if (this.content > 100) {
+                    this.content = 100;
+                }
+            }
+        },
     },
 };
 </script>

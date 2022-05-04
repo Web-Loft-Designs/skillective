@@ -165,7 +165,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import MagnificPopupModal from "./MagnificPopupModal";
 import siteAPI from "../../mixins/siteAPI.js";
 import moment from "moment-timezone";
-import { getTimezone } from "countries-and-timezones";
+import countriesAndTimezones from "countries-and-timezones";
 var FileSaver = require("file-saver");
 
 export default {
@@ -288,26 +288,41 @@ export default {
         calendarApi.scrollToTime(`${newTime}:00:00`);
       }
     },
-    viewRender: function (info) {
-      if (info.view.type === "timeGridWeek") {
-        this.triggerView = "week";
-
-        let calendarApi = this.$refs.fullCalendar.getApi();
-
+    removeUpDownButtons() {
+      const buttons = document.querySelectorAll(".fc-button--arrow");
+      buttons.forEach((item) => {
+        item.remove();
+      }, []);
+    },
+    injectUpDownButtons() {
+      setTimeout(() => {
         const cont = document.querySelector(".fc-view-container");
 
         const buttonUp = document.createElement("button");
+        buttonUp.classList.add("fc-button--arrow");
         buttonUp.classList.add("fc-button--up");
+
         buttonUp.innerHTML = "Expand";
         buttonUp.addEventListener("click", this.scrollUp);
 
         cont.prepend(buttonUp);
 
         const buttonDown = document.createElement("button");
+        buttonDown.classList.add("fc-button--arrow");
         buttonDown.classList.add("fc-button--down");
+
         buttonDown.innerHTML = "Expand";
         buttonDown.addEventListener("click", this.scrollDown);
         cont.appendChild(buttonDown);
+      }, 0);
+    },
+    viewRender: function (info) {
+      if (info.view.type === "timeGridWeek") {
+        this.triggerView = "week";
+
+        let calendarApi = this.$refs.fullCalendar.getApi();
+
+        this.injectUpDownButtons();
 
         calendarApi.scrollTime = "08:00:00";
 
@@ -316,6 +331,8 @@ export default {
         this.triggerView = "day";
       } else {
         this.triggerView = "month";
+
+        this.removeUpDownButtons();
       }
       if (this.triggerOld !== null) {
         if (
@@ -364,7 +381,7 @@ export default {
 
             let userTzOffset = new Date().getTimezoneOffset() * 60 * 1000;
 
-            let lessonTimeZoneObj = getTimezone(item.timezone_id_name);
+            let lessonTimeZoneObj = countriesAndTimezones.getTimezone(item.timezone_id_name);
 
             var jan = new Date(0, 1);
             var jul = new Date(6, 1);
@@ -412,6 +429,10 @@ export default {
             return moment().diff(item.end) <= 0;
           });
 
+          if (this.triggerView == "week") {
+            this.injectUpDownButtons();
+          }
+
           this.loader.hide();
           this.loader = null;
         })
@@ -442,7 +463,7 @@ export default {
 
       const elementBoundingRect = info.el.getBoundingClientRect();
 
-      console.log(info.el);
+      // console.log(info.el);
 
       info.el.innerHTML =
         info.el.innerHTML +
@@ -450,11 +471,11 @@ export default {
         count +
         "</span>" +
         `<div class='calendar-tooltip'>
-            <span class='genre' > ${info.event.extendedProps.genre.title} </span> 
-            <span class='type' >  Lesson Type ${info.event.extendedProps.lesson_type} </span> 
-            <span class='note-title'> Note </span> 
+            <span class='genre' > ${info.event.extendedProps.genre.title} </span>
+            <span class='type' >  Lesson Type ${info.event.extendedProps.lesson_type} </span>
+            <span class='note-title'> Note </span>
             <span class='note-content'> ${info.event.extendedProps.description} </span>
-            <span class='price'> Price $${info.event.extendedProps.spot_price} per lesson </span> 
+            <span class='price'> Price $${info.event.extendedProps.spot_price} per lesson </span>
       </div>`;
     },
     eventMouseEnter: function ({ el }) {

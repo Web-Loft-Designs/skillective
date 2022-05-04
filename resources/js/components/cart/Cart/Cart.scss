@@ -94,3 +94,11 @@
     }
   }
 }
+
+@media (max-width: 500px) {
+  .cart {
+    &__list {
+      padding: 0 19px
+    }
+  }
+}

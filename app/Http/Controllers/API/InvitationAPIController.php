@@ -12,14 +12,14 @@ use App\Http\Controllers\AppBaseController;
 use App\Models\Invitation;
 use App\Models\User;
 use App\Models\Profile;
-use Response;
-use Auth;
-use Log;
-use DB;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use App\Notifications\InstructorRegistrationInvitation;
 use App\Notifications\StudentRegistrationInvitation;
 use App\Notifications\Admin\InviteNewInstructorRequest;
-use Notification;
 use GuzzleHttp\Client as HttpClient;
 use Twilio\Rest\Client;
 
@@ -51,26 +51,36 @@ class InvitationAPIController extends AppBaseController
     public function inviteInstructor(InviteInstructorAPIRequest $request)
     {
 		$input = $this->_prepareInputData($request);
-		if (!isset($input['invited_email']) && !isset($input['invited_mobile_phone']) && !isset($input['invited_instagram_handle'])){
+        $invitedEmail = data_get($input, 'invited_email');
+        $invitedMobilePhone = data_get($input, 'invited_mobile_phone');
+        $invitedInstagramHandle = data_get($input, 'invited_instagram_handle');
+
+		if (!$invitedEmail && !$invitedMobilePhone && !$invitedInstagramHandle) {
 			return $this->sendError('Can\'t invite user. Invalid contact', 400);
 		}
-		if (Auth::user()->instructorInvitations()->count()>=Auth::user()->getMaxAllowedInstructorInvites()){
+
+        if (Auth::user()->instructorInvitations()->count() >= Auth::user()->getMaxAllowedInstructorInvites()) {
 			return $this->sendError('Can\'t invite user. Limit of invitations has been reached', 400);
 		}
-		if (isset($input['invited_email']) && $this->userRepository->findByField('email', $input['invited_email'])->count()>0){
-			return $this->sendError('Seems this user already has an account on our site', 400);
-		}
-		if (isset($input['invited_mobile_phone']) && $this->profileRepository->findByField('mobile_phone', $input['invited_mobile_phone'])->count()>0){
-			return $this->sendError('Seems this user already has an account on our site', 400);
-		}
-		if (isset($input['invited_instagram_handle']) && $this->profileRepository->findByField('instagram_handle', $input['invited_instagram_handle'])->count()>0){
-			return $this->sendError('Seems this user already has an account on our site', 400);
-		}
 
-		if (isset($input['invited_mobile_phone']) && $input['invited_mobile_phone']=='+12222222222')
-			$input['invited_mobile_phone'] = '+375298859083';
+        if ($invitedEmail && $resultCheckEmailInv = $this->userRepository->checkInvitationFromEmail($invitedEmail)) {
+            return $this->sendError($resultCheckEmailInv, 400);
+        }
+
+        if ($invitedMobilePhone && $resultCheckPhoneInv = $this->userRepository->checkInvitationFromPhone($invitedMobilePhone)){
+            return $this->sendError($resultCheckPhoneInv, 400);
+        }
+
+        if ($invitedInstagramHandle && $resultCheckInstInv = $this->userRepository->checkInvitationFromInstagram($invitedInstagramHandle)){
+            return $this->sendError($resultCheckInstInv, 400);
+        }
+
+		if (isset($input['invited_mobile_phone']) && $input['invited_mobile_phone']=='+12222222222') {
+            $input['invited_mobile_phone'] = '+375298859083';
+        }
 
 		$successMessage = 'Invitation has been sent';
+
 		DB::beginTransaction();
 		try{
 			$input['invited_as_instructor']	= true;
@@ -96,6 +106,7 @@ class InvitationAPIController extends AppBaseController
 			Log::error($e->getCode() . ': ' . $e->getMessage());
 			return $this->sendError('Message hasn\'t been sent', 400 );
 		}
+
         return $this->sendResponse(true, $successMessage);
     }
 

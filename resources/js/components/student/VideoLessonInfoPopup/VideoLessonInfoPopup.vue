@@ -62,7 +62,7 @@
               </span>
             </div>
             <p class="video-lesson-info-popup__note">
-              Note:<br />{{ lesson.description }}
+              Note:<br /> <content-viewer :content="lesson.description" />
             </p>
             <div class="video-lesson-info-popup__row">
               <span
@@ -96,6 +96,7 @@
             >
             <loader-button
               v-if="popupButton == 'add-to-cart'"
+              :disabled="!canBook"
               :isLoading="isLoading"
               text="Add to cart"
               @click="addToCart(lesson)"
@@ -112,12 +113,13 @@
 import CloseButton from "../CloseButton/CloseButton.vue";
 import LoaderButton from "../../cart/LoaderButton/LoaderButton.vue";
 import { mapActions } from "vuex";
-
+import ContentViewer from "../../profile/ContentViewer/ContentViewer.vue"
 export default {
   name: "VideoLessonInfoPopup",
   components: {
     CloseButton,
     LoaderButton,
+    ContentViewer
   },
   props: {
     popupButton: {
@@ -125,7 +127,7 @@ export default {
       default: false,
       // possible options: [ null, "add-to-cart", "watch-student", "watch-instructor" ]
     },
-    loggedInAsStudent: {
+    canBook: {
         type: Boolean,
         default: false,
     },
@@ -158,24 +160,19 @@ export default {
       this.opened = true;
     },
     async addToCart(lesson) {
-
-      if (this.loggedInAsStudent) {
-        this.isLoading = true;
-        const result = await this.addItemToCartAtStart({
-          lessonId: lesson.id,
-          isPreRecorded: true,
-        });
-        this.isLoading = false;
-        if (result.isError) {
-          this.errorMessage = result.message;
-        } else {
-          this.opened = false;
-          this.$root.$emit("showMiniCart");
-        }
+      this.isLoading = true;
+      const result = await this.addItemToCartAtStart({
+        lessonId: lesson.id,
+        isPreRecorded: true
+      });
+      if (result.success || result.status == 200) {
+        this.opened = false;
+        this.$root.$emit("showMiniCart");
       } else {
-        window.location.href = "/login";
+        this.errorMessage = result.message;
       }
-    },
+      this.isLoading = false;
+    }
   },
 };
 </script>

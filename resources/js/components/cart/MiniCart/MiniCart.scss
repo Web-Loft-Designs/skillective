@@ -40,8 +40,12 @@
         background: none;
         border: none;
         padding: 0;
-        border-radius: 3px;
         margin-left: 4px;
+        outline: none;
+
+        &:hover, &:focus {
+            text-decoration: underline;
+        }
     }
 
     &__backdrop {
@@ -165,6 +169,10 @@
         background: none;
         border: none;
         padding: 0;
-        border-radius: 3px;
+        outline: none;
+
+        &:hover, &:focus {
+            text-decoration: underline;
+        }
     }
 }

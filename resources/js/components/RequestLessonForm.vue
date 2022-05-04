@@ -379,7 +379,7 @@ import MagnificPopupModal from "./external/MagnificPopupModal";
 require("jquery.maskedinput/src/jquery.maskedinput");
 import DropdownDatepicker from "vue-dropdown-datepicker";
 import VueTimepicker from "vue2-timepicker/src/vue-timepicker.vue";
-const ct = require("countries-and-timezones");
+import countriesAndTimezones from 'countries-and-timezones';
 
 export default {
   components: {
@@ -588,7 +588,7 @@ export default {
         this.$refs.modal.open();
       } else {
         Cookies.set("backToRequestLesson", this.instructorId);
-        window.location = "/login";
+        // window.location = "/login";
       }
     },
     clearFormAndClosePopup() {
@@ -632,7 +632,7 @@ export default {
   },
   created: function () {
     this.timeOptions = this.getTimeOptions();
-    this.timeZomeOptions = ct.getAllTimezones();
+    this.timeZomeOptions = countriesAndTimezones.getAllTimezones();
 
     const tzs = {
       "America/New_York": "America/New_York UTC-05:00",

@@ -1,5 +1,5 @@
 const mix = require('laravel-mix');
-
+require('vuetifyjs-mix-extension')
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management
@@ -27,7 +27,7 @@ mix.babelConfig({
 )
 
 
-mix.js('resources/js/app.js', 'public/js/app.js')
-    .babel('public/js/app.js', 'public/js/app.js')
-   .sass('resources/sass/app.scss', 'public/css')
-   .sass('resources/sass/app-front.scss', 'public/css');
+mix.js('resources/js/app.js', 'public/js/app.js').vue({version: 2}).vuetify('vuetify-loader')
+    .sass('resources/sass/app.scss', 'public/css')
+    .sass('resources/sass/app-front.scss', 'public/css')
+    .vue({ version: 2 });

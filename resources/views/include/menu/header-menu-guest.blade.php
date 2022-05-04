@@ -17,7 +17,7 @@
                 <li><a href="/#become-an-instructor">Sign up as an instructor</a></li>
             </template>
         </nav-drop-down>
-        
+
         <li><a href="#" class="open-login-popup-link">Login</a></li>
     @endif
 </nav-links>

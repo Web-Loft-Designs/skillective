@@ -53,5 +53,9 @@
 
   &--disabled {
     background: #DDDDDD;
+
+    &:hover, &:focus {
+      box-shadow: none;
+    }
   }
 }

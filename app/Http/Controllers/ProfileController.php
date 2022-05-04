@@ -95,13 +95,17 @@ class ProfileController extends Controller
 		$userData['isStudent']			 = !$isInstructor;
 
 		$template = $isInstructor ? 'instructor' : 'student';
+        $dashboardPage = getCurrentPage('instructor/dashboard');
 
 		$vars = [
 			'page_title'		=> ($isInstructor ? 'Instructor': 'Client') . " Profile",
 			'userProfileData'	=> $userData,
 			'siteGenres' => $this->genreRepository->presentResponse($this->genreRepository->getSiteGenres())['data'],
 			'userMedia'	=> $user->getGalleryMedia(),
-			'invitedInstructors' => $invitedInstructors
+			'invitedInstructors' => $invitedInstructors,
+            'authUserIsAdmin' => (Auth::user() && Auth::user()->hasRole('Admin')),
+            'dashboardPage' => $dashboardPage,
+            'booking_fees_description' => getCurrentPageMetaValue($dashboardPage, 'booking_fees_description'),
 		];
 
 		if(Auth::user()){

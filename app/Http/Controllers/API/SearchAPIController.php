@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Genre;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class SearchAPIController extends AppBaseController
 {
@@ -40,19 +40,15 @@ class SearchAPIController extends AppBaseController
         return $this->sendResponse($result);
     }
 
-
     public function autocompleteGenres(Request $request)
     {
-
         $searchString = $request->input('genre');
 
         if (!$searchString) {
             return $this->sendError("genre query param is requrid", 400);
         }
 
-        $result = Genre::where('title', 'LIKE', $searchString . '%')
-            ->get();
-
+        $result = Genre::where('title', 'LIKE', $searchString . '%')->get();
 
         return $this->sendResponse($result);
     }

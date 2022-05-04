@@ -4,6 +4,8 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+import vuetify from '../../src/plugins/vuetify'
+
 if (typeof Object.assign != "function") {
     Object.assign = function(target) {
         "use strict";
@@ -31,7 +33,7 @@ import Vue from "vue";
 require("./bootstrap");
 require("url-search-params-polyfill");
 
-window.Vue = require("vue");
+window.Vue = require("vue").default;
 
 import Vuex from 'vuex';
 Vue.use(Vuex);
@@ -75,7 +77,7 @@ Vue.use(ToggleButton);
 import VueHotelDatepicker from "@northwalker/vue-hotel-datepicker";
 
 if (window.jQuery == undefined) {
-    window.jQuery = require("jquery");
+    window.jQuery = require("jquery").default;
 }
 
 import Multiselect from "vue-multiselect";
@@ -106,7 +108,7 @@ Vue.component(VueCountdown.name, VueCountdown);
 // vue extensions
 
 import ReadMore from 'vue-read-more';
- 
+
 Vue.use(ReadMore);
 
 import VCalendar from 'v-calendar';
@@ -140,6 +142,8 @@ Vue.component("my-library", require("./components/student/MyLibrary/MyLibrary.vu
 Vue.component("my-library-player", require("./components/student/MyLibraryPlayer/MyLibraryPlayer.vue").default);
 Vue.component("instructor-my-shop", require("./components/instructor/InstructorMyShop/InstructorMyShop.vue").default);
 Vue.component("lessons", require("./components/lessons/Lessons/Lessons.vue").default);
+Vue.component("content-viewer", require("./components/profile/ContentViewer/ContentViewer.vue").default);
+Vue.component("discount-management", require("./components/discounts/DiscountManagement/DiscountManagement.vue").default);
 
 
 
@@ -561,6 +565,7 @@ const slickSingle = (window.slickSingle = {
 var app = new Vue({
     el: "#app",
     store,
+    vuetify,
     directives: { Sticky },
     data() {
         return {

@@ -1,0 +1,113 @@
+// transition animations for .info-popup__popup
+.scalein-enter-active, .scalein-leave-active {
+  transition: opacity .5s, transform .5s;
+  opacity: 1;
+  transform: scale(1);
+}
+.scalein-enter, .scalein-leave-to {
+  opacity: 0;
+  transform: scale(0.75);
+}
+
+// transition animations for .info-popup__backdrop
+.show-enter-active, .show-leave-active {
+  transition: opacity .25s;
+  opacity: 1;
+}
+.show-enter, .show-leave-to {
+  opacity: 0;
+}
+
+
+
+.info-popup {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  bottom: 0;
+  right: 0;
+  width: 100vw;
+  pointer-events: none;
+
+  &__backdrop {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.65);
+    pointer-events: all;
+  }
+
+  &__popup-container {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  &__popup {
+    background: #FFFFFF;
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.07), 0px 25px 50px rgba(0, 0, 0, 0.07);
+    border-radius: 5px;
+    width: 500px;
+    padding: 30px;
+    pointer-events: all;
+    position: relative;
+    max-height: 100%;
+    overflow: auto;
+  }
+  
+  &__content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__heading {
+    margin: 0 0 20px 0;
+    font-family: Poppins;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 22px;
+    line-height: 33px;
+    color: #333333;
+    text-align: center;
+  }
+
+  &__close {
+    width: 24px;
+    height: 24px;
+    right: 20px;
+    top: 18px;
+    position: absolute;
+  }
+
+  &__button {
+    padding: 11px 10px 10px;
+    background: linear-gradient(180deg, #11CF13 0%, #01BD00 100%);
+    border-radius: 3px;
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    color: #FFFFFF;
+    margin: 21px auto 0;
+    width: 100%;
+    max-width: 180px;
+    box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+    transition: box-shadow .25s;
+    outline: none;
+    border: none;
+
+    &:hover, &:focus {
+      box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+    }
+  }
+}

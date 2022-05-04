@@ -4,7 +4,10 @@
   box-sizing: border-box;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.03), 0px 5px 10px rgba(0, 0, 0, 0.05);
   border-radius: 5px;
-  margin-bottom: 100px;
+
+  &:last-child {
+    margin-bottom: 100px;
+  }
 
   &__heading {
     font-family: Hind Vadodara;
@@ -98,5 +101,32 @@
     line-height: 21px;
     cursor: pointer;
     border-radius: 3px;
+    outline: none;
+
+    &:hover, &:focus {
+      text-decoration: underline;
+    }
+  }
+
+  &__apply-promo {
+    background: #F4F4F4;
+    border-radius: 3px;
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 25px;
+    text-align: center;
+    color: #0AAB14;
+    padding: 10px;
+    border: none;
+    margin-bottom: 10px;
+    box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+    transition: box-shadow .25s;
+    outline: none;
+
+    &:hover, &:focus {
+      box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+    }
   }
 }

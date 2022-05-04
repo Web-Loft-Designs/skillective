@@ -231,7 +231,7 @@
         width: 100%;
         height: 100%;
 
-        /deep/ .video-js {
+        >>> .video-js {
             width: 100%;
             height: 100%;
             position: relative;
@@ -352,7 +352,7 @@
             }
 
             &:last-child {
-                padding: 20px 0 0 0;    
+                padding: 20px 0 0 0;
             }
         }
 
@@ -390,7 +390,7 @@
         }
 
         &__video-player {
-            /deep/ .video-js .vjs-big-play-button {
+            >>> .video-js .vjs-big-play-button {
                 width: 60px;
                 height: 60px;
                 top: calc(50% - 30px);

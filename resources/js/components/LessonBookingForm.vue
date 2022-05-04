@@ -572,6 +572,7 @@
 </template>
 
 <script>
+import guestCartHelper from "../helpers/guestCartHelper";
 import MaskedInput from "vue-masked-input";
 import siteAPI from "../mixins/siteAPI.js";
 import skillectiveHelper from "../mixins/skillectiveHelper.js";
@@ -684,15 +685,13 @@ export default {
         );
       });
     },
-    async onSubmitStepCreditCard2() {
-      const cartTotal = await this.fetchCartTotal();
-
+    async onSubmitStepCreditCard2() {      
       if (this.getTotal.count > 0) {
         if (this.selectedPaymentMethodObj == null) {
           let i = 0;
           const payment_method_nonce = [];
 
-          while (i < this.lessonsCount) {
+          while (i < this.getTotal.count) {
             let token = await this.fetchBrainthreeToken();
             payment_method_nonce.push(token);
             i++;
@@ -720,12 +719,20 @@ export default {
       if (moment(this.fields.dob))
         this.fields.dob = moment(this.fields.dob).format("YYYY-MM-DD");
 
-      this.apiPost("/api/cart/checkout", this.fields);
+      this.apiPost("/api/cart/checkout", {
+        ...this.fields,
+        guest_cart: guestCartHelper.getProducts(),
+        promo_codes: guestCartHelper.getPromos()
+      });
     },
     componentHandlePostResponse(responseData) {
       if (this.bookingStep == 1) {
         this.bookingStep = 2;
       } else if (this.bookingStep == 2) {
+
+        guestCartHelper.clearProducts();
+        guestCartHelper.clearPromos();
+
         this.booking = responseData.data;
         this.clearSubmittedForm();
         this.successText = null;

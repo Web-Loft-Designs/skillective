@@ -84,13 +84,14 @@
 
 <script>
 import $ from "jquery";
+import urlHelper from "../../helpers/urlHelper";
 import FullCalendar from "@fullcalendar/vue";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import MagnificPopupModal from "./MagnificPopupModal";
 import siteAPI from "../../mixins/siteAPI.js";
-import { getTimezone } from "countries-and-timezones";
+import countriesAndTimezones from "countries-and-timezones";
 var FileSaver = require("file-saver");
 
 export default {
@@ -125,6 +126,7 @@ export default {
       triggerView: "month",
       scrollTime1: "0:00:00",
       selectedEvent: null,
+      lessonIdParsed: false,
     };
   },
   methods: {
@@ -254,7 +256,7 @@ export default {
 
               let userTzOffset = new Date().getTimezoneOffset() * 60 * 1000;
 
-              let lessonTimeZoneObj = getTimezone(item.timezone_id_name);
+              let lessonTimeZoneObj = countriesAndTimezones.getTimezone(item.timezone_id_name);
 
               var jan = new Date(0, 1);
               var jul = new Date(6, 1);
@@ -297,9 +299,9 @@ export default {
 
               return item;
             });
-          this.events = this.events.filter(function (item) {
-            return moment().diff(item.end) <= 0;
-          });
+            this.events = this.events.filter(function (item) {
+              return moment().diff(item.end) <= 0;
+            });
 
             this.loader.hide();
             this.loader = null;
@@ -332,6 +334,16 @@ export default {
         '<span class="spot-left">Spots left: ' +
         count +
         "</span>";
+
+      if (!this.lessonIdParsed) {
+        const params = urlHelper.parseQueryParams();
+        if (params.lessonId) {
+          if (params.lessonId == info.event.id) {
+            this.lessonIdParsed = true;
+            this.dateClick(info);
+          }
+        }
+      }
     },
     selectOverlap: function (event) {
       console.log(event);
@@ -347,9 +359,6 @@ export default {
       calendarApi.gotoDate(info.start);
     },
     dateClick: function (info) {
-
-      console.log(info.e);
-
       this.selectedEvent = {
         id: info.event.id,
         lat: info.event.extendedProps.lat,
