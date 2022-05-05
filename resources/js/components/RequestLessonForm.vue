@@ -2,14 +2,6 @@
   <div id='lesson-form-container'>
     <div class='d-grid gap-2 d-md-block'>
       <button
-        class='btn btn-success'
-        v-if='showCreateBtn'
-        type='button'
-        @click='openPopup'
-      >
-        Request Time
-      </button>
-      <button
         class='btn btn-success btn-sm text-wrap'
         type='button'
         data-toggle='tooltip'
@@ -18,7 +10,7 @@
         @click='showJoinModal'
         :title='tooltipContent()'
       >
-        Add me to {{instructorName}}'s Client List
+        Add me to {{ instructorName }}'s Client List
       </button>
     </div>
     <!--    modal1-->
@@ -42,8 +34,8 @@
           </div>
           <div class='modal-body'>
             <span>
-              If you want to receive notifications when {{instructorName}}
-              is near you or you want to be included in all {{instructorName}}'s
+              If you want to receive notifications when {{ instructorName }}
+              is near you or you want to be included in all {{ instructorName }}'s
               training classes, clinics, workshops and tutorials please
               join his client list
             </span>
@@ -89,7 +81,7 @@
         <div class='modal-content'>
           <div class='modal-body'>
             <form novalidate class='needs-validation'>
-              <h3 class='form-title'>Join {{instructorName}}'s Client List</h3>
+              <h3 class='form-title'>Join {{ instructorName }}'s Client List</h3>
               <div class='d-flex flex-wrap'>
                 <div class='label-w-100'>
                   <label>Complete name</label>
@@ -215,20 +207,9 @@
                   />
                   <span v-if='$v.modalData.email.$dirty && !$v.modalData.email.required'>Email can't be empty</span>
                   <span v-else-if='$v.modalData.email.$dirty && !$v.modalData.email.email'>Error email format</span>
-                  <span v-else-if='storeErrors.email'>{{storeErrors.email[0]}}</span>
+                  <span v-else-if='storeErrors.email'>{{ storeErrors.email[0] }}</span>
                 </div>
                 <div class='form-group checkbox-wrapper'>
-                  <div class='field'>
-                    <label for='newsletter'>
-                      <input
-                        v-model='modalData.newsletter'
-                        type='checkbox'
-                        id='newsletter'
-                      />
-                      <span class='checkmark'></span>
-                      I would like to receive the Monthly Newsletter
-                    </label>
-                  </div>
                   <span v-if='$v.modalData.mobile_phone.$dirty && !modalData.accept_terms'>Please accept terms of service</span>
                 </div>
                 <div
@@ -292,7 +273,7 @@
             <span class='text-center'>
                Thank you for joining my client list. I'll be in touch with upcoming lessons and events. Talk to you soon!
               <br>
-              <strong>- {{instructorName}}</strong>
+              <strong>- {{ instructorName }}</strong>
               <br>
             </span>
             <span>
@@ -354,11 +335,11 @@
                   :key='genre.id'
                   :value='genre.id'
                 >
-                  {{genre.title}}
+                  {{ genre.title }}
                 </option>
               </select>
               <span class='help-block' v-if='errors.genre'>
-                <strong>{{errors.genre[0]}}</strong>
+                <strong>{{ errors.genre[0] }}</strong>
               </span>
             </div>
 
@@ -380,7 +361,7 @@
               ></dropdown-datepicker>
 
               <span class='help-block' v-if='errors.date'>
-                <strong>{{errors.date[0]}}</strong>
+                <strong>{{ errors.date[0] }}</strong>
               </span>
             </div>
             <div
@@ -401,7 +382,7 @@
               ></dropdown-datepicker>
 
               <span class='help-block' v-if='errors.date_to'>
-                <strong>{{errors.date_to[0]}}</strong>
+                <strong>{{ errors.date_to[0] }}</strong>
               </span>
             </div>
             <div
@@ -423,7 +404,7 @@
                 @open="clearTimepicker('timeFrom')"
               ></vue-timepicker>
               <span class='help-block' v-if='errors.time_from'>
-                <strong>{{errors.time_from[0]}}</strong>
+                <strong>{{ errors.time_from[0] }}</strong>
               </span>
             </div>
 
@@ -446,7 +427,7 @@
               ></vue-timepicker>
 
               <span class='help-block' v-if='errors.time_to'>
-                <strong>{{errors.time_to[0]}}</strong>
+                <strong>{{ errors.time_to[0] }}</strong>
               </span>
             </div>
             <div
@@ -464,11 +445,11 @@
                   :key='lessonTypeName'
                   :value='lessonTypeName'
                 >
-                  {{lessonTypeTitle}}
+                  {{ lessonTypeTitle }}
                 </option>
               </select>
               <span class='help-block' v-if='errors.lesson_type'>
-                <strong>{{errors.lesson_type[0]}}</strong>
+                <strong>{{ errors.lesson_type[0] }}</strong>
               </span>
             </div>
 
@@ -488,7 +469,7 @@
                 :disabled='fieldsDisabled'
               />
               <span class='help-block' v-if='errors.location'>
-                <strong>{{errors.location[0]}}</strong>
+                <strong>{{ errors.location[0] }}</strong>
               </span>
             </div>
 
@@ -509,11 +490,11 @@
                   :value='key'
                   :key='key'
                 >
-                  {{value}}
+                  {{ value }}
                 </option>
               </select>
               <span class='help-block' v-if='errors.timezone_id'>
-                <strong>{{errors.timezone_id[0]}}</strong>
+                <strong>{{ errors.timezone_id[0] }}</strong>
               </span>
             </div>
 
@@ -521,7 +502,7 @@
               class='form-group col-lg-9 col-sm-9 col-12 has-feedback align-end'
               :class="{ 'has-error': errors.lesson_price }"
             >
-              <label v-if='priceError'>{{priceError}}</label>
+              <label v-if='priceError'>{{ priceError }}</label>
               <div class='d-flex'>
                 <span class='dollar-wrapper'>
                   <!--<masked-input class="form-control" v-model="fields.lesson_price" mask="111.11" />-->
@@ -537,7 +518,7 @@
               </div>
 
               <span class='help-block' v-if='errors.lesson_price'>
-                <strong>{{errors.lesson_price[0]}}</strong>
+                <strong>{{ errors.lesson_price[0] }}</strong>
               </span>
             </div>
 
@@ -564,7 +545,7 @@
                 type='number'
               />
               <span class='help-block' v-if='errors.count_participants'>
-                <strong>{{errors.count_participants[0]}}</strong>
+                <strong>{{ errors.count_participants[0] }}</strong>
               </span>
             </div>
 
@@ -581,12 +562,12 @@
                 v-model='fields.student_note'
               ></textarea>
               <span class='help-block' v-if='errors.student_note'>
-                <strong>{{errors.student_note[0]}}</strong>
+                <strong>{{ errors.student_note[0] }}</strong>
               </span>
             </div>
             <div v-else class='form-group col-12'>
               <label>Client Note</label>
-              <p>{{fields.student_note ? fields.student_note : '-'}}</p>
+              <p>{{ fields.student_note ? fields.student_note : '-' }}</p>
             </div>
 
             <div
@@ -601,14 +582,14 @@
                 v-model='fields.instructor_note'
               ></textarea>
               <span class='help-block' v-if='errors.instructor_note'>
-                <strong>{{errors.instructor_note[0]}}</strong>
+                <strong>{{ errors.instructor_note[0] }}</strong>
               </span>
             </div>
 
             <div class='col-12'>
-              <div v-if='errorText' class='has-error'>{{errorText}}</div>
+              <div v-if='errorText' class='has-error'>{{ errorText }}</div>
               <div v-if='successText' class='has-success'>
-                {{successText}}
+                {{ successText }}
               </div>
             </div>
 
@@ -688,7 +669,7 @@ export default {
     MaskedInput,
     MagnificPopupModal,
     DropdownDatepicker,
-    VueTimepicker,
+    VueTimepicker
   },
   mixins: [siteAPI, skillectiveHelper],
   props: [
@@ -703,7 +684,7 @@ export default {
     'showCreateBtn',
     'lessonBlockMinPrice',
     'instructorName',
-    'studentId',
+    'studentId'
   ],
   validations: {
     modalData: {
@@ -712,8 +693,8 @@ export default {
       zip: {required, numeric, valid: v => /^[0-9]{5}(\-[0-9]{4})?$/.test(v)},
       email: {email, required},
       mobile_phone: {required, valid: v => /^((\+1)|(\+37))\s\([0-9]{3}\)\s[0-9]{3}\s[0-9]{4}$/.test(v)},
-      accept_terms: {checked: v => v},
-    },
+      accept_terms: {checked: v => v}
+    }
   },
   data() {
     return {
@@ -726,7 +707,7 @@ export default {
         mobile_phone: '',
         instagram_handle: '',
         newsletter: true,
-        accept_terms: false,
+        accept_terms: false
       },
       fields: {
         id: null,
@@ -743,7 +724,7 @@ export default {
         instructor_note: null,
         price_per: 'lesson',
         lesson_type: 'in_person',
-        timezone_id: null,
+        timezone_id: null
       },
       timeOptions: [],
       timeZomeOptions: [],
@@ -756,7 +737,7 @@ export default {
       fieldsDisabled: false,
       isDateInputInit: false,
       openRegisteredModal: false,
-      loadingOtherInstructors: false,
+      loadingOtherInstructors: false
     }
   },
   watch: {
@@ -768,13 +749,13 @@ export default {
         this.fields.date_to = this.selectRange.startStr
         this.fields.time_from = moment(this.selectRange.startStr)
         .format(
-          'H:mm:ss',
+          'H:mm:ss'
         )
         this.fields.time_to = moment(this.selectRange.endStr)
         .format('H:mm:ss')
         this.$refs.modal.open()
       }
-    },
+    }
   },
   computed: {
     ...mapState(['storeErrors', 'storeErrorText']),
@@ -798,11 +779,11 @@ export default {
         Math.abs(Number(this.lessonBlockMinPrice) * Number(countSpots)) >
         Number(this.fields.lesson_price)
       ) {
-        return `The minimum amount this instructor will accept is $${this.lessonBlockMinPrice} per half hour.`
+        return `The minimum amount this instructor will accept is $${ this.lessonBlockMinPrice } per half hour.`
       } else {
         return ''
       }
-    },
+    }
   },
   methods: {
     ...mapActions(['addToClientList', 'createToClientList', 'addStudentToInstructorList']),
@@ -848,7 +829,7 @@ export default {
           zip: this.modalData.zip,
           email: this.modalData.email,
           mobile_phone: this.modalData.mobile_phone,
-          newsletter: this.modalData.newsletter,
+          newsletter: this.modalData.newsletter
         }
         await this.createToClientList(data)
         if (!this.storeErrors?.email?.length) {
@@ -867,7 +848,7 @@ export default {
       this.$v.$reset()
     },
     tooltipContent() {
-      return `Click here to add your contact info to ${this.instructorName}'s Client List so you can be notified when classes, privates or workshops become available.`
+      return `Click here to add your contact info to ${ this.instructorName }'s Client List so you can be notified when classes, privates or workshops become available.`
     },
     async addingNotification() {
       this.apiPost('/api/student/instructor/geo-notifications/' + this.instructorId)
@@ -881,7 +862,7 @@ export default {
           instructors.push(this.instructorId)
           const data = {
             required: this.studentId,
-            instructors: instructors,
+            instructors: instructors
           }
           await this.addToClientList(this.instructorId)
           await this.addStudentToInstructorList(data)
@@ -938,7 +919,7 @@ export default {
 
       if (moment(this.fields.time_from)) {
         this.fields.time_from = moment(this.fields.time_from, [
-          'h:mm A',
+          'h:mm A'
         ])
         .format('HH:mm:ss')
       }
@@ -946,13 +927,13 @@ export default {
       if (moment(this.fields.time_to)) {
         this.fields.time_to = moment(this.fields.time_to, ['h:mm A'])
         .format(
-          'HH:mm:ss',
+          'HH:mm:ss'
         )
       }
       if (this.fields.id > 0)
         this.apiPost(
           '/api/lesson-request/' + this.fields.id + '/accept',
-          this.fields,
+          this.fields
         )
       else this.apiPost('/api/lesson-request', this.fields)
     },
@@ -1038,7 +1019,7 @@ export default {
     initNewPlacesAutocomplete(_ref) {
       var thisComponent = this
       var autocomplete = this.initializeLocationField(this.$refs[_ref], [
-        'address',
+        'address'
       ])
       google.maps.event.addListener(
         autocomplete,
@@ -1046,16 +1027,16 @@ export default {
         function() {
           thisComponent.fields.location = thisComponent.$refs[_ref].value
           console.log(thisComponent.$refs[_ref].value)
-        },
+        }
       )
     },
     cancelLessonRequest() {
       this.cancellingRequest = true
       this.apiPost(
         '/api/lesson-request/' + this.fields.id + '/cancel',
-        this.fields,
+        this.fields
       )
-    },
+    }
   },
 
   created: function() {
@@ -1153,7 +1134,7 @@ export default {
       'Asia/Magadan': 'Asia/Magadan UTC+12:00',
       'Pacific/Auckland': 'Pacific/Auckland UTC+12:00',
       'Pacific/Tongatapu': 'Pacific/Tongatapu UTC+13:00',
-      'Pacific/Apia': 'Pacific/Apia UTC+13:00',
+      'Pacific/Apia': 'Pacific/Apia UTC+13:00'
     }
 
     this.timeZomeOptions = tzs
@@ -1168,7 +1149,7 @@ export default {
 
     this.lessonTypes = {
       in_person: 'In Person',
-      virtual: 'Virtual',
+      virtual: 'Virtual'
     }
   },
   mounted() {
@@ -1184,11 +1165,11 @@ export default {
         genre: lessonRequest.genre_id,
         date: moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
         .format(
-          'YYYY-MM-DD',
+          'YYYY-MM-DD'
         ),
         date_to: moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
         .format(
-          'YYYY-MM-DD',
+          'YYYY-MM-DD'
         ),
         time_from: moment(lessonRequest.start)
         .format('h:mm a'),
@@ -1200,34 +1181,34 @@ export default {
         timezone_id: lessonRequest.timezone_id_name,
         lesson_type: lessonRequest.lesson_type,
         student_note: lessonRequest.student_note,
-        instructor_note: lessonRequest.instructor_note,
+        instructor_note: lessonRequest.instructor_note
       }
 
       setTimeout(() => {
         this.$refs.datepicker.year = Number(
           moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
-          .format('YYYY'),
+          .format('YYYY')
         )
         this.$refs.datepicker.month = Number(
           moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
-          .format('MM'),
+          .format('MM')
         )
         this.$refs.datepicker.day = Number(
           moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
-          .format('DD'),
+          .format('DD')
         )
 
         this.$refs.datepickerTo.year = Number(
           moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
-          .format('YYYY'),
+          .format('YYYY')
         )
         this.$refs.datepickerTo.month = Number(
           moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
-          .format('MM'),
+          .format('MM')
         )
         this.$refs.datepickerTo.day = Number(
           moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
-          .format('DD'),
+          .format('DD')
         )
       }, 10)
 
@@ -1248,7 +1229,7 @@ export default {
       window.jQuery('.mask-input')
       .mask('99/99/9999')
     }, 100)
-  },
+  }
 }
 </script>
 
