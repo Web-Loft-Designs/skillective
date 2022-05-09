@@ -56,6 +56,7 @@
                     <div class="aligner-top row">
                         <div class="card-section-info col-12 col-lg-12 padding-r-30 padding-r-30">
                             <instructor-video-lessons
+                                :profile-data="{{ json_encode($userProfileData) }}"
                                 :instructor-id="'{{ addslashes($userProfileData['id']) }}'"
                                 :can-book="{{ $loggedUserRole==\App\Models\User::ROLE_STUDENT ? 'true' : 'false' }}"
                                 :user-role = "{{ json_encode($loggedUserRole) }}"
