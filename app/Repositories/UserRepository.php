@@ -591,4 +591,13 @@ class UserRepository extends BaseRepository
 
         return null;
     }
+
+    public function getInstructorFromGenres(object $genres)
+    {
+        return $this->with(['profile', 'genres', 'genres.category', 'roles'])
+            ->whereHas('genres', function($query) use ($genres) {
+                $query->whereIn('genre_id', $genres);
+            })
+            ->get();
+    }
 }
