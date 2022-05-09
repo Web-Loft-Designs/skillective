@@ -1,8 +1,8 @@
 <template>
   <div class='instructor-video-lessons'>
     <h2 class='instructor-video-lessons__heading'>
-      <a :href="'/instructor/my-shop'" v-if="userRole==='Instructor'">{{instructorName}}'s Pre-Recorded Lessons</a>
-      <span v-else>{{instructorName}}'s Pre-Recorded Lessons</span>
+      <a :href="'/instructor/my-shop'" v-if="userRole==='Instructor'">{{ instructorName }}'s Pre-Recorded Lessons</a>
+      <span v-else>{{ instructorName }}'s Pre-Recorded Lessons</span>
     </h2>
     <anim-loader v-if='isLoading' />
     <video-lessons-list
@@ -40,8 +40,12 @@ export default {
     },
     userRole: {
       type: String,
-      default: '',
+      default: ''
     },
+    profileData: {
+      default: {},
+      type: Object
+    }
   },
   created() {
     const arr = window.location.href.split('/')
@@ -49,9 +53,9 @@ export default {
   },
   async mounted() {
     let lessons = await lessonService.instructorLessonsById(
-      this.instructorId,
+      this.instructorId
     )
-    this.instructorName = lessons[0].instructor.first_name
+    this.instructorName = this.profileData.first_name
     if (lessons.length > 3) {
       this.lessons = lessons.slice(0, 3)
       this.collapsedLessons = lessons.slice(3, lessons.length)
@@ -66,9 +70,9 @@ export default {
       lessons: [],
       collapsedLessons: [],
       myProfile: false,
-      instructorName: '',
+      instructorName: ''
     }
-  },
+  }
 }
 </script>
 
