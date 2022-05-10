@@ -580,10 +580,10 @@ export default {
         }
 
         if (value.lesson_type === "in_person") {
+          setTimeout(() => {
             var thisComponent = this;
             var autocomplete = this.initializeLocationField(this.$refs["lessonLocation"],["address"]);
 
-            console.log('google.maps.event.addListener', google.maps.event);
             google.maps.event.addListener(
               autocomplete,
                 "place_changed",
@@ -591,6 +591,7 @@ export default {
                   thisComponent.fields.location = thisComponent.$refs["lessonLocation"].value;
               }
             );
+          }, 1);
         }
 
       },
@@ -970,3 +971,9 @@ export default {
   },
 }
 </script>
+
+<style scoped lang="scss">
+    >>> .pac-container {
+        z-index: 10000;
+    }
+</style>
