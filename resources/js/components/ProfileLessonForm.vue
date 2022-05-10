@@ -579,6 +579,21 @@ export default {
           }, 1)
         }
 
+        if (value.lesson_type === "in_person") {
+          setTimeout(() => {
+            var thisComponent = this;
+            var autocomplete = this.initializeLocationField(this.$refs["lessonLocation"],["address"]);
+
+            google.maps.event.addListener(
+              autocomplete,
+                "place_changed",
+                function (e) {
+                  thisComponent.fields.location = thisComponent.$refs["lessonLocation"].value;
+              }
+            );
+          }, 1);
+        }
+
       },
       deep: true,
     },
