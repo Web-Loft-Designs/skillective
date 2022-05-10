@@ -655,13 +655,13 @@ import DropdownDatepicker from 'vue-dropdown-datepicker'
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
 import {mapActions, mapState, mapMutations} from 'vuex'
 import {email, required, numeric} from 'vuelidate/lib/validators'
-import LoaderButton from './cart/LoaderButton/LoaderButton'
+import LoaderButton from './cart/LoaderButton/LoaderButton';
+import ct from 'countries-and-timezones';
 
 $(function() {
   $('[data-toggle="tooltip"]')
   .tooltip()
 })
-const ct = require('countries-and-timezones')
 
 export default {
   components: {
