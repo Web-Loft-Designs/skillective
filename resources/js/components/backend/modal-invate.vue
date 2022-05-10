@@ -10,8 +10,8 @@
 
                </div>
 
-               <div v-if="errorText" class="has-error" style="word-break: break-all">{{ errorText }}</div>
-               <div v-if="formSubmitted" v-html="successText" class="has-success" style="word-break: break-all"></div>
+               <div v-if="errorText" class="has-error" style="white-space: nowrap;">{{ errorText }}</div>
+               <div v-if="formSubmitted" v-html="successText" class="has-success" style="white-space: nowrap;"></div>
                <a href="#" class="btn-green" @click.prevent="onSubmit">Send invite</a>
            </div>
         </magnific-popup-modal>
