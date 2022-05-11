@@ -22,7 +22,7 @@ class UserInvitedByCriteria implements CriteriaInterface
 
     public function apply($model, RepositoryInterface $repository)
     {
-		$model->where('invitations.invited_by', '=', $this->invitedByUserId);
+		$model->where('invitations.invited_by', '=', $this->invitedByUserId)->whereNull('invitations.deleted_at');
         return $model;
     }
 }

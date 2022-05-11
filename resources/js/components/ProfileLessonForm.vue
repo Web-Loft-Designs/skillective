@@ -469,8 +469,6 @@ import TextEditor from './profile/TextEditor/TextEditor';
 
 require('jquery.maskedinput/src/jquery.maskedinput')
 
-const ct = require('countries-and-timezones')
-
 export default {
   components: {
     MaskedInput,
@@ -574,31 +572,13 @@ export default {
         if (value.date && (value.date !== value.oldValue) && !this.isOvernight) {
           value.date_to = value.date
         }
-      },
-      deep: true,
-    },
-    computedFields: {
-      handler(value, oldValue) {
-        if (value.lesson_type) {
-          if (!oldValue || value.lesson_type !== oldValue.lesson_type) {
-            if (value.lesson_type === 'in_person_client') {
-              setTimeout(() => {
-                this.fields.timezone_id = Intl.DateTimeFormat().resolvedOptions().timeZone
-              }, 1)
-            }
-            if (value.lesson_type === 'in_person') {
-              setTimeout(() => {
-                const autocomplete = this.initializeLocationField(
-                  this.$refs.lessonLocation,
-                  ['address'],
-                )
-                google.maps.event.addListener(autocomplete, 'place_changed', () => {
-                  this.fields.location = this.$refs.lessonLocation.value
-                })
-              }, 1)
-            }
-          }
+
+        if (value.lesson_type === 'in_person_client') {
+          setTimeout(() => {
+            this.fields.timezone_id = Intl.DateTimeFormat().resolvedOptions().timeZone
+          }, 1)
         }
+
       },
       deep: true,
     },
@@ -976,3 +956,9 @@ export default {
   },
 }
 </script>
+
+<style>
+    .pac-container {
+        z-index: 10000!important;
+    }
+</style>
