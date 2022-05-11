@@ -731,6 +731,7 @@ export default {
       this.$refs.timeFrom.apm = ''
       this.$refs.lessonLocation = null
 
+        this.fields.lesson_type = 'in_person'
       this.isOvernight = true
     },
     initNewPlacesAutocomplete(_ref) {
