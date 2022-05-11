@@ -34,7 +34,7 @@ class FixInvitationDuplications extends Seeder
         }
 
         if ($this->command->confirm('Delete them ?', false)) {
-            Invitation::whereIn('id', $duplicatedInvitationIds)->delete();
+            Invitation::whereIn('id', $duplicatedInvitationIds)->forceDelete();
         }
     }
 }
