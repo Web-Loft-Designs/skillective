@@ -188,7 +188,7 @@ class BookingRepository extends BaseRepository
 		});
 
 
-		
+
 
 		$perPage = Cookie::get('adminBookingsPerPage', 25);
 
@@ -203,7 +203,7 @@ class BookingRepository extends BaseRepository
 			return $this->paginate($perPage, ['bookings.*']);
 
 
-			
+
 
 	}
 
@@ -290,7 +290,7 @@ class BookingRepository extends BaseRepository
 		}
 
 		return $statistics;
-	}	
+	}
 
 	public function getBookingsWhereUserShouldReceiveRegularNotifications(){
 
@@ -361,7 +361,7 @@ class BookingRepository extends BaseRepository
 		});
 
 		$perPage = Cookie::get('instructorPayoutsPerPage', 25);
-		
+
 		if ($request->filled('limit') && $request->input('limit')>0)
 			return $this->paginate($request->input('limit'), ['totalPayoutsAmount', 'payoutsPeriod']);
 		else
@@ -409,7 +409,7 @@ class BookingRepository extends BaseRepository
 	// 					   ->whereIn('bookings.status', [Booking::STATUS_ESCROW, Booking::STATUS_ESCROW_RELEASED, Booking::STATUS_UNABLE_ESCROW_RELEASE]);
 	// 		return $query;
 	// 	});
-		
+
 
 	// 	$total = 0;
 	// 	$this->get(['totalPayoutYTD'])->each(function($item) use (&$count){

@@ -52,7 +52,7 @@ $booking_fees_description= isset($pageMeta['booking_fees_description']) ? preg_r
                             :instructor-id="{{ Auth::user()->id }}"
                             v-bind:user-genres="{{  json_encode($userGenres) }}"
                             v-bind:site-genres="{{  json_encode($siteGenres) }}"
-                    /> 
+                    />
                 </div>
 
                 <div class="col-12">

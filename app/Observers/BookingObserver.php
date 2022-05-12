@@ -43,19 +43,19 @@ class BookingObserver
         switch ($booking->status){
 			case Booking::STATUS_PENDING:
 				try{
-					$booking->instructor->notify(new BookingCreatedInstructorNotification($booking));
+					//$booking->instructor->notify(new BookingCreatedInstructorNotification($booking));
 				}catch (\Exception $e){
 					Log::error("BookingCreatedInstructorNotification Error for #{$booking->instructor->id} : " . $e->getCode() . ': ' . $e->getMessage());
 				}
 				try{
-					$booking->student->notify(new BookingCreatedStudentConfirmation($booking));
+					//$booking->student->notify(new BookingCreatedStudentConfirmation($booking));
 				}catch (\Exception $e){
 					Log::error("BookingCreatedStudentConfirmation Error for #{$booking->student->id} : " . $e->getCode() . ': ' . $e->getMessage());
 				}
 				break;
 			case Booking::STATUS_APPROVED:
 				try{
-					$booking->student->notify(new BookingApprovedStudentNotification($booking));
+					//$booking->student->notify(new BookingApprovedStudentNotification($booking));
 				}catch (\Exception $e){
 					Log::error("BookingApprovedStudentNotification Error for #{$booking->student->id} : " . $e->getCode() . ': ' . $e->getMessage());
 				}
