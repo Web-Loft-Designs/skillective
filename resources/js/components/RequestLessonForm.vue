@@ -34,10 +34,7 @@
           </div>
           <div class='modal-body'>
             <span>
-              If you want to receive notifications when {{ instructorName }}
-              is near you or you want to be included in all {{ instructorName }}'s
-              training classes, clinics, workshops and tutorials please
-              join his client list
+              Join {{ instructorName }}'s client list to be updated when training classes, clinics, workshops, or new tutorials become available.
             </span>
           </div>
           <div class='modal-footer'>
@@ -49,23 +46,6 @@
             >
               Join client list
             </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!--    modal1-->
-    <div
-      class='modal'
-      id='successAdded'
-      tabindex='-1'
-      role='dialog'
-      aria-labelledby='mySmallModalLabel'
-      aria-hidden='true'
-    >
-      <div class='modal-dialog'>
-        <div class='modal-content'>
-          <div class='modal-body p-5 h3 text-center'>
-            Congratulations! You have been added to the instructor’s list of clients
           </div>
         </div>
       </div>
@@ -247,7 +227,7 @@
     <!--    modal4-->
     <div
       class='modal'
-      id='successAddedAfterRegistered'
+      id='successAdded'
       tabindex='-1'
       role='dialog'
       aria-labelledby='exampleModalCenterTitle'
@@ -269,16 +249,12 @@
               <span aria-hidden='true'>&times;</span>
             </button>
           </div>
-          <div class='modal-body text-center'>
-            <span class='text-center'>
-               Thank you for joining my client list. I'll be in touch with upcoming lessons and events. Talk to you soon!
-              <br>
-              <strong>- {{ instructorName }}</strong>
-              <br>
-            </span>
-            <span>
-              You should have received an email from Skillective with more details
-            </span>
+          <div class='modal-body text-center h3'>
+            Thank you for joining my client list. I'll be in touch with upcoming lessons and events. Talk to you soon!
+            <br>
+            <strong>- {{ instructorName }}</strong>
+            <br>
+            You should have received an email from Skillective with more details.
           </div>
           <div class='modal-footer'>
             <button
@@ -649,14 +625,14 @@ import MaskedInput from 'vue-masked-input'
 import siteAPI from '../mixins/siteAPI.js'
 import skillectiveHelper from '../mixins/skillectiveHelper.js'
 import MagnificPopupModal from './external/MagnificPopupModal'
-
-require('jquery.maskedinput/src/jquery.maskedinput')
 import DropdownDatepicker from 'vue-dropdown-datepicker'
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
-import {mapActions, mapState, mapMutations} from 'vuex'
-import {email, required, numeric} from 'vuelidate/lib/validators'
-import LoaderButton from './cart/LoaderButton/LoaderButton';
-import ct from 'countries-and-timezones';
+import {mapActions, mapMutations, mapState} from 'vuex'
+import {email, numeric, required} from 'vuelidate/lib/validators'
+import LoaderButton from './cart/LoaderButton/LoaderButton'
+import ct from 'countries-and-timezones'
+
+require('jquery.maskedinput/src/jquery.maskedinput')
 
 $(function() {
   $('[data-toggle="tooltip"]')
@@ -802,9 +778,6 @@ export default {
     showSuccessAddedModal() {
       $('#successAdded').modal('show')
     },
-    showAddedAfterSuccessModal() {
-      $('#successAddedAfterRegistered').modal('show')
-    },
     showOtherInstructorsListModal() {
       $('#otherInstructorsList').modal('show')
     },
@@ -834,7 +807,7 @@ export default {
         await this.createToClientList(data)
         if (!this.storeErrors?.email?.length) {
           this.closeForm()
-          this.showAddedAfterSuccessModal()
+          this.showSuccessAddedModal()
         }
       } catch (e) {
         this.loadingBtn = false
@@ -868,12 +841,6 @@ export default {
           await this.addStudentToInstructorList(data)
           this.showSuccessAddedModal()
           await this.addingNotification()
-          setTimeout(() => {
-            $('#successAdded')
-            .modal('hide')
-            $('.modal-backdrop')
-            .remove()
-          }, 3000)
         } catch (e) {
           console.log(e)
         }
