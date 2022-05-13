@@ -262,9 +262,56 @@
               aria-label='Close'
               class='btn btn-success btn-sm'
               data-dismiss='modal'
+              @click='openAllInstructorsModal'
             >
               ОК
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='modal' id='instructorsModal' tabindex='-1' role='dialog' aria-labelledby='instructorsModalLabel'
+         aria-hidden='true'>
+      <div class='modal-dialog' role='document'>
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h5 class='modal-title' id='instructorsModalLabel'>
+              Would you like to be added to other instructor's client lists? Check the boxes below
+            </h5>
+            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+              <span aria-hidden='true'>&times;</span>
+            </button>
+          </div>
+          <div class='modal-body'>
+            <ul class='list-group'>
+              <li class='list-group-item'>
+                <div class='input-group mb-3'>
+                  <div class='input-group-prepend'>
+                    <div class='input-group-text'>
+                      <input type='checkbox' aria-label='Checkbox for following text input'>
+                    </div>
+                  </div>
+                  <div>
+                    <div>
+                      <img src='../../images/add-user.png' class='rounded' alt='instructor`s avatar'>
+                    </div>
+                    <div>
+                      <h3>Title</h3>
+                      <span>Insta</span>
+
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li class='list-group-item'>Dapibus ac facilisis in</li>
+              <li class='list-group-item'>Morbi leo risus</li>
+              <li class='list-group-item'>Porta ac consectetur ac</li>
+              <li class='list-group-item'>Vestibulum at eros</li>
+            </ul>
+          </div>
+          <div class='modal-footer'>
+            <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>
+            <button type='button' class='btn btn-primary'>Save changes</button>
           </div>
         </div>
       </div>
@@ -768,6 +815,9 @@ export default {
       if (this.storeErrors) {
         this.CLEAR_INPUT()
       }
+    },
+    openAllInstructorsModal() {
+      $('#instructorsModal').modal('show')
     },
     showJoinModal() {
       $('#joinClient').modal('show')
