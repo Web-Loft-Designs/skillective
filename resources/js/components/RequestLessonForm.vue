@@ -285,20 +285,38 @@
           <div class='modal-body'>
             <ul class='list-group'>
               <li class='list-group-item'>
-                <div class='input-group mb-3'>
+                <div class='input-group flex-nowrap'>
                   <div class='input-group-prepend'>
-                    <div class='input-group-text'>
-                      <input type='checkbox' aria-label='Checkbox for following text input'>
+                    <div
+                      class="form-group checkbox-wrapper"
+                    >
+                      <div class="field">
+                        <label for="accept-terms">
+                          <input
+                            v-model="test"
+                            type="checkbox"
+                            id="accept-terms"
+                            :value='1'
+                          />
+                          {{test}}
+                          <span class="checkmark"></span>
+                          I agree to the
+                        </label>
+                      </div>
                     </div>
                   </div>
-                  <div>
+                  <div class='d-flex justify-content-between align-content-center p-3 m-0 w-100'>
                     <div>
                       <img src='../../images/add-user.png' class='rounded' alt='instructor`s avatar'>
                     </div>
-                    <div>
-                      <h3>Title</h3>
-                      <span>Insta</span>
-
+                    <div class='d-flex flex-column align-content-center'>
+                      <h3 class='title'>Title</h3>
+                      <span class='inst'>Insta</span>
+                      <div class='profile-genres'>
+                        <span>genre1</span>
+                        <span>genre2</span>
+                        <span>length-2+</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -684,6 +702,7 @@ require('jquery.maskedinput/src/jquery.maskedinput')
 $(function() {
   $('[data-toggle="tooltip"]')
   .tooltip()
+  $('#instructorsModal').modal('show')
 })
 
 export default {
@@ -721,6 +740,7 @@ export default {
   },
   data() {
     return {
+      test: 1,
       loadingBtn: false,
       modalData: {
         first_name: '',
@@ -1251,10 +1271,37 @@ export default {
 </script>
 
 <style lang='scss'>
-//.modal-open .modal {
-//  overflow-y: hidden;
-//}
-
+.title {
+  color: #444;
+  font-family: Hind Vadodara;
+  font-size: 16px;
+  font-weight: 400;
+}
+.profile-genres span{
+  background-color: #f4f4f4;
+  border-radius: 2px;
+  color: #444;
+  display: inline-block;
+  font-family: Hind Vadodara, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  height: 31px;
+  margin-bottom: 5px;
+  margin-right: 5px;
+  padding: 4px 5px;
+  text-align: center;
+}
+.inst {
+  font-family: Hind Vadodara, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 24px;
+  color: #AAAAAA;
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+}
 .modal-open, .modal {
   padding-right: 0 !important
 }
