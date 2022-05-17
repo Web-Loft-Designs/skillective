@@ -240,6 +240,7 @@ Route::group(['middleware' => ['role:Student']], function () {
 
 
 Route::get('featured-instructors', 'InstructorsAPIController@getFeaturedInstructors');
+Route::get('relation-instructors/{instructor}', 'InstructorsAPIController@getRelationInstructors'); // get relation instructors
 
 
 Route::group(['middleware' => ['role:Admin|Instructor']], function () {
