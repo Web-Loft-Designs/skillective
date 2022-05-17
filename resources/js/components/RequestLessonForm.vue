@@ -287,58 +287,59 @@
               <li class='list-group-item'>
                 <div class='input-group align-items-center flex-nowrap'>
                   <div class='input-group-prepend'>
-                    <div
-                      class='form-group checkbox-wrapper'
-                    >
+                    <div class='form-group checkbox-wrapper'>
                       <div class='field'>
                         <label for='select-all-instructors'>
                           <input
                             v-model='selectAll'
                             type='checkbox'
                             id='select-all-instructors'
-                            :value='0'
+                            @input='onSelectAll'
                           />
                           <span class='checkmark'></span>
                         </label>
                       </div>
                     </div>
                   </div>
-                  <div class='d-flex justify-content-start align-items-center pt-2 m-0'>
+                  <div class='d-flex justify-content-start align-items-center pt-4 m-0 px-5 h5'>
                     <span>Select all instructors</span>
                   </div>
                 </div>
               </li>
-              <li class='list-group-item'>
+              <li
+                class='list-group-item'
+                v-for='instructor in instructors'
+                :key='instructor.id'
+              >
                 <div class='input-group align-items-center flex-nowrap'>
                   <div class='input-group-prepend'>
-                    <div
-                      class='form-group checkbox-wrapper'
-                    >
+                    <div class='form-group checkbox-wrapper'>
                       <div class='field'>
-                        <label for='accept-terms-instructors'>
+                        <label :for='`accept-terms-instructors${instructor.id}`'>
                           <input
-                            v-model='test'
+                            v-model='selectedInstructors'
                             type='checkbox'
-                            id='accept-terms-instructors'
-                            :value='1'
-                            @input='selectInstructor(test)'
+                            :id='`accept-terms-instructors${instructor.id}`'
+                            :value='`${instructor.id}`'
                           />
                           <span class='checkmark'></span>
                         </label>
                       </div>
                     </div>
                   </div>
-                  <div class='d-flex justify-content-around align-items-center p-3 m-0 w-100'>
+                  <div class='d-flex justify-content-between align-items-center px-5 m-0 w-100'>
                     <div class='instructor-avatar'>
-                      <img src='../../../public/images/about-1.jpg' alt='instructor`s avatar'>
+                      <img :src='instructor.profile.image' alt='instructor avatar'>
                     </div>
                     <div class='d-flex flex-column mt-0 align-items-center'>
-                      <h3 class='title'>Title</h3>
-                      <span class='inst'>@clown_228</span>
-                      <div class='profile-genres'>
-                        <span>genre1</span>
-                        <span>genre2</span>
-                        <span>length-2+</span>
+                      <h3 class='title'>{{instructor.full_name}}</h3>
+                      <span class='inst'>@{{instructor.profile.instagram_handle}}</span>
+                      <div class='profile-genres d-flex flex-column align-items-center mt-1'>
+                        <span v-if='instructor.genres.length > 0'>{{instructor.genres[0].title}}</span>
+                        <div>
+                          <span v-if='instructor.genres.length > 1'>{{instructor.genres[1].title}}</span>
+                          <span v-if='instructor.genres.length > 2'>+{{instructor.genres.length-2}}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -347,7 +348,13 @@
             </ul>
           </div>
           <div class='modal-footer'>
-            <button type='button' class='btn btn-success'>Save changes</button>
+            <loader-button
+              class='lesson__button'
+              :disabled='!selectedInstructors.length'
+              :is-loading='loadingAdd'
+              text="Add me to these instructor's client lists"
+              @click='addToInstructorsList'
+            />
           </div>
         </div>
       </div>
@@ -714,14 +721,12 @@ import {mapActions, mapMutations, mapState} from 'vuex'
 import {email, numeric, required} from 'vuelidate/lib/validators'
 import LoaderButton from './cart/LoaderButton/LoaderButton'
 import ct from 'countries-and-timezones'
-import photo from '../../images/avatar-main.png'
 
 require('jquery.maskedinput/src/jquery.maskedinput')
 
 $(function() {
   $('[data-toggle="tooltip"]')
   .tooltip()
-  $('#instructorsModal').modal('show')
 })
 
 export default {
@@ -759,7 +764,8 @@ export default {
   },
   data() {
     return {
-      test: false,
+      loadingAdd: false,
+      selectedInstructors: [],
       loadingBtn: false,
       modalData: {
         first_name: '',
@@ -801,7 +807,6 @@ export default {
       openRegisteredModal: false,
       loadingOtherInstructors: false,
       selectAll: false,
-      selectedInstructors: []
     }
   },
   watch: {
@@ -822,7 +827,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['storeErrors', 'storeErrorText']),
+    ...mapState(['storeErrors', 'storeErrorText', 'instructors']),
     priceError: function() {
       if (
         !this.fields.time_from ||
@@ -850,18 +855,34 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['addToClientList', 'createToClientList', 'addStudentToInstructorList']),
+    ...mapActions(['addToClientList', 'createToClientList', 'addStudentToInstructorList', 'getInstructors']),
     ...mapMutations(['CLEAR_INPUT']),
+    async addToInstructorsList() {
+      this.loadingAdd = true
+      const instructors = this.selectedInstructors.map(instructorId => +instructorId)
+      const data = {
+        required: this.studentId,
+        instructors
+      }
+      await this.addStudentToInstructorList(data)
+      this.loadingAdd = false
+      // this.closeAllInstructorsModal()
+    },
+    onSelectAll() {
+      this.selectAll
+        ? this.selectedInstructors = []
+        : this.instructors.forEach(instructor => this.selectedInstructors.push(+instructor.id))
+    },
     changeEmail() {
       if (this.storeErrors) {
         this.CLEAR_INPUT()
       }
     },
-    selectInstructor(instructorStatus) {
-      console.log(instructorStatus)
-    },
     openAllInstructorsModal() {
       $('#instructorsModal').modal('show')
+    },
+    closeAllInstructorsModal() {
+      $('#instructorsModal').modal('hide')
     },
     showJoinModal() {
       $('#joinClient').modal('show')
@@ -1100,7 +1121,7 @@ export default {
     }
   },
 
-  created: function() {
+  async created() {
     this.timeOptions = this.getTimeOptions()
     this.timeZomeOptions = ct.getAllTimezones()
 
@@ -1212,6 +1233,7 @@ export default {
       in_person: 'In Person',
       virtual: 'Virtual'
     }
+    await this.getInstructors(this.instructorId)
   },
   mounted() {
     this.initNewPlacesAutocomplete('lessonLocation')
@@ -1304,16 +1326,15 @@ export default {
 
 .instructor-avatar {
   position: relative;
-  border: 1px solid red;
-  width: 75px;
-  height: 75px;
-  border-radius: 50%;
-
+  width: 125px;
+  height: 125px;
   img {
     position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
+    width: 100%;
+    border-radius: 50%;
   }
 }
 

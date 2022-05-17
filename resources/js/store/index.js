@@ -9,18 +9,18 @@ export default new Vuex.Store({
   state: {
     storeErrors: {},
     storeErrorText: '',
+    instructors: [],
   },
   getters: {},
   mutations: {
+    SET_INSTRUCTORS: (state, data) => state.instructors = data,
     ERROR_HANDLER: (state, error) => {
-      console.log(error)
       state.storeErrors = {}
       state.storeErrorText = ''
       if (error.response !== undefined && error.response.status === 422) {
         state.storeErrors = error.response.data.errors || {}
         state.storeErrorText = error.response.data.message
-      } else if (error.response !== undefined && error.response.status ===
-        419) {
+      } else if (error.response !== undefined && error.response.status === 419) {
         state.storeErrorText = error.response.data.message ||
           'Unable to process your request. Reload the page please and try again'
       } else if (error.response !== undefined) {
@@ -33,6 +33,14 @@ export default new Vuex.Store({
     CLEAR_INPUT: (state) => state.storeErrors = {},
   },
   actions: {
+    async getInstructors({commit}, instructorId) {
+      try {
+        const res = await axios.get(`/api/relation-instructors/${instructorId}`)
+        commit('SET_INSTRUCTORS', res.data.data)
+      } catch (e) {
+        commit('ERROR_HANDLER', e)
+      }
+    },
     async addToClientList({commit}, instructorId) {
       try {
         await axios.post('/api/add-to-client-list',
