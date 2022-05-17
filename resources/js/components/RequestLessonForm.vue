@@ -886,10 +886,9 @@ export default {
         instructors
       }
       await this.addStudentToInstructorList(data)
-      this.instructors.forEach(instructor => {
-        this.instructorNames.push(this.selectedInstructors.filter(instructorId => instructorId === instructor.id))
-      })
-      console.log(this.instructorNames)
+      this.instructorNames = this.instructors
+        .filter(instructor => instructors.includes(instructor.id))
+        .map(instructor => instructor.full_name)
       this.loadingAdd = false
       // this.closeAllInstructorsModal()
     },
