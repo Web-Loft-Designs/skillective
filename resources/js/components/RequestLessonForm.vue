@@ -333,7 +333,13 @@
                     </div>
                     <div class='d-flex w-100 pl-4 flex-column mt-0 align-items-center'>
                       <h3 class='title'>{{ instructor.full_name }}</h3>
-                      <span class='inst'>@{{ instructor.profile.instagram_handle }}</span>
+                      <a
+                        class='inst'
+                        :href='`https://www.instagram.com/${instructor.profile.instagram_handle}`'
+                        target='_blank'
+                      >
+                        @{{ instructor.profile.instagram_handle }}
+                      </a>
                       <div class='profile-genres d-flex flex-column align-items-center mt-1'>
                         <span v-if='instructor.genres.length > 0'>{{ instructor.genres[0].title }}</span>
                         <div>
@@ -1389,6 +1395,9 @@ export default {
   display: flex;
   align-items: center;
   padding: 5px 0;
+  &:hover, &:visited {
+    color: #AAAAAA;
+  }
 }
 
 .modal-open, .modal {
