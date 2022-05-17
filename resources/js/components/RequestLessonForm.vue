@@ -331,14 +331,14 @@
                     <div class='instructor-avatar'>
                       <img :src='instructor.profile.image' alt='instructor avatar'>
                     </div>
-                    <div class='d-flex flex-column mt-0 align-items-center'>
-                      <h3 class='title'>{{instructor.full_name}}</h3>
-                      <span class='inst'>@{{instructor.profile.instagram_handle}}</span>
+                    <div class='d-flex w-100 pl-4 flex-column mt-0 align-items-center'>
+                      <h3 class='title'>{{ instructor.full_name }}</h3>
+                      <span class='inst'>@{{ instructor.profile.instagram_handle }}</span>
                       <div class='profile-genres d-flex flex-column align-items-center mt-1'>
-                        <span v-if='instructor.genres.length > 0'>{{instructor.genres[0].title}}</span>
+                        <span v-if='instructor.genres.length > 0'>{{ instructor.genres[0].title }}</span>
                         <div>
-                          <span v-if='instructor.genres.length > 1'>{{instructor.genres[1].title}}</span>
-                          <span v-if='instructor.genres.length > 2'>+{{instructor.genres.length-2}}</span>
+                          <span v-if='instructor.genres.length > 1'>{{ instructor.genres[1].title }}</span>
+                          <span v-if='instructor.genres.length > 2'>+{{ instructor.genres.length - 2 }}</span>
                         </div>
                       </div>
                     </div>
@@ -359,6 +359,26 @@
         </div>
       </div>
     </div>
+    <!--    <div class='modal' id='addedOtherInstructors' tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel'-->
+    <!--         aria-hidden='true'>-->
+    <!--      <div class='modal-dialog' role='document'>-->
+    <!--        <div class='modal-content'>-->
+    <!--          <div class='modal-header'>-->
+    <!--            <h5 class='modal-title' id='exampleModalLabel'>Modal title</h5>-->
+    <!--            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>-->
+    <!--              <span aria-hidden='true'>&times;</span>-->
+    <!--            </button>-->
+    <!--          </div>-->
+    <!--          <div class='modal-body'>-->
+    <!--            ...-->
+    <!--          </div>-->
+    <!--          <div class='modal-footer'>-->
+    <!--            <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>-->
+    <!--            <button type='button' class='btn btn-primary'>Save changes</button>-->
+    <!--          </div>-->
+    <!--        </div>-->
+    <!--      </div>-->
+    <!--    </div>-->
     <magnific-popup-modal
       class='ie-fix'
       @modalClosed='clearFormAndClosePopup'
@@ -807,6 +827,7 @@ export default {
       openRegisteredModal: false,
       loadingOtherInstructors: false,
       selectAll: false,
+      instructorNames: []
     }
   },
   watch: {
@@ -865,6 +886,10 @@ export default {
         instructors
       }
       await this.addStudentToInstructorList(data)
+      this.instructors.forEach(instructor => {
+        this.instructorNames.push(this.selectedInstructors.filter(instructorId => instructorId === instructor.id))
+      })
+      console.log(this.instructorNames)
       this.loadingAdd = false
       // this.closeAllInstructorsModal()
     },
@@ -1328,6 +1353,8 @@ export default {
   position: relative;
   width: 125px;
   height: 125px;
+  margin-top: 40px;
+
   img {
     position: absolute;
     top: 0;
@@ -1403,6 +1430,13 @@ export default {
 }
 
 #instructorsModal {
+  .modal-body {
+    ul {
+      overflow-y: auto;
+      height: 530px;
+    }
+  }
+
   .modal-footer {
     justify-content: center;
 
