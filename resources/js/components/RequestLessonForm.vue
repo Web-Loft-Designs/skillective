@@ -365,26 +365,32 @@
         </div>
       </div>
     </div>
-    <!--    <div class='modal' id='addedOtherInstructors' tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel'-->
-    <!--         aria-hidden='true'>-->
-    <!--      <div class='modal-dialog' role='document'>-->
-    <!--        <div class='modal-content'>-->
-    <!--          <div class='modal-header'>-->
-    <!--            <h5 class='modal-title' id='exampleModalLabel'>Modal title</h5>-->
-    <!--            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>-->
-    <!--              <span aria-hidden='true'>&times;</span>-->
-    <!--            </button>-->
-    <!--          </div>-->
-    <!--          <div class='modal-body'>-->
-    <!--            ...-->
-    <!--          </div>-->
-    <!--          <div class='modal-footer'>-->
-    <!--            <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>-->
-    <!--            <button type='button' class='btn btn-primary'>Save changes</button>-->
-    <!--          </div>-->
-    <!--        </div>-->
-    <!--      </div>-->
-    <!--    </div>-->
+    <div class='modal' id='addedOtherInstructors' tabindex='-1' role='dialog'
+         aria-labelledby='addedOtherInstructorsLabel'
+         aria-hidden='true'>
+      <div class='modal-dialog' role='document'>
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h5 class='modal-title' id='addedOtherInstructorsLabel'>Thank you from all of us!</h5>
+            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+              <span aria-hidden='true'>&times;</span>
+            </button>
+          </div>
+          <div class='modal-body'>
+            <p>
+              You should have recieved an email to login and view all your instructos whose client lists you have jonied.
+              We appreciate you being here with us!
+            </p>
+            <strong>
+              {{ instructorNames.join(', ') }}.
+            </strong>
+          </div>
+          <div class='modal-footer'>
+            <button type='button' data-dismiss='modal' class='btn btn-success'>Ok</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <magnific-popup-modal
       class='ie-fix'
       @modalClosed='clearFormAndClosePopup'
@@ -833,7 +839,8 @@ export default {
       openRegisteredModal: false,
       loadingOtherInstructors: false,
       selectAll: false,
-      instructorNames: []
+      instructorNames: [],
+      newStudentId: null
     }
   },
   watch: {
@@ -888,15 +895,16 @@ export default {
       this.loadingAdd = true
       const instructors = this.selectedInstructors.map(instructorId => +instructorId)
       const data = {
-        required: this.studentId,
+        required: this.loggedInStudent ? this.studentId : this.newStudentId.toString(),
         instructors
       }
       await this.addStudentToInstructorList(data)
       this.instructorNames = this.instructors
-        .filter(instructor => instructors.includes(instructor.id))
-        .map(instructor => instructor.full_name)
+      .filter(instructor => instructors.includes(instructor.id))
+      .map(instructor => instructor.full_name)
       this.loadingAdd = false
-      // this.closeAllInstructorsModal()
+      this.closeAllInstructorsModal()
+      $('#addedOtherInstructors').modal('show')
     },
     onSelectAll() {
       this.selectAll
@@ -949,7 +957,7 @@ export default {
           mobile_phone: this.modalData.mobile_phone,
           newsletter: this.modalData.newsletter
         }
-        await this.createToClientList(data)
+        this.newStudentId = await this.createToClientList(data)
         if (!this.storeErrors?.email?.length) {
           this.closeForm()
           this.showSuccessAddedModal()
@@ -1395,6 +1403,7 @@ export default {
   display: flex;
   align-items: center;
   padding: 5px 0;
+
   &:hover, &:visited {
     color: #AAAAAA;
   }
