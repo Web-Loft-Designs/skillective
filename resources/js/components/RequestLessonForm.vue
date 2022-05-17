@@ -285,33 +285,56 @@
           <div class='modal-body'>
             <ul class='list-group'>
               <li class='list-group-item'>
-                <div class='input-group flex-nowrap'>
+                <div class='input-group align-items-center flex-nowrap'>
                   <div class='input-group-prepend'>
                     <div
-                      class="form-group checkbox-wrapper"
+                      class='form-group checkbox-wrapper'
                     >
-                      <div class="field">
-                        <label for="accept-terms">
+                      <div class='field'>
+                        <label for='select-all-instructors'>
                           <input
-                            v-model="test"
-                            type="checkbox"
-                            id="accept-terms"
-                            :value='1'
+                            v-model='selectAll'
+                            type='checkbox'
+                            id='select-all-instructors'
+                            :value='0'
                           />
-                          {{test}}
-                          <span class="checkmark"></span>
-                          I agree to the
+                          <span class='checkmark'></span>
                         </label>
                       </div>
                     </div>
                   </div>
-                  <div class='d-flex justify-content-between align-content-center p-3 m-0 w-100'>
-                    <div>
-                      <img src='../../images/add-user.png' class='rounded' alt='instructor`s avatar'>
+                  <div class='d-flex justify-content-start align-items-center pt-2 m-0'>
+                    <span>Select all instructors</span>
+                  </div>
+                </div>
+              </li>
+              <li class='list-group-item'>
+                <div class='input-group align-items-center flex-nowrap'>
+                  <div class='input-group-prepend'>
+                    <div
+                      class='form-group checkbox-wrapper'
+                    >
+                      <div class='field'>
+                        <label for='accept-terms-instructors'>
+                          <input
+                            v-model='test'
+                            type='checkbox'
+                            id='accept-terms-instructors'
+                            :value='1'
+                            @input='selectInstructor(test)'
+                          />
+                          <span class='checkmark'></span>
+                        </label>
+                      </div>
                     </div>
-                    <div class='d-flex flex-column align-content-center'>
+                  </div>
+                  <div class='d-flex justify-content-around align-items-center p-3 m-0 w-100'>
+                    <div class='instructor-avatar'>
+                      <img src='../../../public/images/about-1.jpg' alt='instructor`s avatar'>
+                    </div>
+                    <div class='d-flex flex-column mt-0 align-items-center'>
                       <h3 class='title'>Title</h3>
-                      <span class='inst'>Insta</span>
+                      <span class='inst'>@clown_228</span>
                       <div class='profile-genres'>
                         <span>genre1</span>
                         <span>genre2</span>
@@ -321,15 +344,10 @@
                   </div>
                 </div>
               </li>
-              <li class='list-group-item'>Dapibus ac facilisis in</li>
-              <li class='list-group-item'>Morbi leo risus</li>
-              <li class='list-group-item'>Porta ac consectetur ac</li>
-              <li class='list-group-item'>Vestibulum at eros</li>
             </ul>
           </div>
           <div class='modal-footer'>
-            <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>
-            <button type='button' class='btn btn-primary'>Save changes</button>
+            <button type='button' class='btn btn-success'>Save changes</button>
           </div>
         </div>
       </div>
@@ -696,6 +714,7 @@ import {mapActions, mapMutations, mapState} from 'vuex'
 import {email, numeric, required} from 'vuelidate/lib/validators'
 import LoaderButton from './cart/LoaderButton/LoaderButton'
 import ct from 'countries-and-timezones'
+import photo from '../../images/avatar-main.png'
 
 require('jquery.maskedinput/src/jquery.maskedinput')
 
@@ -740,7 +759,7 @@ export default {
   },
   data() {
     return {
-      test: 1,
+      test: false,
       loadingBtn: false,
       modalData: {
         first_name: '',
@@ -780,7 +799,9 @@ export default {
       fieldsDisabled: false,
       isDateInputInit: false,
       openRegisteredModal: false,
-      loadingOtherInstructors: false
+      loadingOtherInstructors: false,
+      selectAll: false,
+      selectedInstructors: []
     }
   },
   watch: {
@@ -835,6 +856,9 @@ export default {
       if (this.storeErrors) {
         this.CLEAR_INPUT()
       }
+    },
+    selectInstructor(instructorStatus) {
+      console.log(instructorStatus)
     },
     openAllInstructorsModal() {
       $('#instructorsModal').modal('show')
@@ -1277,7 +1301,23 @@ export default {
   font-size: 16px;
   font-weight: 400;
 }
-.profile-genres span{
+
+.instructor-avatar {
+  position: relative;
+  border: 1px solid red;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+  }
+}
+
+.profile-genres span {
   background-color: #f4f4f4;
   border-radius: 2px;
   color: #444;
@@ -1291,6 +1331,7 @@ export default {
   padding: 4px 5px;
   text-align: center;
 }
+
 .inst {
   font-family: Hind Vadodara, sans-serif;
   font-style: normal;
@@ -1302,6 +1343,7 @@ export default {
   align-items: center;
   padding: 5px 0;
 }
+
 .modal-open, .modal {
   padding-right: 0 !important
 }
@@ -1337,5 +1379,15 @@ export default {
 
 .tooltip {
   font-size: 10px;
+}
+
+#instructorsModal {
+  .modal-footer {
+    justify-content: center;
+
+    button {
+      width: 100%;
+    }
+  }
 }
 </style>
