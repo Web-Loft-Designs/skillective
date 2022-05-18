@@ -28,7 +28,8 @@ class StudentAddClientListAPIController extends AppBaseController
 
     public function addToClientList(StudentAddClientListRequest $request)
     {
-        $student = Auth::user();
+
+        $student = $this->userRepository->find($request->required);
         return $this->toClientList($request, $student);
     }
 
@@ -63,7 +64,7 @@ class StudentAddClientListAPIController extends AppBaseController
                 $instructorGenresIds->push($instructor->genres->pluck('id')->toArray());
 
                 $stdunInstrApi = new StudentInstructorsAPIController($this->userRepository);
-                $stdunInstrApi->addAndMarkAsFavorite($instructor->id);
+                $stdunInstrApi->addAndMarkAsFavorite($student, $instructor->id);
 
                 $message .= 'Client ' . $student->getName() . ' added to instructor ' . $instructor->getName();
 
