@@ -889,7 +889,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['addToClientList', 'createToClientList', 'addStudentToInstructorList', 'getInstructors']),
+    ...mapActions(['addToClientList', 'createToClientList', 'addStudentToInstructorList', 'getInstructors', 'geoNotification','virtualNotification']),
     ...mapMutations(['CLEAR_INPUT']),
     async addToInstructorsList() {
       this.loadingAdd = true
@@ -903,6 +903,7 @@ export default {
       .filter(instructor => instructors.includes(instructor.id))
       .map(instructor => instructor.full_name)
       this.loadingAdd = false
+      this.addingNotification()
       this.closeAllInstructorsModal()
       $('#addedOtherInstructors').modal('show')
     },
@@ -977,8 +978,15 @@ export default {
       return `Click here to add your contact info to ${ this.instructorName }'s Client List so you can be notified when classes, privates or workshops become available.`
     },
     async addingNotification() {
-      this.apiPost('/api/student/instructor/geo-notifications/' + this.instructorId)
-      this.apiPost('/api/student/instructor/virtual-lesson-notifications/' + this.instructorId)
+      let data = {
+        instructor: []
+      }
+      this.selectedInstructors.length 
+        ? data.instructor = this.selectedInstructors 
+        : data.instructor.push(this.instructorId)
+      console.log(data, 'data')
+      await this.geoNotification(data)
+      await this.virtualNotification(data)
     },
     async successJoinedToClient() {
       this.closeJoinModal()
