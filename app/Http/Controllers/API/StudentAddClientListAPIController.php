@@ -28,8 +28,7 @@ class StudentAddClientListAPIController extends AppBaseController
 
     public function addToClientList(StudentAddClientListRequest $request)
     {
-        //$student = Auth::user();
-        $student = User::find(237);
+        $student = Auth::user();
         return $this->toClientList($request, $student);
     }
 
