@@ -66,7 +66,21 @@ export default new Vuex.Store({
       } catch (e) {
         commit('ERROR_HANDLER', e)
       }
-    }
+    },
+    async geoNotification(context, data) {
+      try {
+        await axios.post('/api/student/instructor/geo-notifications',data)
+      } catch (e) {
+        commit('ERROR_HANDLER', e)
+      }
+    },
+    async virtualNotification(context, data) {
+      try {
+        await axios.post('/api/student/instructor/virtual-lesson-notifications',data)
+      } catch (e) {
+        commit('ERROR_HANDLER', e)
+      }
+    },
   },
   modules: {
     cart
