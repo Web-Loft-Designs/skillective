@@ -34,8 +34,11 @@ class StudentAddClientListAPIController extends AppBaseController
 
     public function createToClientList(StudentSmallRegisterRequest $request)
     {
+
         $student = UserRegistrator::registerInactiveStudent($request);
+        $this->toClientList($request, $student);
         return $student;
+
     }
 
     private function toClientList($request, $student)

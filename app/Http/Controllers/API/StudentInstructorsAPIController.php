@@ -53,10 +53,13 @@ class StudentInstructorsAPIController extends AppBaseController
     public function add(AddStudentInstructorsAPIRequest $request)
     {
     	$count_added = 0;
+        $user = $this->userRepository->find($request->required);
+
 		foreach ($request->input('instructors') as $instructorId){
 			$instructor = $this->userRepository->find($instructorId);
-			if ($instructor->hasRole($this->userRepository->model()::ROLE_INSTRUCTOR) && !Auth::user()->hasOwnInstructor($instructorId)) {
-				Auth::user()->instructors()->attach( $instructorId );
+            $instructor->clients()->syncWithoutDetaching( $user->id );
+			if ($instructor->hasRole($this->userRepository->model()::ROLE_INSTRUCTOR) && !$user->hasOwnInstructor($instructorId)) {
+                $user->instructors()->attach( $instructorId );
 				$count_added++;
 			}
 		}
