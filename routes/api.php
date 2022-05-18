@@ -191,6 +191,7 @@ Route::get('cart/total', 'CartAPIController@getCartSummary');
 Route::post('cart/checkout', 'CartAPIController@checkout');
 Route::get('cart/promo/{promo}', 'CartAPIController@checkIsPromoIsValid');
 
+Route::post('student/instructors', 'StudentInstructorsAPIController@add'); // add many
 Route::group(['middleware' => ['role:Student']], function () {
 
 
@@ -216,7 +217,7 @@ Route::group(['middleware' => ['role:Student']], function () {
 	Route::get('student/pre-r-lessons/{lesson}', 'StudentLibraryAPIController@getStudentLessonById');
 
 	Route::get('student/instructors', 'StudentInstructorsAPIController@index'); // current student instructors
-	Route::post('student/instructors', 'StudentInstructorsAPIController@add'); // add many
+
 	Route::post('student/instructors/remove', 'StudentInstructorsAPIController@removeMany');
 	Route::delete('student/instructor/{instructor}', 'StudentInstructorsAPIController@remove'); // remove instructor
 

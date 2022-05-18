@@ -899,6 +899,7 @@ export default {
         instructors
       }
       await this.addStudentToInstructorList(data)
+      await this.addToClientList(this.selectedInstructors)
       this.instructorNames = this.instructors
       .filter(instructor => instructors.includes(instructor.id))
       .map(instructor => instructor.full_name)
@@ -978,15 +979,16 @@ export default {
       return `Click here to add your contact info to ${ this.instructorName }'s Client List so you can be notified when classes, privates or workshops become available.`
     },
     async addingNotification() {
+      if (this.loggedInStudent) {
       let data = {
         instructor: []
       }
       this.selectedInstructors.length 
         ? data.instructor = this.selectedInstructors 
         : data.instructor.push(this.instructorId)
-      console.log(data, 'data')
       await this.geoNotification(data)
       await this.virtualNotification(data)
+      }
     },
     async successJoinedToClient() {
       this.closeJoinModal()
