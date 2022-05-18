@@ -5,6 +5,7 @@ namespace App\Models;
 use Eloquent as Model;
 use Auth;
 use App\Facades\BraintreeProcessor;
+use Illuminate\Support\Carbon;
 use Log;
 use App\Models\PurchasedLesson;
 use App\Models\Setting;
@@ -136,5 +137,19 @@ class PreRecordedLesson extends Model
         $purchashedLesson->save();
 
         return $purchashedLesson;
+    }
+
+    public function setCreatedAtAttribute($value)
+    {
+
+        $date = $value;
+        $user = Auth::user();
+        $timezone = getTimezoneByCoordinates($user->profile->lat, $user->profile->lng);
+        if( $timezone )
+        {
+            $date = Carbon::now()->timezone($timezone->timeZoneId);
+        }
+        $this->attributes['created_at'] = $date;
+
     }
 }
