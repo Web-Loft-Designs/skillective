@@ -2,7 +2,7 @@
   <div id='lesson-form-container'>
     <div class='d-grid gap-2 d-md-block'>
       <button
-        class='btn btn-success btn-sm text-wrap'
+        class='btn green btn-sm text-wrap'
         type='button'
         data-toggle='tooltip'
         v-if='showCreateBtn'
@@ -41,7 +41,7 @@
             <button
               type='button'
               aria-label='Close'
-              class='btn btn-success btn-sm'
+              class='btn green btn-sm'
               @click='successJoinedToClient'
             >
               Join client list
@@ -1472,4 +1472,12 @@ export default {
     }
   }
 }
+  .green {
+    background-color: #8ada00;
+    color: #fff;
+
+    &:hover {
+      color: #fff;
+    }
+  }
 </style>
