@@ -280,8 +280,6 @@ class BraintreeProcessor {
 			'lineItems'				=> $lineItems
 		]);
 
-        print_r(number_format($booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2, '.', ''));exit();
-
 		if ($result->success) {
 			return $result->transaction;
 		} else {
@@ -332,8 +330,6 @@ class BraintreeProcessor {
 			'descriptor'			=> $descriptor,
 			'lineItems'				=> $lineItems
 		]);
-
-        print_r(number_format((float)$purchasedLesson->preRecordedLesson->price + $serviceFee + $expectedBrainTreeFee, 2, '.', ''));exit();
 
 		if ($result->success) {
 			return $result->transaction;
