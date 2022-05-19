@@ -10,7 +10,7 @@
         @click='showJoinModal'
         :title='tooltipContent()'
       >
-        Add me to {{ instructorName }}s Client List
+        Add me to {{ instructorName }}'s Client List
       </button>
     </div>
     <!--    modal1-->
@@ -358,7 +358,7 @@
               class='lesson__button'
               :disabled='!selectedInstructors.length'
               :is-loading='loadingAdd'
-              text="Add me to these instructor's client lists"
+              text="Add me to these instructors client lists"
               @click='addToInstructorsList'
             />
           </div>
