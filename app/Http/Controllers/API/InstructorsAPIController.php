@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -50,4 +51,18 @@ class InstructorsAPIController extends AppBaseController
 
         return $this->sendResponse($featuredInstructors);
     }
+
+    /**
+     * @param User $instructor
+     * @return void
+     */
+    public function getRelationInstructors(User $instructor)
+    {
+
+        $related = $this->userRepository->getRelationInstructors($instructor);
+
+        return $this->sendResponse($related);
+
+    }
+
 }

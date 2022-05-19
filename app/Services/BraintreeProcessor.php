@@ -270,7 +270,7 @@ class BraintreeProcessor {
 
 		$result = $this->gateway->transaction()->sale([
 			'merchantAccountId'		=> $subMerchantId,
-			'amount'				=> number_format((float)$booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2, '.', ''),
+			'amount'				=> number_format($booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2, '.', ''),
 			'paymentMethodToken'	=> $paymentMethodVaultToken,
 			'serviceFeeAmount'		=> number_format((float)$serviceFee + $expectedBrainTreeFee, 2, '.', ''),
 			'options'				=> $options,
@@ -408,7 +408,7 @@ class BraintreeProcessor {
 	}
 
 	public function updateMerchant($user, $inputData){
-		
+
 		if($inputData['funding_accountNumber_confirmation'] !== $inputData['funding_accountNumber']){
 			throw new \Exception('Bank Account Number and Bank Account Number Confirmation do not match');
 		}
