@@ -270,15 +270,17 @@ class BraintreeProcessor {
 
 		$result = $this->gateway->transaction()->sale([
 			'merchantAccountId'		=> $subMerchantId,
-			'amount'				=> round($booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2),
+			'amount'				=> number_format($booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2, '.', ''),
 			'paymentMethodToken'	=> $paymentMethodVaultToken,
-			'serviceFeeAmount'		=> round($serviceFee + $expectedBrainTreeFee, 2),
+			'serviceFeeAmount'		=> number_format((float)$serviceFee + $expectedBrainTreeFee, 2, '.', ''),
 			'options'				=> $options,
 			'orderId'				=> str_pad($booking->id, 6, "0", STR_PAD_LEFT),
 			'customer'				=> $customer,
 			'descriptor'			=> $descriptor,
 			'lineItems'				=> $lineItems
 		]);
+
+        print_r(number_format($booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2, '.', ''));exit();
 
 		if ($result->success) {
 			return $result->transaction;
@@ -321,15 +323,17 @@ class BraintreeProcessor {
 
 		$result = $this->gateway->transaction()->sale([
 			'merchantAccountId'		=> $subMerchantId,
-			'amount'				=> round($purchasedLesson->preRecordedLesson->price + $serviceFee + $expectedBrainTreeFee, 2),
+			'amount'				=> number_format((float)$purchasedLesson->preRecordedLesson->price + $serviceFee + $expectedBrainTreeFee, 2, '.', ''),
 			'paymentMethodToken'	=> $paymentMethodVaultToken,
-			'serviceFeeAmount'		=> round($serviceFee + $expectedBrainTreeFee, 2),
+			'serviceFeeAmount'		=> number_format((float)$serviceFee + $expectedBrainTreeFee, 2, '.', ''),
 			'options'				=> $options,
 			'orderId'				=> str_pad($purchasedLesson->id, 6, "0", STR_PAD_LEFT),
 			'customer'				=> $customer,
 			'descriptor'			=> $descriptor,
 			'lineItems'				=> $lineItems
 		]);
+
+        print_r(number_format((float)$purchasedLesson->preRecordedLesson->price + $serviceFee + $expectedBrainTreeFee, 2, '.', ''));exit();
 
 		if ($result->success) {
 			return $result->transaction;
