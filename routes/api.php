@@ -191,7 +191,6 @@ Route::get('cart/total', 'CartAPIController@getCartSummary');
 Route::post('cart/checkout', 'CartAPIController@checkout');
 Route::get('cart/promo/{promo}', 'CartAPIController@checkIsPromoIsValid');
 
-Route::post('student/instructors', 'StudentInstructorsAPIController@add'); // add many
 Route::group(['middleware' => ['role:Student']], function () {
 
 
@@ -217,17 +216,17 @@ Route::group(['middleware' => ['role:Student']], function () {
 	Route::get('student/pre-r-lessons/{lesson}', 'StudentLibraryAPIController@getStudentLessonById');
 
 	Route::get('student/instructors', 'StudentInstructorsAPIController@index'); // current student instructors
-
+	Route::post('student/instructors', 'StudentInstructorsAPIController@add'); // add many
 	Route::post('student/instructors/remove', 'StudentInstructorsAPIController@removeMany');
 	Route::delete('student/instructor/{instructor}', 'StudentInstructorsAPIController@remove'); // remove instructor
 
 	Route::post('student/instructor/favorite/{instructor}', 'StudentInstructorsAPIController@addAndMarkAsFavorite');
 	Route::delete('student/instructor/favorite/{instructor}', 'StudentInstructorsAPIController@removeFromFavorites');
 
-	Route::post('student/instructor/geo-notifications', 'StudentInstructorsAPIController@enableGeoNotifications');
+	Route::post('student/instructor/geo-notifications/{instructor}', 'StudentInstructorsAPIController@enableGeoNotifications');
 	Route::delete('student/instructor/geo-notifications/{instructor}', 'StudentInstructorsAPIController@disableGeoNotifications');
 
-	Route::post('student/instructor/virtual-lesson-notifications', 'StudentInstructorsAPIController@enableVirtualLessonNotifications');
+	Route::post('student/instructor/virtual-lesson-notifications/{instructor}', 'StudentInstructorsAPIController@enableVirtualLessonNotifications');
 	Route::delete('student/instructor/virtual-lesson-notifications/{instructor}', 'StudentInstructorsAPIController@disableVirtualLessonNotifications');
 
 	Route::get('instructors', 'InstructorsAPIController@index'); // get instructors list to add as student instructors
@@ -241,7 +240,6 @@ Route::group(['middleware' => ['role:Student']], function () {
 
 
 Route::get('featured-instructors', 'InstructorsAPIController@getFeaturedInstructors');
-Route::get('relation-instructors/{instructor}', 'InstructorsAPIController@getRelationInstructors'); // get relation instructors
 
 
 Route::group(['middleware' => ['role:Admin|Instructor']], function () {

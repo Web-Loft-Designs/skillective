@@ -226,8 +226,7 @@ class CartAPIController extends AppBaseController
                     }
                 }
 
-                $lesson->book($user_repository, $request, $nonce ? $nonce[$key] : "", $student)->approve();
-
+                $lesson->book($user_repository, $request, $nonce ? $nonce[$key] : "", $student);
             } else {
                 array_push($appendedGenres, $cartItem->preRecordedLesson->genre_id);
 

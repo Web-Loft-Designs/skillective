@@ -10,7 +10,7 @@ class StudentAddClientListRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'instructor_id' => ['required']
+            'instructor_id' => ['required', 'numeric', Rule::exists('users', 'id')]
         ];
     }
 }
