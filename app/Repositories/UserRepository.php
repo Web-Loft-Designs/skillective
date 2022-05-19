@@ -601,31 +601,4 @@ class UserRepository extends BaseRepository
             })
             ->get();
     }
-
-    /**
-     * @param $instructor
-     * @return mixed
-     */
-    public function getRelationInstructors($instructor)
-    {
-
-        $instructor_genres = $instructor->genres->pluck('id')->toArray();
-
-        if( Auth::check() )
-        {
-            $instructor_genres = Auth::user()->genres->pluck('id')->toArray();
-        }
-
-        $related = User::whereHas('roles', function ($query) {
-            $query->where('name', USER::ROLE_INSTRUCTOR);
-        })
-            ->whereHas('genres', function ($query) use ($instructor_genres) {
-                return $query->whereIn('id', $instructor_genres);
-            })
-            ->where('id', '!=', $instructor->id)
-            ->get()->toArray();
-
-        return $related;
-
-    }
 }

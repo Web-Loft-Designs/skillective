@@ -95,6 +95,7 @@ export default {
     urlHelper.updateQueryParams({
       page: params.page === 1 ? null : params.page,
     }, false)
+    console.log(this.lessons)
     this.$root.$on('globalShopLoadLessons', (params) => {
       this.loadLessons(params)
     })

@@ -10,18 +10,18 @@
           >
             All
           </a>
-<!--          <a-->
-<!--            href="#"-->
-<!--            @click.prevent="toggleShowOnly('pending')"-->
-<!--            :class="{ active: showOnly == 'pending' }"-->
-<!--            >Pending ({{ pendingCount }})</a-->
-<!--          >-->
-<!--          <a-->
-<!--            href="#"-->
-<!--            @click.prevent="toggleShowOnly('approved')"-->
-<!--            :class="{ active: showOnly == 'approved' }"-->
-<!--            >Approved-->
-<!--          </a>-->
+          <a
+            href="#"
+            @click.prevent="toggleShowOnly('pending')"
+            :class="{ active: showOnly == 'pending' }"
+            >Pending ({{ pendingCount }})</a
+          >
+          <a
+            href="#"
+            @click.prevent="toggleShowOnly('approved')"
+            :class="{ active: showOnly == 'approved' }"
+            >Approved
+          </a>
           <a
             href="#"
             v-if="showPastLesson"

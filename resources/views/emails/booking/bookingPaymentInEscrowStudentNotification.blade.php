@@ -1,4 +1,4 @@
-<p>Your lesson or event with [[instructor_name]] has been booked</p>
+<p>Booking payment hold in escrow</p>
 <ul>
     <li>Booking ID: [[id]]</li>
     <li>Price: [[spot_price]]</li>

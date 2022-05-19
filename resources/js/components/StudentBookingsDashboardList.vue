@@ -11,6 +11,11 @@
           >Current</a>
           <a
             href="#"
+            @click.prevent="toggleShowOnly('pending')"
+            :class="{'active':(showOnly=='pending')}"
+          >Pending</a>
+          <a
+            href="#"
             @click.prevent="toggleShowOnly('past')"
             :class="{'active':(showOnly=='past')}"
           >Past</a>
@@ -19,6 +24,11 @@
             @click.prevent="toggleShowOnly('cancelled')"
             :class="{'active':(showOnly=='cancelled')}"
           >Cancelled</a>
+          <a
+            href="#"
+            @click.prevent="toggleShowOnly('pending_cancellation')"
+            :class="{'active':(showOnly=='pending_cancellation')}"
+          >Pending cancellation</a>
           <a
             href="#"
             @click.prevent="toggleShowOnly('lesson_requests')"
@@ -147,7 +157,7 @@
             </td>
 
             <td v-else-if="booking.lesson_id != null">
-              <a
+              <a 
                  @click.prevent="addToCart(booking.lesson_id)"
                 class="btn-approve"
               >Add to cart</a>
@@ -192,7 +202,7 @@ export default {
   },
   methods: {
     ...mapActions(['addItemToCartAtStart']),
-    addToCart: async function(lessonId) {
+    addToCart: async function(lessonId) {    
       await this.addItemToCartAtStart({
         lessonId,
         specialRequest: this.specialRequestText || "",

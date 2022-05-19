@@ -117,12 +117,12 @@
       <div v-if='isOpened' class='dashboard-bookings-item--content-bottom'>
         <div v-if="showOnly !== 'past'" class='tabs-inner'>
           <ul>
-<!--            <li-->
-<!--	            @click="selectTab('new')"-->
-<!--	            :class="{ 'is-active': active === 'new' }"-->
-<!--            >-->
-<!--              New bookings ({{ new_bookings_count }})-->
-<!--            </li>-->
+            <li
+	            @click="selectTab('new')"
+	            :class="{ 'is-active': active === 'new' }"
+            >
+              New bookings ({{ new_bookings_count }})
+            </li>
             <li
 	            @click="selectTab('cancellation')"
 	            :class="{ 'is-active': active === 'cancellation' }"
@@ -326,7 +326,7 @@
 
         <div class='aprooved-bookings'>
           <h3>
-            Bookings ({{ approvedBookings.length }})
+            Approved Bookings ({{ approvedBookings.length }})
             <button
 	            v-if="showOnly !== 'past' && bookings_students.length > 0"
 	            @click='notifyAll'
