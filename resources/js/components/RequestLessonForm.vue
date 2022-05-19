@@ -10,7 +10,7 @@
         @click='showJoinModal'
         :title='tooltipContent()'
       >
-        Add me to {{ instructorName }}'s Client List
+        Add me to {{ instructorName }}s Client List
       </button>
     </div>
     <!--    modal1-->
@@ -260,7 +260,7 @@
             <button
               type='button'
               aria-label='Close'
-              class='btn btn-success btn-sm'
+              class='btn green btn-sm'
               data-dismiss='modal'
               @click='openAllInstructorsModal'
             >
@@ -378,7 +378,7 @@
           </div>
           <div class='modal-body'>
             <p>
-              You should have recieved an email to login and view all your instructos whose client lists you have jonied.
+              You should have recieved an email to login and view all your instructors whose client lists you have jonied.
               We appreciate you being here with us!
             </p>
             <strong>
@@ -386,7 +386,7 @@
             </strong>
           </div>
           <div class='modal-footer'>
-            <button type='button' data-dismiss='modal' class='btn btn-success'>Ok</button>
+            <button type='button' data-dismiss='modal' class='btn green'>Ok</button>
           </div>
         </div>
       </div>
@@ -1342,7 +1342,7 @@ export default {
           .format('DD')
         )
       }, 10)
-
+      
       this.fieldsDisabled =
         this.fields.id != null && this.loggedInStudent === true
 
@@ -1473,10 +1473,22 @@ export default {
   }
 }
 .green {
-    background-color: #8ada00;
     color: #fff;
+    font-family: Poppins;
+    font-size: 14px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    background-image: linear-gradient(180deg, #11cf13 0%, #01bd00 100%);
+    transition: all 0.25s ease;
+    outline: none !important;
+    box-shadow: none !important;
+
     &:hover {
-        color: #fff;
+      background-image: linear-gradient(180deg, #0ea510 0%, #038202 100%);
+      color: #fff;
     }
 }
 </style>
