@@ -8,8 +8,10 @@ use App\Http\Requests\API\StudentRegisterRequest;
 use App\Http\Requests\StudentAddClientListRequest;
 use App\Http\Requests\StudentCreateClientListRequest;
 use App\Http\Requests\StudentSmallRegisterRequest;
+use App\Models\User;
 use App\Repositories\StudentAddClientListRepository;
 use App\Repositories\UserRepository;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class StudentAddClientListAPIController extends AppBaseController
@@ -26,14 +28,18 @@ class StudentAddClientListAPIController extends AppBaseController
 
     public function addToClientList(StudentAddClientListRequest $request)
     {
-        $student = Auth::user();
+
+        $student = $this->userRepository->find($request->required);
         return $this->toClientList($request, $student);
     }
 
     public function createToClientList(StudentSmallRegisterRequest $request)
     {
+
         $student = UserRegistrator::registerInactiveStudent($request);
-        return $this->toClientList($request, $student);
+        $this->toClientList($request, $student);
+        return $student;
+
     }
 
     private function toClientList($request, $student)
@@ -45,17 +51,31 @@ class StudentAddClientListAPIController extends AppBaseController
         $student = $this->userRepository->find($student->id);
 
         if ($student->hasRole($this->userRepository->model()::ROLE_STUDENT)) {
-            $instructor = $this->userRepository->find($request->instructor_id);
-            $instructor->clients()->syncWithoutDetaching($student->id);
-            $instructorGenresIds = $instructor->genres->pluck('id');
-            $instructorsFromGenres = $this->userRepository->getInstructorFromGenres($instructorGenresIds)->toArray();
 
-            $stdunInstrApi = new StudentInstructorsAPIController($this->userRepository);
-            $stdunInstrApi->addAndMarkAsFavorite($instructor->id);
+            $instructors = (array) $request->instructor_id;
+            $message = null;
+            $instructorGenresIds = new Collection();
 
-            $message = 'Client ' . $student->getName() . ' added to instructor ' . $instructor->getName();
+            foreach ( $instructors as $item )
+            {
+
+                $instructor = $this->userRepository->find($item);
+                $instructor->clients()->syncWithoutDetaching($student->id);
+                $instructorGenresIds->push($instructor->genres->pluck('id')->toArray());
+
+                $stdunInstrApi = new StudentInstructorsAPIController($this->userRepository);
+                $stdunInstrApi->addAndMarkAsFavorite($student, $instructor->id);
+
+                $message .= 'Client ' . $student->getName() . ' added to instructor ' . $instructor->getName();
+
+            }
+
+            $instructorsFromGenres = $this->userRepository->getInstructorFromGenres($instructorGenresIds->collapse())->toArray();
+
             return $this->sendResponse($instructorsFromGenres, $message);
+
         }
+
 
         return $this->sendError('Client not has true role');
     }

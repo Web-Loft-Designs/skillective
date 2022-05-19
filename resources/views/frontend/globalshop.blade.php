@@ -1,10 +1,6 @@
 @extends('layouts.app-frontend')
 @section('content')
 
-    <?php
-        $lessons['meta']['pagination']['per_page'] = 21;
-    ?>
-
     <calendar-input
         :genres="{{ json_encode($siteGenres) }}"
         default-lesson-type="pre_recorded"

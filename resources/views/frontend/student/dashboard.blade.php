@@ -141,7 +141,7 @@ $invitation_form_description= isset($pageMeta['invitation_form_description']) ? 
                     </div>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </div>

@@ -78,7 +78,7 @@
         </div>
         @endif
         <div class="profile-info-genres">
-            <p class="profile-label">Genres:
+            <p class="profile-label">Genresssss:
                 @if( Auth::user() && (Auth::user ()->id==$userProfileData['id'] || Auth::user()->hasRole('Admin')))
                     <a href="{{ $editRoute }}">(Edit)</a>
                 @endif

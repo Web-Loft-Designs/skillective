@@ -126,7 +126,7 @@ abstract class AbstractCustomNotification extends Notification
 			});
 
         return (new MailMessage)
-            ->subject($this->methods['mail']['data']['subject'])
+            ->subject(Placeholders::parse($this->methods['mail']['data']['subject'], $this->getVars()))
             ->markdown('emails.abstract', [
                 'view' => $this->content['mail'],
                 'sender_first_name' => data_get($this->content['var'], 'sender_first_name'),
