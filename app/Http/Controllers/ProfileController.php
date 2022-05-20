@@ -43,11 +43,13 @@ class ProfileController extends Controller
      * @param User $user
      * @return \Illuminate\View\View
      */
-    public function show(User $user)
+    public function show(Profile $profile)
     {
+        $user = User::findOrFail($profile->user_id);
 		$currentUserIsAdmin = (Auth::user() && Auth::user()->hasRole(User::ROLE_ADMIN));
-    	if ($user && !$user->id && !$currentUserIsAdmin)
-			$user = Auth::user();
+    	if ($user && !$user->id && !$currentUserIsAdmin) {
+            $user = Auth::user();
+        }
     	if (!$user){
 			return redirect(route('frontend.login'));
 		}
