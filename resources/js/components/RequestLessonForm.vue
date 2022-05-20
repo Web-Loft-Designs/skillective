@@ -2,7 +2,7 @@
   <div id='lesson-form-container'>
     <div class='d-grid gap-2 d-md-block'>
       <button
-        class='btn btn-success btn-sm text-wrap'
+        class='btn green btn-sm text-wrap'
         type='button'
         data-toggle='tooltip'
         v-if='showCreateBtn'
@@ -34,38 +34,18 @@
           </div>
           <div class='modal-body'>
             <span>
-              If you want to receive notifications when {{ instructorName }}
-              is near you or you want to be included in all {{ instructorName }}'s
-              training classes, clinics, workshops and tutorials please
-              join his client list
+              Join {{ instructorName }}'s client list to be updated when training classes, clinics, workshops, or new tutorials become available.
             </span>
           </div>
           <div class='modal-footer'>
             <button
               type='button'
               aria-label='Close'
-              class='btn btn-success btn-sm'
+              class='btn green btn-sm'
               @click='successJoinedToClient'
             >
               Join client list
             </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!--    modal1-->
-    <div
-      class='modal'
-      id='successAdded'
-      tabindex='-1'
-      role='dialog'
-      aria-labelledby='mySmallModalLabel'
-      aria-hidden='true'
-    >
-      <div class='modal-dialog'>
-        <div class='modal-content'>
-          <div class='modal-body p-5 h3 text-center'>
-            Congratulations! You have been added to the instructor’s list of clients
           </div>
         </div>
       </div>
@@ -247,7 +227,7 @@
     <!--    modal4-->
     <div
       class='modal'
-      id='successAddedAfterRegistered'
+      id='successAdded'
       tabindex='-1'
       role='dialog'
       aria-labelledby='exampleModalCenterTitle'
@@ -269,16 +249,12 @@
               <span aria-hidden='true'>&times;</span>
             </button>
           </div>
-          <div class='modal-body text-center'>
-            <span class='text-center'>
-               Thank you for joining my client list. I'll be in touch with upcoming lessons and events. Talk to you soon!
-              <br>
-              <strong>- {{ instructorName }}</strong>
-              <br>
-            </span>
-            <span>
-              You should have received an email from Skillective with more details
-            </span>
+          <div class='modal-body text-center h3'>
+            Thank you for joining my client list. I'll be in touch with upcoming lessons and events. Talk to you soon!
+            <br>
+            <strong>- {{ instructorName }}</strong>
+            <br>
+            You should have received an email from Skillective with more details.
           </div>
           <div class='modal-footer'>
             <button
@@ -286,9 +262,131 @@
               aria-label='Close'
               class='btn btn-success btn-sm'
               data-dismiss='modal'
+              @click='openAllInstructorsModal'
             >
               ОК
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='modal' id='instructorsModal' tabindex='-1' role='dialog' aria-labelledby='instructorsModalLabel'
+         aria-hidden='true'>
+      <div class='modal-dialog' role='document'>
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h5 class='modal-title' id='instructorsModalLabel'>
+              Would you like to be added to other instructor's client lists? Check the boxes below
+            </h5>
+            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+              <span aria-hidden='true'>&times;</span>
+            </button>
+          </div>
+          <div class='modal-body'>
+            <ul class='list-group'>
+              <li class='list-group-item'>
+                <div class='input-group align-items-center flex-nowrap'>
+                  <div class='input-group-prepend'>
+                    <div class='form-group checkbox-wrapper'>
+                      <div class='field'>
+                        <label for='select-all-instructors'>
+                          <input
+                            v-model='selectAll'
+                            type='checkbox'
+                            id='select-all-instructors'
+                            @input='onSelectAll'
+                          />
+                          <span class='checkmark'></span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class='d-flex justify-content-start align-items-center pt-4 m-0 px-5 h5'>
+                    <span>Select all instructors</span>
+                  </div>
+                </div>
+              </li>
+              <li
+                class='list-group-item'
+                v-for='instructor in instructors'
+                :key='instructor.id'
+              >
+                <div class='input-group align-items-center flex-nowrap'>
+                  <div class='input-group-prepend'>
+                    <div class='form-group checkbox-wrapper'>
+                      <div class='field'>
+                        <label :for='`accept-terms-instructors${instructor.id}`'>
+                          <input
+                            v-model='selectedInstructors'
+                            type='checkbox'
+                            :id='`accept-terms-instructors${instructor.id}`'
+                            :value='`${instructor.id}`'
+                          />
+                          <span class='checkmark'></span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class='d-flex justify-content-between align-items-center px-5 m-0 w-100'>
+                    <div class='instructor-avatar'>
+                      <img :src='instructor.profile.image' alt='instructor avatar'>
+                    </div>
+                    <div class='d-flex w-100 pl-4 flex-column mt-0 align-items-center'>
+                      <h3 class='title'>{{ instructor.full_name }}</h3>
+                      <a
+                        class='inst'
+                        :href='`https://www.instagram.com/${instructor.profile.instagram_handle}`'
+                        target='_blank'
+                      >
+                        @{{ instructor.profile.instagram_handle }}
+                      </a>
+                      <div class='profile-genres d-flex flex-column align-items-center mt-1'>
+                        <span v-if='instructor.genres.length > 0'>{{ instructor.genres[0].title }}</span>
+                        <div>
+                          <span v-if='instructor.genres.length > 1'>{{ instructor.genres[1].title }}</span>
+                          <span v-if='instructor.genres.length > 2'>+{{ instructor.genres.length - 2 }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class='modal-footer'>
+            <loader-button
+              class='lesson__button'
+              :disabled='!selectedInstructors.length'
+              :is-loading='loadingAdd'
+              text="Add me to these instructor's client lists"
+              @click='addToInstructorsList'
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='modal' id='addedOtherInstructors' tabindex='-1' role='dialog'
+         aria-labelledby='addedOtherInstructorsLabel'
+         aria-hidden='true'>
+      <div class='modal-dialog' role='document'>
+        <div class='modal-content'>
+          <div class='modal-header'>
+            <h5 class='modal-title' id='addedOtherInstructorsLabel'>Thank you from all of us!</h5>
+            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+              <span aria-hidden='true'>&times;</span>
+            </button>
+          </div>
+          <div class='modal-body'>
+            <p>
+              You should have recieved an email to login and view all your instructos whose client lists you have jonied.
+              We appreciate you being here with us!
+            </p>
+            <strong>
+              {{ instructorNames.join(', ') }}.
+            </strong>
+          </div>
+          <div class='modal-footer'>
+            <button type='button' data-dismiss='modal' class='btn btn-success'>Ok</button>
           </div>
         </div>
       </div>
@@ -649,14 +747,14 @@ import MaskedInput from 'vue-masked-input'
 import siteAPI from '../mixins/siteAPI.js'
 import skillectiveHelper from '../mixins/skillectiveHelper.js'
 import MagnificPopupModal from './external/MagnificPopupModal'
-
-require('jquery.maskedinput/src/jquery.maskedinput')
 import DropdownDatepicker from 'vue-dropdown-datepicker'
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
-import {mapActions, mapState, mapMutations} from 'vuex'
-import {email, required, numeric} from 'vuelidate/lib/validators'
-import LoaderButton from './cart/LoaderButton/LoaderButton';
-import ct from 'countries-and-timezones';
+import {mapActions, mapMutations, mapState} from 'vuex'
+import {email, numeric, required} from 'vuelidate/lib/validators'
+import LoaderButton from './cart/LoaderButton/LoaderButton'
+import ct from 'countries-and-timezones'
+
+require('jquery.maskedinput/src/jquery.maskedinput')
 
 $(function() {
   $('[data-toggle="tooltip"]')
@@ -698,6 +796,8 @@ export default {
   },
   data() {
     return {
+      loadingAdd: false,
+      selectedInstructors: [],
       loadingBtn: false,
       modalData: {
         first_name: '',
@@ -737,7 +837,10 @@ export default {
       fieldsDisabled: false,
       isDateInputInit: false,
       openRegisteredModal: false,
-      loadingOtherInstructors: false
+      loadingOtherInstructors: false,
+      selectAll: false,
+      instructorNames: [],
+      newStudentId: null
     }
   },
   watch: {
@@ -758,7 +861,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['storeErrors', 'storeErrorText']),
+    ...mapState(['storeErrors', 'storeErrorText', 'instructors']),
     priceError: function() {
       if (
         !this.fields.time_from ||
@@ -786,12 +889,40 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['addToClientList', 'createToClientList', 'addStudentToInstructorList']),
+    ...mapActions(['addToClientList', 'createToClientList', 'addStudentToInstructorList', 'getInstructors', 'geoNotification','virtualNotification']),
     ...mapMutations(['CLEAR_INPUT']),
+    async addToInstructorsList() {
+      this.loadingAdd = true
+      const instructors = this.selectedInstructors.map(instructorId => +instructorId)
+      const data = {
+        required: this.loggedInStudent ? this.studentId : this.newStudentId.toString(),
+        instructors
+      }
+      await this.addStudentToInstructorList(data)
+      await this.addToClientList(this.selectedInstructors)
+      this.instructorNames = this.instructors
+      .filter(instructor => instructors.includes(instructor.id))
+      .map(instructor => instructor.full_name)
+      this.loadingAdd = false
+      this.addingNotification()
+      this.closeAllInstructorsModal()
+      $('#addedOtherInstructors').modal('show')
+    },
+    onSelectAll() {
+      this.selectAll
+        ? this.selectedInstructors = []
+        : this.instructors.forEach(instructor => this.selectedInstructors.push(+instructor.id))
+    },
     changeEmail() {
       if (this.storeErrors) {
         this.CLEAR_INPUT()
       }
+    },
+    openAllInstructorsModal() {
+      $('#instructorsModal').modal('show')
+    },
+    closeAllInstructorsModal() {
+      $('#instructorsModal').modal('hide')
     },
     showJoinModal() {
       $('#joinClient').modal('show')
@@ -801,9 +932,6 @@ export default {
     },
     showSuccessAddedModal() {
       $('#successAdded').modal('show')
-    },
-    showAddedAfterSuccessModal() {
-      $('#successAddedAfterRegistered').modal('show')
     },
     showOtherInstructorsListModal() {
       $('#otherInstructorsList').modal('show')
@@ -831,10 +959,10 @@ export default {
           mobile_phone: this.modalData.mobile_phone,
           newsletter: this.modalData.newsletter
         }
-        await this.createToClientList(data)
+        this.newStudentId = await this.createToClientList(data)
         if (!this.storeErrors?.email?.length) {
           this.closeForm()
-          this.showAddedAfterSuccessModal()
+          this.showSuccessAddedModal()
         }
       } catch (e) {
         this.loadingBtn = false
@@ -851,8 +979,16 @@ export default {
       return `Click here to add your contact info to ${ this.instructorName }'s Client List so you can be notified when classes, privates or workshops become available.`
     },
     async addingNotification() {
-      this.apiPost('/api/student/instructor/geo-notifications/' + this.instructorId)
-      this.apiPost('/api/student/instructor/virtual-lesson-notifications/' + this.instructorId)
+      if (this.loggedInStudent) {
+      let data = {
+        instructor: []
+      }
+      this.selectedInstructors.length
+        ? data.instructor = this.selectedInstructors
+        : data.instructor.push(this.instructorId)
+      await this.geoNotification(data)
+      await this.virtualNotification(data)
+      }
     },
     async successJoinedToClient() {
       this.closeJoinModal()
@@ -868,12 +1004,6 @@ export default {
           await this.addStudentToInstructorList(data)
           this.showSuccessAddedModal()
           await this.addingNotification()
-          setTimeout(() => {
-            $('#successAdded')
-            .modal('hide')
-            $('.modal-backdrop')
-            .remove()
-          }, 3000)
         } catch (e) {
           console.log(e)
         }
@@ -1039,7 +1169,7 @@ export default {
     }
   },
 
-  created: function() {
+  async created() {
     this.timeOptions = this.getTimeOptions()
     this.timeZomeOptions = ct.getAllTimezones()
 
@@ -1151,6 +1281,7 @@ export default {
       in_person: 'In Person',
       virtual: 'Virtual'
     }
+    await this.getInstructors(this.instructorId)
   },
   mounted() {
     this.initNewPlacesAutocomplete('lessonLocation')
@@ -1234,9 +1365,59 @@ export default {
 </script>
 
 <style lang='scss'>
-//.modal-open .modal {
-//  overflow-y: hidden;
-//}
+.title {
+  color: #444;
+  font-family: Hind Vadodara;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.instructor-avatar {
+  position: relative;
+  width: 125px;
+  height: 125px;
+  margin-top: 40px;
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    border-radius: 50%;
+  }
+}
+
+.profile-genres span {
+  background-color: #f4f4f4;
+  border-radius: 2px;
+  color: #444;
+  display: inline-block;
+  font-family: Hind Vadodara, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  height: 31px;
+  margin-bottom: 5px;
+  margin-right: 5px;
+  padding: 4px 5px;
+  text-align: center;
+}
+
+.inst {
+  font-family: Hind Vadodara, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 24px;
+  color: #AAAAAA;
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+
+  &:hover, &:visited {
+    color: #AAAAAA;
+  }
+}
 
 .modal-open, .modal {
   padding-right: 0 !important
@@ -1274,4 +1455,29 @@ export default {
 .tooltip {
   font-size: 10px;
 }
+
+#instructorsModal {
+  .modal-body {
+    ul {
+      overflow-y: auto;
+      height: 530px;
+    }
+  }
+
+  .modal-footer {
+    justify-content: center;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+  .green {
+    background-color: #8ada00;
+    color: #fff;
+
+    &:hover {
+      color: #fff;
+    }
+  }
 </style>
