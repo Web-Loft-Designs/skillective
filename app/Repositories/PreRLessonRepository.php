@@ -66,7 +66,7 @@ class PreRLessonRepository extends BaseRepository
 			return $query;
 		});
 
-		return $this->paginate(20, ['pre_r_lessons.*']);
+		return $this->paginate(21, ['pre_r_lessons.*']);
 	}
 
 
@@ -111,6 +111,6 @@ class PreRLessonRepository extends BaseRepository
 			}
 		}
 
-		return $this->paginate(20);
+		return $this->paginate(21);
 	}
 }

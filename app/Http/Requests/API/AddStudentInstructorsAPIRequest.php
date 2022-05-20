@@ -11,15 +11,6 @@ use Illuminate\Validation\Rule;
 
 class AddStudentInstructorsAPIRequest extends APIRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-		return Auth::user()->hasRole(User::ROLE_STUDENT);
-    }
 
     /**
      * Get the validation rules that apply to the request.
