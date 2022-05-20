@@ -22,7 +22,7 @@ abstract class AbstractCustomNotification extends Notification
     /**
      * @var \App\Models\CustomNotification
      */
-	private $customNotification;
+    private $customNotification;
     protected $content = [];
     protected $vars = [];
     protected $methods;
@@ -50,9 +50,9 @@ abstract class AbstractCustomNotification extends Notification
         if (isset($this->methods['sms'])) {
             $this->generateSMSContent();
         }
-		if (isset($this->methods['whatsapp'])) {
-			$this->generateWhatsAppContent();
-		}
+        if (isset($this->methods['whatsapp'])) {
+            $this->generateWhatsAppContent();
+        }
     }
 
     protected function generateEmailContent()
@@ -65,16 +65,16 @@ abstract class AbstractCustomNotification extends Notification
     protected function generateSMSContent()
     {
         $smsContent    = Placeholders::parse($this->methods['sms']['content'], $this->getVars());
-		$smsContent		= preg_replace( "/\r|\n/", "", strip_tags($smsContent));
+        $smsContent		= preg_replace( "/\r|\n/", "", strip_tags($smsContent));
         $this->content['sms'] = $smsContent;
     }
 
-	protected function generateWhatsAppContent()
-	{
-		$whatsappContent    = Placeholders::parse($this->methods['whatsapp']['content'], $this->getVars());
-		$whatsappContent	= preg_replace( "/\r|\n/", "", strip_tags($whatsappContent));
-		$this->content['whatsapp'] = $whatsappContent;
-	}
+    protected function generateWhatsAppContent()
+    {
+        $whatsappContent    = Placeholders::parse($this->methods['whatsapp']['content'], $this->getVars());
+        $whatsappContent	= preg_replace( "/\r|\n/", "", strip_tags($whatsappContent));
+        $this->content['whatsapp'] = $whatsappContent;
+    }
 
     /**
      * Get the notification's delivery channels.
@@ -94,8 +94,8 @@ abstract class AbstractCustomNotification extends Notification
                     } elseif ($item == 'email') {
                         return 'mail';
                     }  elseif ($item == 'whatsapp') {
-						return WhatsAppChannel::class;
-					}
+                        return WhatsAppChannel::class;
+                    }
 
                     return $item;
                 })->toArray();
@@ -120,10 +120,10 @@ abstract class AbstractCustomNotification extends Notification
      */
     public function toMail($notifiable): MailMessage
     {
-		if ($this->customNotification==null && !isset($this->methods['mail'])) // for some reason saved queued job doesnot contain prepared array of methods
-			$this->methods = $this->methods->mapWithKeys(function ($item) {
-				return [$item->method => $item];
-			});
+        if ($this->customNotification==null && !isset($this->methods['mail'])) // for some reason saved queued job doesnot contain prepared array of methods
+            $this->methods = $this->methods->mapWithKeys(function ($item) {
+                return [$item->method => $item];
+            });
 
         return (new MailMessage)
             ->subject(Placeholders::parse($this->methods['mail']['data']['subject'], $this->getVars()))
@@ -136,41 +136,41 @@ abstract class AbstractCustomNotification extends Notification
 
     public function toTwilio($notifiable)
     {
-		if ($this->customNotification==null && !isset($this->methods['sms'])) // for some reason saved queued job doesnot contain prepared array of methods
-			$this->methods = $this->methods->mapWithKeys(function ($item) {
-				return [$item->method => $item];
-			});
+        if ($this->customNotification==null && !isset($this->methods['sms'])) // for some reason saved queued job doesnot contain prepared array of methods
+            $this->methods = $this->methods->mapWithKeys(function ($item) {
+                return [$item->method => $item];
+            });
 //		Log::info($this->content['sms']);
-		if ($this->content['sms'])
-			return (new TwilioSmsMessage())
-				->content($this->content['sms']);
-		else
-			return false;
+        if ($this->content['sms'])
+            return (new TwilioSmsMessage())
+                ->content($this->content['sms']);
+        else
+            return false;
     }
 
-	public function toWhatsApp($notifiable)
-	{
-		if ($this->customNotification==null && !isset($this->methods['whatsapp'])) // for some reason saved queued job doesnot contain prepared array of methods
-			$this->methods = $this->methods->mapWithKeys(function ($item) {
-				return [$item->method => $item];
-			});
+    public function toWhatsApp($notifiable)
+    {
+        if ($this->customNotification==null && !isset($this->methods['whatsapp'])) // for some reason saved queued job doesnot contain prepared array of methods
+            $this->methods = $this->methods->mapWithKeys(function ($item) {
+                return [$item->method => $item];
+            });
 
-		$sid    = config( 'services.twilio.account_sid' );
-		$token  = config( 'services.twilio.auth_token' );
-		$twilio = new Client($sid, $token);
-		if (isset($this->content['whatsapp'])) {
-			$message = $twilio->messages
-				->create( "whatsapp:" . $notifiable->profile()->value( 'mobile_phone' ), // to format +15005550006
-					array(
-						"from" => "whatsapp:" . config( 'services.whatsapp.from' ),
-						"body" => $this->content['whatsapp'] // this should be a template
-					)
-				);
-			//		Log::info('message', (array)$message);
-			return $message;
-		}else
-			return false;
-	}
+        $sid    = config( 'services.twilio.account_sid' );
+        $token  = config( 'services.twilio.auth_token' );
+        $twilio = new Client($sid, $token);
+        if (isset($this->content['whatsapp'])) {
+            $message = $twilio->messages
+                ->create( "whatsapp:" . $notifiable->profile()->value( 'mobile_phone' ), // to format +15005550006
+                    array(
+                        "from" => "whatsapp:" . config( 'services.whatsapp.from' ),
+                        "body" => $this->content['whatsapp'] // this should be a template
+                    )
+                );
+            //		Log::info('message', (array)$message);
+            return $message;
+        }else
+            return false;
+    }
 
     /**
      * Get the array representation of the notification.
@@ -199,7 +199,7 @@ abstract class AbstractCustomNotification extends Notification
         $this->vars = [
             'app_name'     => config('app.name'),
             'app_url'      => config('app.url'),
-			'login_url'      => route('frontend.login'),
+            'login_url'      => route('frontend.login'),
             'current_year' => now()->format('Y'),
         ];
     }
