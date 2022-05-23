@@ -279,10 +279,9 @@
           </span>
         </div>
 
-
-                <div
+        <div
           class="form-group w-50 has-feedback"
-          :class="{ 'has-error': errors.lesson_block_min_price }"
+          :class="{ 'has-error': errors.virtual_min_price }"
           v-if="userProfileData.isInstructor"
         >
           <label>
@@ -292,7 +291,7 @@
           <input
             type="text"
             class="form-control"
-            name="lesson_block_min_price"
+            name="virtual_min_price"
             value
             v-model="fields.virtual_min_price"
             placeholder="Min price per 30 minute lesson"
@@ -301,6 +300,28 @@
             <strong>{{ errors.virtual_min_price[0] }}</strong>
           </span>
         </div>
+
+        <!-- <div
+          class="form-group w-50 has-feedback"
+          :class="{ 'has-error': errors.virtual_min_price }"
+          v-if="userProfileData.isInstructor"
+        >
+          <label>
+            <strong style="display: block">Request a Lesson (Virtual) </strong>
+            Virtual lesson minimum price allowed per half hour
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            name="virtual_min_price"
+            value
+            v-model="fields.virtual_min_price"
+            placeholder="Min price per 30 minute lesson"
+          />
+          <span class="help-block" v-if="errors.virtual_min_price">
+            <strong>{{ errors.virtual_min_price[0] }}</strong>
+          </span>
+        </div> -->
 
         <div v-if="errorText" class="form-group has-error">{{ errorText }}</div>
         <div class="form-group">
@@ -354,18 +375,15 @@ export default {
     };
   },
   methods: {
-    onSubmit() {
-      if (moment(this.fields.dob))
-        this.fields.dob = moment(this.fields.dob).format("YYYY-MM-DD");
-
+    async onSubmit() {
+      if (moment(this.fields.dob)) this.fields.dob = moment(this.fields.dob).format("YYYY-MM-DD");
       var submitUrl = "/api/user/profile";
       if (this.isAdminForm != null) submitUrl += "/" + this.userProfileData.id;
-      this.apiPut(submitUrl, this.fields);
+      await this.apiPut(submitUrl, this.fields);
     },
   },
   created: function () {
-
-    this.currentYear = moment().format("YYYY")
+    this.currentYear = parseInt(moment().format("YYYY"))
 
     setTimeout(() => {
       if (this.$refs.datepicker) {
@@ -397,6 +415,7 @@ export default {
       instagram_handle: this.userProfileData.profile.instagram_handle,
       lesson_block_min_price: this.userProfileData.profile
         .lesson_block_min_price,
+      virtual_min_price: this.userProfileData.profile.virtual_min_price
     };
     setTimeout(function () {
       window.jQuery(".mask-input").mask("99/99/9999");
