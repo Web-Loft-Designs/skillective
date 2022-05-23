@@ -216,8 +216,17 @@ class AppServiceProvider extends ServiceProvider
             $timeTo = $request->input($parameters[1]);
             $timeZone = $request->input($parameters[5]);
 
-            if (!$timeTo || !$timeFrom || !$timeZone) {
+            if (!$timeTo || !$timeFrom) {
                 return true;
+            }
+
+            if(!$timeZone) {
+                $lessonLocationDetails = getLocationDetails($request->location);
+                if ($lessonLocationDetails['timezone_id']) {
+                    $timeZone = $lessonLocationDetails['timezone_id'];
+                } else {
+                    $timeZone = config('geoip.default_location.timezone');
+                }
             }
 
             $dateTimeZone = new DateTimeZone($timeZone);

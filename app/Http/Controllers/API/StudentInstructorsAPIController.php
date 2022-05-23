@@ -54,10 +54,9 @@ class StudentInstructorsAPIController extends AppBaseController
     {
     	$count_added = 0;
         $user = $this->userRepository->find($request->required);
-
 		foreach ($request->input('instructors') as $instructorId){
 			$instructor = $this->userRepository->find($instructorId);
-            $instructor->clients()->syncWithoutDetaching( $user->id );
+			$instructor->clients()->syncWithoutDetaching( $user->id );
 			if ($instructor->hasRole($this->userRepository->model()::ROLE_INSTRUCTOR) && !$user->hasOwnInstructor($instructorId)) {
                 $user->instructors()->attach( $instructorId );
 				$count_added++;
@@ -111,14 +110,12 @@ class StudentInstructorsAPIController extends AppBaseController
 			return $this->sendError('Instructor not found');
 		}
 		if ($instructor->hasRole($this->userRepository->model()::ROLE_INSTRUCTOR)) {
-
             if (!$student->hasOwnInstructor($instructorId))
             {
                 $student->instructors()->attach($instructorId, ['is_favorite' => true]);
             }else{
                 $student->instructors()->updateExistingPivot($instructorId, ['is_favorite' => true], false);
             }
-
 		}
 
 		return $this->sendResponse(true, 'Instructor added to your favorites');
@@ -144,8 +141,7 @@ class StudentInstructorsAPIController extends AppBaseController
 
 	public function enableGeoNotifications(Request $request)
 	{
-
-        $instructors = (array) $request->instructor;
+		$instructors = (array) $request->instructor;
 
         if( $instructors )
         {
@@ -199,7 +195,6 @@ class StudentInstructorsAPIController extends AppBaseController
 
     public function enableVirtualLessonNotifications(Request $request)
     {
-
         $instructors = (array) $request->instructor;
 
         if( $instructors )
@@ -221,11 +216,8 @@ class StudentInstructorsAPIController extends AppBaseController
             }
 
         }else{
-
             return $this->sendError('Instructor not found');
-
         }
-
 
         return $this->sendResponse(true, 'Virtual Lesson Notifications enabled for this Instructor');
     }

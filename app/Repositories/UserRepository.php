@@ -162,6 +162,7 @@ class UserRepository extends BaseRepository
 
 			if ($invitedBy > 0) {
 				$query->leftJoin("invitations", 'users.id', '=', "invitations.invited_user_id");
+				$query->distinct('users.id');
 			}
 
 			return $query;
@@ -600,7 +601,7 @@ class UserRepository extends BaseRepository
             })
             ->get();
     }
-
+		
     /**
      * @param $instructor
      * @return mixed

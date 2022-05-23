@@ -48,7 +48,7 @@ class CreateLessonAPIRequest extends APIRequest
 			'spots_count'	=> ['required', 'integer', 'min:1', 'max:100'],
 			'spot_price'	=> ['required', 'numeric', 'virtual_min_price:lesson_type'],
 			'location'		=> ['required_if:lesson_type,in_person', 'nullable', 'is_exact_address'],
-            'timezone_id'   => ['required', "valid_timezone:$lesson_type"],
+            'timezone_id'   => ['required_if:lesson_type,virtual,in_person_client', "valid_timezone:$lesson_type"],
             'lesson_type'   => ['required', 'in:in_person,virtual,in_person_client']
 		];
 

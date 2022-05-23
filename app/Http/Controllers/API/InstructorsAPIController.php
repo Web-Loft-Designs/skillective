@@ -52,6 +52,7 @@ class InstructorsAPIController extends AppBaseController
         return $this->sendResponse($featuredInstructors);
     }
 
+    
     /**
      * @param User $instructor
      * @return void
@@ -64,5 +65,4 @@ class InstructorsAPIController extends AppBaseController
         return $this->sendResponse($related);
 
     }
-
 }

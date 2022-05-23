@@ -28,18 +28,15 @@ class StudentAddClientListAPIController extends AppBaseController
 
     public function addToClientList(StudentAddClientListRequest $request)
     {
-
         $student = $this->userRepository->find($request->required);
         return $this->toClientList($request, $student);
     }
 
     public function createToClientList(StudentSmallRegisterRequest $request)
     {
-
         $student = UserRegistrator::registerInactiveStudent($request);
         $this->toClientList($request, $student);
         return $student;
-
     }
 
     private function toClientList($request, $student)
@@ -51,7 +48,6 @@ class StudentAddClientListAPIController extends AppBaseController
         $student = $this->userRepository->find($student->id);
 
         if ($student->hasRole($this->userRepository->model()::ROLE_STUDENT)) {
-
             $instructors = (array) $request->instructor_id;
             $message = null;
             $instructorGenresIds = new Collection();
@@ -73,9 +69,7 @@ class StudentAddClientListAPIController extends AppBaseController
             $instructorsFromGenres = $this->userRepository->getInstructorFromGenres($instructorGenresIds->collapse())->toArray();
 
             return $this->sendResponse($instructorsFromGenres, $message);
-
         }
-
 
         return $this->sendError('Client not has true role');
     }

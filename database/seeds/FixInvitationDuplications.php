@@ -13,7 +13,8 @@ class FixInvitationDuplications extends Seeder
     {
         $duplicatedInvitationIds = [];
 
-        Invitation::all()
+        Invitation::withTrashed()
+            ->get()
             ->groupBy('invited_email')
             ->each(static function (Collection $invitationCollection) use (&$duplicatedInvitationIds) {
                 if ($invitationCollection->count() === 1) {
@@ -34,7 +35,7 @@ class FixInvitationDuplications extends Seeder
         }
 
         if ($this->command->confirm('Delete them ?', false)) {
-            Invitation::whereIn('id', $duplicatedInvitationIds)->delete();
+            Invitation::whereIn('id', $duplicatedInvitationIds)->forceDelete();
         }
     }
 }

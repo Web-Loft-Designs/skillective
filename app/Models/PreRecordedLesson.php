@@ -5,7 +5,6 @@ namespace App\Models;
 use Eloquent as Model;
 use Auth;
 use App\Facades\BraintreeProcessor;
-use Illuminate\Support\Carbon;
 use Log;
 use App\Models\PurchasedLesson;
 use App\Models\Setting;
@@ -87,7 +86,7 @@ class PreRecordedLesson extends Model
 		if(Auth::user() != null){
 			$user_repository->updateUserData(Auth::user()->id, $request);
 		}
-
+        
         if ($paymentMethodNonce) {
             $device_data = $request->input('device_data', null);
             $paymentMethod = BraintreeProcessor::createPaymentMethod($student, $paymentMethodNonce, $device_data);
@@ -137,19 +136,5 @@ class PreRecordedLesson extends Model
         $purchashedLesson->save();
 
         return $purchashedLesson;
-    }
-
-    public function setCreatedAtAttribute($value)
-    {
-
-        $date = $value;
-        $user = Auth::user();
-        $timezone = getTimezoneByCoordinates($user->profile->lat, $user->profile->lng);
-        if( $timezone )
-        {
-            $date = Carbon::now()->timezone($timezone->timeZoneId);
-        }
-        $this->attributes['created_at'] = $date;
-
     }
 }

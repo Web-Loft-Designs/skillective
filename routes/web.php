@@ -94,8 +94,8 @@ Route::group(['prefix' => 'student', 'middleware'=>['role:Student']], function (
 	Route::get('/bookings', 'StudentBookingsController@index')->name('student.bookings');
 	Route::get('/instructors', 'StudentInstructorsController@index')->name('student.instructors');
 	Route::get('/gallery', 'StudentGalleryController@index')->name('student.gallery');
-
-
+	
+	
 	Route::get('/library', 'StudentLibraryController@index')->name('student.library');
 	Route::get('/library/video/{video}', 'StudentLibraryVideoController@index')->name('student.library.video');
 });

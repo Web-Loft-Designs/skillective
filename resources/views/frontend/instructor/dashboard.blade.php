@@ -2,14 +2,14 @@
 
 @section('content')
 
-<?php
-$pageMeta = $currentPage->getAllMeta();
+    <?php
+    $pageMeta = $currentPage->getAllMeta();
 
-$invitation_form_title= isset($pageMeta['invitation_form_title']) ? $pageMeta['invitation_form_title'] : '';
-$invitation_form_description= isset($pageMeta['invitation_form_description']) ? $pageMeta['invitation_form_description'] : '';
-$booking_fees_description= isset($pageMeta['booking_fees_description']) ? preg_replace('/\n|\r/', '', $pageMeta['booking_fees_description']) : '';
+    $invitation_form_title= isset($pageMeta['invitation_form_title']) ? $pageMeta['invitation_form_title'] : '';
+    $invitation_form_description= isset($pageMeta['invitation_form_description']) ? $pageMeta['invitation_form_description'] : '';
+    $booking_fees_description= isset($pageMeta['booking_fees_description']) ? preg_replace('/\n|\r/', '', $pageMeta['booking_fees_description']) : '';
 
-?>
+    ?>
 
     <div class="dashboard-page">
         <div class="container">
@@ -39,28 +39,28 @@ $booking_fees_description= isset($pageMeta['booking_fees_description']) ? preg_r
 
                 <div class="col-lg-5 col-md-6 col-12">
                     <chart-dashboard
-                            :initial-goal-value="{{ Auth::user()->profile->goal_value }}"
-                            :initial-goal-color="'{{ Auth::user()->profile->goal_color }}'"
-                            :date-chart="null"
-                            :is-dashboard="true"
-                            :year-of-registration="{{ Auth::user()->created_at->format('Y') }}"
+                        :initial-goal-value="{{ Auth::user()->profile->goal_value }}"
+                        :initial-goal-color="'{{ Auth::user()->profile->goal_color }}'"
+                        :date-chart="null"
+                        :is-dashboard="true"
+                        :year-of-registration="{{ Auth::user()->created_at->format('Y') }}"
                     ></chart-dashboard>
                 </div>
                 <div class="col-lg-7 col-md-6 col-12">
                     <colendar-add-lesson
-                            :current-user-can-book="{{ $currentUserCanBook?'true':'false' }}"
-                            :instructor-id="{{ Auth::user()->id }}"
-                            v-bind:user-genres="{{  json_encode($userGenres) }}"
-                            v-bind:site-genres="{{  json_encode($siteGenres) }}"
+                        :current-user-can-book="{{ $currentUserCanBook?'true':'false' }}"
+                        :instructor-id="{{ Auth::user()->id }}"
+                        v-bind:user-genres="{{  json_encode($userGenres) }}"
+                        v-bind:site-genres="{{  json_encode($siteGenres) }}"
                     />
                 </div>
 
                 <div class="col-12">
                     <request-lesson-form
-                            :show-create-btn="false"
-                            :site-genres="{{  json_encode($siteGenres) }}"
-                            :logged-in-student="false"
-                            :booking-fees-description="'{{ isset($booking_fees_description) ? preg_replace('/\n|\r/', '', addslashes($booking_fees_description)) : '' }}'"
+                        :show-create-btn="false"
+                        :site-genres="{{  json_encode($siteGenres) }}"
+                        :logged-in-student="false"
+                        :booking-fees-description="'{{ isset($booking_fees_description) ? preg_replace('/\n|\r/', '', addslashes($booking_fees_description)) : '' }}'"
                     ></request-lesson-form>
                     <instructor-dashboard-bookings-clients :clients="{{ json_encode($clients['data']) }}" :bookings="{{ json_encode($bookings) }}" :bookings-meta="{{ isset($bookings['meta'])?json_encode($bookings['meta']):'[]' }}"></instructor-dashboard-bookings-clients>
 
