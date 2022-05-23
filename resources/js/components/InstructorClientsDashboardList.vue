@@ -49,7 +49,7 @@
               <a
                 class="btn-notify"
                 @click="notifyClient(client)"
-                v-if="client.profile.notification_methods.length > 0"
+                v-if="checkClientProfile(client)"
                 >Notify</a
               >
               <a class="btn-delete" @click="deleteClient(client)">Delete</a>
@@ -88,7 +88,7 @@
               <a
                 class="btn-notify"
                 @click="notifyClient(client)"
-                v-if="client.profile.notification_methods.length > 0"
+                v-if="checkClientProfile(client)"
                 >Notify</a
               >
               <a class="btn-delete" @click="deleteClient(client)">Delete</a>
@@ -120,6 +120,9 @@ export default {
     return {};
   },
   methods: {
+    checkClientProfile(client) {
+      return client.profile?.notification_methods?.length > 0
+    },
     confirmDelete(text, action) {
         this.$refs.confirmationPopup.showConfirm(text, () => {
             action();
