@@ -315,7 +315,7 @@ class LessonRepository extends BaseRepository
 
 		if($request->get('type') && $request->get('type') === 'past'){
 			$this->orderBy('lessons.start', 'desc');
-		}	
+		}
 
 
 		if ($request->get('sort')) {
@@ -543,7 +543,7 @@ class LessonRepository extends BaseRepository
 			$geoMatchingLessons = $this->model->select('lessons.id', 'lessons.spots_count')
 				// ->addSelect(DB::raw("get_distance_in_miles_between_geo_locations({$userGeoCoordinate['lat']},{$userGeoCoordinate['lng']}, lat, lng) as distance"))
 				// ->whereNotNull('lat')
-				// ->whereNotNull('lng') 
+				// ->whereNotNull('lng')
 				->leftJoin('bookings', function ($join) {
 					$join->on('lessons.id', '=', 'bookings.lesson_id')
 						->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ");
@@ -773,7 +773,7 @@ class LessonRepository extends BaseRepository
 			$fromDate = Carbon::now()->subDays(30)->format('Y-m-d H:i:s'); // UTC
 			$query = $query->select('lessons.*')
 				->join('users', 'lessons.instructor_id', '=', "users.id")
-				->whereRaw("( ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) AND ( lessons.start BETWEEN CONVERT_TZ('$fromDate', 'GMT', lessons.timezone_id) AND CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) ) ) 
+				->whereRaw("( ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) AND ( lessons.start BETWEEN CONVERT_TZ('$fromDate', 'GMT', lessons.timezone_id) AND CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) ) )
 						   OR
 						   (lessons.created_at BETWEEN '$fromDate' AND '$nowOnServer')")
 				->groupBy('lessons.instructor_id');
