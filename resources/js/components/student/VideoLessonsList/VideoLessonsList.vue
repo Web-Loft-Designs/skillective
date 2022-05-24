@@ -1,8 +1,8 @@
 <template>
   <div class="video-lessons-list">
-    <div class="video-lessons-list__list" v-if="lessons.length">
+    <div class="video-lessons-list__list" v-if="allLessons.length">
       <div
-        v-for="(lesson, lessonIndex) in lessons"
+        v-for="(lesson, lessonIndex) in allLessons"
         :key="lessonIndex"
         class="video-lesson"
       >
@@ -253,6 +253,7 @@
 import CollapseTransition from "@ivanv/vue-collapse-transition/src/CollapseTransition.vue";
 import VideoLessonInfoPopup from "../VideoLessonInfoPopup/VideoLessonInfoPopup.vue";
 import OptionsMenu from "../OptionsMenu/OptionsMenu.vue";
+import urlHelper from "../../../helpers/urlHelper";
 
 export default {
   name: "VideoLessonsList",
@@ -321,7 +322,18 @@ export default {
   data() {
     return {
       collapsed: true,
+      allLessons: []
     };
+  },
+  created() {
+    this.allLessons = this.lessons
+    const params = urlHelper.parseQueryParams()
+    if (params?.instructorId) {
+      const arr = this.allLessons.filter(lesson => lesson.instructor_id === parseInt(params.instructorId))
+      arr.length > 0
+        ? this.allLessons = arr
+        : this.allLessons = []
+    }
   },
 };
 </script>
