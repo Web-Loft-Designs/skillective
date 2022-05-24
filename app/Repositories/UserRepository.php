@@ -347,7 +347,7 @@ class UserRepository extends BaseRepository
 		$perPage = Cookie::get('instructorClientsPerPage', 25);
 		$this->with(['profile', 'genres', 'genres.category', 'roles']);
 		if ($request->filled('limit'))
-			return $this->get();
+			return $this->get(['users.*']);
 		else
 			return $this->paginate($perPage, ['users.*']);
 	}
