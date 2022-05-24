@@ -43,8 +43,14 @@ class ProfileController extends Controller
      * @param User $user
      * @return \Illuminate\View\View
      */
-    public function show(Profile $profile)
+    public function show(Request $request, Profile $profile)
     {
+
+        if(!$profile->id)
+        {
+            $profile = Auth::user()->profile;
+        }
+
         $user = User::findOrFail($profile->user_id);
 		$currentUserIsAdmin = (Auth::user() && Auth::user()->hasRole(User::ROLE_ADMIN));
     	if ($user && !$user->id && !$currentUserIsAdmin) {
