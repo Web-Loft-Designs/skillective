@@ -19,23 +19,23 @@
     </button>
 
     <anim-loader v-if="isLoading && !virtual" class="calendar-input-where-tab__loading" />
-    
+
     <div class="calendar-input-where-tab__table" v-if="!isLoading && results.length && !virtual">
       <button class="calendar-input-where-tab__result" v-for="(result, index) in results" :key="index" @click.prevent="chooseLocation(result.city)">
         <img class="calendar-input-where-tab__pin" src="/images/map-pin-green.svg" />
         <span class="calendar-input-where-tab__name">{{ result.city }}</span>
         <span class="calendar-input-where-tab__count">{{ formatCount(result.city_count) }} Lessons</span>
         <span class="calendar-input-where-tab__count">
-          <a 
+          <a
             @click.stop
-            :href="'/instructors?location=' + text" 
+            :href="'/instructors?location=' + text"
           >{{ formatCount(result.instructors_count) }} Instructors</a>
         </span>
       </button>
       <a class="calendar-input-where-tab__more" href="/">View More...</a>
     </div>
 
-    <div class="calendar-input-where-tab__empty" v-if="!isLoading && !results.length && !virtual && text">No places found</div>
+    <div class="calendar-input-where-tab__empty" v-if="!isLoading && !results.length && !virtual && text">There are currently no instructors teaching lessons in your area.</div>
 
     <div class="calendar-input-where-tab__virtual-blank" v-if="virtual">
       <div class="calendar-input-where-tab__virtual-blank-content">
