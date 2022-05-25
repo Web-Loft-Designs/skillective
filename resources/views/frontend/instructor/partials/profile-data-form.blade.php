@@ -32,9 +32,9 @@
            {{ $userProfileData['profile']['city'] }} <br/>
            {{ $userProfileData['profile']['state'] }}
         </p>
-        <div class="d-flex align-items-center">
+        <div class="d-flex flex-column">
             @if ($userProfileData['total_count_lessons'] >= 25)
-            <p><strong>{{ $userProfileData['total_count_lessons'] }}</strong> Lessons Held</p>
+            <p class='mb-3'><strong>{{ $userProfileData['total_count_lessons'] }}</strong> Lessons Held</p>
             @endif
             <?php
             $loggedInStudent = ( Auth::user() && Auth::user()->hasRole('Student') );
