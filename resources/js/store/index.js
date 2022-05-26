@@ -9,12 +9,10 @@ export default new Vuex.Store({
   state: {
     storeErrors: {},
     storeErrorText: '',
-    instructors: [],
-    datesFromCalendar: {}
+    instructors: []
   },
   getters: {},
   mutations: {
-    SET_SELECTED_DATES: (state, dates) => state.datesFromCalendar = dates,
     SET_INSTRUCTORS: (state, data) => state.instructors = data,
     ERROR_HANDLER: (state, error) => {
       state.storeErrors = {}
