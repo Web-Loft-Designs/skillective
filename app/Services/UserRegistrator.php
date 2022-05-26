@@ -154,6 +154,9 @@ class UserRegistrator {
 			$userRole = Role::findByName( User::ROLE_STUDENT );
 			$user->assignRole( $userRole );
 
+            $notification[] = 'email';
+            if( $data['sms_notification'] ) $notification[] = 'sms';
+
 			$profile = new Profile( [
 				'address'			=> isset($data['address'])?$data['address']:'',
 				'city'				=> isset($data['city'])?$data['city']:'',
@@ -164,6 +167,7 @@ class UserRegistrator {
 				'about_me'			=> isset($data['about_me'])?$data['about_me']:'',
 				'gender'			=> isset($data['gender'])?$data['gender']:'',
 				'instagram_handle'	=> isset($data['instagram_handle'])?$data['instagram_handle']:'',
+                'notification_methods' => isset($data['sms_notification'])?$notification:'',
 			] );
 			$user->profile()->save($profile);
 
