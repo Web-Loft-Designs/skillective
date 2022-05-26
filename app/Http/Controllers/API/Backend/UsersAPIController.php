@@ -38,6 +38,7 @@ class UsersAPIController extends AppBaseController
 		]);
 		$totalToSuspend = count($request->input('users'));
 		foreach ($request->input('users') as $userId){
+
 			$user = $this->userRepository->findWithoutFail($userId);
 
 			if (
@@ -57,6 +58,12 @@ class UsersAPIController extends AppBaseController
 				$count_cancelled++;
 			}else{
 				$count_not_cancelled++;
+
+                if( $user->status=User::STATUS_BLOCKED )
+                {
+                    $this->deleteUser($request, $user);
+                }
+
 			}
 		}
 		$error = '';//$count_not_cancelled>0 ? 'Not suspended users have not completed bookings or upcoming lessons' : '';
