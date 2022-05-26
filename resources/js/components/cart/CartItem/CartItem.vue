@@ -137,7 +137,7 @@ export default {
         return `${discount.itemsLeft} Virtual Lessons`;
       } else if (discount.lesson_type === "pre-recorded") {
         return `${discount.itemsLeft} Pre-Recorded Lessons`;
-      } else if (discount.lesson_type === "in-person-client") {
+      } else if (discount.lesson_type === "in-person") {
         return `${discount.itemsLeft} In-Person Lessons`;
       }
     },
