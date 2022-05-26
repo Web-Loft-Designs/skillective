@@ -81,7 +81,7 @@
         </div>
 
         <span v-else class="lessons-list__empty"
-            >No lessons for your request</span
+            >There are currently no instructors teaching lessons in your area.</span
         >
 
         <info-popup ref="infoPopup" />
