@@ -288,6 +288,23 @@
           </span>
         </div>
 
+        <div
+          class="form-group checkbox-wrapper has-feedback"
+        >
+          <div class="field">
+            <label for="sms-notification">
+              <input
+                v-model="fields.sms_notification"
+                type="checkbox"
+                id="sms-notification"
+                :value="false"
+              />
+              <span class="checkmark"></span>
+              By clicking this box, you represent that you have the authority to agree to receive SMS messages on the telephone number that you provided to us. Message frequency depends upon your activity. Standard message and data rates may apply. SMS messaging is not available in all areas. Not all mobile devices or handsets may be supported. Skillective and the mobile carriers are not liable for delayed or undelivered messages
+            </label>
+          </div>
+        </div>
+
         <div class="form-group">
           <button type="submit" class="btn btn-block">Get Started</button>
           <!--<a href="/login" class="text-center">I already have a membership</a>-->
@@ -333,6 +350,7 @@ export default {
         //                    password : '',
         //                    password_confirmation : '',
         accept_terms: false,
+        sms_notification: false,
         instagram_handle: "",
       },
     };

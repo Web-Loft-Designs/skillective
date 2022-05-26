@@ -211,6 +211,22 @@
                   </div>
                   <span v-if='$v.modalData.mobile_phone.$dirty && !modalData.accept_terms'>Please accept terms of service</span>
                 </div>
+                <div
+                  class='form-group checkbox-wrapper has-feedback'
+                >
+                  <div class='field'>
+                    <label for='sms-notification'>
+                      <input
+                        v-model='modalData.sms_notification'
+                        type='checkbox'
+                        id='sms-notification'
+                        :value='false'
+                      />
+                      <span class='checkmark'></span>
+                      By clicking this box, you represent that you have the authority to agree to receive SMS messages on the telephone number that you provided to us. Message frequency depends upon your activity. Standard message and data rates may apply. SMS messaging is not available in all areas. Not all mobile devices or handsets may be supported. Skillective and the mobile carriers are not liable for delayed or undelivered messages
+                    </label>
+                  </div>
+                </div>                
                 <div class='form-group'>
                   <loader-button
                     :isLoading='loadingBtn'
@@ -810,7 +826,8 @@ export default {
         mobile_phone: '',
         instagram_handle: '',
         newsletter: true,
-        accept_terms: false
+        accept_terms: false,
+        sms_notification: false,
       },
       fields: {
         id: null,
@@ -960,7 +977,8 @@ export default {
           zip: this.modalData.zip,
           email: this.modalData.email,
           mobile_phone: this.modalData.mobile_phone,
-          newsletter: this.modalData.newsletter
+          newsletter: this.modalData.newsletter,
+          sms_notification: this.modalData.sms_notification
         }
         this.newStudentId = await this.createToClientList(data)
         if (!this.storeErrors?.email?.length) {
