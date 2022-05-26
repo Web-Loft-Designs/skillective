@@ -246,10 +246,11 @@ class BraintreeProcessor {
 				'kind'			=> 'debit',
 				'name'			=> "Lesson #{$booking->lesson_id} Booking ",
 				'quantity'		=> 1,
-				'totalAmount'	=> $booking->spot_price + $serviceFee + $expectedBrainTreeFee,
-				'unitAmount'	=> $booking->spot_price + $serviceFee + $expectedBrainTreeFee
+				'totalAmount'	=> number_format((float)$booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2, '.', ''),
+				'unitAmount'	=> number_format((float)$booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2, '.', '')
 			]
 		];
+
 		$options = [
 			'submitForSettlement'	=> true,
 			'holdInEscrow'			=> true,
