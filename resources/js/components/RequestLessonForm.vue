@@ -3,9 +3,11 @@
     <div class='d-grid gap-2 d-md-block'>
       <button
         class='btn green btn-sm text-wrap'
+        :class="{'disabledBtn': checkInstructors}"
         type='button'
         data-toggle='tooltip'
         v-if='showCreateBtn'
+        :disabled='checkInstructors'
         data-placement='bottom'
         @click='showJoinModal'
         :title='tooltipContent()'
@@ -880,7 +882,10 @@ export default {
     }
   },
   computed: {
-    ...mapState(['storeErrors', 'storeErrorText', 'instructors']),
+    ...mapState(['storeErrors', 'storeErrorText', 'instructors', 'studentInstructors']),
+    checkInstructors() {
+      return this.studentInstructors.some(instructor => instructor.id === this.instructorId)
+    },
     priceError: function() {
       if (
         !this.fields.time_from ||
@@ -908,7 +913,15 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['addToClientList', 'createToClientList', 'addStudentToInstructorList', 'getInstructors', 'geoNotification','virtualNotification']),
+    ...mapActions([
+      'addToClientList',
+      'createToClientList',
+      'addStudentToInstructorList',
+      'getInstructors',
+      'geoNotification',
+      'virtualNotification',
+      'getStudentInstructors'
+    ]),
     ...mapMutations(['CLEAR_INPUT']),
     async addToInstructorsList() {
       this.loadingAdd = true
@@ -937,7 +950,8 @@ export default {
         this.CLEAR_INPUT()
       }
     },
-    openAllInstructorsModal() {
+    async openAllInstructorsModal() {
+      await this.getStudentInstructors()
       $('#instructorsModal').modal('show')
     },
     closeAllInstructorsModal() {
@@ -1190,6 +1204,8 @@ export default {
   },
 
   async created() {
+    await this.getStudentInstructors()
+
     this.timeOptions = this.getTimeOptions()
     this.timeZomeOptions = ct.getAllTimezones()
 
@@ -1527,5 +1543,11 @@ export default {
       background-image: linear-gradient(180deg, #0ea510 0%, #038202 100%);
       color: #fff;
     }
+}
+.disabledBtn {
+  background-image: linear-gradient(180deg, #737473 0%, #7a7b7a 100%);
+  &:hover {
+    background-image: linear-gradient(180deg, #737473 0%, #7a7b7a 100%);
+  }
 }
 </style>
