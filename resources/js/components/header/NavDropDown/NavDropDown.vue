@@ -26,6 +26,16 @@ export default {
       opened: false,
     }
   },
+  created() {
+    document.addEventListener('click', (e) => {
+      const dropBtn = document.querySelector('.nav-drop-down__button')
+      const click = e.composedPath().includes(dropBtn)
+      if (this.opened && !click) {
+        this.opened = !this.opened
+      }
+    });
+    this.$on('hook:beforeDestroy', () => document.removeEventListener('click', onClickOutside));
+  },
 }
 </script>
 
