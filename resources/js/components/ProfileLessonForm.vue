@@ -27,7 +27,6 @@
             <div
               class="col-12 form-group has-feedback"
               :class="{ 'has-error': errors.genre }"
-              class='col-12 form-group has-feedback'
             >
               <label>Genre</label>
               <select class="form-control" name="genre" v-model="fields.genre">
@@ -47,7 +46,6 @@
             <div
               class="form-group col-4 has-feedback"
               :class="{ 'has-error': errors.lesson_type }"
-              class='form-group col-4 has-feedback'
             >
               <label>Type of Lesson</label>
               <select class="form-control" v-model="fields.lesson_type">
@@ -67,8 +65,6 @@
               class="form-group col-12 has-feedback"
               :class="{ 'has-error': errors.location }"
               v-if="fields.lesson_type === 'in_person'"
-              :class="{ 'has-error': errors.location }"
-              class='form-group col-12 has-feedback'
             >
               <label>Location</label>
               <input
@@ -87,8 +83,6 @@
               class="col-12 form-group has-feedback"
               :class="{ 'has-error': errors.timezone_id }"
               v-if="fields.lesson_type === 'virtual'"
-              :class="{ 'has-error': errors.timezone_id }"
-              class='col-12 form-group has-feedback'
             >
               <label>Time Zone</label>
               <select class="form-control" v-model="fields.timezone_id">
@@ -109,7 +103,6 @@
             <div
               class="col-lg-12 col-sm-12 col-12 form-group has-feedback"
               :class="{ 'has-error': errors.date }"
-              class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
             >
               <label>Date</label>
               <!--<datepicker :monday-first="false" :typeable="true" :input-class="'mask-input'" v-model="fields.date" name="date" :placeholder="'mm/dd/yyyy'" :format="'MM/dd/yyyy'"></datepicker>-->
@@ -170,7 +163,6 @@
             <div
               class="time-from col-lg-6 col-sm-6 col-12 form-group has-feedback"
               :class="{ 'has-error': errors.time_from }"
-              class='time-from col-lg-6 col-sm-6 col-12 form-group has-feedback'
             >
               <label>Time from</label>
               <vue-timepicker
@@ -194,7 +186,6 @@
             <div
               class="time-to col-lg-6 col-sm-6 col-12 form-group has-feedback"
               :class="{ 'has-error': errors.time_to }"
-              class='time-to col-lg-6 col-sm-6 col-12 form-group has-feedback'
             >
               <label>Time to</label>
               <vue-timepicker
@@ -370,7 +361,6 @@
                 disabled: fields.count_booked === 1,
                 'has-error': errors.spot_price,
               }"
-              class='form-group col-lg-9 col-sm-9 col-12 has-feedback'
             >
               <label>Price</label>
               <div class="d-flex">
@@ -396,7 +386,6 @@
             <div
               class="form-group col-lg-3 col-sm-3 col-12 has-feedback"
               :class="{ 'has-error': errors.spots_count }"
-              class='form-group col-lg-3 col-sm-3 col-12 has-feedback'
             >
               <span class="private-lesson">
                 <span v-if="fields.spots_count === 1">
@@ -423,7 +412,6 @@
             <div
               class="form-group col-12 has-feedback"
               :class="{ 'has-error': errors.description }"
-              class='form-group col-12 has-feedback'
             >
               <label>Description</label>
               <text-editor name="description" v-model="fields.description" />
@@ -461,9 +449,6 @@
                 type="submit"
                 class="btn btn-primary btn-block"
                 v-else
-                class='btn btn-primary btn-block'
-                type='submit'
-                @keypress.enter.prevent
               >
                 Add lesson
               </button>
@@ -476,9 +461,6 @@
                 :class="{
                   'cancel-lesson': students.length === 0,
                 }"
-                class='btn btn-primary btn-block'
-                type='submit'
-                @click='cancelLesson(fields.id)'
               >
                 Cancel lesson
               </button>
