@@ -29,7 +29,10 @@
       >
         <h6>{{ discount.title }}</h6>
         <ul v-if="discount.isActivate">
-            <li> <span>{{ generateDiscountAmount(discount) }} discount </span> is applied. </li>
+          <li>
+            <span>{{ generateDiscountAmount(discount) }} discount </span> is
+            applied.
+          </li>
         </ul>
         <ul v-else>
           <li>
@@ -154,7 +157,7 @@ export default {
       switch (str) {
         case "virtual":
           return "Virtual";
-        case "in_person":
+        case "in_person_client":
           return "In Person";
         default:
           return "Pre-Recorded";

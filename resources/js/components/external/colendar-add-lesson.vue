@@ -166,6 +166,7 @@ import MagnificPopupModal from "./MagnificPopupModal";
 import siteAPI from "../../mixins/siteAPI.js";
 import moment from "moment-timezone";
 import countriesAndTimezones from "countries-and-timezones";
+import {mapMutations} from 'vuex'
 var FileSaver = require("file-saver");
 
 export default {
@@ -206,6 +207,7 @@ export default {
     });
   },
   methods: {
+    ...mapMutations(['SET_SELECTED_DATES']),
     copyTextToClipboard(text) {
       var textArea = document.createElement("input");
 
@@ -368,11 +370,11 @@ export default {
       axios
         .get(
           "/api/instructor/" +
-            this.instructorId +
-            "/lessons?" +
-            this.triggerView +
-            "=" +
-            moment(info.view.currentStart).format("YYYY-MM-DD")
+          this.instructorId +
+          "/lessons?" +
+          this.triggerView +
+          "=" +
+          moment(info.view.currentStart).format("YYYY-MM-DD")
         )
         .then((response) => {
           this.events = response.data.data;
@@ -516,6 +518,12 @@ export default {
       let calendarApi = this.$refs.fullCalendar.getApi();
       calendarApi.changeView("timeGridWeek");
       calendarApi.gotoDate(info.start);
+      const dates = {
+        start: info.start,
+        end: info.end,
+        type: info.view.type
+      }
+      this.SET_SELECTED_DATES(dates)
     },
     dateClick: function (info) {
       this.selectedEvent = {
