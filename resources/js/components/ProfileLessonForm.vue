@@ -569,6 +569,8 @@ export default {
   watch: {
     fields: {
       handler(value) {
+        console.log('ref',this.$refs.lessonLocation.value)
+        console.log('this',this.fields.location)
         if (value.date && (value.date !== value.oldValue) && !this.isOvernight) {
           value.date_to = value.date
         }
@@ -743,7 +745,10 @@ export default {
         autocomplete,
         'place_changed',
         function() {
+          console.log('ref2', thisComponent.$refs[_ref])
+          console.log('this2',thisComponent.fields.location)
           thisComponent.fields.location = thisComponent.$refs[_ref].value
+          console.log('this3',thisComponent.fields.location)
         },
       )
     },
