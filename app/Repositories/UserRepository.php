@@ -529,10 +529,12 @@ class UserRepository extends BaseRepository
 		];
 
 		if ($user->hasRole(User::ROLE_STUDENT))
-			$profileParams[] = 'instagram_handle';
-		else
-			$profileParams[] = 'lesson_block_min_price';
-
+        {
+            $profileParams[] = 'instagram_handle';
+        }else{
+            $profileParams[] = 'lesson_block_min_price';
+            $profileParams[] = 'virtual_min_price';
+        }
 
 		$user->profile->update($request->only($profileParams));
 
