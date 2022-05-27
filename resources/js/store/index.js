@@ -9,10 +9,12 @@ export default new Vuex.Store({
   state: {
     storeErrors: {},
     storeErrorText: '',
-    instructors: []
+    instructors: [],
+    allInstructors: []
   },
   getters: {},
   mutations: {
+    SET_ALL_INSTRUCTORS: (state,data) => state.allInstructors = data,
     SET_INSTRUCTORS: (state, data) => state.instructors = data,
     ERROR_HANDLER: (state, error) => {
       state.storeErrors = {}
@@ -34,6 +36,15 @@ export default new Vuex.Store({
     CLEAR_INPUT: (state) => state.storeErrors = {}
   },
   actions: {
+    async getAllInstructors({commit}) {
+      try {
+        const res = await axios.get(
+          `/api/search/instructors`)
+        commit('SET_ALL_INSTRUCTORS', res.data.data)
+      } catch (e) {
+        commit('ERROR_HANDLER', e)
+      }
+    },
     async getInstructors({commit}, instructorId) {
       try {
         const res = await axios.get(
