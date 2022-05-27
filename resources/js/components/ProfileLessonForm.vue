@@ -618,8 +618,10 @@ export default {
     },
     fields: {
       handler(value) {
-        if (value.date && value.date !== value.oldValue && !this.isOvernight) {
-          value.date_to = value.date;
+        console.log('ref',this.$refs.lessonLocation.value)
+        console.log('this',this.fields.location)
+        if (value.date && (value.date !== value.oldValue) && !this.isOvernight) {
+          value.date_to = value.date
         }
 
         if (value.lesson_type === "in_person_client") {
@@ -788,11 +790,18 @@ export default {
     initNewPlacesAutocomplete(_ref) {
       var thisComponent = this;
       var autocomplete = this.initializeLocationField(this.$refs[_ref], [
-        "address",
-      ]);
-      google.maps.event.addListener(autocomplete, "place_changed", function () {
-        thisComponent.fields.location = thisComponent.$refs[_ref].value;
-      });
+        'address',
+      ])
+      google.maps.event.addListener(
+        autocomplete,
+        'place_changed',
+        function() {
+          console.log('ref2', thisComponent.$refs[_ref])
+          console.log('this2',thisComponent.fields.location)
+          thisComponent.fields.location = thisComponent.$refs[_ref].value
+          console.log('this3',thisComponent.fields.location)
+        },
+      )
     },
   },
   created: function () {
