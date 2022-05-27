@@ -11,10 +11,12 @@ export default new Vuex.Store({
     storeErrorText: '',
     instructors: [],
     studentInstructors: [],
+    datesFromCalendar: {},
   },
   getters: {},
   mutations: {
-    SET_STUDENT_INSTRUCTORS: (state, data) => state.studentInstructors = data,
+    SET_STUDENT_INSTRUCTORS: (state, data) => state.studentInstructors = data,  
+    SET_SELECTED_DATES: (state, dates) => state.datesFromCalendar = dates,
     SET_INSTRUCTORS: (state, data) => state.instructors = data,
     ERROR_HANDLER: (state, error) => {
       state.storeErrors = {}
