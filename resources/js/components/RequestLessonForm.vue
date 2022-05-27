@@ -378,8 +378,7 @@
           </div>
           <div class='modal-body'>
             <p>
-              You should have recieved an email to login and view all your instructors whose client lists you have jonied.
-              We appreciate you being here with us!
+              You should have received an email to create a password and login.  Once logged in, you will be able to view all of your instructors. We appreciate you joining us!
             </p>
             <strong>
               {{ instructorNames.join(', ') }}.
