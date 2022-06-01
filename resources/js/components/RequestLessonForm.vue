@@ -270,6 +270,8 @@
             <br>
             <strong>- {{ instructorName }}</strong>
             <br>
+            <br>
+            <br>
             You should have received an email from Skillective with more details.
           </div>
           <div class='modal-footer'>
@@ -280,7 +282,7 @@
               data-dismiss='modal'
               @click='openAllInstructorsModal'
             >
-              ОК
+              Join other Instructor's client lists here
             </button>
           </div>
         </div>
@@ -291,8 +293,9 @@
       <div class='modal-dialog' role='document'>
         <div class='modal-content'>
           <div class='modal-header'>
-            <h5 class='modal-title' id='instructorsModalLabel'>
-              Would you like to be added to other instructor's client lists? Check the boxes below
+            <h5 class='modal-title text-center' id='instructorsModalLabel'>
+              Would you like to be added to other instructor's client lists? <br>
+            <span class="text-center"> Check the boxes below </span>
             </h5>
             <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
               <span aria-hidden='true'>&times;</span>
@@ -1475,6 +1478,12 @@ export default {
 }
 
 #instructorsModal {
+  .modal-title {
+    span {
+      font-size: 12px;
+    }
+  }
+
   .modal-body {
     ul {
       overflow-y: auto;
@@ -1490,6 +1499,17 @@ export default {
     }
   }
 }
+
+#successAdded {
+  .modal-footer {
+    justify-content: center;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
 .green {
     color: #fff;
     font-family: Poppins;
