@@ -25,7 +25,7 @@ class PurchasedLessonSingleTransformer extends TransformerAbstract
         list($hours, $minutes, $seconds) = sscanf($model->preRecordedLesson->duration, '%d:%d:%d');
         $duration = new DateInterval(sprintf('PT%dH%dM%dS', $hours, $minutes, $seconds));
 
-        
+
         return [
 			'id' => (int)$model->id,
 			'instructor_id' => $model->instructor_id,
@@ -36,7 +36,7 @@ class PurchasedLessonSingleTransformer extends TransformerAbstract
             'title' => $model->preRecordedLesson->title,
             'duration' => $model->preRecordedLesson->video ? $duration->format('%h h %i min %s sec') : "",
             'start' => $model->preRecordedLesson->created_at->format('M d, H:i A'),
-            'video' => $model->preRecordedLesson->video ?  $model->preRecordedLesson->getVideoUrl() : "",
+            'video' => $model->preRecordedLesson->video ?  config('app.url') . '/storage/' . 'videos/' . $model->preRecordedLesson->instructor_id . '/' . $model->preRecordedLesson->video : "",
             'created_at' => $model->preRecordedLesson->created_at->format('M d, H:i A'),
             'purchased_at' => $model->created_at->format('M d, H:i A'),
             'documents' => $model->preRecordedLesson->files,

@@ -24,20 +24,20 @@ class PreRLessonSingleTransformer extends TransformerAbstract
     {
 
         list($hours, $minutes, $seconds) = sscanf($model->duration, '%d:%d:%d');
-        
+
         $duration = "";
 
         if($model->duration){
             $duration = new DateInterval(sprintf('PT%dH%dM%dS', $hours, $minutes, $seconds));
         }
-       
+
         return [
             'id' => (int)$model->id,
             'instructor_id' => $model->instructor_id,
             'genre_id' => $model->genre_id,
             'genre' => $model->genre->transform(),
             'preview' => $model->getPreviewUrl(),
-            'video' => $model->video ? $model->getVideoUrl() : "",
+            'video' => $model->video ? config('app.url') . '/storage/' . 'videos/' . $model->instructor->id . '/'. $model->video : "",
             'description' => $model->description,
             'title' => $model->title,
             'price' => $model->price,
