@@ -1,31 +1,36 @@
 <template>
-  <div class='video-lessons-list'>
-    <div v-if='allLessons.length' class='video-lessons-list__list'>
+  <div class="video-lessons-list">
+    <div class="video-lessons-list__list" v-if="allLessons.length">
       <div
-        v-for='(lesson, lessonIndex) in allLessons'
-        :key='lessonIndex'
-        class='video-lesson'
+        v-for="(lesson, lessonIndex) in allLessons"
+        :key="lessonIndex"
+        class="video-lesson"
       >
         <img
-          :alt='lesson.preview'
-          :src='lesson.preview'
-          class='video-lesson__image'
+          class="video-lesson__image"
+          :src="lesson.preview"
+          :alt="lesson.preview"
         />
-        <div v-if='showInstructorInfo' class='video-lesson__instructor-info'>
+        <div v-if="showInstructorInfo" class="video-lesson__instructor-info">
           <img
-            :alt='lesson.instructor.full_name'
-            :src='lesson.instructor.profile.image'
+            :src="lesson.instructor.profile.image"
+            :alt="lesson.instructor.full_name"
           />
           <h6>
-            <a :href="'https://www.instagram.com/' + lesson.instructor.instagram_handle">
+            <a
+              :href="
+                'https://www.instagram.com/' +
+                lesson.instructor.instagram_handle
+              "
+            >
               @{{ lesson.instructor.instagram_handle }}
             </a>
           </h6>
           <span>
             <a :href="'/profile/' + lesson.instructor_id">
               {{ lesson.instructor.full_name }}
-            </a>
-          </span>
+            </a></span
+          >
         </div>
         <div
           :class="{
@@ -33,83 +38,81 @@
             'video-lesson__content--wide-row-titles': purchased,
           }"
         >
-          <div class='video-lesson__title-container'>
-            <span class='video-lesson__title'>{{ lesson.title }}</span>
+          <div class="video-lesson__title-container">
+            <span class="video-lesson__title">{{ lesson.title }}</span>
             <options-menu
-              v-if='optionsMenuItems.length > 0'
-              :options='optionsMenuItems'
-              @menu-item-clicked='optionsMenuItemClicked($event, lesson)'
+              v-if="optionsMenuItems.length > 0"
+              :options="optionsMenuItems"
+              @menu-item-clicked="optionsMenuItemClicked($event, lesson)"
             />
           </div>
-          <div class='video-lesson__genres'>
-            <span class='video-lesson__genre'>{{ lesson.genre.title }}</span>
+          <div class="video-lesson__genres">
+            <span class="video-lesson__genre">{{ lesson.genre.title }}</span>
           </div>
-          <div v-if='purchased' class='video-lesson__row'>
-            <span class='video-lesson__row-title'>Purchase date:</span>
-            <span class='video-lesson__row-value'>
-              {{ lesson.purchaseDate }}
-            </span>
+          <div v-if="purchased" class="video-lesson__row">
+            <span class="video-lesson__row-title">Purchase date:</span>
+            <span class="video-lesson__row-value">{{
+              lesson.purchaseDate
+            }}</span>
           </div>
-          <div class='video-lesson__row'>
-            <span class='video-lesson__row-title'>Created:</span>
-            <span class='video-lesson__row-value'>{{ lesson.start }}</span>
+          <div class="video-lesson__row">
+            <span class="video-lesson__row-title">Created:</span>
+            <span class="video-lesson__row-value">{{ lesson.start }}</span>
           </div>
-          <div v-if='lesson.duration' class='video-lesson__row'>
-            <span class='video-lesson__row-title'>Duration:</span>
-            <span class='video-lesson__row-value'>{{ lesson.duration }}</span>
+          <div v-if="lesson.duration" class="video-lesson__row">
+            <span class="video-lesson__row-title">Duration:</span>
+            <span class="video-lesson__row-value">{{ lesson.duration }}</span>
           </div>
 
-          <div v-if='isInstructorView' class='video-lesson__row'>
-            <span class='video-lesson__row-title'>Total Revenue:</span>
-            <span class='video-lesson__row-value'>
+          <div v-if="isInstructorView" class="video-lesson__row">
+            <span class="video-lesson__row-title">Total Revenue:</span>
+            <span class="video-lesson__row-value">
               ${{ lesson.totalRevenue }}
             </span>
           </div>
 
-          <div v-if='isInstructorView' class='video-lesson__row'>
-            <span class='video-lesson__row-title'>Total Purchases:</span>
-            <span class='video-lesson__row-value'>
-              {{ lesson.totalPurchares }}
-            </span>
+          <div v-if="isInstructorView" class="video-lesson__row">
+            <span class="video-lesson__row-title">Total Purchares:</span>
+            <span class="video-lesson__row-value">{{
+              lesson.totalPurchares
+            }}</span>
           </div>
 
-          <div v-if='!purchased' class='video-lesson__row'>
-            <span class='video-lesson__row-title video-lesson__row-title--price'>
-              Price:
-            </span>
-            <span class='video-lesson__row-value video-lesson__row-value--price'>
-              ${{ lesson.price }}
-            </span>
+          <div v-if="!purchased" class="video-lesson__row">
+            <span class="video-lesson__row-title video-lesson__row-title--price"
+              >Price:</span
+            >
+            <span class="video-lesson__row-value video-lesson__row-value--price"
+              >${{ lesson.price }}</span
+            >
           </div>
-          <div class='video-lesson__button'>
+          <div class="video-lesson__button">
             <a
-              v-if="cardButton === 'watch-student'"
+              v-if="cardButton == 'watch-student'"
+              class="video-lesson__more-info"
               :href="'/student/library/video/' + lesson.id"
-              class='video-lesson__more-info'
+              >Watch the Video</a
             >
-              Watch the Video
-            </a>
             <a
-              v-if="cardButton === 'watch-instructor'"
+              v-if="cardButton == 'watch-instructor'"
+              class="video-lesson__more-info"
               :href="'/instructor/my-shop/video/' + lesson.id"
-              class='video-lesson__more-info'
+              >Watch the Video</a
             >
-              Watch the Video
-            </a>
             <button
-              v-if="cardButton === 'more-info'"
-              class='video-lesson__more-info'
-              @click.prevent='showMoreInfoPopup(lesson)'
+              v-if="cardButton == 'more-info'"
+              class="video-lesson__more-info"
+              @click.prevent="showMoreInfoPopup(lesson)"
             >
               More info
             </button>
             <button
               v-if="
-                cardButton === 'watch-instructor' ||
-                cardButton === 'watch-student'
+                cardButton == 'watch-instructor' ||
+                cardButton == 'watch-student'
               "
-              class='video-lesson__more-info-link'
-              @click.prevent='showMoreInfoPopup(lesson)'
+              class="video-lesson__more-info-link"
+              @click.prevent="showMoreInfoPopup(lesson)"
             >
               Show all info
             </button>
@@ -118,101 +121,104 @@
       </div>
     </div>
 
-    <span v-else class='video-lessons-list__empty'>
-      No lessons for your request
-    </span>
+    <span v-else class="video-lessons-list__empty"
+      >No lessons for your request</span
+    >
 
     <collapse-transition>
       <div
-        v-if='!collapsed && collapsedLessons.length > 0'
-        class='video-lessons-list__collapsed'
+        v-if="!collapsed && collapsedLessons.length > 0"
+        class="video-lessons-list__collapsed"
       >
-        <div class='video-lessons-list__list'>
+        <div class="video-lessons-list__list">
           <div
-            v-for='(lesson, lessonIndex) in collapsedLessons'
-            :key='lessonIndex'
-            class='video-lesson'
+            v-for="(lesson, lessonIndex) in collapsedLessons"
+            :key="lessonIndex"
+            class="video-lesson"
           >
             <img
-              :alt='lesson.preview'
-              :src='lesson.preview'
-              class='video-lesson__image'
+              class="video-lesson__image"
+              :src="lesson.image"
+              :alt="lesson.image"
             />
             <div
-              v-if='showInstructorInfo'
-              class='video-lesson__instructor-info'
+              v-if="showInstructorInfo"
+              class="video-lesson__instructor-info"
             >
               <img
-                :alt='lesson.instructorImage'
-                :src='lesson.instructorImage'
+                :src="lesson.instructorImage"
+                :alt="lesson.instructorImage"
               />
               <h6>
-                <a :href="'https://www.instagram.com/' + lesson.instructorHandle">
+                <a
+                  :href="'https://www.instagram.com/' + lesson.instructorHandle"
+                >
                   @{{ lesson.instagram_handle }}
                 </a>
               </h6>
               <span>
                 <a :href="'/profile/' + lesson.instructor_id">
                   {{ lesson.instructor }}
-                </a>
-              </span>
+                </a></span
+              >
             </div>
-            <div class='video-lesson__content'>
-              <div class='video-lesson__title-container'>
-                <span class='video-lesson__title'>{{ lesson.title }}</span>
+            <div class="video-lesson__content">
+              <div class="video-lesson__title-container">
+                <span class="video-lesson__title">{{ lesson.title }}</span>
                 <options-menu
-                  v-if='optionsMenuItems.length > 0'
-                  :options='optionsMenuItems'
-                  @menu-item-clicked='optionsMenuItemClicked($event, lesson)'
+                  v-if="optionsMenuItems.length > 0"
+                  :options="optionsMenuItems"
+                  @menu-item-clicked="optionsMenuItemClicked($event, lesson)"
                 />
               </div>
-              <div class='video-lesson__genres'>
-                <span class='video-lesson__genre'>
-                  {{ lesson.genre.title }}
-                </span>
+              <div class="video-lesson__genres">
+                <span class="video-lesson__genre">{{
+                  lesson.genre.title
+                }}</span>
               </div>
-              <div class='video-lesson__row'>
-                <span class='video-lesson__row-title'>Created:</span>
-                <span class='video-lesson__row-value'>{{ lesson.start }}</span>
+              <div class="video-lesson__row">
+                <span class="video-lesson__row-title">Created:</span>
+                <span class="video-lesson__row-value">{{ lesson.start }}</span>
               </div>
-              <div v-if='lesson.duration' class='video-lesson__row'>
-                <span class='video-lesson__row-title'>Duration:</span>
-                <span class='video-lesson__row-value'>
-                  {{ lesson.duration }}
-                </span>
+              <div v-if="lesson.duration" class="video-lesson__row">
+                <span class="video-lesson__row-title">Duration:</span>
+                <span class="video-lesson__row-value">{{
+                  lesson.duration
+                }}</span>
               </div>
-              <div class='video-lesson__row'>
-                <span class='video-lesson__row-title video-lesson__row-title--price'>
-                  Price:
-                </span>
-                <span class='video-lesson__row-value video-lesson__row-value--price'>
-                  ${{ lesson.price }}
-                </span>
+              <div class="video-lesson__row">
+                <span
+                  class="video-lesson__row-title video-lesson__row-title--price"
+                  >Price:</span
+                >
+                <span
+                  class="video-lesson__row-value video-lesson__row-value--price"
+                  >${{ lesson.price }}</span
+                >
               </div>
               <a
                 v-if="
-                  cardButton === 'watch-instructor' ||
-                  cardButton === 'watch-student'
+                  cardButton == 'watch-instructor' ||
+                  cardButton == 'watch-student'
                 "
+                class="video-lesson__more-info"
                 :href="'/student/library/video/' + lesson.id"
-                class='video-lesson__more-info'
+                >Watch the Video</a
               >
-                Watch the Video
-              </a>
               <button
-                v-if="cardButton === 'more-info'"
-                class='video-lesson__more-info'
-                @click.prevent='showMoreInfoPopup(lesson)'
+                v-if="cardButton == 'more-info'"
+                class="video-lesson__more-info"
+                @click.prevent="showMoreInfoPopup(lesson)"
               >
                 More info
               </button>
               <button
                 v-if="
-                  cardButton === 'watch-instructor' ||
-                  cardButton === 'watch-student'
+                  cardButton == 'watch-instructor' ||
+                  cardButton == 'watch-student'
                 "
-                class='video-lesson__more-info-link'
-                @click.prevent='showMoreInfoPopup(lesson)'
+                class="video-lesson__more-info-link"
+                @click.prevent="showMoreInfoPopup(lesson)"
               >
                 Show all info
               </button>
@@ -222,35 +228,35 @@
       </div>
     </collapse-transition>
     <button
-      v-if='collapsed && collapsedLessons.length > 0'
-      class='video-lessons-list__show-more'
-      @click.prevent='collapsed = false'
+      v-if="collapsed && collapsedLessons.length > 0"
+      class="video-lessons-list__show-more"
+      @click.prevent="collapsed = false"
     >
       Show more
     </button>
     <button
-      v-if='!collapsed && collapsedLessons.length > 0'
-      class='video-lessons-list__show-more'
-      @click.prevent='collapsed = true'
+      v-if="!collapsed && collapsedLessons.length > 0"
+      class="video-lessons-list__show-more"
+      @click.prevent="collapsed = true"
     >
       Show less
     </button>
     <video-lesson-info-popup
-      ref='videoLessonInfoPopup'
-      :can-book='canBook'
-      :popup-button='popupButton'
+      :can-book="canBook"
+      ref="videoLessonInfoPopup"
+      :popup-button="popupButton"
     />
   </div>
 </template>
 
 <script>
-import CollapseTransition from '@ivanv/vue-collapse-transition/src/CollapseTransition.vue'
-import VideoLessonInfoPopup from '../VideoLessonInfoPopup/VideoLessonInfoPopup.vue'
-import OptionsMenu from '../OptionsMenu/OptionsMenu.vue'
-import urlHelper from '../../../helpers/urlHelper'
+import CollapseTransition from "@ivanv/vue-collapse-transition/src/CollapseTransition.vue";
+import VideoLessonInfoPopup from "../VideoLessonInfoPopup/VideoLessonInfoPopup.vue";
+import OptionsMenu from "../OptionsMenu/OptionsMenu.vue";
+import urlHelper from "../../../helpers/urlHelper";
 
 export default {
-  name: 'VideoLessonsList',
+  name: "VideoLessonsList",
   components: {
     CollapseTransition,
     VideoLessonInfoPopup,
@@ -258,26 +264,26 @@ export default {
   },
   methods: {
     showMoreInfoPopup(lesson) {
-      this.$refs.videoLessonInfoPopup.showPopup(lesson)
+      this.$refs.videoLessonInfoPopup.showPopup(lesson);
     },
     optionsMenuItemClicked(menuItemIndex, lesson) {
-      this.$emit('options-menu-item-clicked', {
+      this.$emit("options-menu-item-clicked", {
         menuItemIndex,
         lesson,
-      })
+      });
     },
   },
   props: {
     lessons: {
       type: Array,
       default: () => {
-        return []
+        return [];
       },
     },
     collapsedLessons: {
       type: Array,
       default: () => {
-        return []
+        return [];
       },
     },
     showInstructorInfo: {
@@ -290,12 +296,12 @@ export default {
     },
     isInstructorView: {
       type: Boolean,
-      default: false,
+      deafult: false,
     },
     optionsMenuItems: {
       type: Array,
       default: () => {
-        return []
+        return [];
       },
     },
     cardButton: {
@@ -316,8 +322,8 @@ export default {
   data() {
     return {
       collapsed: true,
-      allLessons: [],
-    }
+      allLessons: []
+    };
   },
   created() {
     this.allLessons = this.lessons
@@ -329,9 +335,9 @@ export default {
         : this.allLessons = []
     }
   },
-}
+};
 </script>
 
-<style lang='scss' scoped>
-@import './VideoLessonsList.scss';
+<style lang="scss" scoped>
+@import "./VideoLessonsList.scss";
 </style>
