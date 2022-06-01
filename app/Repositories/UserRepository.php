@@ -69,9 +69,12 @@ class UserRepository extends BaseRepository
 
         $data = $this->presenter->present($data);
 
-        foreach ( $data['data'] as $key => $instructor )
+        if (request()->routeIs('instructors'))
         {
-            $data['data'][$key]['genres'] = $this->find($instructor['id'])->genres->toArray();
+            foreach ( $data['data'] as $key => $instructor )
+            {
+                $data['data'][$key]['genres'] = $this->find($instructor['id'])->genres->toArray();
+            }
         }
 
 		return $data;
