@@ -5,6 +5,8 @@
         <h2 class='d-flex align-items-center'>
           {{ selectedLesson.title }}
         </h2>
+        <p class='instructor-full_name'>{{ selectedLesson.instructor.full_name }}</p>
+        <p class='instructor-instagram'>@{{ selectedLesson.instructor.profile.instagram_handle }}</p>
         <span class='lesson-type'>
           Lesson Type: {{ getLessonTypeName(selectedLesson.lesson_type) }}
         </span>
@@ -13,7 +15,10 @@
           class='avatar-stack'
           v-if='selectedLesson.students.length > 0 && studentList === true'
         >
-          <span v-for='student in selectedLesson.students.slice(0,countAvatarsToShow)'>
+          <span 
+          v-for='(student, index) in selectedLesson.students.slice(0,countAvatarsToShow)'
+          :key="index"
+          >
             <img
               :src='student.profile.image'
               :alt='student.full_name'
@@ -203,7 +208,7 @@ export default {
       }, 1000)
     },
   },
-  created: function() {
+  created() {
     this.updateLessonDetails()
     this.showNotifyClientsBtn = this.showNotifyBtn
   },
@@ -214,3 +219,20 @@ export default {
   },
 }
 </script>
+<style lang="scss" scoped>
+  .instructor-instagram {
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 24px;
+    color: #AAAAAA;
+    margin-bottom: 5px;
+  }
+
+  .instructor-full_name {
+    margin-bottom: 5px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+</style>
