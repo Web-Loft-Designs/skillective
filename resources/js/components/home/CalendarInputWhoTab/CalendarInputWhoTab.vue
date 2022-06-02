@@ -38,6 +38,7 @@
 import instructorService from "../../../services/instructorService";
 import AnimLoader from "../../cart/AnimLoader/AnimLoader.vue";
 import autocompleteHelper from "../../../helpers/autocompleteHelper";
+import { mapState } from 'vuex';
 
 export default {
   name: "CalendarInputWhoTab",
@@ -46,6 +47,7 @@ export default {
   },
   props: {
     value: Object,
+    getAll: Boolean,
   },
   data() {
     return {
@@ -101,10 +103,19 @@ export default {
       }
     },
   },
+  computed: {
+    ...mapState(['allInstructors'])
+  },
   watch: {
     isLoading(newValue) {
       this.$emit("loading-changed", this.isLoading);
     },
+    getAll() {
+      this.isLoading = true
+      this.instructors = this.allInstructors
+      this.isLoading = false
+      this.$emit("loading-changed", this.isLoading)
+    }
   },
 }
 </script>

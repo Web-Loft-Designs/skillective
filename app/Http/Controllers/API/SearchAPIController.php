@@ -17,6 +17,13 @@ class SearchAPIController extends AppBaseController
 {
     public function autocompleteInstructor(Request $request)
     {
+
+        if( !$request->has('instructor') )
+        {
+            $result = User::take(10)->orderBy('first_name')->get();
+            return $this->sendResponse($result);
+        }
+
         $searchString = $request->input('instructor');
         $searchString = trim($searchString, '@');
 
@@ -26,7 +33,9 @@ class SearchAPIController extends AppBaseController
 
         $searchStringArr = preg_split('/\s+/', $searchString, -1, PREG_SPLIT_NO_EMPTY);
 
-        $userQuery = User::with(['profile', 'roles']);
+        $userQuery = User::with(['profile', 'roles'])
+            ->where('first_name', 'LIKE', $searchString . '%')
+            ->orWhere('last_name', 'LIKE', $searchString . '%');
 
         foreach($searchStringArr as $searchString) {
             $userQuery->searchFromNameInstagram($searchString);
@@ -35,9 +44,11 @@ class SearchAPIController extends AppBaseController
         $result = $userQuery->whereHas('roles', static function (Builder $query) {
                 $query->where('name', USER::ROLE_INSTRUCTOR);
             })
+            ->orderBy('first_name')
             ->get();
 
         return $this->sendResponse($result);
+
     }
 
     public function autocompleteGenres(Request $request)
