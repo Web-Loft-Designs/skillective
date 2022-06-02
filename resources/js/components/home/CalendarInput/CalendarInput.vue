@@ -105,7 +105,7 @@
             class="calendar-input-option__input"
             placeholder="Do you want to learn from?"
             v-model="whoValue.text"
-            @click.stop="selectedTab = 'who'"
+            @click.stop="toggleTab('who', $event)"
           />
           <span
             class="calendar-input-option__autocomplete"
@@ -245,7 +245,7 @@
         <transition name="slidein">
           <div
             class="calendar-input__tab calendar-input__tab--who"
-            v-if="selectedTab == 'who' && whoValue.text"
+            v-if="(selectedTab == 'who' && whoValue.text) || (allInstructors.length > 0 && selectedTab == 'who')"
           >
             <calendar-input-who-tab
               @autocomplete="setWhoAutocompleteText($event)"
@@ -253,6 +253,7 @@
               ref="calendarInputWhoTab"
               :value="whoValue"
               @loading-changed="setAutocompleteLoading($event)"
+              :getAll="getAll"
             />
           </div>
         </transition>
@@ -312,6 +313,7 @@ import CalendarInputWhereTab from "../CalendarInputWhereTab/CalendarInputWhereTa
 import NewHeader from "../../header/NewHeader/NewHeader.vue";
 import dateHelper from "../../../helpers/dateHelper";
 import urlHelper from "../../../helpers/urlHelper";
+import {mapState, mapActions} from "vuex";
 
 export default {
   name: "CalendarInput",
@@ -401,9 +403,11 @@ export default {
       showFixedCalendarInput: false,
       windowWidth: window.innerWidth,
       preRecorded: false,
+      getAll: false
     };
   },
   methods: {
+    ...mapActions(['getAllInstructors']),
     parseQueryParams() {
       const params = urlHelper.parseQueryParams();
 
@@ -566,11 +570,16 @@ export default {
     clearWhenValue() {
       this.$refs.calendarInputWhenTab.clearValue();
     },
-    toggleTab(tab = null, event = null) {
+    async toggleTab(tab = null, event = null) {
+      this.getAll = false
       if (this.selectedTab == tab) {
         this.selectedTab = null;
       } else {
         this.selectedTab = tab;
+      }
+      if (this.selectedTab === 'who' && event.target.value === '') {
+        await this.getAllInstructors()
+        this.getAll = true
       }
       if (event) {
         const input = event.target.getElementsByTagName("input")[0];
@@ -655,6 +664,9 @@ export default {
       deep: true,
     },
   },
+  computed: {
+    ...mapState(['allInstructors'])
+  }
 };
 </script>
 
