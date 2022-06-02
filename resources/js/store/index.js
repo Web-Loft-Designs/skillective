@@ -10,10 +10,12 @@ export default new Vuex.Store({
     storeErrors: {},
     storeErrorText: '',
     instructors: [],
+    studentInstructors: [],
     allInstructors: []
   },
   getters: {},
   mutations: {
+    SET_STUDENT_INSTRUCTORS: (state, data) => state.studentInstructors = data,
     SET_ALL_INSTRUCTORS: (state,data) => state.allInstructors = data,
     SET_INSTRUCTORS: (state, data) => state.instructors = data,
     ERROR_HANDLER: (state, error) => {
@@ -36,6 +38,16 @@ export default new Vuex.Store({
     CLEAR_INPUT: (state) => state.storeErrors = {}
   },
   actions: {
+
+    async getStudentInstructors({commit}) {
+      try {
+        const res = await axios.get('/api/student/instructors')
+        commit('SET_STUDENT_INSTRUCTORS', res.data.data.data)
+        } catch (e) {
+        commit('ERROR_HANDLER', e)
+      }
+    },
+
     async getAllInstructors({commit}) {
       try {
         const res = await axios.get(
@@ -47,8 +59,7 @@ export default new Vuex.Store({
     },
     async getInstructors({commit}, instructorId) {
       try {
-        const res = await axios.get(
-          `/api/relation-instructors/${ instructorId }`)
+        const res = await axios.get(`/api/relation-instructors/${instructorId}`)
         commit('SET_INSTRUCTORS', res.data.data)
       } catch (e) {
         commit('ERROR_HANDLER', e)
