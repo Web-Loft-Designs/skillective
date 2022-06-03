@@ -6,11 +6,25 @@
     font-size: 28px;
     line-height: 42px;
     color: #333;
-    margin: 50px 0 24px 0;
+    margin: 50px 0 10px 0;
+  }
+
+  &__steps {
+    margin-bottom: 14px;
   }
 
   &__row {
     display: flex;
+
+    .step {
+      width: 65%;
+      justify-content: space-between;
+
+      .green {
+        height: auto;
+        font-size: 12px;
+      }
+    }
   }
 
   &__column {
