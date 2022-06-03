@@ -123,43 +123,6 @@
               </span>
             </div>
 
-            <!--            <div class='col-12 form-group has-feedback'>-->
-            <!--              <toggle-button-->
-            <!--                :value='isOvernight'-->
-            <!--                :color="{ checked: '#a94442', unchecked: '#01bd00' }"-->
-            <!--                :sync='true'-->
-            <!--                :labels="{-->
-            <!--                  checked: 'Disable overnight',-->
-            <!--                  unchecked: 'Enable overnight',-->
-            <!--                }"-->
-            <!--                @change='toggleOvernight'-->
-            <!--                :font-size='14'-->
-            <!--                :height='38'-->
-            <!--                :width='186'-->
-            <!--              />-->
-            <!--            </div>-->
-
-            <div
-              class="col-lg-12 col-sm-12 col-12 form-group has-feedback"
-              :class="{ 'has-error': errors.date }"
-              v-if="isOvernight"
-            >
-              <label>Date to</label>
-              <dropdown-datepicker
-                v-if="isDateInputInit"
-                display-format="mdy"
-                v-model="fields.date_to"
-                submit-format="yyyy-mm-dd"
-                key="sombun5"
-                ref="datepickerTo"
-                :minYear="2021"
-                maxDate="2030-01-01"
-              ></dropdown-datepicker>
-
-              <span class="help-block" v-if="errors.date_to">
-                <strong>{{ errors.date_to[0] }}</strong>
-              </span>
-            </div>
             <div
               class="time-from col-lg-6 col-sm-6 col-12 form-group has-feedback"
               :class="{ 'has-error': errors.time_from }"
@@ -482,6 +445,7 @@ import VueTimepicker from "vue2-timepicker/src/vue-timepicker.vue";
 import CopyInput from "./discounts/CopyInput/CopyInput";
 import shareHelper from "../helpers/shareHelper";
 import TextEditor from "./profile/TextEditor/TextEditor";
+import {mapState} from 'vuex'
 
 require("jquery.maskedinput/src/jquery.maskedinput");
 
@@ -524,12 +488,12 @@ export default {
       lessonTypes: [],
       isDateInputInit: false,
       isTimeIntervals: false,
-      isOvernight: true,
       isReccuring: false,
       students: [],
     };
   },
   computed: {
+    ...mapState(['datesFromCalendar']),
     num: function () {
       if (
         this.fields.date &&
@@ -586,9 +550,39 @@ export default {
   },
 
   watch: {
+    datesFromCalendar: {
+      handler() {
+        if (this.datesFromCalendar.type === 'timeGridWeek') {
+          this.fields.time_from = moment(this.datesFromCalendar.start)
+            .format('hh:mm a')
+          this.fields.time_to = moment(this.datesFromCalendar.end)
+            .format('hh:mm a')
+        }
+        this.fields.date = moment(this.datesFromCalendar.start)
+          .format('YYYY-MM-DD')
+        setTimeout(() => {
+          if (this.$refs.datepicker) {
+            this.$refs.datepicker.day = Number(
+              moment(this.datesFromCalendar.start)
+                .format('DD'),
+            )
+            this.$refs.datepicker.month = Number(
+              moment(this.datesFromCalendar.start)
+                .format('MM'),
+            )
+            this.$refs.datepicker.year = Number(
+              moment(this.datesFromCalendar.start)
+                .format('YYYY'),
+            )
+          }
+        }, 0)
+        this.openPopup()
+      },
+      deep: true,
+    },
     fields: {
       handler(value) {
-        if (value.date && value.date !== value.oldValue && !this.isOvernight) {
+        if (value.date && value.date !== value.oldValue) {
           value.date_to = value.date;
         }
 
@@ -615,21 +609,6 @@ export default {
 
       if (moment(this.fields.date))
         this.fields.date = moment(today).format("YYYY-MM-DD");
-
-      if (this.isOvernight) {
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-
-        this.$refs.datepickerTo.year = tomorrow.getFullYear();
-        this.$refs.datepickerTo.month = tomorrow.getMonth() + 1;
-        this.$refs.datepickerTo.day = tomorrow.getDate();
-
-        if (moment(this.fields.date_to))
-          this.fields.date_to = moment(tomorrow).format("YYYY-MM-DD");
-      } else {
-        if (moment(this.fields.date_to))
-          this.fields.date_to = moment(today).format("YYYY-MM-DD");
-      }
     },
     toggleTimeInervals() {
       this.isTimeIntervals = !this.isTimeIntervals;
@@ -653,10 +632,10 @@ export default {
       this.$refs[input].apm = "";
     },
     timeFormChange() {
-      if (moment(this.fields.time_from)) {
-        this.fields.time_to = moment(this.fields.time_from, ["h:mm a"])
-          .add("30", "minutes")
-          .format("h:mm a");
+      if (moment(this.fields.time_from) && this.datesFromCalendar.type !== 'timeGridWeek') {
+        this.fields.time_to = moment(this.fields.time_from, ['h:mm a'])
+          .add('30', 'minutes')
+          .format('h:mm a')
       }
     },
     onSubmit() {
@@ -701,13 +680,8 @@ export default {
     },
     openPopup() {
       this.isDateInputInit = true;
-      this.isOvernight = true;
-
       setTimeout(() => {
-        if (this.fields.date) {
-          this.isOvernight = this.fields.date !== this.fields.date_to;
-        } else {
-          this.isOvernight = false;
+        if (!this.fields.date) {
           this.initDateFrom();
         }
       }, 1);
@@ -753,7 +727,6 @@ export default {
       this.$refs.lessonLocation = null;
 
       this.fields.lesson_type = "in_person";
-      this.isOvernight = true;
     },
     initNewPlacesAutocomplete(_ref) {
       var thisComponent = this;

@@ -11,12 +11,14 @@ export default new Vuex.Store({
     storeErrorText: '',
     instructors: [],
     studentInstructors: [],
-    allInstructors: []
+    allInstructors: [],
+    datesFromCalendar: {},
   },
   getters: {},
   mutations: {
+    SET_SELECTED_DATES: (state, dates) => state.datesFromCalendar = dates,
     SET_STUDENT_INSTRUCTORS: (state, data) => state.studentInstructors = data,
-    SET_ALL_INSTRUCTORS: (state,data) => state.allInstructors = data,
+    SET_ALL_INSTRUCTORS: (state, data) => state.allInstructors = data,
     SET_INSTRUCTORS: (state, data) => state.instructors = data,
     ERROR_HANDLER: (state, error) => {
       state.storeErrors = {}
@@ -35,19 +37,18 @@ export default new Vuex.Store({
         state.storeErrorText = 'Unable to process your request'
       }
     },
-    CLEAR_INPUT: (state) => state.storeErrors = {}
+    CLEAR_INPUT: (state) => state.storeErrors = {},
   },
   actions: {
-
     async getStudentInstructors({commit}) {
       try {
         const res = await axios.get('/api/student/instructors')
         commit('SET_STUDENT_INSTRUCTORS', res.data.data.data)
-        } catch (e) {
+      } catch (e) {
         commit('ERROR_HANDLER', e)
       }
     },
-
+    
     async getAllInstructors({commit}) {
       try {
         const res = await axios.get(
@@ -91,20 +92,20 @@ export default new Vuex.Store({
     },
     async geoNotification(context, data) {
       try {
-        await axios.post('/api/student/instructor/geo-notifications',data)
+        await axios.post('/api/student/instructor/geo-notifications', data)
       } catch (e) {
         commit('ERROR_HANDLER', e)
       }
     },
     async virtualNotification(context, data) {
       try {
-        await axios.post('/api/student/instructor/virtual-lesson-notifications',data)
+        await axios.post('/api/student/instructor/virtual-lesson-notifications', data)
       } catch (e) {
         commit('ERROR_HANDLER', e)
       }
     },
   },
   modules: {
-    cart
-  }
+    cart,
+  },
 })
