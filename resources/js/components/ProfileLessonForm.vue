@@ -413,8 +413,8 @@
               class="form-group col-12 has-feedback"
               :class="{ 'has-error': errors.description }"
             >
-              <label>Description</label>
-              <text-editor name="description" v-model="fields.description" />
+              <label>What I am teaching, offering or sharing:</label>
+              <text-editor name="description" v-model="fields.description" placeholder='provide a description' />
               <span class="help-block" v-if="errors.description">
                 <strong>{{ errors.description[0] }}</strong>
               </span>
