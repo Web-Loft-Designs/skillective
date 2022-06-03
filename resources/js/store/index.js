@@ -13,9 +13,11 @@ export default new Vuex.Store({
     studentInstructors: [],
     allInstructors: [],
     datesFromCalendar: {},
+    checkOutStep: 1,
   },
   getters: {},
   mutations: {
+    SET_CHECK_OUT_STEP: (state, step) => state.checkOutStep = step,
     SET_SELECTED_DATES: (state, dates) => state.datesFromCalendar = dates,
     SET_STUDENT_INSTRUCTORS: (state, data) => state.studentInstructors = data,
     SET_ALL_INSTRUCTORS: (state, data) => state.allInstructors = data,

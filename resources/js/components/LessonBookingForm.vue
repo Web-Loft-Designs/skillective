@@ -2,7 +2,7 @@
   <div class="checkout-outer">
     <div v-if="getTotal.count == 0 && !checkoutSuccess" class="no-lessons-wrap">
       <span> No items in cart </span>
-      <p> Maybe someone booked the lesson before you </p>
+      <p>Maybe someone booked the lesson before you</p>
       <a href="/lessons"> Book lessons </a>
     </div>
     <div v-else id="booking-form-container">
@@ -572,15 +572,15 @@
 </template>
 
 <script>
-import guestCartHelper from "../helpers/guestCartHelper";
-import MaskedInput from "vue-masked-input";
-import siteAPI from "../mixins/siteAPI.js";
-import skillectiveHelper from "../mixins/skillectiveHelper.js";
-import { mapActions, mapGetters } from "vuex";
+import guestCartHelper from '../helpers/guestCartHelper'
+import MaskedInput from 'vue-masked-input'
+import siteAPI from '../mixins/siteAPI.js'
+import skillectiveHelper from '../mixins/skillectiveHelper.js'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 // import VueAutonumeric from '../../../node_modules/vue-autonumeric/src/components/VueAutonumeric.vue';
-import $ from "jquery";
-require("jquery.maskedinput/src/jquery.maskedinput");
-import DropdownDatepicker from "vue-dropdown-datepicker";
+import $ from 'jquery'
+require('jquery.maskedinput/src/jquery.maskedinput')
+import DropdownDatepicker from 'vue-dropdown-datepicker'
 export default {
   components: {
     MaskedInput,
@@ -589,40 +589,40 @@ export default {
   },
   mixins: [siteAPI, skillectiveHelper],
   props: [
-    "user",
-    "categorizedGenres",
-    "userPaymentMethods",
-    "paymentEnvironment",
-    "clientToken",
-    "confirmationText",
-    "lessonsCount",
+    'user',
+    'categorizedGenres',
+    'userPaymentMethods',
+    'paymentEnvironment',
+    'clientToken',
+    'confirmationText',
+    'lessonsCount',
   ],
   data() {
     return {
       //				route: '',
       //				logItems : [],
       //				focusLoop: false,
-      paymentMethod: "CreditCard",
+      paymentMethod: 'CreditCard',
       paymentMethods: [],
-      lesson_type: "",
+      lesson_type: '',
       fields: {
-        first_name: "",
-        last_name: "",
-        instagram_handle: "",
-        email: "",
-        address: "",
-        city: "",
-        state: "",
-        zip: "",
-        dob: "",
-        gender: "",
-        mobile_phone: "",
+        first_name: '',
+        last_name: '',
+        instagram_handle: '',
+        email: '',
+        address: '',
+        city: '',
+        state: '',
+        zip: '',
+        dob: '',
+        gender: '',
+        mobile_phone: '',
         genres: [],
         accept_terms: false,
         payment_method_token: null,
         payment_method_nonce: null,
-        device_data: "",
-        lesson_type: "",
+        device_data: '',
+        lesson_type: '',
       },
       booking: null,
       genresTemp: [],
@@ -631,31 +631,32 @@ export default {
       useSavedMethod: false,
       venmoNotSupported: false,
       checkoutSuccess: false,
-    };
+    }
   },
   methods: {
     ...mapActions({
-      fetchCartTotal: "fetchCartTotal",
-      fetchCartItems: "fetchCartItems",
+      fetchCartTotal: 'fetchCartTotal',
+      fetchCartItems: 'fetchCartItems',
     }),
     ...mapGetters({
-      getCartTotal: "getCartTotal",
+      getCartTotal: 'getCartTotal',
     }),
+    ...mapMutations(['SET_CHECK_OUT_STEP']),
     initNewPlacesAutocomplete(_ref) {
-      var thisComponent = this;
+      var thisComponent = this
       var autocomplete = this.initializeLocationField(this.$refs[_ref], [
-        "address",
-      ]);
+        'address',
+      ])
       google.maps.event.addListener(
         autocomplete,
-        "place_changed",
+        'place_changed',
         function (e) {
-          thisComponent.fields.location = thisComponent.$refs[_ref].value;
+          thisComponent.fields.location = thisComponent.$refs[_ref].value
         }
-      );
+      )
     },
     fetchBrainthreeToken() {
-      var vueComponent = this;
+      var vueComponent = this
 
       return new Promise((resolve, reject) => {
         this.braintreeClientInstance.tokenize(
@@ -665,98 +666,99 @@ export default {
           function (tokenizeErr, payload) {
             if (tokenizeErr) {
               //                        console.error(tokenizeErr);
-              vueComponent.errorText = tokenizeErr.message;
+              vueComponent.errorText = tokenizeErr.message
               //                        vueComponent.errorText = 'Error: Can\'t process your data'
-              return;
-            } else vueComponent.errorText = "";
+              return
+            } else vueComponent.errorText = ''
             if (payload.nonce != undefined) {
               if (
                 vueComponent.fields.payment_method_token == null &&
                 payload.nonce == null
               ) {
-                vueComponent.errorText = "No payment method provided";
-                return;
+                vueComponent.errorText = 'No payment method provided'
+                return
               }
-              resolve(payload.nonce);
+              resolve(payload.nonce)
             } else {
-              vueComponent.errorText = "Can't process your data.";
+              vueComponent.errorText = "Can't process your data."
             }
           }
-        );
-      });
+        )
+      })
     },
-    async onSubmitStepCreditCard2() {      
+    async onSubmitStepCreditCard2() {
       if (this.getTotal.count > 0) {
         if (this.selectedPaymentMethodObj == null) {
-          let i = 0;
-          const payment_method_nonce = [];
+          let i = 0
+          const payment_method_nonce = []
 
           while (i < this.getTotal.count) {
-            let token = await this.fetchBrainthreeToken();
-            payment_method_nonce.push(token);
-            i++;
+            let token = await this.fetchBrainthreeToken()
+            payment_method_nonce.push(token)
+            i++
           }
 
-          this.fields.payment_method_nonce = payment_method_nonce;
+          this.fields.payment_method_nonce = payment_method_nonce
 
           setTimeout(() => {
-            this.book();
-          }, 1);
+            this.book()
+          }, 1)
         } else {
-          this.book();
+          this.book()
         }
       }
     },
     onSubmitStep1() {
       if (moment(this.fields.dob))
-        this.fields.dob = moment(this.fields.dob).format("YYYY-MM-DD");
+        this.fields.dob = moment(this.fields.dob).format('YYYY-MM-DD')
 
-      this.fetchCartTotal();
-      this.fetchCartItems();
-      this.apiPost("/api/cart/validate-user-info", this.fields);
+      this.fetchCartTotal()
+      this.fetchCartItems()
+      this.apiPost('/api/cart/validate-user-info', this.fields)
+      this.SET_CHECK_OUT_STEP(2)
     },
     book() {
       if (moment(this.fields.dob))
-        this.fields.dob = moment(this.fields.dob).format("YYYY-MM-DD");
+        this.fields.dob = moment(this.fields.dob).format('YYYY-MM-DD')
 
-      this.apiPost("/api/cart/checkout", {
+      this.apiPost('/api/cart/checkout', {
         ...this.fields,
         guest_cart: guestCartHelper.getProducts(),
-        promo_codes: guestCartHelper.getPromos()
-      });
+        promo_codes: guestCartHelper.getPromos(),
+      })
     },
     componentHandlePostResponse(responseData) {
       if (this.bookingStep == 1) {
-        this.bookingStep = 2;
+        this.bookingStep = 2
       } else if (this.bookingStep == 2) {
+        guestCartHelper.clearProducts()
+        guestCartHelper.clearPromos()
 
-        guestCartHelper.clearProducts();
-        guestCartHelper.clearPromos();
-
-        this.booking = responseData.data;
-        this.clearSubmittedForm();
-        this.successText = null;
-        this.bookingStep = 3;
-        this.fetchCartTotal();
-        this.fetchCartItems();
-        this.checkoutSuccess = true;
+        this.booking = responseData.data
+        this.clearSubmittedForm()
+        this.successText = null
+        this.bookingStep = 3
+        this.SET_CHECK_OUT_STEP(3)
+        this.fetchCartTotal()
+        this.fetchCartItems()
+        this.checkoutSuccess = true
       }
     },
     componentHandleGetResponse(responseData) {
       if (this.bookingStep == 2) {
-        this.paymentMethodsData = responseData.data;
+        this.paymentMethodsData = responseData.data
       }
     },
     changeIt: function () {
-      var tempArry = [];
+      var tempArry = []
       this.genresTemp.forEach((item) => {
-        tempArry.push(item.id);
-      });
-      this.fields.genres = tempArry;
+        tempArry.push(item.id)
+      })
+      this.fields.genres = tempArry
     },
     initBraintreeClient() {
-      var vueComponent = this;
-      this.fields.payment_method_nonce = null;
+      var vueComponent = this
+      this.fields.payment_method_nonce = null
       if (this.selectedPaymentMethodObj == null) {
         // needed only for creating new method
 
@@ -766,11 +768,11 @@ export default {
           },
           function (clientErr, clientInstance) {
             if (clientErr) {
-              vueComponent.errorText = clientErr.message;
-              return;
-            } else vueComponent.errorText = "";
+              vueComponent.errorText = clientErr.message
+              return
+            } else vueComponent.errorText = ''
 
-            if (vueComponent.paymentMethod == "CreditCard") {
+            if (vueComponent.paymentMethod == 'CreditCard') {
               // Create a hostedFields component to initialize the form
               //							if (vueComponent.selectedPaymentMethodObj!=null){
               //								vueComponent.fields.cardholderName = vueComponent.selectedPaymentMethodObj.cardholderName;
@@ -782,51 +784,51 @@ export default {
                   styles: {
                     // https://developers.braintreepayments.com/guides/hosted-fields/styling/javascript/v3
                     input: {
-                      "font-size": "14px",
-                      border: "1px solid #ccc",
+                      'font-size': '14px',
+                      border: '1px solid #ccc',
                     },
-                    "input.invalid": {
-                      color: "red",
+                    'input.invalid': {
+                      color: 'red',
                     },
-                    "input.valid": {
-                      color: "green",
+                    'input.valid': {
+                      color: 'green',
                     },
                   },
                   // Configure which fields in your card form will be generated by Hosted Fields instead
                   fields: {
                     number: {
-                      selector: "#card-number",
-                      placeholder: "____ ____ ____ ____",
+                      selector: '#card-number',
+                      placeholder: '____ ____ ____ ____',
                     },
                     cvv: {
-                      selector: "#cvv",
-                      placeholder: "•••",
+                      selector: '#cvv',
+                      placeholder: '•••',
                     },
                     expirationDate: {
-                      selector: "#expiration-date",
-                      placeholder: "MM / YYYY",
+                      selector: '#expiration-date',
+                      placeholder: 'MM / YYYY',
                       //										prefill : (vueComponent.selectedPaymentMethodObj!=null) ? (vueComponent.selectedPaymentMethodObj.expirationDate) :''
                     },
                   },
                 },
                 function (hostedFieldsErr, instance) {
                   if (hostedFieldsErr) {
-                    vueComponent.errorText = hostedFieldsErr.message;
-                    console.error(hostedFieldsErr);
-                    return;
-                  } else vueComponent.errorText = "";
+                    vueComponent.errorText = hostedFieldsErr.message
+                    console.error(hostedFieldsErr)
+                    return
+                  } else vueComponent.errorText = ''
                   document
-                    .querySelector("#payment-method-form-submit")
-                    .removeAttribute("disabled");
-                  vueComponent.braintreeClientInstance = instance;
+                    .querySelector('#payment-method-form-submit')
+                    .removeAttribute('disabled')
+                  vueComponent.braintreeClientInstance = instance
                 }
-              );
-            } else if (vueComponent.paymentMethod == "PayPalAccount") {
-              var forPayPal = true;
+              )
+            } else if (vueComponent.paymentMethod == 'PayPalAccount') {
+              var forPayPal = true
               vueComponent.collectDeviceDataForBraintree(
                 clientInstance,
                 forPayPal
-              );
+              )
 
               // Create a PayPal Checkout component.
               braintree.paypalCheckout.create(
@@ -838,12 +840,12 @@ export default {
                   // This could happen if there was a network error or if it's incorrectly
                   // configured.
                   if (paypalCheckoutErr) {
-                    vueComponent.errorText = paypalCheckoutErr.message;
+                    vueComponent.errorText = paypalCheckoutErr.message
                     console.error(
-                      "Error connecting to PayPal:",
+                      'Error connecting to PayPal:',
                       paypalCheckoutErr
-                    );
-                    return;
+                    )
+                    return
                   }
 
                   // Set up PayPal with the checkout.js library
@@ -851,17 +853,17 @@ export default {
                     {
                       env: vueComponent.paymentEnvironment, //'production' or 'sandbox'
                       style: {
-                        label: "pay",
-                        size: "large",
+                        label: 'pay',
+                        size: 'large',
                         //										tagline : false,
-                        shape: "rect",
+                        shape: 'rect',
                       },
                       payment: function () {
                         return paypalCheckoutInstance.createPayment({
-                          flow: "vault",
-                          billingAgreementDescription: "",
+                          flow: 'vault',
+                          billingAgreementDescription: '',
                           enableShippingAddress: false,
-                        });
+                        })
                       },
                       onAuthorize: function (data, actions) {
                         return paypalCheckoutInstance.tokenizePayment(
@@ -869,40 +871,40 @@ export default {
                           function (err, payload) {
                             if (payload.nonce != undefined) {
                               vueComponent.fields.payment_method_nonce =
-                                payload.nonce;
-                              vueComponent.book();
+                                payload.nonce
+                              vueComponent.book()
                             } else {
                               vueComponent.errorText =
-                                "Can't process your data.";
+                                "Can't process your data."
                             }
                           }
-                        );
+                        )
                       },
                       onCancel: function (data) {
                         console.log(
-                          "Payment cancelled",
+                          'Payment cancelled',
                           JSON.stringify(data, 0, 2)
-                        );
+                        )
                       },
 
                       onError: function (err) {
-                        console.error("checkout.js error", err);
+                        console.error('checkout.js error', err)
                       },
                     },
-                    "#paypal-button"
+                    '#paypal-button'
                   ).then(function () {
                     // The PayPal button will be rendered in an html element with the id
                     // `paypal-button`. This function will be called when the PayPal button
                     // is set up and ready to be used.
-                  });
+                  })
                 }
-              );
-            } else if (vueComponent.paymentMethod == "VenmoAccount") {
-              var forPayPal = true;
+              )
+            } else if (vueComponent.paymentMethod == 'VenmoAccount') {
+              var forPayPal = true
               vueComponent.collectDeviceDataForBraintree(
                 clientInstance,
                 forPayPal
-              );
+              )
 
               //							vueComponent.logItems.push('create method');
 
@@ -914,47 +916,47 @@ export default {
                 function (venmoErr, venmoInstance) {
                   // Stop if there was a problem creating Venmo. This could happen if there was a network error or if it's incorrectly configured.
                   if (venmoErr) {
-                    vueComponent.errorText = venmoErr.message;
-                    console.error("Error creating Venmo:", venmoErr);
-                    return;
+                    vueComponent.errorText = venmoErr.message
+                    console.error('Error creating Venmo:', venmoErr)
+                    return
                   }
 
                   // Verify browser support before proceeding.
                   if (!venmoInstance.isBrowserSupported()) {
-                    vueComponent.venmoNotSupported = true;
-                    return;
+                    vueComponent.venmoNotSupported = true
+                    return
                   }
 
                   //								vueComponent.logItems.push('create button');
 
-                  var venmoButton = document.getElementById("venmo-button");
-                  venmoButton.style.display = "block"; // Assumes that venmoButton is initially display: none.
-                  venmoButton.addEventListener("click", function () {
-                    venmoButton.disabled = true;
+                  var venmoButton = document.getElementById('venmo-button')
+                  venmoButton.style.display = 'block' // Assumes that venmoButton is initially display: none.
+                  venmoButton.addEventListener('click', function () {
+                    venmoButton.disabled = true
 
-                    Cookies.set("currentOrderDetails", {
+                    Cookies.set('currentOrderDetails', {
                       fields: vueComponent.fields,
                       paymentMethod: vueComponent.paymentMethod,
                       bookingStep: vueComponent.bookingStep,
                       useSavedMethod: vueComponent.useSavedMethod,
-                    });
+                    })
                     //									vueComponent.logItems.push('button clicked');
                     //									vueComponent.focusLoop = true;
                     //									vueComponent.focusWindow();
 
                     venmoInstance.tokenize(function (tokenizeErr, payload) {
                       //										vueComponent.logItems.push('tokenized');
-                      venmoButton.removeAttribute("disabled");
+                      venmoButton.removeAttribute('disabled')
                       if (tokenizeErr) {
                         //											vueComponent.logItems.push(tokenizeErr.message);
-                        if (tokenizeErr.code === "VENMO_CANCELED") {
+                        if (tokenizeErr.code === 'VENMO_CANCELED') {
                           vueComponent.errorText =
-                            "App is not available or user aborted payment flow";
-                        } else if (tokenizeErr.code === "VENMO_APP_CANCELED") {
-                          vueComponent.errorText = "User canceled payment flow";
+                            'App is not available or user aborted payment flow'
+                        } else if (tokenizeErr.code === 'VENMO_APP_CANCELED') {
+                          vueComponent.errorText = 'User canceled payment flow'
                         } else {
                           vueComponent.errorText =
-                            "An error occurred:" + tokenizeErr.message;
+                            'An error occurred:' + tokenizeErr.message
                         }
                       } else {
                         // Send payload.nonce to your server.
@@ -964,14 +966,14 @@ export default {
                         //											console.log('Venmo user:', payload.details.username);
                         if (payload.nonce != undefined) {
                           vueComponent.fields.payment_method_nonce =
-                            payload.nonce;
-                          vueComponent.book();
+                            payload.nonce
+                          vueComponent.book()
                         } else {
-                          vueComponent.errorText = "Can't process your data.";
+                          vueComponent.errorText = "Can't process your data."
                         }
                       }
-                    });
-                  });
+                    })
+                  })
 
                   // Check if tokenization results already exist. This occurs when your checkout page is relaunched in a new tab. This step can be omitted if allowNewBrowserTab is false.
                   if (venmoInstance.hasTokenizationResult()) {
@@ -980,40 +982,40 @@ export default {
                     venmoInstance.tokenize(function (tokenizeErr, payload) {
                       //										vueComponent.logItems.push('tokenized 2');
                       if (tokenizeErr) {
-                        if (tokenizeErr.code === "VENMO_CANCELED") {
+                        if (tokenizeErr.code === 'VENMO_CANCELED') {
                           vueComponent.errorText =
-                            "App is not available or user aborted payment flow";
-                        } else if (tokenizeErr.code === "VENMO_APP_CANCELED") {
-                          vueComponent.errorText = "User canceled payment flow";
+                            'App is not available or user aborted payment flow'
+                        } else if (tokenizeErr.code === 'VENMO_APP_CANCELED') {
+                          vueComponent.errorText = 'User canceled payment flow'
                         } else {
                           vueComponent.errorText =
-                            "An error occurred:" + tokenizeErr.message;
+                            'An error occurred:' + tokenizeErr.message
                         }
                       } else {
                         // Send payload.nonce to your server.
                         //											console.log('Got a payment method nonce:', payload.nonce);
                         // Display the Venmo username in your checkout UI.
-                        console.log("Venmo user:", payload.details.username);
+                        console.log('Venmo user:', payload.details.username)
                         if (payload.nonce != undefined) {
                           vueComponent.fields.payment_method_nonce =
-                            payload.nonce;
-                          vueComponent.book();
+                            payload.nonce
+                          vueComponent.book()
                         } else {
-                          vueComponent.errorText = "Can't process your data.";
+                          vueComponent.errorText = "Can't process your data."
                         }
                       }
-                    });
-                    return;
+                    })
+                    return
                   }
                 }
-              );
+              )
             }
           }
-        );
+        )
       }
     },
     collectDeviceDataForBraintree(clientInstance, forPayPal) {
-      var vueComponent = this;
+      var vueComponent = this
       braintree.dataCollector.create(
         {
           client: clientInstance,
@@ -1021,31 +1023,30 @@ export default {
         },
         function (err, dataCollectorInstance) {
           if (err) {
-            vueComponent.errorText = err.message;
-            dataCollectorInstance.teardown();
-            return;
+            vueComponent.errorText = err.message
+            dataCollectorInstance.teardown()
+            return
           }
           // At this point, you should access the dataCollectorInstance.deviceData value and provide it
           // to your server, e.g. by injecting it into your form as a hidden input.
-          vueComponent.fields.device_data = dataCollectorInstance.deviceData;
-          dataCollectorInstance.teardown();
+          vueComponent.fields.device_data = dataCollectorInstance.deviceData
+          dataCollectorInstance.teardown()
         }
-      );
+      )
     },
     setSelectedPaymentMethodObj(_paymentMethod) {
       if (
         this.useSavedMethod &&
         this.paymentMethods[_paymentMethod] != undefined
       ) {
-        this.selectedPaymentMethodObj = this.paymentMethods[_paymentMethod];
-        this.fields.payment_method_token = this.paymentMethods[
-          _paymentMethod
-        ].token;
-      } else this.selectedPaymentMethodObj = null;
-      this.initBraintreeClient();
+        this.selectedPaymentMethodObj = this.paymentMethods[_paymentMethod]
+        this.fields.payment_method_token =
+          this.paymentMethods[_paymentMethod].token
+      } else this.selectedPaymentMethodObj = null
+      this.initBraintreeClient()
     },
     getSavedCardNumberVal(_last4) {
-      return "•••• •••• •••• " + _last4;
+      return '•••• •••• •••• ' + _last4
     },
     //			focusWindow: function () {
     //				setInterval( () => {
@@ -1063,51 +1064,56 @@ export default {
     //			},
   },
   computed: {
+    ...mapState(['checkOutStep']),
     computedFields: function () {
-      return Object.assign({}, this.fields);
+      return Object.assign({}, this.fields)
     },
     getTotal() {
-      return this.getCartTotal();
+      return this.getCartTotal()
     },
   },
   mounted: function () {
-    this.initNewPlacesAutocomplete("lessonLocation");
+    this.initNewPlacesAutocomplete('lessonLocation')
   },
   watch: {
+    checkOutStep() {
+      if (this.checkOutStep == 1) this.bookingStep = 1
+      if (this.checkOutStep == 3) this.bookingStep = 3
+    },
     useSavedMethod: function (newValue, oldValue) {
-      this.setSelectedPaymentMethodObj(this.paymentMethod);
+      this.setSelectedPaymentMethodObj(this.paymentMethod)
     },
     paymentMethod: function (newPaymentMethod, oldPaymentMethod) {
-      this.useSavedMethod = false;
-      this.venmoNotSupported = false;
-      this.setSelectedPaymentMethodObj(newPaymentMethod);
+      this.useSavedMethod = false
+      this.venmoNotSupported = false
+      this.setSelectedPaymentMethodObj(newPaymentMethod)
     },
     bookingStep: function (newBookingStep, oldBookingStep) {
       if (newBookingStep == 2) {
-        this.errorText = "";
-        this.setSelectedPaymentMethodObj(this.paymentMethod);
+        this.errorText = ''
+        this.setSelectedPaymentMethodObj(this.paymentMethod)
       }
     },
     computedFields: {
       handler(value, oldValue) {
         if (value.lesson_type) {
           if (!oldValue || value.lesson_type !== oldValue.lesson_type) {
-            if (value.lesson_type == "in_person_client") {
+            if (value.lesson_type == 'in_person_client') {
               setTimeout(() => {
-                var thisComponent = this;
+                var thisComponent = this
                 var autocomplete = this.initializeLocationField(
-                  this.$refs["lessonLocation"],
-                  ["address"]
-                );
+                  this.$refs['lessonLocation'],
+                  ['address']
+                )
                 google.maps.event.addListener(
                   autocomplete,
-                  "place_changed",
+                  'place_changed',
                   function (e) {
                     thisComponent.fields.location =
-                      thisComponent.$refs["lessonLocation"].value;
+                      thisComponent.$refs['lessonLocation'].value
                   }
-                );
-              }, 1);
+                )
+              }, 1)
             }
           }
         }
@@ -1118,43 +1124,43 @@ export default {
   created: function () {
     if (
       window.location.hash.search(/venmoSuccess=/) !== -1 &&
-      Cookies.get("currentOrderDetails") != undefined
+      Cookies.get('currentOrderDetails') != undefined
     ) {
-      var currentOrderDetails = Cookies.get("currentOrderDetails");
-      if (typeof currentOrderDetails == "string")
-        currentOrderDetails = JSON.parse(currentOrderDetails);
+      var currentOrderDetails = Cookies.get('currentOrderDetails')
+      if (typeof currentOrderDetails == 'string')
+        currentOrderDetails = JSON.parse(currentOrderDetails)
       //				console.log(Cookies.get('currentOrderDetails'));
       //				console.log(currentOrderDetails);
-      this.fields = currentOrderDetails.fields;
-      this.paymentMethod = currentOrderDetails.paymentMethod;
-      this.bookingStep = currentOrderDetails.bookingStep;
-      this.useSavedMethod = currentOrderDetails.useSavedMethod;
-      this.setSelectedPaymentMethodObj(this.paymentMethod);
+      this.fields = currentOrderDetails.fields
+      this.paymentMethod = currentOrderDetails.paymentMethod
+      this.bookingStep = currentOrderDetails.bookingStep
+      this.useSavedMethod = currentOrderDetails.useSavedMethod
+      this.setSelectedPaymentMethodObj(this.paymentMethod)
     } else if (this.user !== null) {
-      this.fields.first_name = this.user.first_name;
-      this.fields.last_name = this.user.last_name;
-      this.fields.instagram_handle = this.user.profile.instagram_handle;
-      this.fields.email = this.user.email;
-      this.fields.address = this.user.profile.first_name;
-      this.fields.city = this.user.profile.city;
-      this.fields.state = this.user.profile.state;
-      this.fields.zip = this.user.profile.zip;
-      this.fields.dob = this.user.profile.dob;
-      this.fields.gender = this.user.profile.gender;
-      this.fields.mobile_phone = this.user.profile.mobile_phone;
-      this.fields.genres = this.user.genres;
+      this.fields.first_name = this.user.first_name
+      this.fields.last_name = this.user.last_name
+      this.fields.instagram_handle = this.user.profile.instagram_handle
+      this.fields.email = this.user.email
+      this.fields.address = this.user.profile.first_name
+      this.fields.city = this.user.profile.city
+      this.fields.state = this.user.profile.state
+      this.fields.zip = this.user.profile.zip
+      this.fields.dob = this.user.profile.dob
+      this.fields.gender = this.user.profile.gender
+      this.fields.mobile_phone = this.user.profile.mobile_phone
+      this.fields.genres = this.user.genres
 
       // console.log("g", this.user.genres)
       this.genresTemp = this.siteGenres.filter((v) => {
-        return this.user.genres.includes(v.id);
-      });
+        return this.user.genres.includes(v.id)
+      })
       //				this.formReadonly = this.user.email!='';
     }
     setTimeout(function () {
-      window.jQuery(".mask-input").mask("99/99/9999");
-    }, 200);
-    this.paymentMethods = this.userPaymentMethods;
+      window.jQuery('.mask-input').mask('99/99/9999')
+    }, 200)
+    this.paymentMethods = this.userPaymentMethods
     //			this.route = window.location.hash;
   },
-};
+}
 </script>
