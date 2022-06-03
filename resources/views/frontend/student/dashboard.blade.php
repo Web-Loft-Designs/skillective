@@ -11,12 +11,14 @@
     <div class="dashboard-page dashboard-page-student">
         <div class="container">
             <div class="row">
-
                 @if (isset($upcomingBooking))
                     <div class="col-12" id="upcoming-booking-notification">
                         <div class="top-alert">
                             <div class="avatar-stack">
-                                <?php $countToShow = 7 ?>
+                                <?php 
+                                $countToShow = 7;
+                                $date = Carbon\Carbon::createFromTimeString($upcomingBooking['lesson']['start'])->toFormattedDateString();
+                                ?>
                                 @foreach ($upcomingBooking['lesson']['students'] as $i=>$student)
                                     @if ($i<$countToShow)
                                         <span>
@@ -28,7 +30,16 @@
                                     @endif
                                 @endforeach
                             </div>
-                            <p>Next <strong>{{ $upcomingBooking['lesson']['genre']['title'] }}</strong> @if($upcomingBooking['lesson']['lesson_type']=='virtual') virtual @endif lesson starts at {{ \Carbon\Carbon::createFromTimeString($upcomingBooking['lesson']['start'])->format('h:i A') . ' ' . $upcomingBooking['lesson']['timezone_id'] }} @if($upcomingBooking['lesson']['lesson_type']!='virtual') at <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($upcomingBooking['lesson']['location']) }}" target="_blank">{{ $upcomingBooking['lesson']['location'] }}</a> @endif </p>
+                            <p>Next
+                                <strong>{{ $upcomingBooking['lesson']['genre']['title'] }}</strong>
+                                @if($upcomingBooking['lesson']['lesson_type']=='virtual')
+                                 virtual @endif lesson starts at 
+                                 {{$date}}
+                                 {{ \Carbon\Carbon::createFromTimeString($upcomingBooking['lesson']['start'])->format('h:i A') . ' ' . $upcomingBooking['lesson']['timezone_id'] }}
+                                  @if($upcomingBooking['lesson']['lesson_type']!='virtual')
+                                    at <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($upcomingBooking['lesson']['location']) }}" target="_blank">
+                                         {{ $upcomingBooking['lesson']['location'] }}
+                                    </a> @endif </p>
                             <span onclick="hideUpcomingBookingNotification({{ $upcomingBooking['id'] }})" class="close-it"></span>
                         </div>
                     </div>
