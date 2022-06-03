@@ -84,7 +84,7 @@
         >
           Request Cancel
         </a>
-        <p class='booking-request-title'>What I want to learn</p>
+        <p class='booking-request-title'>What I want to learn:</p>
         <textarea
           class='booking-request-area'
           placeholder='notes on what you hope to gain or other instructions'
