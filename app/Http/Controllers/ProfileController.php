@@ -108,6 +108,7 @@ class ProfileController extends Controller
 		$vars = [
 			'page_title'		=> ($isInstructor ? 'Instructor': 'Client') . " Profile",
 			'userProfileData'	=> $userData,
+			'userGenres'=> 'userGenres',
 			'siteGenres' => $this->genreRepository->presentResponse($this->genreRepository->getSiteGenres())['data'],
 			'userMedia'	=> $user->getGalleryMedia(),
 			'invitedInstructors' => $invitedInstructors,
