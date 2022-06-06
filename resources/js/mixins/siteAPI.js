@@ -56,7 +56,6 @@ let siteAPIMixin =  {
 		apiPost : function(action, data){
 			this.apiPreSend();
 
-
 			axios.post(action, data)
 				.then(response => {
 					this.apiHandleResponse(response);
@@ -65,7 +64,6 @@ let siteAPIMixin =  {
 					}
 				})
 				.catch(error => this.apiHandleError(error))
-				// .finally(() => this.hideLoader());
 		},
 		apiPut : function(action, data){
 			this.apiPreSend();
