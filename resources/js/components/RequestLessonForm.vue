@@ -913,7 +913,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions([
+     ...mapActions([
       'addToClientList',
       'createToClientList',
       'addStudentToInstructorList',
