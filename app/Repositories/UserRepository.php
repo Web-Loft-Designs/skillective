@@ -66,7 +66,18 @@ class UserRepository extends BaseRepository
 
 	public function presentResponse($data)
 	{
-		return $this->presenter->present($data);
+
+        $data = $this->presenter->present($data);
+
+        if (request()->routeIs('instructors'))
+        {
+            foreach ( $data['data'] as $key => $instructor )
+            {
+                $data['data'][$key]['genres'] = $this->find($instructor['id'])->genres->toArray();
+            }
+        }
+
+		return $data;
 	}
 
 	public function forceDelete($id)
@@ -224,6 +235,8 @@ class UserRepository extends BaseRepository
 				->orderBy('users.created_at', 'desc')
 				->groupBy('users.id');
 
+
+
 			if ($request->filled('rate_from') || $request->filled('rate_to')) {
 				// use $query as subquery
 				$filterQuery = User::selectRaw('*, case when ( min_rate IS NULL ) then 0 else min_rate end as min_rate, case when ( max_rate IS NULL ) then 0 else max_rate end as max_rate ')->fromSub($query, 'users');
@@ -244,7 +257,6 @@ class UserRepository extends BaseRepository
 				if ($request->filled('orderBy') && $request->filled('sortedBy') && $request->orderBy == 'min_rate' && in_array($request->sortedBy, ['asc', 'desc'])) {
 					$filterQuery->orderBy($request->orderBy, $request->sortedBy);
 				}
-
 				return $filterQuery;
 			} else {
 				return $query;
@@ -529,10 +541,12 @@ class UserRepository extends BaseRepository
 		];
 
 		if ($user->hasRole(User::ROLE_STUDENT))
-			$profileParams[] = 'instagram_handle';
-		else
-			$profileParams[] = 'lesson_block_min_price';
-
+        {
+            $profileParams[] = 'instagram_handle';
+        }else{
+            $profileParams[] = 'lesson_block_min_price';
+            $profileParams[] = 'virtual_min_price';
+        }
 
 		$user->profile->update($request->only($profileParams));
 

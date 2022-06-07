@@ -62,7 +62,7 @@
               </span>
             </div>
             <p class="video-lesson-info-popup__note">
-              Note:<br /> <content-viewer :content="lesson.description" />
+              Lesson Description:<br /> <content-viewer :content="lesson.description" />
             </p>
             <div class="video-lesson-info-popup__row">
               <span

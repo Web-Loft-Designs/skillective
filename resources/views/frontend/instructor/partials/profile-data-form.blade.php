@@ -32,8 +32,10 @@
            {{ $userProfileData['profile']['city'] }} <br/>
            {{ $userProfileData['profile']['state'] }}
         </p>
-        <div class="d-flex align-items-center">
-            <p><strong>{{ $userProfileData['total_count_lessons'] }}</strong> Lessons Held</p>
+        <div class="d-flex flex-column">
+            @if ($userProfileData['total_count_lessons'] >= 25)
+            <p class='mb-3'><strong>{{ $userProfileData['total_count_lessons'] }}</strong> Lessons Held</p>
+            @endif
             <?php
             $loggedInStudent = ( Auth::user() && Auth::user()->hasRole('Student') );
             if(Auth::user()){
@@ -71,7 +73,7 @@
             </p>
             <content-viewer content="{{ $userProfileData['profile']['about_me'] }}"></content-viewer>
         </div>
-        @if($userProfileData['lessons_rate_min']>0 || $userProfileData['lessons_rate_max']>0)
+        <!-- @if($userProfileData['lessons_rate_min']>0 || $userProfileData['lessons_rate_max']>0)
         <div class="profile-info-rates">
             <p class="profile-label">Lesson Rates:</p>
             <p><strong>${{ number_format($userProfileData['lessons_rate_min'], 2) }}@if($userProfileData['lessons_rate_min']<$userProfileData['lessons_rate_max']) – ${{ number_format($userProfileData['lessons_rate_max'], 2) }}@endif</strong></p>
@@ -86,7 +88,7 @@
             @foreach ($userProfileData['genres'] as $genre)
                 <span>{{ $genre['title'] }} </span>
             @endforeach
-        </div>
+        </div> -->
         @if(count($invitedInstructors)>0 && Auth::user() && Auth::user()->hasRole('Admin'))
         <div class="profile-info-invated">
             @include('frontend.partials.profile.invited-instructors')

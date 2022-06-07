@@ -1,8 +1,7 @@
 <template>
   <div class='instructor-video-lessons'>
     <h2 class='instructor-video-lessons__heading'>
-      <a :href="'/instructor/my-shop'" v-if="userRole==='Instructor'">{{ instructorName }}'s Pre-Recorded Lessons</a>
-      <span v-else>{{ instructorName }}'s Pre-Recorded Lessons</span>
+      <a :href="`/globalshop?instructorId=${instructorId}`"> {{ instructorName }}'s Pre-Recorded Lessons </a>
     </h2>
     <anim-loader v-if='isLoading' />
     <video-lessons-list

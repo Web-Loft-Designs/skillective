@@ -3,9 +3,11 @@
     <div class='d-grid gap-2 d-md-block'>
       <button
         class='btn green btn-sm text-wrap'
+        :class="{'disabledBtn': checkInstructors}"
         type='button'
         data-toggle='tooltip'
         v-if='showCreateBtn'
+        :disabled='checkInstructors'
         data-placement='bottom'
         @click='showJoinModal'
         :title='tooltipContent()'
@@ -211,6 +213,22 @@
                   </div>
                   <span v-if='$v.modalData.mobile_phone.$dirty && !modalData.accept_terms'>Please accept terms of service</span>
                 </div>
+                <div
+                  class='form-group checkbox-wrapper has-feedback'
+                >
+                  <div class='field'>
+                    <label for='sms-notification'>
+                      <input
+                        v-model='modalData.sms_notification'
+                        type='checkbox'
+                        id='sms-notification'
+                        :value='false'
+                      />
+                      <span class='checkmark'></span>
+                      By clicking this box, you represent that you have the authority to agree to receive SMS messages on the telephone number that you provided to us. Message frequency depends upon your activity. Standard message and data rates may apply. SMS messaging is not available in all areas. Not all mobile devices or handsets may be supported. Skillective and the mobile carriers are not liable for delayed or undelivered messages
+                    </label>
+                  </div>
+                </div>                
                 <div class='form-group'>
                   <loader-button
                     :isLoading='loadingBtn'
@@ -254,6 +272,8 @@
             <br>
             <strong>- {{ instructorName }}</strong>
             <br>
+            <br>
+            <br>
             You should have received an email from Skillective with more details.
           </div>
           <div class='modal-footer'>
@@ -264,7 +284,7 @@
               data-dismiss='modal'
               @click='openAllInstructorsModal'
             >
-              ОК
+              Join other Instructor's client lists here
             </button>
           </div>
         </div>
@@ -275,8 +295,9 @@
       <div class='modal-dialog' role='document'>
         <div class='modal-content'>
           <div class='modal-header'>
-            <h5 class='modal-title' id='instructorsModalLabel'>
-              Would you like to be added to other instructor's client lists? Check the boxes below
+            <h5 class='modal-title text-center' id='instructorsModalLabel'>
+              Would you like to be added to other instructor's client lists? <br>
+            <span class="text-center"> Check the boxes below </span>
             </h5>
             <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
               <span aria-hidden='true'>&times;</span>
@@ -378,8 +399,7 @@
           </div>
           <div class='modal-body'>
             <p>
-              You should have recieved an email to login and view all your instructors whose client lists you have jonied.
-              We appreciate you being here with us!
+              You should have received an email to create a password and login.  Once logged in, you will be able to view all of your instructors. We appreciate you joining us!
             </p>
             <strong>
               {{ instructorNames.join(', ') }}.
@@ -807,7 +827,8 @@ export default {
         mobile_phone: '',
         instagram_handle: '',
         newsletter: true,
-        accept_terms: false
+        accept_terms: false,
+        sms_notification: false,
       },
       fields: {
         id: null,
@@ -861,7 +882,10 @@ export default {
     }
   },
   computed: {
-    ...mapState(['storeErrors', 'storeErrorText', 'instructors']),
+    ...mapState(['storeErrors', 'storeErrorText', 'instructors', 'studentInstructors']),
+    checkInstructors() {
+      return this.studentInstructors.some(instructor => instructor.id === this.instructorId)
+    },
     priceError: function() {
       if (
         !this.fields.time_from ||
@@ -889,7 +913,15 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['addToClientList', 'createToClientList', 'addStudentToInstructorList', 'getInstructors', 'geoNotification','virtualNotification']),
+     ...mapActions([
+      'addToClientList',
+      'createToClientList',
+      'addStudentToInstructorList',
+      'getInstructors',
+      'geoNotification',
+      'virtualNotification',
+      'getStudentInstructors'
+    ]),
     ...mapMutations(['CLEAR_INPUT']),
     async addToInstructorsList() {
       this.loadingAdd = true
@@ -918,7 +950,8 @@ export default {
         this.CLEAR_INPUT()
       }
     },
-    openAllInstructorsModal() {
+    async openAllInstructorsModal() {
+      await this.getStudentInstructors()
       $('#instructorsModal').modal('show')
     },
     closeAllInstructorsModal() {
@@ -957,7 +990,8 @@ export default {
           zip: this.modalData.zip,
           email: this.modalData.email,
           mobile_phone: this.modalData.mobile_phone,
-          newsletter: this.modalData.newsletter
+          newsletter: this.modalData.newsletter,
+          sms_notification: this.modalData.sms_notification
         }
         this.newStudentId = await this.createToClientList(data)
         if (!this.storeErrors?.email?.length) {
@@ -1170,6 +1204,7 @@ export default {
   },
 
   async created() {
+    await this.getStudentInstructors()
     this.timeOptions = this.getTimeOptions()
     this.timeZomeOptions = ct.getAllTimezones()
 
@@ -1457,6 +1492,12 @@ export default {
 }
 
 #instructorsModal {
+  .modal-title {
+    span {
+      font-size: 12px;
+    }
+  }
+
   .modal-body {
     ul {
       overflow-y: auto;
@@ -1472,6 +1513,17 @@ export default {
     }
   }
 }
+
+#successAdded {
+  .modal-footer {
+    justify-content: center;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
 .green {
     color: #fff;
     font-family: Poppins;
@@ -1490,5 +1542,11 @@ export default {
       background-image: linear-gradient(180deg, #0ea510 0%, #038202 100%);
       color: #fff;
     }
+}
+.disabledBtn {
+  background-image: linear-gradient(180deg, #737473 0%, #7a7b7a 100%);
+  &:hover {
+    background-image: linear-gradient(180deg, #737473 0%, #7a7b7a 100%);
+  }
 }
 </style>
