@@ -138,8 +138,8 @@
           >
             <img
               class="video-lesson__image"
-              :src="lesson.image"
-              :alt="lesson.image"
+              :src="lesson.preview"
+              :alt="lesson.preview"
             />
             <div
               v-if="showInstructorInfo"
