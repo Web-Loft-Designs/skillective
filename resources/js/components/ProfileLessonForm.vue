@@ -1,15 +1,15 @@
 <template>
   <div id='lesson-form-container'>
     <magnific-popup-modal
-      class='ie-fix'
-      @modalClosed='clearFormAndClosePopup'
-      :show='false'
+      ref='modal'
       :config='{
-        closeOnBgClick: true,
+        closeOnBgClick: false,
         showCloseBtn: true,
         enableEscapeKey: false,
       }'
-      ref='modal'
+      :show='false'
+      class='ie-fix'
+      @modalClosed='clearFormAndClosePopup'
     >
       <div class='modal-add-lesson'>
         <form method='post' @keypress.enter.prevent @submit.prevent='onSubmit'>
@@ -19,17 +19,17 @@
             </h2>
             <h2 v-else class='login-box-msg col-12'>Edit Lesson</h2>
 
-            <div class="form-group col-12" v-if="fields.id">
+            <div v-if='fields.id' class='form-group col-12'>
               <label>Share link</label>
-              <copy-input :value="shareLink" readonly />
+              <copy-input :value='shareLink' readonly/>
             </div>
 
             <div
-              class='col-12 form-group has-feedback'
               :class="{ 'has-error': errors.genre }"
+              class='col-12 form-group has-feedback'
             >
               <label>Genre</label>
-              <select class='form-control' name='genre' v-model='fields.genre'>
+              <select v-model='fields.genre' class='form-control' name='genre'>
                 <option value></option>
                 <option
                   v-for='(genre, key) in formGenres'
@@ -39,171 +39,132 @@
                   {{ genre.title }}
                 </option>
               </select>
-              <span class='help-block' v-if='errors.genre'>
+              <span v-if='errors.genre' class='help-block'>
                 <strong>{{ errors.genre[0] }}</strong>
               </span>
             </div>
             <div
-              class='form-group col-4 has-feedback'
               :class="{ 'has-error': errors.lesson_type }"
+              class='form-group col-4 has-feedback'
             >
               <label>Type of Lesson</label>
-              <select class='form-control' v-model='fields.lesson_type'>
+              <select v-model='fields.lesson_type' class='form-control'>
                 <option
                   v-for='(lessonTypeTitle, lessonTypeName) in lessonTypes'
-                  :value='lessonTypeName'
                   :key='lessonTypeName'
+                  :value='lessonTypeName'
                 >
                   {{ lessonTypeTitle }}
                 </option>
               </select>
-              <span class='help-block' v-if='errors.lesson_type'>
+              <span v-if='errors.lesson_type' class='help-block'>
                 <strong>{{ errors.lesson_type[0] }}</strong>
               </span>
             </div>
             <div
-              class='form-group col-12 has-feedback'
-              :class="{ 'has-error': errors.location }"
               v-if="fields.lesson_type === 'in_person'"
+              :class="{ 'has-error': errors.location }"
+              class='form-group col-12 has-feedback'
             >
               <label>Location</label>
               <input
-                type='text'
+                ref='lessonLocation'
+                v-model='fields.location'
                 class='form-control'
                 name='location'
+                type='text'
                 value
-                v-model='fields.location'
-                ref='lessonLocation'
               />
-              <span class='help-block' v-if='errors.location'>
+              <span v-if='errors.location' class='help-block'>
                 <strong>{{ errors.location[0] }}</strong>
               </span>
             </div>
             <div
-              class='col-12 form-group has-feedback'
-              :class="{ 'has-error': errors.timezone_id }"
               v-if="fields.lesson_type === 'virtual'"
+              :class="{ 'has-error': errors.timezone_id }"
+              class='col-12 form-group has-feedback'
             >
               <label>Time Zone</label>
-              <select class='form-control' v-model='fields.timezone_id'>
-                <option value disabled>Select...</option>
+              <select v-model='fields.timezone_id' class='form-control'>
+                <option disabled value>Select...</option>
                 <option
                   v-for='(value, key) in timeZomeOptions'
-                  :value='key'
                   :key='key'
+                  :value='key'
                 >
                   {{ value }}
                 </option>
               </select>
-              <span class='help-block' v-if='errors.timezone_id'>
+              <span v-if='errors.timezone_id' class='help-block'>
                 <strong>{{ errors.timezone_id[0] }}</strong>
               </span>
             </div>
 
             <div
-              class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
               :class="{ 'has-error': errors.date }"
+              class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
             >
-
               <label>Date</label>
               <!--<datepicker :monday-first="false" :typeable="true" :input-class="'mask-input'" v-model="fields.date" name="date" :placeholder="'mm/dd/yyyy'" :format="'MM/dd/yyyy'"></datepicker>-->
 
               <dropdown-datepicker
                 v-if='isDateInputInit'
-                display-format='mdy'
-                v-model='fields.date'
-                submit-format='yyyy-mm-dd'
                 key='sombun3'
                 ref='datepicker'
+                v-model='fields.date'
                 :minYear='2021'
-                maxDate='2030-01-01'
-              ></dropdown-datepicker>
-
-              <span class='help-block' v-if='errors.date'>
-                <strong>{{ errors.date[0] }}</strong>
-
-              </span>
-            </div>
-
-            <!--            <div class='col-12 form-group has-feedback'>-->
-            <!--              <toggle-button-->
-            <!--                :value='isOvernight'-->
-            <!--                :color="{ checked: '#a94442', unchecked: '#01bd00' }"-->
-            <!--                :sync='true'-->
-            <!--                :labels="{-->
-            <!--                  checked: 'Disable overnight',-->
-            <!--                  unchecked: 'Enable overnight',-->
-            <!--                }"-->
-            <!--                @change='toggleOvernight'-->
-            <!--                :font-size='14'-->
-            <!--                :height='38'-->
-            <!--                :width='186'-->
-            <!--              />-->
-            <!--            </div>-->
-
-            <div
-              class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
-              :class="{ 'has-error': errors.date }"
-              v-if='isOvernight'
-            >
-              <label>Date to</label>
-              <dropdown-datepicker
-                v-if='isDateInputInit'
                 display-format='mdy'
-                v-model='fields.date_to'
-                submit-format='yyyy-mm-dd'
-                key='sombun5'
-                ref='datepickerTo'
-                :minYear='2021'
                 maxDate='2030-01-01'
+                submit-format='yyyy-mm-dd'
               ></dropdown-datepicker>
 
-              <span class='help-block' v-if='errors.date_to'>
-                <strong>{{ errors.date_to[0] }}</strong>
+              <span v-if='errors.date' class='help-block'>
+                <strong>{{ errors.date[0] }}</strong>
               </span>
             </div>
+
             <div
-              class='time-from col-lg-6 col-sm-6 col-12 form-group has-feedback'
               :class="{ 'has-error': errors.time_from }"
+              class='time-from col-lg-6 col-sm-6 col-12 form-group has-feedback'
             >
               <label>Time from</label>
               <vue-timepicker
-                :minute-interval='15'
-                v-model='fields.time_from'
-                placeholder='Start Time'
-                format='h:mm a'
-                close-on-complete
                 ref='timeFrom'
+                v-model='fields.time_from'
+                :minute-interval='15'
+                apm-label='AM/PM'
+                close-on-complete
+                format='h:mm a'
                 hour-label='Hour'
                 minute-label='Minute'
-                apm-label='AM/PM'
+                placeholder='Start Time'
                 @change='timeFormChange'
                 @open="clearTimepicker('timeFrom')"
               ></vue-timepicker>
-              <span class='help-block' v-if='errors.time_from'>
+              <span v-if='errors.time_from' class='help-block'>
                 <strong>{{ errors.time_from[0] }}</strong>
               </span>
             </div>
 
             <div
-              class='time-to col-lg-6 col-sm-6 col-12 form-group has-feedback'
               :class="{ 'has-error': errors.time_to }"
+              class='time-to col-lg-6 col-sm-6 col-12 form-group has-feedback'
             >
               <label>Time to</label>
               <vue-timepicker
-                :minute-interval='15'
-                v-model='fields.time_to'
-                placeholder='End Time'
-                format='h:mm a'
-                close-on-complete
                 ref='timeTo'
+                v-model='fields.time_to'
+                :minute-interval='15'
+                apm-label='AM/PM'
+                close-on-complete
+                format='h:mm a'
                 hour-label='Hour'
                 minute-label='Minute'
-                apm-label='AM/PM'
+                placeholder='End Time'
                 @open="clearTimepicker('timeTo')"
               ></vue-timepicker>
 
-              <span class='help-block' v-if='errors.time_to'>
+              <span v-if='errors.time_to' class='help-block'>
                 <strong>{{ errors.time_to[0] }}</strong>
               </span>
             </div>
@@ -213,17 +174,20 @@
               class='col-lg-6 col-sm-6 col-12 form-group has-feedback'
             >
               <toggle-button
-                :value='isTimeIntervals'
-                :color="{ checked: '#a94442', unchecked: '#01bd00' }"
-                :sync='true'
+                :color="{
+                  checked: '#a94442',
+                  unchecked: '#01bd00',
+                }"
+                :font-size='14'
+                :height='38'
                 :labels="{
                   checked: 'Disable time intervals',
                   unchecked: 'Enable time intervals',
                 }"
-                @change='toggleTimeInervals'
-                :font-size='14'
-                :height='38'
+                :sync='true'
+                :value='isTimeIntervals'
                 :width='186'
+                @change='toggleTimeInervals'
               />
             </div>
             <div
@@ -231,29 +195,36 @@
               class='col-lg-6 col-sm-6 col-12 form-group has-feedback'
             >
               <toggle-button
-                :value='isReccuring'
-                :color="{ checked: '#a94442', unchecked: '#01bd00' }"
-                :sync='true'
+                :color="{
+                  checked: '#a94442',
+                  unchecked: '#01bd00',
+                }"
+                :font-size='14'
+                :height='38'
                 :labels="{
                   checked: 'Disable recurring',
                   unchecked: 'Enable recurring',
                 }"
-                @change='toggleReccuring'
-                :font-size='14'
-                :height='38'
+                :sync='true'
+                :value='isReccuring'
                 :width='166'
+                @change='toggleReccuring'
               />
             </div>
 
-            <div class="time-intervals-dropdowns">
-
+            <div class='time-intervals-dropdowns'>
               <div
-                class='time-from col-lg-6 col-sm-6 col-12 form-group has-feedback'
-                :class="{ 'has-error': errors.time_interval }"
                 v-if='isTimeIntervals && !fields.id'
+                :class="{ 'has-error': errors.time_interval }"
+                class='
+                  time-from
+                  col-lg-6 col-sm-6 col-12
+                  form-group
+                  has-feedback
+                '
               >
                 <label>Time Intervals</label>
-                <select class='form-control' v-model='fields.time_interval'>
+                <select v-model='fields.time_interval' class='form-control'>
                   <option value='0'>No intervals</option>
                   <option value='30'>30 min</option>
                   <option value='60'>1 hour</option>
@@ -262,51 +233,60 @@
                   <option value='180'>3 hours</option>
                   <option value='240'>4 hours</option>
                 </select>
-                <span class='help-block' v-if='errors.time_interval'>
+                <span v-if='errors.time_interval' class='help-block'>
                   <strong>{{ errors.time_interval[0] }}</strong>
                 </span>
               </div>
 
               <div
-                class='time-from col-lg-6 col-sm-6 col-12 form-group has-feedback'
-                :class="{ 'has-error': errors.interval_break }"
                 v-if='isTimeIntervals && !fields.id'
+                :class="{ 'has-error': errors.interval_break }"
+                class='
+                  time-from
+                  col-lg-6 col-sm-6 col-12
+                  form-group
+                  has-feedback
+                '
               >
                 <label>Interval Breaks</label>
-                <select class='form-control' v-model='fields.interval_break'>
+                <select v-model='fields.interval_break' class='form-control'>
                   <option value='0'>No breaks</option>
                   <option value='15'>15 min</option>
                   <option value='30'>30 min</option>
                   <option value='45'>45 min</option>
                   <option value='60'>1 hour</option>
                 </select>
-                <span class="help-block" v-if='errors.interval_break'>
+                <span v-if='errors.interval_break' class='help-block'>
                   <strong>{{ errors.interval_break[0] }}</strong>
                 </span>
               </div>
 
-            <div
-              class='time-to col-lg-6 col-sm-6 col-12 form-group has-feedback'
-              :class="{ 'has-error': numError }"
-              v-if='isTimeIntervals && !fields.id'
-            >
-              <label> Num </label>
-              <input type='number' disabled class='form-control' :value='num'/>
-              <span class='help-block' v-if='numError'>
-                <strong>{{ numError }}</strong>
-              </span>
+              <div
+                v-if='isTimeIntervals && !fields.id'
+                :class="{ 'has-error': numError }"
+                class='time-to col-lg-6 col-sm-6 col-12 form-group has-feedback'
+              >
+                <label> Num </label>
+                <input
+                  :value='num'
+                  class='form-control'
+                  disabled
+                  type='number'
+                />
+                <span v-if='numError' class='help-block'>
+                  <strong>{{ numError }}</strong>
+                </span>
+              </div>
             </div>
 
-            </div>
-
             <div
-              class='col-lg-6 col-sm-6 col-12 form-group has-feedback'
               v-if='isReccuring && !fields.id'
+              class='col-lg-6 col-sm-6 col-12 form-group has-feedback'
             >
               <label> Recurrence frequencies: </label>
               <select
-                class='form-control'
                 v-model='fields.recurrence_frequencies'
+                class='form-control'
               >
                 <option value='0'>Disable recurring</option>
                 <option value='day'>Daily</option>
@@ -314,94 +294,91 @@
                 <option value='week2'>Every 2 Weeks</option>
                 <option value='month'>Monthly</option>
               </select>
-              <span class='help-block' v-if='errors.recurrence_frequencies'>
+              <span v-if='errors.recurrence_frequencies' class='help-block'>
                 <strong>{{ errors.recurrence_frequencies[0] }}</strong>
               </span>
             </div>
 
             <div
-              class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
               v-if='isReccuring && !fields.id'
+              class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
             >
               <label> Recurrence until </label>
               <dropdown-datepicker
                 v-if='isDateInputInit'
-                display-format='mdy'
-                v-model='fields.recurrence_until'
-                submit-format='yyyy-mm-dd'
                 ref='recurrenceUntil'
+                v-model='fields.recurrence_until'
                 :minYear='2021'
+                display-format='mdy'
                 maxDate='2030-01-01'
+                submit-format='yyyy-mm-dd'
               ></dropdown-datepicker>
-              <span class='help-block' v-if='errors.recurrence_until'>
+              <span v-if='errors.recurrence_until' class='help-block'>
                 <strong>{{ errors.recurrence_until[0] }}</strong>
               </span>
             </div>
 
             <div
-              class='form-group col-lg-9 col-sm-9 col-12 has-feedback'
               :class="{
                 disabled: fields.count_booked === 1,
                 'has-error': errors.spot_price,
               }"
+              class='form-group col-lg-9 col-sm-9 col-12 has-feedback'
             >
               <label>Price</label>
               <div class='d-flex'>
                 <span class='dollar-wrapper'>
                   <!--<masked-input class="form-control" v-model="fields.spot_price" mask="111.11" />-->
                   <input
-                    type='number'
-                    min='0'
-                    step='0.01'
-                    class='form-control'
                     v-model='fields.spot_price'
                     :disabled='fields.count_booked === 1'
+                    class='form-control'
+                    min='0'
+                    step='0.01'
+                    type='number'
                   />
                 </span>
                 <span class='per-lesson'>Per lesson</span>
               </div>
 
-              <span class='maw-200 help-block' v-if='errors.spot_price'>
+              <span v-if='errors.spot_price' class='maw-200 help-block'>
                 <strong>{{ errors.spot_price[0] }}</strong>
               </span>
             </div>
 
             <div
-              class='form-group col-lg-3 col-sm-3 col-12 has-feedback'
               :class="{ 'has-error': errors.spots_count }"
+              class='form-group col-lg-3 col-sm-3 col-12 has-feedback'
             >
               <span class='private-lesson'>
                 <span v-if='fields.spots_count === 1'>
-                  <img src='../../images/man-user.svg' alt/>
+                  <img alt src='../../images/man-user.svg'/>
                 </span>
                 <span v-if='fields.spots_count > 1'>
-                  <img src='../../images/multiple-users-silhouette.svg' alt/>
+                  <img alt src='../../images/multiple-users-silhouette.svg'/>
                 </span>
               </span>
               <label>Max students</label>
               <input
-                @input='replaceInput'
-                class='form-control'
-                min='1'
-                max='50'
                 v-model.number='fields.spots_count'
+                class='form-control'
+                max='50'
+                min='1'
                 type='number'
+                @input='replaceInput'
               />
-              <span class='help-block' v-if='errors.spots_count'>
+              <span v-if='errors.spots_count' class='help-block'>
                 <strong>{{ errors.spots_count[0] }}</strong>
               </span>
             </div>
 
             <div
-              class='form-group col-12 has-feedback'
               :class="{ 'has-error': errors.description }"
+              class='form-group col-12 has-feedback'
             >
-              <label>Description</label>
-              <text-editor
-                name="description"
-                v-model="fields.description"
-              />
-              <span class="help-block" v-if="errors.description">
+              <label>What I am teaching, offering or sharing:</label>
+              <text-editor v-model='fields.description' name='description' placeholder='provide a description'/>
+              <span v-if='errors.description' class='help-block'>
                 <strong>{{ errors.description[0] }}</strong>
               </span>
             </div>
@@ -413,7 +390,9 @@
               </span>
             </div>
             <div class='col-12'>
-              <div v-if='errorText' class='has-error'>{{ errorText }}</div>
+              <div v-if='errorText' class='has-error'>
+                {{ errorText }}
+              </div>
               <div v-if='successText' class='has-success'>
                 {{ successText }}
               </div>
@@ -421,30 +400,30 @@
 
             <div class='col-12'>
               <button
-                @keypress.enter.prevent
-                type='submit'
-                class='btn btn-primary btn-block'
                 v-if='fields.id'
+                class='btn btn-primary btn-block'
+                type='submit'
+                @keypress.enter.prevent
               >
                 Save lesson
               </button>
               <button
-                @keypress.enter.prevent
-                type='submit'
-                class='btn btn-primary btn-block'
                 v-else
+                class='btn btn-primary btn-block'
+                type='submit'
+                @keypress.enter.prevent
               >
                 Add lesson
               </button>
 
               <button
-                @click='cancelLesson(fields.id)'
-                type='submit'
                 v-if='fields.id'
-                class='btn btn-primary btn-block'
                 :class="{
                   'cancel-lesson': students.length === 0,
                 }"
+                class='btn btn-primary btn-block'
+                type='submit'
+                @click='cancelLesson(fields.id)'
               >
                 Cancel lesson
               </button>
@@ -457,15 +436,16 @@
 </template>
 
 <script>
-import MaskedInput from 'vue-masked-input';
+import MaskedInput from 'vue-masked-input'
 import siteAPI from '../mixins/siteAPI.js'
 import skillectiveHelper from '../mixins/skillectiveHelper.js'
 import MagnificPopupModal from './external/MagnificPopupModal'
 import DropdownDatepicker from 'vue-dropdown-datepicker'
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
-import CopyInput from './discounts/CopyInput/CopyInput';
-import shareHelper from '../helpers/shareHelper';
-import TextEditor from './profile/TextEditor/TextEditor';
+import CopyInput from './discounts/CopyInput/CopyInput'
+import shareHelper from '../helpers/shareHelper'
+import TextEditor from './profile/TextEditor/TextEditor'
+import {mapState} from 'vuex'
 
 require('jquery.maskedinput/src/jquery.maskedinput')
 
@@ -476,13 +456,13 @@ export default {
     DropdownDatepicker,
     VueTimepicker,
     CopyInput,
-    TextEditor
+    TextEditor,
   },
   mixins: [siteAPI, skillectiveHelper],
   props: ['lesson', 'userGenres', 'siteGenres', 'selectRange', 'instructorId'],
   data() {
     return {
-      shareLink: "",
+      shareLink: '',
       fields: {
         genre: null,
         date: '',
@@ -508,12 +488,12 @@ export default {
       lessonTypes: [],
       isDateInputInit: false,
       isTimeIntervals: false,
-      isOvernight: true,
       isReccuring: false,
       students: [],
     }
   },
   computed: {
+    ...mapState(['datesFromCalendar']),
     num: function() {
       if (
         this.fields.date &&
@@ -525,13 +505,15 @@ export default {
         let start = this.fields.date + ' ' + this.fields.time_from,
           end = this.fields.date_to + ' ' + this.fields.time_to
 
-        let minutesStart = moment(start, ['YYYY-MM-DD H:mm: a']).unix(),
-          minutesEnd = moment(end, ['YYYY-MM-DD H:mm: a']).unix()
+        let minutesStart = moment(start, ['YYYY-MM-DD H:mm: a'])
+            .unix(),
+          minutesEnd = moment(end, ['YYYY-MM-DD H:mm: a'])
+            .unix()
 
         let diffInMinutes = (minutesEnd - minutesStart) / 60
 
-        let lessonsCount = diffInMinutes / this.fields.time_interval;
-        return Math.floor(lessonsCount);
+        let lessonsCount = diffInMinutes / this.fields.time_interval
+        return Math.floor(lessonsCount)
       } else {
         return 0
       }
@@ -548,12 +530,17 @@ export default {
         let start = this.fields.date + ' ' + this.fields.time_from,
           end = this.fields.date_to + ' ' + this.fields.time_to
 
-        let minutesStart = moment(start, ['YYYY-MM-DD H:mm: a']).unix(),
-          minutesEnd = moment(end, ['YYYY-MM-DD H:mm: a']).unix()
+        let minutesStart = moment(start, ['YYYY-MM-DD H:mm: a'])
+            .unix(),
+          minutesEnd = moment(end, ['YYYY-MM-DD H:mm: a'])
+            .unix()
 
         let diffInMinutes = (minutesEnd - minutesStart) / 60
 
-        let lessonsCount = diffInMinutes / (Number(this.fields.time_interval) + Number(this.fields.interval_break));
+        let lessonsCount =
+          diffInMinutes /
+          (Number(this.fields.time_interval) +
+            Number(this.fields.interval_break))
 
         if (Math.floor(lessonsCount) < 1) {
           return 'The specified time interval is not enough for 1 lesson'
@@ -567,25 +554,56 @@ export default {
   },
 
   watch: {
+    datesFromCalendar: {
+      handler() {
+        if (this.datesFromCalendar.type === 'timeGridWeek') {
+          this.fields.time_from = moment(this.datesFromCalendar.start)
+            .format('hh:mm a')
+          this.fields.time_to = moment(this.datesFromCalendar.end)
+            .format('hh:mm a')
+        }
+        this.fields.date = moment(this.datesFromCalendar.start)
+          .format('YYYY-MM-DD')
+        setTimeout(() => {
+          if (this.$refs.datepicker) {
+            this.$refs.datepicker.day = Number(
+              moment(this.datesFromCalendar.start)
+                .format('DD'),
+            )
+            this.$refs.datepicker.month = Number(
+              moment(this.datesFromCalendar.start)
+                .format('MM'),
+            )
+            this.$refs.datepicker.year = Number(
+              moment(this.datesFromCalendar.start)
+                .format('YYYY'),
+            )
+          }
+        }, 0)
+        this.openPopup()
+      },
+      deep: true,
+    },
     fields: {
       handler(value) {
-        if (value.date && (value.date !== value.oldValue) && !this.isOvernight) {
+        if (value.date && value.date !== value.oldValue) {
           value.date_to = value.date
         }
 
         if (value.lesson_type === 'in_person_client') {
           setTimeout(() => {
-            this.fields.timezone_id = Intl.DateTimeFormat().resolvedOptions().timeZone
+            this.fields.timezone_id =
+              Intl.DateTimeFormat()
+                .resolvedOptions().timeZone
           }, 1)
         }
-
       },
       deep: true,
     },
   },
   methods: {
     getShareLink() {
-      return shareHelper.buildShareLink(this.instructorId, this.fields.id);
+      return shareHelper.buildShareLink(this.instructorId, this.fields.id)
     },
     initDateFrom() {
       const today = new Date()
@@ -595,22 +613,8 @@ export default {
       this.$refs.datepicker.day = today.getDate()
 
       if (moment(this.fields.date))
-        this.fields.date = moment(today).format('YYYY-MM-DD')
-
-      if (this.isOvernight) {
-        const tomorrow = new Date(today)
-        tomorrow.setDate(tomorrow.getDate() + 1)
-
-        this.$refs.datepickerTo.year = tomorrow.getFullYear()
-        this.$refs.datepickerTo.month = tomorrow.getMonth() + 1
-        this.$refs.datepickerTo.day = tomorrow.getDate()
-
-        if (moment(this.fields.date_to))
-          this.fields.date_to = moment(tomorrow).format('YYYY-MM-DD')
-      } else {
-        if (moment(this.fields.date_to))
-          this.fields.date_to = moment(today).format('YYYY-MM-DD')
-      }
+        this.fields.date = moment(today)
+          .format('YYYY-MM-DD')
     },
     toggleTimeInervals() {
       this.isTimeIntervals = !this.isTimeIntervals
@@ -634,29 +638,35 @@ export default {
       this.$refs[input].apm = ''
     },
     timeFormChange() {
-      if (moment(this.fields.time_from)) {
-        this.fields.time_to = moment(this.fields.time_from, ['h:mm a']).add('30', 'minutes').format('h:mm a')
+      if (moment(this.fields.time_from) && this.datesFromCalendar.type !== 'timeGridWeek') {
+        this.fields.time_to = moment(this.fields.time_from, ['h:mm a'])
+          .add('30', 'minutes')
+          .format('h:mm a')
       }
     },
     onSubmit() {
       if (moment(this.fields.date))
-        this.fields.date = moment(this.fields.date).format('YYYY-MM-DD')
+        this.fields.date = moment(this.fields.date)
+          .format('YYYY-MM-DD')
 
       if (moment(this.fields.date_to))
-        this.fields.date_to = moment(this.fields.date_to).format('YYYY-MM-DD')
+        this.fields.date_to = moment(this.fields.date_to)
+          .format('YYYY-MM-DD')
 
       if (moment(this.fields.time_from)) {
         this.fields.time_from = moment(this.fields.time_from, [
           'h:mm A',
-        ]).format('HH:mm:ss')
+        ])
+          .format('HH:mm:ss')
       }
 
       if (moment(this.fields.time_to)) {
-        this.fields.time_to = moment(this.fields.time_to, ['h:mm A']).format(
-          'HH:mm:ss',
-        )
+        this.fields.time_to = moment(this.fields.time_to, ['h:mm A'])
+          .format(
+            'HH:mm:ss',
+          )
       }
-
+      console.log(this.fields)
       if (this.fields.id > 0)
         this.apiPut('/api/instructor/lesson/' + this.fields.id, this.fields)
       else this.apiPost('/api/instructor/lesson', this.fields)
@@ -680,13 +690,8 @@ export default {
     },
     openPopup() {
       this.isDateInputInit = true
-      this.isOvernight = true
-
       setTimeout(() => {
-        if (this.fields.date) {
-          this.isOvernight = this.fields.date !== this.fields.date_to
-        } else {
-          this.isOvernight = false
+        if (!this.fields.date) {
           this.initDateFrom()
         }
       }, 1)
@@ -731,21 +736,16 @@ export default {
       this.$refs.timeFrom.apm = ''
       this.$refs.lessonLocation = null
 
-        this.fields.lesson_type = 'in_person'
-      this.isOvernight = true
+      this.fields.lesson_type = 'in_person'
     },
     initNewPlacesAutocomplete(_ref) {
       var thisComponent = this
       var autocomplete = this.initializeLocationField(this.$refs[_ref], [
         'address',
       ])
-      google.maps.event.addListener(
-        autocomplete,
-        'place_changed',
-        function() {
-          thisComponent.fields.location = thisComponent.$refs[_ref].value
-        },
-      )
+      google.maps.event.addListener(autocomplete, 'place_changed', function() {
+        thisComponent.fields.location = thisComponent.$refs[_ref].value
+      })
     },
   },
   created: function() {
@@ -860,34 +860,42 @@ export default {
         this.fields.date_to = selectRange.startStr
         this.isDateInputInit = true
 
-        this.fields.time_from = moment(selectRange.startStr).format('h:mm a')
+        this.fields.time_from = moment(selectRange.startStr)
+          .format('h:mm a')
 
         setTimeout(() => {
           setTimeout(() => {
-            this.fields.time_to = moment(selectRange.endStr).format('h:mm a')
+            this.fields.time_to = moment(selectRange.endStr)
+              .format('h:mm a')
           }, 10)
 
           if (this.$refs.datepicker) {
             this.$refs.datepicker.day = Number(
-              moment(selectRange.startStr).format('DD'),
+              moment(selectRange.startStr)
+                .format('DD'),
             )
             this.$refs.datepicker.month = Number(
-              moment(selectRange.startStr).format('MM'),
+              moment(selectRange.startStr)
+                .format('MM'),
             )
             this.$refs.datepicker.year = Number(
-              moment(selectRange.startStr).format('YYYY'),
+              moment(selectRange.startStr)
+                .format('YYYY'),
             )
           }
 
           if (this.$refs.datepickerTo) {
             this.$refs.datepickerTo.day = Number(
-              moment(selectRange.startStr).format('DD'),
+              moment(selectRange.startStr)
+                .format('DD'),
             )
             this.$refs.datepickerTo.month = Number(
-              moment(selectRange.startStr).format('MM'),
+              moment(selectRange.startStr)
+                .format('MM'),
             )
             this.$refs.datepickerTo.year = Number(
-              moment(selectRange.startStr).format('YYYY'),
+              moment(selectRange.startStr)
+                .format('YYYY'),
             )
           }
         }, 1)
@@ -898,16 +906,22 @@ export default {
 
     this.$root.$on('lessonUpdateInit', (lesson) => {
       const parser = new DOMParser()
-      const currentLocation = parser.parseFromString(lesson.location, 'text/html').body.textContent
+      const currentLocation = parser.parseFromString(
+        lesson.location,
+        'text/html',
+      ).body.textContent
 
       this.fields = {
         id: lesson.id,
         genre: lesson.genre_id,
-        date: moment(lesson.start).format('YYYY-MM-DD'),
-        date_to: moment(lesson.end).format('YYYY-MM-DD'),
-        time_from: moment(lesson.start, ['YYYY-MM-DD HH:mm:ss']).format(
-          'h:mm a',
-        ),
+        date: moment(lesson.start)
+          .format('YYYY-MM-DD'),
+        date_to: moment(lesson.end)
+          .format('YYYY-MM-DD'),
+        time_from: moment(lesson.start, ['YYYY-MM-DD HH:mm:ss'])
+          .format(
+            'h:mm a',
+          ),
         spots_count: lesson.spots_count,
         spot_price: lesson.spot_price,
         location: currentLocation,
@@ -922,25 +936,31 @@ export default {
       setTimeout(() => {
         if (this.$refs.datepicker) {
           this.$refs.datepicker.day = Number(
-            moment(this.fields.date).format('DD'),
+            moment(this.fields.date)
+              .format('DD'),
           )
           this.$refs.datepicker.month = Number(
-            moment(this.fields.date).format('MM'),
+            moment(this.fields.date)
+              .format('MM'),
           )
           this.$refs.datepicker.year = Number(
-            moment(this.fields.date).format('YYYY'),
+            moment(this.fields.date)
+              .format('YYYY'),
           )
         }
 
         if (this.$refs.datepickerTo) {
           this.$refs.datepickerTo.day = Number(
-            moment(this.fields.date_to).format('DD'),
+            moment(this.fields.date_to)
+              .format('DD'),
           )
           this.$refs.datepickerTo.month = Number(
-            moment(this.fields.date_to).format('MM'),
+            moment(this.fields.date_to)
+              .format('MM'),
           )
           this.$refs.datepickerTo.year = Number(
-            moment(this.fields.date_to).format('YYYY'),
+            moment(this.fields.date_to)
+              .format('YYYY'),
           )
         }
       }, 1)
@@ -948,18 +968,19 @@ export default {
       setTimeout(() => {
         (this.fields.time_to = moment(lesson.end, [
           'YYYY-MM-DD HH:mm:ss',
-        ]).format('h:mm a')),
-          this.openPopup();
-      }, 1);
+        ])
+          .format('h:mm a')),
+          this.openPopup()
+      }, 1)
 
-      this.shareLink = this.getShareLink();
-    });
+      this.shareLink = this.getShareLink()
+    })
   },
 }
 </script>
 
 <style>
-    .pac-container {
-        z-index: 10000!important;
-    }
+.pac-container {
+  z-index: 10000 !important;
+}
 </style>

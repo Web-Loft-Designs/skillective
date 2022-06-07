@@ -832,7 +832,7 @@ class NotificationTableSeed extends Seeder
 						'method' => 'mail',
 						"content" => view("emails.booking.booking_in_24_hour")->render(),
 						'data'    => [
-							'subject' => 'Lesson on Skillective start in 24 hours',
+							'subject' => 'Lesson on Skillective starts in 24 hours',
 						],
 					]
 				]
