@@ -39,7 +39,8 @@ class HomeController extends AppBaseController
 			'featuresInstructors' => $userRepository->presentResponse($userRepository->getInstructorsForHome())['data'],
 			'testimonials' => $testimonialRepository->orderBy('position', 'asc')->all(),
 			'upcomingNearbyLessons' => $lessonRepository->upcomingNearbyLessons(request()->ip()),
-			'userIpLocation' => $userIpLocation
+			'userIpLocation' => $userIpLocation,
+            'userGenres' => Auth::check() ? Auth::user()->genres : [],
 		];
         return view('home', $vars);
     }
