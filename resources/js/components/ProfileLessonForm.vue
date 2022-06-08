@@ -716,7 +716,6 @@ export default {
     clearFormAndClosePopup() {
       this.clearSubmittedForm()
       this.date = null
-      console.log('clearFormAndClosePopup', this.$refs.lessonLocation)
       this.id = null
 
       this.genre = ''
@@ -732,7 +731,6 @@ export default {
       this.$refs.timeFrom.hour = ''
       this.$refs.timeFrom.minute = ''
       this.$refs.timeFrom.apm = ''
-      this.$refs.lessonLocation = null
       this.fields.lesson_type = 'in_person'
     },
     initNewPlacesAutocomplete(_ref) {
@@ -743,12 +741,9 @@ export default {
       google.maps.event.addListener(autocomplete, 'place_changed', function() {
         thisComponent.fields.location = thisComponent.$refs[_ref].value
       })
-      console.log('initNewPlacesAutocomplete, location',this.fields.location);
-      console.log('initNewPlacesAutocomplete',this.$refs);
     },
   },
   created: function() {
-    console.log(this.fields, 'created fields')
     this.timeOptions = this.getTimeOptions()
     this.timeZomeOptions = {
       'America/New_York': 'America/New_York UTC-05:00',
