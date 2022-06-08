@@ -666,7 +666,6 @@ export default {
             'HH:mm:ss',
           )
       }
-      console.log(this.fields)
       if (this.fields.id > 0)
         this.apiPut('/api/instructor/lesson/' + this.fields.id, this.fields)
       else this.apiPost('/api/instructor/lesson', this.fields)
@@ -675,7 +674,7 @@ export default {
       this.clearFormAndClosePopup()
       this.$root.$emit('lessonCreated', responseData.data)
       this.$emit('lesson', responseData.data)
-
+      console.log('createdLessons',this.fields)
       this.$root.$emit('createdLessons')
 
       this.$refs.modal.close()
@@ -734,9 +733,9 @@ export default {
       this.$refs.timeFrom.hour = ''
       this.$refs.timeFrom.minute = ''
       this.$refs.timeFrom.apm = ''
-      this.$refs.lessonLocation = null
-
+      this.$refs.lessonLocation = ''
       this.fields.lesson_type = 'in_person'
+      console.log('clearFormAndClosePopup', this.$refs.lessonLocation);
     },
     initNewPlacesAutocomplete(_ref) {
       var thisComponent = this
@@ -746,9 +745,11 @@ export default {
       google.maps.event.addListener(autocomplete, 'place_changed', function() {
         thisComponent.fields.location = thisComponent.$refs[_ref].value
       })
+      console.log('initNewPlacesAutocomplete, location',this.fields.location);
     },
   },
   created: function() {
+    console.log(this.fields, 'created fields')
     this.timeOptions = this.getTimeOptions()
     this.timeZomeOptions = {
       'America/New_York': 'America/New_York UTC-05:00',
