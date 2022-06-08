@@ -674,7 +674,6 @@ export default {
       this.clearFormAndClosePopup()
       this.$root.$emit('lessonCreated', responseData.data)
       this.$emit('lesson', responseData.data)
-      console.log('createdLessons',this.fields)
       this.$root.$emit('createdLessons')
 
       this.$refs.modal.close()
@@ -717,7 +716,7 @@ export default {
     clearFormAndClosePopup() {
       this.clearSubmittedForm()
       this.date = null
-
+      console.log('clearFormAndClosePopup', this.$refs.lessonLocation)
       this.id = null
 
       this.genre = ''
@@ -733,9 +732,8 @@ export default {
       this.$refs.timeFrom.hour = ''
       this.$refs.timeFrom.minute = ''
       this.$refs.timeFrom.apm = ''
-      this.$refs.lessonLocation = ''
+      this.$refs.lessonLocation = null
       this.fields.lesson_type = 'in_person'
-      console.log('clearFormAndClosePopup', this.$refs.lessonLocation);
     },
     initNewPlacesAutocomplete(_ref) {
       var thisComponent = this
@@ -746,6 +744,7 @@ export default {
         thisComponent.fields.location = thisComponent.$refs[_ref].value
       })
       console.log('initNewPlacesAutocomplete, location',this.fields.location);
+      console.log('initNewPlacesAutocomplete',this.$refs);
     },
   },
   created: function() {
