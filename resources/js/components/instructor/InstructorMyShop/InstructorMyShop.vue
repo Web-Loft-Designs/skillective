@@ -137,12 +137,14 @@ export default {
     };
   },
   created() {
-    const params = urlHelper.parseQueryParams();
-
-    this.loadLessons();
+    this.loadLessons({
+      page: this.pagination.currentPage,
+      genres: this.selectedGenres,
+      content: this.selectedContent,
+    });
   },
   methods: {
-    async loadLessons() {
+    async loadLessons(params) {
       this.isLoading = true;
       const genres = await lessonService.myShopGenres();
       this.filters[1].options = genres.map((item, index) => {
@@ -151,12 +153,7 @@ export default {
           label: item.title,
         }
       });
-      const data = await lessonService.myShopLessons({
-        page: this.pagination.currentPage,
-        sortBy: this.selectedSortBy,
-        genres: this.selectedGenres,
-        content: this.selectedContent,
-      });
+      const data = await lessonService.myShopLessons(params);
       this.lessons = data.lessons;
       this.pagination.currentPage = data.pagination.currentPage;
       this.pagination.pageCount = data.pagination.pageCount;
@@ -167,7 +164,12 @@ export default {
     },
     changePage(pageNum) {
       this.pagination.currentPage = pageNum;
-      this.loadLessons();
+      this.loadLessons({
+        page: this.pagination.currentPage,
+        sortBy: this.selectedSortBy,
+        genres: this.selectedGenres,
+        content: this.selectedContent,
+      });
     },
     filterChanged({ value, filterIndex }) {
       switch (filterIndex) {
@@ -183,7 +185,12 @@ export default {
           this.selectedContent = value.code;
           break;
       }
-      this.loadLessons();
+      this.loadLessons({
+        page: this.pagination.currentPage,
+        sortBy: this.selectedSortBy,
+        genres: this.selectedGenres,
+        content: this.selectedContent,
+      });
     },
     addLesson() {
       this.$refs.addLessonPopup.showPopup();

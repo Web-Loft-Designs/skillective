@@ -18,19 +18,19 @@
               v-if="windowWidth > 1400 && (!showFixedSearch || showFixedCalendarInput)"
             >
               <button
-                @click.prevent="whereValue.virtual = false"
+                @click.prevent="onLearnInPerson"
                 :class="{ active: !whereValue.virtual }"
               >
                 Learn In-Person
               </button>
               <button
-                @click.prevent="whereValue.virtual = true; preRecorded = false;"
+                @click.prevent="onLearnVirtually"
                 :class="{ active: (whereValue.virtual && !preRecorded) }"
               >
                 Learn Virtually
               </button>
               <button
-                @click.prevent="preRecorded = true; whereValue.virtual = true; selectedTab = null;"
+                @click.prevent="onPreRecorded"
                 :class="{ active: preRecorded && whereValue.virtual }"
               >
                 Pre-Recorded Lessons
@@ -70,19 +70,19 @@
 
       <div class="calendar-input__fixed-nav" v-if="windowWidth <= 1400 && !showFixedSearchByDefault">
         <button
-          @click.prevent="whereValue.virtual = false"
+          @click.prevent="onLearnInPerson"
           :class="{ active: !whereValue.virtual }"
         >
           Learn In-Person
         </button>
         <button
-          @click.prevent="whereValue.virtual = true; preRecorded = false;"
+          @click.prevent="onLearnVirtually"
           :class="{ active: (whereValue.virtual && !preRecorded) }"
         >
           Learn Virtually
         </button>
         <button
-          @click.prevent="preRecorded = true; whereValue.virtual = true; selectedTab = null;"
+          @click.prevent="onPreRecorded"
           :class="{ active: preRecorded && whereValue.virtual }"
         >
           Pre-Recorded Lessons
@@ -361,6 +361,9 @@ export default {
     this.parseQueryParams();
   },
   mounted() {
+    if (window.location.search === '?learnVirtually=true') {
+      this.whereValue.virtual = true
+    }
     window.addEventListener("resize", () => {
       this.windowWidth = window.innerWidth;
     });
@@ -408,6 +411,26 @@ export default {
   },
   methods: {
     ...mapActions(['getAllInstructors']),
+    onPreRecorded() {
+      const params = this.buildQueryParams();
+      this.preRecorded = true
+      this.whereValue.virtual = true
+      this.selectedTab = null
+      urlHelper.updateQueryParams(params, true, true, this.preRecorded ? '/globalshop' : '/lessons')
+    },
+    onLearnVirtually() {
+      if (this.preRecorded) {
+        urlHelper.updateQueryParams({learnVirtually: true}, true, true, '/')
+      }
+      this.whereValue.virtual = true
+      this.preRecorded = false
+    },
+    onLearnInPerson() {
+      if (this.preRecorded) {
+        urlHelper.updateQueryParams({}, true, true, '/')
+      }
+      this.whereValue.virtual = false
+    },
     parseQueryParams() {
       const params = urlHelper.parseQueryParams();
 
