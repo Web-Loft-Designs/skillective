@@ -128,7 +128,6 @@ let siteAPIMixin =  {
 						this.fields[_prop] = (_prop==='id') ? null : '';
 					}
 				}
-				console.log('clearSubmittedForm',_prop)
 			}
 			this.errors = {};
 			this.errorText =  null;
