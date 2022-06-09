@@ -164,15 +164,6 @@
                                     <td v-if='listLoaded == true'>
                                         <a
                                             href='#'
-                                            @click.prevent='approveBooking(booking)'
-                                            class='btn-approve'
-                                            v-if="
-                          booking.status == 'pending' && !isPastLesson(start)
-                        "
-                                        >Approve</a
-                                        >
-                                        <a
-                                            href='#'
                                             @click.prevent='cancelBooking(booking)'
                                             class='btn-cancel'
                                             v-if="
@@ -212,15 +203,6 @@
                                             </li>
                                         </ul>
                                         <div class='user-b-bottom'>
-                                            <a
-                                                href='#'
-                                                @click.prevent='approveBooking(booking)'
-                                                class='btn-approve'
-                                                v-if="
-                          booking.status == 'pending' && !isPastLesson(start)
-                        "
-                                            >Approve</a
-                                            >
                                             <a
                                                 href='#'
                                                 @click.prevent='cancelBooking(booking)'
