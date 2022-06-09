@@ -5,10 +5,8 @@
             <h2 class=" page-title">Bookings</h2>
             <div class="d-flex align-items-center">
                 <button @click.prevent="toggleShowOnly('current')" :class="{'active':(showOnly=='current')}">Current</button>
-                <button @click.prevent="toggleShowOnly('pending')" :class="{'active':(showOnly=='pending')}">Pending</button>
                 <button @click.prevent="toggleShowOnly('past')" :class="{'active':(showOnly=='past')}">Past</button>
                 <button @click.prevent="toggleShowOnly('cancelled')" :class="{'active':(showOnly=='cancelled')}">Cancelled</button>
-                <button @click.prevent="toggleShowOnly('pending_cancellation')" :class="{'active':(showOnly=='pending_cancellation')}">Pending cancellation</button>
                 <button @click.prevent="toggleShowOnly('lesson_requests')" :class="{'active':(showOnly=='lesson_requests')}">Booking Requests</button>
             </div>
         </div>
@@ -60,7 +58,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(booking, index) in listItems">
+                <tr v-for="(booking, index) in listItems" :key="index">
                     <td v-if="showOnly!='lesson_requests' && listLoaded==true"><span class="checkbox-wrapper"><label><input @change="select" type="checkbox" v-model="selectedBookings" :value="booking.id"/><span class="checkmark"></span></label></span></td>
 
                     <td >{{ (firstListItemNumber + index) }}</td>
@@ -99,7 +97,6 @@
                             <span class="d-flex w-100 align-items-center">
                                 <lesson-participant-room-controls v-if="showOnly=='current' && listLoaded==true && !booking.lesson.room_completed" :booking="booking"></lesson-participant-room-controls>
                                 <span class="btn btn-notify" @click="notifyInstructor(booking.lesson.instructor)" v-if="booking.lesson.instructor.profile.notification_methods.length>0">contact</span>
-                                <span class="btn btn-danger" @click="requestCancelBooking(booking)" v-if="(booking.status!='cancelled' && !isPastLesson(booking.lesson.start))">Request Cancel</span>
                             </span>
                     </td>
                     <td v-else>
@@ -210,9 +207,6 @@
 				this.apiGet(getUrl, {
 					params: queryParams
 				});
-			},
-			requestCancelBooking(booking){
-				this.apiDelete('/api/student/booking/' + booking.id);
 			},
 			requestCancelManyBookings(){
 				this.apiPost('/api/student/bookings/cancel', {bookings : this.selectedBookings});
