@@ -30,6 +30,8 @@ class LessonsPageController extends Controller
 		}
 
     	$vars = [
+    	    'userGenres' => 'userGenres',
+    	    'siteGenres' => 'siteGenres',
 			'genres' => $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
 			'lessons' => $lessons,
 			'page_title' => 'Search Lessons'
