@@ -56,8 +56,7 @@ const cartService = {
                     console.log(e);
                 });
             needed = needed.data.data;
-
-            guestCartHelper.clearProducts();
+            // guestCartHelper.clearProducts();
         }
         return needed;
     },

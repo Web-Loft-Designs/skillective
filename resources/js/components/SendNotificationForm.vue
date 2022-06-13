@@ -13,41 +13,41 @@
       ref="modalNotification"
     >
       <div v-if="usersToNotify.length == 0">No users to notify selected</div>
-      <div v-if="usersToNotify.length > 0" class="d-flex flex-wrap w-100">
-        <div v-if="mode !== 'simple'" class="calender-form">
-          <div class="calendar-component">
-            <div class="calendar-component-top">
-              <h2>Choose lesson</h2>
-            </div>
-            <div class="calendar-component-body">
-              <FullCalendar
-                :header="{
-                  left: 'prev',
-                  center: 'title',
-                  right: 'next',
-                }"
-                :footer="{
-                  right: 'timeGridDay,timeGridWeek,dayGridMonth',
-                }"
-                :showNonCurrentDates="false"
-                :fixedWeekCount="false"
-                :firstDay="0"
-                :defaultView="'dayGridMonth'"
-                :navLinks="true"
-                :nowIndicator="true"
-                :plugins="calendarPlugins"
-                :events="events"
-                :dayRender="dayRender"
-                :eventRender="eventRender"
-                :eventTimeFormat="eventTimeFormat"
-                :selectable="false"
-                :datesRender="viewRender"
-                @eventClick="dateClick"
-                ref="fullCalendarModal"
-              ></FullCalendar>
-            </div>
-          </div>
-        </div>
+      <div v-if="usersToNotify.length > 0" class="w-100">
+<!--        <div v-if="mode !== 'simple'" class="calender-form">-->
+<!--          <div class="calendar-component">-->
+<!--            <div class="calendar-component-top">-->
+<!--              <h2>Choose lesson</h2>-->
+<!--            </div>-->
+<!--            <div class="calendar-component-body">-->
+<!--              <FullCalendar-->
+<!--                :header="{-->
+<!--                  left: 'prev',-->
+<!--                  center: 'title',-->
+<!--                  right: 'next',-->
+<!--                }"-->
+<!--                :footer="{-->
+<!--                  right: 'timeGridDay,timeGridWeek,dayGridMonth',-->
+<!--                }"-->
+<!--                :showNonCurrentDates="false"-->
+<!--                :fixedWeekCount="false"-->
+<!--                :firstDay="0"-->
+<!--                :defaultView="'dayGridMonth'"-->
+<!--                :navLinks="true"-->
+<!--                :nowIndicator="true"-->
+<!--                :plugins="calendarPlugins"-->
+<!--                :events="events"-->
+<!--                :dayRender="dayRender"-->
+<!--                :eventRender="eventRender"-->
+<!--                :eventTimeFormat="eventTimeFormat"-->
+<!--                :selectable="false"-->
+<!--                :datesRender="viewRender"-->
+<!--                @eventClick="dateClick"-->
+<!--                ref="fullCalendarModal"-->
+<!--              ></FullCalendar>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
         <div class="block-form">
           <h2 v-if="usersToNotify.length == 1">
             Notify {{ usersToNotify[0].full_name }}
