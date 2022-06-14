@@ -186,7 +186,7 @@ class CartRepository extends BaseRepository
             if ($cartItem->lesson_id) {
                 $booking = new Booking();
 
-                $virtual_fee = $booking->getBookingVirtualFeeAmount($cartItem->lesson);
+                $virtual_fee = round($booking->getBookingVirtualFeeAmount($cartItem->lesson), 2);
 
                 $finishPrice = $cartItem->lesson->spot_price;
 
@@ -196,11 +196,11 @@ class CartRepository extends BaseRepository
                         if ($discount->discount_type == 'fixed-amount') {
                             $discountAmount = $discount->discount / $cartCount;
                             $response["discount"] += $discountAmount;
-                            $finishPrice -= $discountAmount;
+                            $finishPrice -= round($discountAmount, 2);
                         } else if ($discount->discount_type == 'percent') {
                             $discountAmount = $discount->discount / 100 * $cartItem->lesson->spot_price;
                             $response["discount"] += $discountAmount;
-                            $finishPrice -= $discountAmount;
+                            $finishPrice -= round($discountAmount, 2);
                         }
                     }
                 }
@@ -211,21 +211,21 @@ class CartRepository extends BaseRepository
                         if ($promo->discount_type == 'fixed-amount') {
                             $discountAmount = $promo->discount / $cartCount;
                             $response["discount"] += $discountAmount;
-                            $finishPrice -= $discountAmount;
+                            $finishPrice -= round($discountAmount, 2);
                         } else if ($promo->discount_type == 'percent') {
                             $discountAmount = $promo->discount / 100 * $cartItem->lesson->spot_price;
                             $response["discount"] += $discountAmount;
-                            $finishPrice -= $discountAmount;
+                            $finishPrice -= round($discountAmount, 2);
                         }
                     }
                 }
 
-                $service_fee = $booking->getBookingServiceFeeAmount($finishPrice);
+                $service_fee = round($booking->getBookingServiceFeeAmount($finishPrice), 2);
 
-                $processor_fee        = $booking->getBookingPaymentProcessingFeeAmount($finishPrice, $service_fee + $virtual_fee);
+                $processor_fee = round($booking->getBookingPaymentProcessingFeeAmount($finishPrice, $service_fee + $virtual_fee), 2);
 
                 $response["count"] += 1;
-                $response["subtotal"] += $cartItem->lesson->spot_price;
+                $response["subtotal"] += round($cartItem->lesson->spot_price, 2);
                 $response["fee"] += $service_fee + $virtual_fee + $processor_fee;
                 $response["total"] += round($finishPrice + $service_fee + $virtual_fee + $processor_fee, 2);
             } else {
@@ -238,11 +238,11 @@ class CartRepository extends BaseRepository
                         if ($discount->discount_type == 'fixed-amount') {
                             $discountAmount = $discount->discount / $cartCount;
                             $response["discount"] += $discountAmount;
-                            $finishPrice -= $discountAmount;
+                            $finishPrice -= round($discountAmount, 2);
                         } else if ($discount->discount_type == 'percent') {
                             $discountAmount = $discount->discount / 100 * $cartItem->preRecordedLesson->price;
                             $response["discount"] += $discountAmount;
-                            $finishPrice -= $discountAmount;
+                            $finishPrice -= round($discountAmount, 2);
                         }
                     }
                 }
@@ -252,23 +252,24 @@ class CartRepository extends BaseRepository
                         if ($promo->discount_type == 'fixed-amount') {
                             $discountAmount = $promo->discount / $cartCount;
                             $response["discount"] += $discountAmount;
-                            $finishPrice -= $discountAmount;
+                            $finishPrice -= round($discountAmount, 2);
                         } else if ($promo->discount_type == 'percent') {
                             $discountAmount = $promo->discount / 100 * $cartItem->preRecordedLesson->price;
                             $response["discount"] += $discountAmount;
-                            $finishPrice -= $discountAmount;
+                            $finishPrice -= round($discountAmount, 2);
                         }
                     }
                 }
 
-                $service_fee = $preRecordedLesson->getPreRecordedLessonServiceFeeAmount($finishPrice);
-                $processor_fee = $preRecordedLesson->getPreRecordedLessonPaymentProcessingFeeAmount($finishPrice, $service_fee);
+                $service_fee = round($preRecordedLesson->getPreRecordedLessonServiceFeeAmount($finishPrice), 2);
+                $processor_fee = round($preRecordedLesson->getPreRecordedLessonPaymentProcessingFeeAmount($finishPrice, $service_fee), 2);
 
 
                 $response["count"] += 1;
-                $response["subtotal"] += $cartItem->preRecordedLesson->price;
+                $response["subtotal"] += round($cartItem->preRecordedLesson->price, 2);
                 $response["fee"] += $service_fee + $processor_fee;
-                $response["total"] += round($finishPrice + $service_fee + $processor_fee, 2);
+                $response["total"] += round($finishPrice + $service_fee + $processor_fee);
+
             }
         }
 
