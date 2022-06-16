@@ -58,13 +58,15 @@ class PreRLessonRepository extends BaseRepository
 			$this->pushCriteria(new PreRLessonFilterByTopicCriteria($request->get('topic')));
 		}
 
-		$this->scopeQuery(function ($query) use ($request) {
-			$query = $query->select('pre_r_lessons.*')
-				->join('users', 'pre_r_lessons.instructor_id', '=', "users.id")
-				->groupBy('pre_r_lessons.id');
+        $this->scopeQuery(function ($query) use ($request) {
+            $query = $query->select('pre_r_lessons.*')
+                ->join('users', 'pre_r_lessons.instructor_id', '=', "users.id")
+                ->join('purchased_lessons', 'pre_r_lessons.id', '=', "purchased_lessons.pre_r_lesson_id")
+                ->groupBy('pre_r_lessons.id')
+                ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'asc');
 
-			return $query;
-		});
+            return $query;
+        });
 
 		return $this->paginate(21, ['pre_r_lessons.*']);
 	}
@@ -93,8 +95,8 @@ class PreRLessonRepository extends BaseRepository
 				->addSelect(DB::raw('COUNT( DISTINCT purchased_lessons.id) * purchased_lessons.price  as totalRevenue'))
 				->leftJoin('purchased_lessons', 'pre_r_lessons.id', '=', "purchased_lessons.pre_r_lesson_id")
 				->groupBy('pre_r_lessons.id')
-				->where('pre_r_lessons.instructor_id', $instructor_id);
-
+				->where('pre_r_lessons.instructor_id', $instructor_id)
+                ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'asc');
 
 			return $query;
 		})->with(['files']);
