@@ -69,7 +69,7 @@ class PreRLessonRepository extends BaseRepository
 
                 $userGenres = Auth()->user()->genres()->orderBy('title', 'desc')->get()->pluck('id')->toArray();
                 $ids_ordered = implode(',', $userGenres);
-                $query->orderBy(DB::raw('FIELD(pre_r_lessons.genre_id, '.$ids_ordered.'), COUNT(`purchased_lessons`.`id`)'), 'desc');
+                $query->orderBy(DB::raw('FIELD(pre_r_lessons.genre_id, '.$ids_ordered.') + COUNT(`purchased_lessons`.`id`), COUNT(`purchased_lessons`.`id`)'), 'desc');
 
             }else{
 
