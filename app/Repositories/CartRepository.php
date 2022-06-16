@@ -227,7 +227,7 @@ class CartRepository extends BaseRepository
                 $response["count"] += 1;
                 $response["subtotal"] += round($cartItem->lesson->spot_price, 2);
                 $response["fee"] += $service_fee + $virtual_fee + $processor_fee;
-                $response["total"] += $finishPrice + $service_fee + $virtual_fee + $processor_fee;
+                $response["total"] += round($finishPrice + $service_fee + $virtual_fee + $processor_fee, 2);
             } else {
                 $preRecordedLesson = new PreRecordedLesson();
 
