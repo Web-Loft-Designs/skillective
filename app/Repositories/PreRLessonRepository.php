@@ -69,11 +69,11 @@ class PreRLessonRepository extends BaseRepository
 
                 $userGenres = Auth()->user()->genres()->orderBy('title', 'desc')->get()->pluck('id')->toArray();
                 $ids_ordered = implode(',', $userGenres);
-                $query->orderBy(DB::raw('FIELD(pre_r_lessons.genre_id, '.$ids_ordered.'), COUNT(`purchased_lessons`.`id`)'), 'asc');
+                $query->orderBy(DB::raw('FIELD(pre_r_lessons.genre_id, '.$ids_ordered.'), COUNT(`purchased_lessons`.`id`)'), 'desc');
 
             }else{
 
-                $query->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'asc');
+                $query->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'desc');
 
             }
 
@@ -109,7 +109,7 @@ class PreRLessonRepository extends BaseRepository
 				->leftJoin('purchased_lessons', 'pre_r_lessons.id', '=', "purchased_lessons.pre_r_lesson_id")
 				->groupBy('pre_r_lessons.id')
 				->where('pre_r_lessons.instructor_id', $instructor_id)
-                ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'asc');
+                ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'desc');
 
 			return $query;
 		})->with(['files']);
