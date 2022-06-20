@@ -153,7 +153,16 @@ class BookingObserver
         }
     }
 
+    /**
+     * @param Booking $booking
+     * @return void
+     */
     public function created(Booking $booking){
+
+        if( \Cookie::has('guest_cart') )
+        {
+            \Cookie::queue(\Cookie::forget('guest_cart'));
+        }
 
     }
 }

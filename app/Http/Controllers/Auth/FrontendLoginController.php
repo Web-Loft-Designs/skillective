@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
-use Session;
-use Log;
 use Auth;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use App\Models\User;
@@ -47,10 +45,27 @@ class FrontendLoginController extends AppBaseController
 
 	public function redirectTo()
 	{
-		if ( Auth::user()->hasRole(User::ROLE_INSTRUCTOR) ){
-			return route('instructor.dashboard');//session('prev_page', route('instructor.dashboard'));
-		}elseif ( Auth::user()->hasRole(User::ROLE_STUDENT) ){
-            return route('student.dashboard'); //session()->exists('prev_page') ? session('prev_page') : route('student.dashboard');
+
+		if ( Auth::user()->hasRole(User::ROLE_INSTRUCTOR) )
+        {
+
+            return route('instructor.dashboard');//session('prev_page', route('instructor.dashboard'));
+
+		}elseif ( Auth::user()->hasRole(User::ROLE_STUDENT) )
+        {
+
+            if (Cookie::has('redirect_after_auth_checkout'))
+            {
+
+                Cookie::queue(Cookie::forget('redirect_after_auth_checkout'));
+                return route('checkout');
+
+            }else{
+
+                return route('student.dashboard'); //session()->exists('prev_page') ? session('prev_page') : route('student.dashboard');
+
+            }
+
 		}
 	}
 

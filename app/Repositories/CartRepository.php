@@ -3,6 +3,10 @@
 namespace App\Repositories;
 
 use App\Models\Cart;
+use App\Models\PurchasedLesson;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use InfyOm\Generator\Common\BaseRepository;
 use App\Models\Booking;
 use App\Models\Lesson;
@@ -10,7 +14,6 @@ use App\Models\PreRecordedLesson;
 use Carbon\Carbon;
 use App\Models\Discount;
 use App\Models\PromoCode;
-use Log;
 
 class CartRepository extends BaseRepository
 {
@@ -89,56 +92,70 @@ class CartRepository extends BaseRepository
             }
 
             return $cart;
+
         } else if ($product_list) {
-            $lessons_ids = [];
-            $pre_r_lessons_ids = [];
 
-            foreach (json_decode($product_list) as $key => $value) {
-                if (isset($value->isPreRecorded)) {
-                    $pre_r_lessons_ids[] = (int)$value->lesson_id;
-                } else {
-                    $lessons_ids[] = (int)$value->lesson_id;
-                }
-            }
+            return $this->addToCart($product_list);
 
-            $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
-            $lessons = Lesson::whereIn('lessons.id', $lessons_ids)
-                ->leftJoin('bookings', function ($join) {
-                    $join->on('lessons.id', '=', 'bookings.lesson_id')
-                        ->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ");
-                })
-                ->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")->with(["genre", 'instructor', 'instructor.discounts']);
-
-            $cart = $lessons->get(["lessons.*"]);
-
-
-            $preRCart = PreRecordedLesson::whereIn("pre_r_lessons.id", $pre_r_lessons_ids)->with(["genre", "instructor"])->get(["pre_r_lessons.*"]);
-
-
-            $cart = $cart->merge($preRCart);
-
-            foreach ($cart as $key => $value) {
-                $metaCartItem = [];
-
-                if ($value instanceof Lesson) {
-                    $metaCartItem = [
-                        "lesson_id" => $value->id,
-                        "instructor_id" => $value->instructor_id,
-                    ];
-                    $cart[$key] = new Cart($metaCartItem);
-                } else {
-                    $metaCartItem = [
-                        "pre_r_lesson_id" => $value->id,
-                        "instructor_id" => $value->instructor_id,
-                    ];
-
-                    $cart[$key] = new Cart($metaCartItem);
-                }
-            }
-
-            return $cart;
         }
     }
+
+    /**
+     * @param $product_list
+     * @return mixed
+     */
+    public function addToCart($product_list)
+    {
+
+        $lessons_ids = [];
+        $pre_r_lessons_ids = [];
+
+        foreach (json_decode($product_list) as $key => $value) {
+            if (isset($value->isPreRecorded)) {
+                $pre_r_lessons_ids[] = (int)$value->lesson_id;
+            } else {
+                $lessons_ids[] = (int)$value->lesson_id;
+            }
+        }
+
+        $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
+        $lessons = Lesson::whereIn('lessons.id', $lessons_ids)
+            ->leftJoin('bookings', function ($join) {
+                $join->on('lessons.id', '=', 'bookings.lesson_id')
+                    ->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ");
+            })
+            ->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")->with(["genre", 'instructor', 'instructor.discounts']);
+
+        $cart = $lessons->get(["lessons.*"]);
+
+        $preRCart = PreRecordedLesson::whereIn("pre_r_lessons.id", $pre_r_lessons_ids)->with(["genre", "instructor"])->get(["pre_r_lessons.*"]);
+
+        $cart = $cart->merge($preRCart);
+
+        foreach ($cart as $key => $value) {
+            $metaCartItem = [];
+
+            if ($value instanceof Lesson) {
+                $metaCartItem = [
+                    "lesson_id" => $value->id,
+                    "instructor_id" => $value->instructor_id,
+                ];
+                $cart[$key] = new Cart($metaCartItem);
+            } else {
+                $metaCartItem = [
+                    "pre_r_lesson_id" => $value->id,
+                    "instructor_id" => $value->instructor_id,
+                ];
+
+                $cart[$key] = new Cart($metaCartItem);
+            }
+
+        }
+
+        return $cart;
+
+    }
+
 
     public function getLessonsCountInCart($student_id, $guest_cart)
     {
@@ -146,7 +163,6 @@ class CartRepository extends BaseRepository
 
         return  count($cart);
     }
-
 
 
     public function getCartSummary($student_id, $guest_cart, $promos)
@@ -279,5 +295,38 @@ class CartRepository extends BaseRepository
     public function presentResponse($data)
     {
         return $this->presenter->present($data);
+    }
+
+    /**
+     * @param Request $request
+     * @return bool
+     */
+    public function storeGuestCart(Request $request)
+    {
+
+        if ( !\Cookie::has('guest_cart') || !Auth::check() ) return false;
+
+        $guestCart = json_decode(\Cookie::get('guest_cart'));
+
+        foreach ( $guestCart as $item )
+        {
+
+            $data = array();
+
+            $data['student_id'] = Auth::user()->id;
+            $data['lesson_id'] = $item->lesson_id;
+
+            $lesson = Lesson::where('id',  $item->lesson_id)->first();
+
+            $data['instructor_id'] = $lesson->instructor_id;
+            $data['description'] = $item->description;
+            $data['is_guest'] = 1;
+
+            $result = Cart::create($data);
+
+        }
+
+        return true;
+
     }
 }
