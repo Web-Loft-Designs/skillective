@@ -15,9 +15,8 @@ use App\Repositories\UserRepository;
 use App\Repositories\CartRepository;
 use Illuminate\Support\Facades\App;
 use App\Facades\UserRegistrator;
-use App\Http\Requests\API\StudentRegisterRequest;
 use Auth;
-use Log;
+use Illuminate\Support\Facades\Cookie;
 use Carbon\Carbon;
 
 
@@ -36,16 +35,17 @@ class CartAPIController extends AppBaseController
     {
 
         $student_id = null;
-
-        if (Auth::user()) {
-            $student_id = Auth::user()->id;
-        }
-
         $guest_cart = $request->query('guest_cart');
 
+        if (Auth::user()) {
+
+            $student_id = Auth::user()->id;
+
+        }else{
+            Cookie::queue('guest_cart', $guest_cart, 84600);
+        }
 
         $cart = $this->cartRepository->getUserCart($student_id, $guest_cart);
-
 
         $this->cartRepository->setPresenter("App\\Presenters\\CartListPresenter");
         $cart = $this->cartRepository->presentResponse($cart);
@@ -72,14 +72,31 @@ class CartAPIController extends AppBaseController
 
     public function getCartSummary(Request $request)
     {
+
         $student_id = null;
-
-        if (Auth::user()) {
-            $student_id = Auth::user()->id;
-        }
-
         $guest_cart = $request->query('guest_cart');
         $promo_codes = $request->query('promo_codes');
+
+        if (Auth::user())
+        {
+            $student_id = Auth::user()->id;
+
+        }
+
+        /**
+         * Guest Cart
+         */
+        $guestCart = json_decode($guest_cart, true);
+        if( count($guestCart) <> 0 )
+        {
+            if (!Auth::user())
+            {
+                Cookie::queue('guest_cart', $guest_cart, 84600);
+            }
+
+        }else{
+            Cookie::queue(Cookie::forget('guest_cart'));
+        }
 
         $response = $this->cartRepository->getCartSummary($student_id, $guest_cart, $promo_codes);
 
@@ -323,7 +340,9 @@ class CartAPIController extends AppBaseController
             $data['description'] = $request->input('description');
 
             $result = Cart::create($data);
+
         } else {
+
             $isExist = Cart::where('lesson_id', $request->input('lesson_id'))->where('student_id', Auth::user()->id)->first();
 
             if ($isExist) {
