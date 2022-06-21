@@ -13,11 +13,13 @@ use App\Models\Booking;
 use App\Models\PurchasedLesson;
 use App\Repositories\UserRepository;
 use App\Repositories\CartRepository;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use App\Facades\UserRegistrator;
 use Auth;
 use Illuminate\Support\Facades\Cookie;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Session;
 
 
 class CartAPIController extends AppBaseController
@@ -76,6 +78,7 @@ class CartAPIController extends AppBaseController
         $student_id = null;
         $guest_cart = $request->query('guest_cart');
         $promo_codes = $request->query('promo_codes');
+        $message = null;
 
         if (Auth::user())
         {
@@ -95,10 +98,29 @@ class CartAPIController extends AppBaseController
             }
 
         }else{
-            Cookie::queue(Cookie::forget('guest_cart'));
+
+            if( \Cookie::has('guest_cart') )
+            {
+
+                $guestCart = json_decode(\Cookie::get('guest_cart'), true);
+                $ids = Arr::pluck($guestCart, 'lesson_id');
+
+                $cart = Cart::where('is_guest', 0)
+                    ->where('student_id', \Auth::id())
+                    ->whereIn('lesson_id', $ids)
+                    ->delete();
+
+                if( $cart )
+                {
+                    $message = 'One or more lessons have been removed from your cart because you have already purchased them.';
+                }
+
+                Cookie::queue(Cookie::forget('guest_cart'));
+
+            }
         }
 
-        $response = $this->cartRepository->getCartSummary($student_id, $guest_cart, $promo_codes);
+        $response = $this->cartRepository->getCartSummary($student_id, $guest_cart, $promo_codes, $message);
 
         return  $this->sendResponse($response);
     }

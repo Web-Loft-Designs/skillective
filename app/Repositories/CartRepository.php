@@ -165,7 +165,7 @@ class CartRepository extends BaseRepository
     }
 
 
-    public function getCartSummary($student_id, $guest_cart, $promos)
+    public function getCartSummary($student_id, $guest_cart, $promos, $message = null)
     {
         $cart = $this->getUserCart($student_id, $guest_cart);
 
@@ -288,6 +288,8 @@ class CartRepository extends BaseRepository
 
             }
         }
+
+        $response["message"] = $message;
 
         return  $response;
     }

@@ -3,6 +3,9 @@
 namespace App\Observers;
 
 use App\Models\Booking;
+use App\Models\Cart;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Session;
 use Log;
 use App\Repositories\UserRepository;
 
@@ -160,10 +163,7 @@ class BookingObserver
     public function created(Booking $booking)
     {
 
-        if( \Cookie::has('guest_cart') )
-        {
-            \Cookie::queue(\Cookie::forget('guest_cart'));
-        }
+
 
     }
 }
