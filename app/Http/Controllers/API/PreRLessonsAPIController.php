@@ -18,7 +18,7 @@ class PreRLessonsAPIController extends AppBaseController
     }
 
     public function index(Request $request)
-    {        
+    {
         $lessons = $this->preRLessonRepository->getPreRLessons($request);
 
         $this->preRLessonRepository->setPresenter("App\\Presenters\\PreRLessonInListPresenter");
@@ -27,8 +27,10 @@ class PreRLessonsAPIController extends AppBaseController
     }
 
     public function getPreRecordedLessonsByInstructorId(Request $request, $instructor)
-    {        
-        $instructorLessons = PreRecordedLesson::where('instructor_id', "=", (int) $instructor)->orderBy('pre_r_lessons.created_at', 'desc')->paginate(20);
+    {
+        $instructorLessons = PreRecordedLesson::where('instructor_id', "=", (int) $instructor)
+            ->orderBy('pre_r_lessons.created_at', 'desc')
+            ->paginate(20);
 
         $this->preRLessonRepository->setPresenter("App\\Presenters\\PreRLessonInListPresenter");
         $instructorLessons = $this->preRLessonRepository->presentResponse( $instructorLessons );
