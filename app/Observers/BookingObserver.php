@@ -157,7 +157,8 @@ class BookingObserver
      * @param Booking $booking
      * @return void
      */
-    public function created(Booking $booking){
+    public function created(Booking $booking)
+    {
 
         if( \Cookie::has('guest_cart') )
         {
