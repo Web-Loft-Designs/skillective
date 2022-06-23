@@ -50,7 +50,6 @@ class PurchasedLessonRepository extends BaseRepository
 				->join('genres', 'pre_r_lessons.genre_id', '=', "genres.id")
 				->where('purchased_lessons.student_id', $studentUserId)
                 ->orderBy('purchased_lessons.pre_r_lesson_id', 'desc')
-                ->orderBy(DB::raw('FIELD(pre_r_lessons.genre_id, '.$ids_ordered.')'), 'asc')
                 ->groupBy('purchased_lessons.id');
 
 			return $query;
