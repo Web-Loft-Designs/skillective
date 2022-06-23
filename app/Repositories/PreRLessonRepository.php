@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\User;
 use InfyOm\Generator\Common\BaseRepository;
 use App\Models\PreRecordedLesson;
 use App\Criteria\PreRLessonFilterByContentCriteria;
@@ -18,45 +19,45 @@ use DB;
 class PreRLessonRepository extends BaseRepository
 {
 
-	protected $fieldSearchable = [
-		'content',
-	];
+    protected $fieldSearchable = [
+        'content',
+    ];
 
-	public function model()
-	{
-		return PreRecordedLesson::class;
-	}
+    public function model()
+    {
+        return PreRecordedLesson::class;
+    }
 
-	protected $skipPresenter = true;
+    protected $skipPresenter = true;
 
-	public function presenter()
-	{
-		return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
-	}
+    public function presenter()
+    {
+        return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
+    }
 
-	public function presentResponse($data)
-	{
-		return $this->presenter->present($data);
-	}
+    public function presentResponse($data)
+    {
+        return $this->presenter->present($data);
+    }
 
 
-	public function getPreRLessons($request)
-	{
+    public function getPreRLessons($request)
+    {
 
-		$this->resetCriteria();
-		$this->resetScope();
+        $this->resetCriteria();
+        $this->resetScope();
 
-		$this->pushCriteria(new RequestCriteria($request));
-		$this->pushCriteria(new LimitOffsetCriteria($request));
+        $this->pushCriteria(new RequestCriteria($request));
+        $this->pushCriteria(new LimitOffsetCriteria($request));
 
-		if ($request->filled('instructor_name'))
-			$this->pushCriteria(new PreRLessonFilterByInstructorNameCriteria($request->get('instructor_name')));
-		if ($request->filled('genre')) {
-			$this->pushCriteria(new PreRLessonFilterByGenreCriteria($request->get('genre')));
-		}
-		if ($request->filled('topic')) {
-			$this->pushCriteria(new PreRLessonFilterByTopicCriteria($request->get('topic')));
-		}
+        if ($request->filled('instructor_name'))
+            $this->pushCriteria(new PreRLessonFilterByInstructorNameCriteria($request->get('instructor_name')));
+        if ($request->filled('genre')) {
+            $this->pushCriteria(new PreRLessonFilterByGenreCriteria($request->get('genre')));
+        }
+        if ($request->filled('topic')) {
+            $this->pushCriteria(new PreRLessonFilterByTopicCriteria($request->get('topic')));
+        }
 
         $this->scopeQuery(function ($query) use ($request) {
             $query = $query->select('pre_r_lessons.*')
@@ -66,10 +67,18 @@ class PreRLessonRepository extends BaseRepository
             if( Auth::check() )
             {
 
-                $userGenres = Auth()->user()->genres()->orderBy('title', 'desc')->get()->pluck('id')->toArray();
-                $ids_ordered = implode(',', $userGenres);
-                $query->groupBy('pre_r_lessons.id')
-                    ->orderBy(DB::raw('FIELD(pre_r_lessons.genre_id, '.$ids_ordered.') + COUNT(`purchased_lessons`.`id`), COUNT(`purchased_lessons`.`id`)'), 'asc');
+                if (Auth::user()->hasRole(User::ROLE_INSTRUCTOR)){
+                    $query->groupBy('pre_r_lessons.id')
+                        ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'asc');
+                }else if ( Auth::user()->hasRole(User::ROLE_STUDENT) ){
+
+                    $userGenres = Auth()->user()->genres()->orderBy('title', 'desc')->get()->pluck('id')->toArray();
+                    $ids_ordered = implode(',', $userGenres);
+                    $query->groupBy('pre_r_lessons.id')
+                        ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'asc')
+                        ->orderBy(DB::raw('FIELD(pre_r_lessons.genre_id, '.$ids_ordered.') + COUNT(`purchased_lessons`.`id`), COUNT(`purchased_lessons`.`id`)'), 'asc');
+
+                }
 
             }else{
 
@@ -82,51 +91,51 @@ class PreRLessonRepository extends BaseRepository
         });
 
 
-		return $this->paginate(21, ['pre_r_lessons.*']);
-	}
+        return $this->paginate(21, ['pre_r_lessons.*']);
+    }
 
 
-	public function getInstructorPreRLessons($request)
-	{
+    public function getInstructorPreRLessons($request)
+    {
 
-		$user = Auth::user();
-		$instructor_id = $user->id;
+        $user = Auth::user();
+        $instructor_id = $user->id;
 
 
-		$this->resetCriteria();
-		$this->resetScope();
+        $this->resetCriteria();
+        $this->resetScope();
 
-		if ($request->filled('content'))
-			$this->pushCriteria(new PreRLessonFilterByContentCriteria($request->get('content')));
-		if ($request->filled('genres')) {
-			$this->pushCriteria(new PreRLessonFilterByGenresListCriteria($request->get('genres')));
-		}
+        if ($request->filled('content'))
+            $this->pushCriteria(new PreRLessonFilterByContentCriteria($request->get('content')));
+        if ($request->filled('genres')) {
+            $this->pushCriteria(new PreRLessonFilterByGenresListCriteria($request->get('genres')));
+        }
 
-		$this->scopeQuery(function ($query) use ($request, $instructor_id) {
+        $this->scopeQuery(function ($query) use ($request, $instructor_id) {
 
-			$query = $query->select('pre_r_lessons.*')
-				->addSelect(DB::raw('COUNT( DISTINCT purchased_lessons.id) as totalPurchares'))
-				->addSelect(DB::raw('COUNT( DISTINCT purchased_lessons.id) * purchased_lessons.price  as totalRevenue'))
-				->leftJoin('purchased_lessons', 'pre_r_lessons.id', '=', "purchased_lessons.pre_r_lesson_id")
-				->groupBy('pre_r_lessons.id')
-				->where('pre_r_lessons.instructor_id', $instructor_id)
+            $query = $query->select('pre_r_lessons.*')
+                ->addSelect(DB::raw('COUNT( DISTINCT purchased_lessons.id) as totalPurchares'))
+                ->addSelect(DB::raw('COUNT( DISTINCT purchased_lessons.id) * purchased_lessons.price  as totalRevenue'))
+                ->leftJoin('purchased_lessons', 'pre_r_lessons.id', '=', "purchased_lessons.pre_r_lesson_id")
+                ->groupBy('pre_r_lessons.id')
+                ->where('pre_r_lessons.instructor_id', $instructor_id)
                 ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'desc');
 
-			return $query;
-		})->with(['files']);
+            return $query;
+        })->with(['files']);
 
-		if ($request->get('sortBy')) {
-			if ($request->get('sortBy') === 'price_desc') {
-				$this->orderBy('pre_r_lessons.price', 'desc');
-			} else if ($request->get('sortBy') === 'price_asc') {
-				$this->orderBy('pre_r_lessons.price', 'asc');
-			} else if ($request->get('sortBy') === 'created_at_asc') {
-				$this->orderBy('pre_r_lessons.created_at', 'asc');
-			} else if ($request->get('sortBy') === 'created_at_desc') {
-				$this->orderBy('pre_r_lessons.created_at', 'desc');
-			}
-		}
+        if ($request->get('sortBy')) {
+            if ($request->get('sortBy') === 'price_desc') {
+                $this->orderBy('pre_r_lessons.price', 'desc');
+            } else if ($request->get('sortBy') === 'price_asc') {
+                $this->orderBy('pre_r_lessons.price', 'asc');
+            } else if ($request->get('sortBy') === 'created_at_asc') {
+                $this->orderBy('pre_r_lessons.created_at', 'asc');
+            } else if ($request->get('sortBy') === 'created_at_desc') {
+                $this->orderBy('pre_r_lessons.created_at', 'desc');
+            }
+        }
 
-		return $this->paginate(21);
-	}
+        return $this->paginate(21);
+    }
 }
