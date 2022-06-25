@@ -62,6 +62,7 @@ class LessonRequestInListTransformer extends TransformerAbstract
             'zip' => $model->zip,
             'student_note' => $model->student_note,
             'lesson_type' => $model->lesson_type,
+            'preview' => $model->getPreviewUrl(),
 
 		];
     }
