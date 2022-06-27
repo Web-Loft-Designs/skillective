@@ -42,6 +42,17 @@ export default new Vuex.Store({
     CLEAR_INPUT: (state) => state.storeErrors = {},
   },
   actions: {
+    async getStudentGenres({commit}, params) {
+      try {
+        const res = await axios.get(
+          '/api/student/genres',
+          {params: params},
+        )
+        return res.data.data
+      } catch (e) {
+        console.log(e)
+      }
+    },
     async getStudentInstructors({commit}) {
       try {
         const res = await axios.get('/api/student/instructors')
