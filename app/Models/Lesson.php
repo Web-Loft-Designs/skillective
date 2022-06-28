@@ -366,6 +366,10 @@ class Lesson extends Model implements Transformable
 
     public function getPreviewUrl()
     {
-        return config('app.url') . '/storage/' . 'lessons/' . $this->instructor_id . '/' . $this->preview;
+        if ($this->preview != null){
+            return config('app.url') . '/storage/' . 'lessons/' . $this->instructor_id . '/' . $this->preview;
+        }else{
+            return '';
+        }
     }
 }

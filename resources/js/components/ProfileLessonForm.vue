@@ -815,6 +815,7 @@ export default {
       this.$refs.timeFrom.minute = ''
       this.$refs.timeFrom.apm = ''
       this.fields.lesson_type = 'in_person'
+      this.clearPreviewFile()
     },
     initNewPlacesAutocomplete(_ref) {
       var thisComponent = this
