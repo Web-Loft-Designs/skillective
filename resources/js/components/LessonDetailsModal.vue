@@ -5,6 +5,7 @@
         ref='previewImage'
         class="video-lesson__image"
         :src='selectedLesson.preview'
+        v-if='selectedLesson.preview'
         alt="Lesson preview"
       />
       <div :class="{ 'col-12 content-modal': true, 'col-md-12': true }">
