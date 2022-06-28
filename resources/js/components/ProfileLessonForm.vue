@@ -1009,8 +1009,10 @@ export default {
         count_booked: lesson.count_booked,
         preview: lesson.preview
       }
-      this.$refs.uploadPreviewImage.src = lesson.preview
-      setTimeout(() => this.$refs.previewImage.src = lesson.preview, 0)
+      setTimeout(() => {
+        this.$refs.previewImage.src = lesson.preview
+        this.$refs.uploadPreviewImage.src = lesson.preview
+      }, 0)
       this.previewFileName = lesson.preview
 
       this.isDateInputInit = true
