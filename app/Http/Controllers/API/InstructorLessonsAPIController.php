@@ -152,6 +152,11 @@ class InstructorLessonsAPIController extends AppBaseController
         }
         $input = $this->_prepareInputData($request);
 
+        if( $input['preview'] )
+        {
+            $input['preview'] = basename($input['preview']);
+        }
+
         if ($input['recurrence_until'] && $input['recurrence_frequencies'] != "0") {
 
             $ty = $input['recurrence_frequencies'];
@@ -274,6 +279,11 @@ class InstructorLessonsAPIController extends AppBaseController
             $input['timezone_id'] = isset($locationDetails['timezone_id']) ? $locationDetails['timezone_id'] : null;
         }
 
+        if( $input['preview'] )
+        {
+            $input['preview'] = basename($input['preview']);
+        }
+
 
         $lesson = $this->lessonRepository->update($input, $lesson['id']);
 
@@ -321,7 +331,8 @@ class InstructorLessonsAPIController extends AppBaseController
             'time_interval',
             'recurrence_until',
             'recurrence_frequencies',
-            'interval_break'
+            'interval_break',
+            'preview'
         ]);
 
         $input['start'] = $input['date'] . ' ' . $input['time_from'];

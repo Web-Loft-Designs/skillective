@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios'
 
 const instructorService = {
     async autocompleteInstructors(str) {
@@ -132,6 +132,24 @@ const instructorService = {
             });
         return response.data.data;
     },
+  async setLessonImage(img, progressChanged) {
+    const formData = new FormData()
+    formData.append('preview', img)
+    const res = await axios.post(
+        '/api/instructor/lesson/upload-preview', formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          onUploadProgress: (progressEvent) => {
+            progressChanged(progressEvent.loaded * 100 / progressEvent.total)
+          },
+        })
+      .catch(e => {
+        console.log(e)
+      })
+    return res.data.data
+  },
 };
 
 export default instructorService;

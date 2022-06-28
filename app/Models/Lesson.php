@@ -58,7 +58,8 @@ class Lesson extends Model implements Transformable
 		'room_sid',
 		'room_completed',
 		'private_for_student_id',
-		'count_places_in_spot'
+		'count_places_in_spot',
+        'preview'
 	];
 
 	/**
@@ -83,7 +84,8 @@ class Lesson extends Model implements Transformable
 		'lat' => 'float',
 		'lng' => 'float',
 		'description' => 'string',
-		'timezone_id' => 'string'
+		'timezone_id' => 'string',
+        'preview' => 'string'
 	];
 
 	/**
@@ -361,4 +363,9 @@ class Lesson extends Model implements Transformable
 
 		return $this->create($input);
 	}
+
+    public function getPreviewUrl()
+    {
+        return config('app.url') . '/storage/' . 'lessons/' . $this->instructor_id . '/' . $this->preview;
+    }
 }
