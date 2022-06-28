@@ -14,6 +14,13 @@
       <div class='modal-add-lesson'>
         <form method='post' @keypress.enter.prevent @submit.prevent='onSubmit'>
           <div class='row'>
+            <img
+              ref='previewImage'
+              v-if='previewFileName'
+              class="video-lesson__image"
+              src='/images/upload-image.svg'
+              alt="Lesson preview"
+            />
             <h2 v-if='!fields.id' class='login-box-msg col-12'>
               Add Lesson Time
             </h2>
@@ -42,6 +49,51 @@
               <span v-if='errors.genre' class='help-block'>
                 <strong>{{ errors.genre[0] }}</strong>
               </span>
+            </div>
+            <div  class='form-group col-4 has-feedback'>
+              <label>Lesson preview</label>
+              <div
+                :class="{
+                'add-lesson-popup__upload': true,
+                'add-lesson-popup__upload--uploaded': previewFileName,
+              }"
+              >
+                <input
+                  id='upload-preview-input'
+                  ref='uploadPreviewInput'
+                  accept='image/png, image/jpeg'
+                  name='upload-preview-input'
+                  type='file'
+                  @change='previewFileChanged($event)'
+                />
+                <label for='upload-preview-input'>Upload a file</label>
+                <div class='add-lesson-popup__upload-image'>
+                  <img
+                    ref='uploadPreviewImage'
+                    alt='Upload Lesson preview file'
+                    src='/images/upload-image.svg'
+                  />
+                </div>
+                <span class='add-lesson-popup__upload-title'>
+                  Lesson preview
+                </span>
+                <span class='add-lesson-popup__upload-formats'>PNG, JPG up to 10MB</span>
+                <div
+                  v-if='previewFileName'
+                  class='add-lesson-popup__upload-actions'
+                >
+                  <button title='Reupload file' @click.prevent='reuploadPreviewFile()'>
+                    <img alt='Reupload file' src='/images/upload-cloud-outline.svg'/>
+                    Reupload file
+                  </button>
+                  <button title='Remove file' @click.prevent='clearPreviewFile()'>
+                    <img alt='Remove file' src='/images/upload-trash.svg'/>
+                    Remove file
+                  </button>
+                </div>
+              </div>
+              <upload-progress-bar v-model='uploadPreviewProgress'/>
+              <field-errors v-model='errors.preview'/>
             </div>
             <div
               :class="{ 'has-error': errors.lesson_type }"
@@ -446,11 +498,17 @@ import CopyInput from './discounts/CopyInput/CopyInput'
 import shareHelper from '../helpers/shareHelper'
 import TextEditor from './profile/TextEditor/TextEditor'
 import {mapState} from 'vuex'
+import UploadProgressBar from './instructor/UploadProgressBar/UploadProgressBar'
+import FieldErrors from './instructor/FieldErrors/FieldErrors'
+import instructorService from '../services/instructorService'
+import urlHelper from '../helpers/urlHelper'
 
 require('jquery.maskedinput/src/jquery.maskedinput')
 
 export default {
   components: {
+    FieldErrors,
+    UploadProgressBar,
     MaskedInput,
     MagnificPopupModal,
     DropdownDatepicker,
@@ -462,8 +520,11 @@ export default {
   props: ['lesson', 'userGenres', 'siteGenres', 'selectRange', 'instructorId'],
   data() {
     return {
+      uploadPreviewProgress: 0,
+      previewFileName: null,
       shareLink: '',
       fields: {
+        preview: '',
         genre: null,
         date: '',
         date_to: null,
@@ -602,6 +663,28 @@ export default {
     },
   },
   methods: {
+    clearPreviewFile() {
+      this.previewFileName = null
+      this.$refs.uploadPreviewImage.src = '/images/upload-image.svg'
+      document.getElementById('upload-preview-input').value = ''
+    },
+    reuploadPreviewFile() {
+      document.querySelector('#upload-preview-input + label')
+        .click()
+    },
+    async previewFileChanged(event) {
+      const fileName = event.target.files.length > 0 && event.target.files[0].name
+      const data = await instructorService.setLessonImage(event.target.files[0], (percent) => {
+        this.uploadPreviewProgress = percent
+      })
+      this.$refs.uploadPreviewImage.src = data
+      this.fields.preview = data
+      setTimeout(() => this.$refs.previewImage.src = data, 0)
+      if (fileName) {
+        this.previewFileName = fileName
+      }
+      this.uploadPreviewProgress = 101
+    },
     getShareLink() {
       return shareHelper.buildShareLink(this.instructorId, this.fields.id)
     },
@@ -924,7 +1007,11 @@ export default {
         timezone_id: lesson.timezone_id,
         description: lesson.description,
         count_booked: lesson.count_booked,
+        preview: lesson.preview
       }
+      this.$refs.uploadPreviewImage.src = lesson.preview
+      setTimeout(() => this.$refs.previewImage.src = lesson.preview, 0)
+      this.previewFileName = lesson.preview
 
       this.isDateInputInit = true
 
@@ -974,7 +1061,9 @@ export default {
 }
 </script>
 
-<style>
+<style lang='scss'>
+@import './instructor/AddLessonPopup/AddLessonPopup.scss';
+@import "./student/VideoLessonsList/VideoLessonsList.scss";
 .pac-container {
   z-index: 10000 !important;
 }
