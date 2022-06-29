@@ -141,6 +141,7 @@ Route::group(['middleware' => ['role:Instructor']], function () {
 
 	Route::post('instructor/lesson', 'InstructorLessonsAPIController@store');
 	Route::put('instructor/lesson/{lesson}', 'InstructorLessonsAPIController@update');
+    Route::post('instructor/lesson/upload-preview', 'UploadPreviewLessonAPIController@uploadPreview');
 
 
 	Route::get('instructor/discount', 'InstructorDiscountsAPIController@indexDiscounts');

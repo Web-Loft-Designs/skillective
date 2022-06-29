@@ -73,7 +73,8 @@ class LessonDashboardTransformer extends TransformerAbstract
             'room_completed' => $model->room_completed,
             'extra_time_before_start' => Lesson::VIRTUAL_LESSON_EXTRA_TIME_BEFORE_START,
 			'extra_time_after_end' => Lesson::VIRTUAL_LESSON_EXTRA_TIME_AFTER_END,
-			'bookings_count' => $model->bookings_count
+			'bookings_count' => $model->bookings_count,
+            'preview' => $model->getPreviewUrl(),
         ];
     }
 }

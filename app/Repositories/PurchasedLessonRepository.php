@@ -38,7 +38,7 @@ class PurchasedLessonRepository extends BaseRepository
 		$this->resetCriteria();
 		$this->resetScope();
 
-		$this->scopeQuery(function ($query) use ($studentUserId, $request) {
+    $this->scopeQuery(function ($query) use ($studentUserId, $request) {
 			$query->join('users', 'purchased_lessons.student_id', '=', "users.id")
 				->join('profiles', 'users.id', '=', "profiles.user_id")
 				->join('pre_r_lessons', 'purchased_lessons.pre_r_lesson_id', '=', "pre_r_lessons.id")

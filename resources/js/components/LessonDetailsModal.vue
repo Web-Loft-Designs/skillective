@@ -1,6 +1,13 @@
 <template>
   <div>
     <div class='d-flex flex-wrap' v-if='selectedLesson != null'>
+      <img
+        ref='previewImage'
+        class="video-lesson__image"
+        :src='selectedLesson.preview'
+        v-if='selectedLesson.preview'
+        alt="Lesson preview"
+      />
       <div :class="{ 'col-12 content-modal': true, 'col-md-12': true }">
         <h2 class='d-flex align-items-center'>
           {{ selectedLesson.title }}
