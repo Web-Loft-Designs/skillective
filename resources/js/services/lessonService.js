@@ -34,9 +34,9 @@ const lessonService = {
             }
         };
     },
-    async myLibraryLessons() {
+    async myLibraryLessons(params) {
         const response = await axios
-            .get("/api/student/pre-r-lessons")
+            .get("/api/student/pre-r-lessons", {params: params})
             .catch(e => {
                 console.log(e);
             });

@@ -15,11 +15,11 @@ class StudentLibraryAPIController extends AppBaseController
     public function __construct(PurchasedLessonRepository $purshLessonRepo)
     {
         $this->purshLessonRepo = $purshLessonRepo;
-    }   
-    
+    }
+
 
     public function index(Request $request)
-    {                
+    {
         $studentLessons = $this->purshLessonRepo->getStudentPurchasedLessons($request, Auth::user()->id);
 
         try{
@@ -29,7 +29,7 @@ class StudentLibraryAPIController extends AppBaseController
             Log::info($studentLessons);
 
 		}catch (\Exception $e){
-            
+
 			Log::error('getStudentBookings : ' . $e->getMessage());
 			$studentLessons = ['data'=>[]];
 		}
@@ -38,7 +38,7 @@ class StudentLibraryAPIController extends AppBaseController
     }
 
     public function getStudentLessonById(Request $request, $lesson)
-    {                
+    {
 		$lesson = $this->purshLessonRepo->findWithoutFail((int)$lesson);
 
 		if (empty($lesson)) {
@@ -49,4 +49,21 @@ class StudentLibraryAPIController extends AppBaseController
 		$lesson = $this->purshLessonRepo->presentResponse( $lesson );
 		return $this->sendResponse($lesson);
     }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getStudentGenres()
+    {
+
+        $genres = Auth::user()->genres;
+
+        if (empty($genres)) {
+            return $this->sendError('Genres not found');
+        }
+
+        return $this->sendResponse($genres);
+
+    }
+
 }
