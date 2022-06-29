@@ -875,7 +875,39 @@ class NotificationTableSeed extends Seeder
 						],
 					]
 				]
-			]
+			],
+
+            [
+                'tag'     => 'lesson_instructor_change_time',
+                'data'    => [
+                    'available_vars' => [
+                        'id',
+                        'instructor_id',
+                        'instructor_name',
+                        'instructor_instagram',
+                        'lesson_date',
+                        'lesson_start_time',
+                        'lesson_end_time',
+                        'lesson_start',
+                        'lesson_end',
+                        'lesson_location',
+                        'lesson_timezone',
+                        'lesson_genre',
+                        'spot_price',
+                        'lesson_url',
+                        'instructor_profile_url',
+                    ],
+                ],
+                'methods' => [
+                    [
+                        'method'  => 'mail',
+                        "content" => view("emails.lesson.instructorChangeTimeLessonNotification")->render(),
+                        'data'    => [
+                            'subject' => 'A Lesson or event has been updated by the instructor',
+                        ],
+                    ],
+                ],
+            ],
 		];
 
 		foreach ($notifications as $notification) {
