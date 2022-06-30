@@ -136,6 +136,11 @@ class Lesson extends Model implements Transformable
 		return $this->belongsTo(\App\Models\User::class, 'instructor_id');
 	}
 
+    public function student()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'student_id');
+    }
+
 	public function roomChatMessages()
 	{
 		return $this->hasMany('App\Models\RoomChatMessage', 'lesson_id', 'id');

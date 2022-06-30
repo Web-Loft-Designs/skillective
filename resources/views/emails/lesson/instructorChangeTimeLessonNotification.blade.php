@@ -7,4 +7,3 @@
     <li>Instructor: [[instructor_name]]</li>
     <li>Lesson: [[lesson_start]]-[[lesson_end]], [[lesson_location]], [[lesson_genre]]</li>
 </ul>
-<p>Regards, <a href="[[app_url]]" target="_blank">Skillective</a></p>

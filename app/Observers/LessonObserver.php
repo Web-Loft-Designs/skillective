@@ -53,9 +53,10 @@ class LessonObserver
         {
 
             $students = $this->userRepository->getStudentsWhoMayBeInterestedInRegularLesson($lesson);
+
             foreach ($students as $student) {
                 try{
-                    $student->notify(new InstructorChangeTimeLessonNotification($lesson));
+                    $student->notify(new InstructorChangeTimeLessonNotification($lesson, $student));
                 }catch (\Exception $e){
                     Log::error("InstructorChangeTimeLessonNotification Error for #{$lesson->id} user#{{$student->id}} : " . $e->getCode() . ': ' . $e->getMessage());
                 }
