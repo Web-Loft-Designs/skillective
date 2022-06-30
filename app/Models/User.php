@@ -79,10 +79,10 @@ class User extends Authenticatable implements HasMedia, Transformable
     public function scopeSearchFromNameInstagram(Builder $query, string $searchString): Builder
     {
         return $query->where(static function (Builder $subQuery) use ($searchString) {
-            $subQuery->where('first_name', 'LIKE', "{$searchString}%")
-                ->orWhere('last_name', 'LIKE', "{$searchString}%")
+            $subQuery->where('first_name', 'LIKE', "%{$searchString}%")
+                ->orWhere('last_name', 'LIKE', "%{$searchString}%")
                 ->orWhereHas('profile', static function (Builder $relationQuery) use ($searchString) {
-                    $relationQuery->where('instagram_handle', 'LIKE', "{$searchString}%");
+                    $relationQuery->where('instagram_handle', 'LIKE', "%{$searchString}%");
                 });
             });
     }
