@@ -3,29 +3,27 @@
 namespace App\Notifications;
 
 use App\Models\CustomNotification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Models\Lesson;
-use Illuminate\Bus\Queueable;
+use App\Models\User;
 
-class InstructorChangeTimeLessonNotification extends AbstractCustomNotification implements ShouldQueue
+class InstructorChangeTimeLessonNotification extends AbstractCustomNotification
 {
-	use Queueable;
 
 	private $lesson;
+    public $user;
 
-	public $tries = 1;
-
-	public function __construct(Lesson $lesson)
+	public function __construct(Lesson $lesson, User $user)
 	{
 		$this->lesson	= $lesson;
+        $this->user	= $user;
 
 		parent::__construct();
 	}
 
-	public function via($notifiable)
-	{
-        return 'mail';
-	}
+    public function via($notifiable)
+    {
+        return ['mail'];
+    }
 
 	public function variables()
 	{
@@ -42,7 +40,8 @@ class InstructorChangeTimeLessonNotification extends AbstractCustomNotification 
 			'lesson_location'	=> $this->lesson->location,
 			'lesson_genre'		=> $this->lesson->genre->title,
 			'spot_price'		=> $this->lesson->spot_price,
-			'lesson_url'		=> route('lesson', ['lesson' => $this->lesson->id])
+			'lesson_url'		=> route('lesson', ['lesson' => $this->lesson->id]),
+            'student_name'      => $this->user->getName(),
 		];
 	}
 
