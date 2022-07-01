@@ -117,6 +117,14 @@ export default new Vuex.Store({
         commit('ERROR_HANDLER', e)
       }
     },
+    async getInstructorPreLessons({commit},instructorId) {
+      try {
+        const res = await axios.get(`/api/pre-r-lesson/instructor/${instructorId}`)
+        return res.data.data
+      } catch (e) {
+        commit('ERROR_HANDLER', e)
+      }
+    },
   },
   modules: {
     cart,
