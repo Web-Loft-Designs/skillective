@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\CheckoutRequest;
+use App\Http\Requests\API\CartUserInfoRequest;
 use Illuminate\Http\Request;
 use App\Models\PromoCode;
 use App\Models\Cart;
@@ -13,11 +14,13 @@ use App\Models\Booking;
 use App\Models\PurchasedLesson;
 use App\Repositories\UserRepository;
 use App\Repositories\CartRepository;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use App\Facades\UserRegistrator;
 use Auth;
 use Illuminate\Support\Facades\Cookie;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Session;
 
 
 class CartAPIController extends AppBaseController
@@ -76,6 +79,7 @@ class CartAPIController extends AppBaseController
         $student_id = null;
         $guest_cart = $request->query('guest_cart');
         $promo_codes = $request->query('promo_codes');
+        $message = null;
 
         if (Auth::user())
         {
@@ -95,10 +99,29 @@ class CartAPIController extends AppBaseController
             }
 
         }else{
-            Cookie::queue(Cookie::forget('guest_cart'));
+
+            if( \Cookie::has('guest_cart') )
+            {
+
+                $guestCart = json_decode(\Cookie::get('guest_cart'), true);
+                $ids = Arr::pluck($guestCart, 'lesson_id');
+
+                $cart = Cart::where('is_guest', 0)
+                    ->where('student_id', \Auth::id())
+                    ->whereIn('lesson_id', $ids)
+                    ->delete();
+
+                if( $cart )
+                {
+                    $message = 'One or more lessons have been removed from your cart because you have already purchased them.';
+                }
+
+                Cookie::queue(Cookie::forget('guest_cart'));
+
+            }
         }
 
-        $response = $this->cartRepository->getCartSummary($student_id, $guest_cart, $promo_codes);
+        $response = $this->cartRepository->getCartSummary($student_id, $guest_cart, $promo_codes, $message);
 
         return  $this->sendResponse($response);
     }
@@ -295,10 +318,10 @@ class CartAPIController extends AppBaseController
     }
 
 
-    public function validateUserData(Request $request)
+    public function validateUserData(CartUserInfoRequest $request)
     {
         // Log::info('validateUserData:');
-        // Log::info($request);
+        //Log::info($request);
 
         if (($error = $this->_checkForLessonAvailability()) != '') {
             return $this->sendError($error, 400);
@@ -307,7 +330,7 @@ class CartAPIController extends AppBaseController
         $settingsModel = App::make('App\Models\Setting');
         $settingsModel->incrementValue('report_count_payment_form_views');
 
-        return $this->sendResponse(true, 'User data valid');
+        return $this->sendResponse(false, 'User data valid');
     }
 
     public function store(Request $request)

@@ -193,11 +193,12 @@ Route::post('cart/checkout', 'CartAPIController@checkout');
 Route::get('cart/promo/{promo}', 'CartAPIController@checkIsPromoIsValid');
 
 Route::post('student/instructors', 'StudentInstructorsAPIController@add'); // add many
+Route::post('cart/validate-user-info', 'CartAPIController@validateUserData');
 Route::group(['middleware' => ['role:Student']], function () {
 
 
 	Route::post('cart', 'CartAPIController@store');
-	Route::post('cart/validate-user-info', 'CartAPIController@validateUserData');
+
 	Route::delete('cart/{cart}', 'CartAPIController@delete');
 
 	// Lesson Request
