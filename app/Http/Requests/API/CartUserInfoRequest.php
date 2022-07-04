@@ -15,7 +15,7 @@ class CartUserInfoRequest extends FormRequest
      */
     public function authorize()
     {
-		return !Auth::user();
+		return true;
     }
 
     /**
@@ -26,9 +26,17 @@ class CartUserInfoRequest extends FormRequest
     public function rules(Request $request)
     {
 
-		return [
-			'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-			];
+        if( !Auth::check() )
+        {
+            return [
+                'email' => [ 'required', 'string',  'email',  'max:255',  'unique:users' ],
+            ];
+        }
+
+        return [
+            'email' => [ 'required', 'string',  'email',  'max:255' ],
+        ];
+
     }
 
 	public function messages()
