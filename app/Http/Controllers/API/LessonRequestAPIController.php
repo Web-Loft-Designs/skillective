@@ -65,6 +65,9 @@ class LessonRequestAPIController extends AppBaseController
 
     public function accept(LessonRequest $lessonRequest, AcceptLessonRequestAPIRequest $request)
     {
+
+        //dd($lessonRequest);
+
         if ($lessonRequest->status!=$lessonRequest::STATUS_PENDING)
             return $this->sendError('You are not able to cancel this request', 403);
 
@@ -79,7 +82,7 @@ class LessonRequestAPIController extends AppBaseController
         $lessonRequest->lesson_price = $input['lesson_price'];
         $lessonRequest->location = $request->input('location');
         $lessonRequest->save();
-        
+
         $lessonRequest->saveQuietly($input);
 
         $lesson = new Lesson();
@@ -128,8 +131,8 @@ class LessonRequestAPIController extends AppBaseController
 
 		$input['start'] = $input['date'] . ' ' . $input['time_from'];
         unset($input['time_from']);
-        
-    
+
+
 		$input['end'] = $input['date_to'] . ' ' . $input['time_to'];
 		unset($input['time_to']);
         unset($input['date_to']);
