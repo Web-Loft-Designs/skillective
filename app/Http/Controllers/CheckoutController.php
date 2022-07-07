@@ -8,6 +8,7 @@ use App\Repositories\UserRepository;
 use Auth;
 use App\Facades\BraintreeProcessor;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 
 class CheckoutController extends Controller
@@ -17,8 +18,10 @@ class CheckoutController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(CartRepository $cartRepository, GenreRepository $genreRepository, UserRepository $userRepository)
+    public function index(Request $request, CartRepository $cartRepository, GenreRepository $genreRepository, UserRepository $userRepository)
     {
+
+        $guestCart = $cartRepository->storeGuestCart($request);
 
         $userData = null;
         $userPaymentMethods = [];

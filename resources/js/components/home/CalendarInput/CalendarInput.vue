@@ -18,19 +18,19 @@
               v-if="windowWidth > 1400 && (!showFixedSearch || showFixedCalendarInput)"
             >
               <button
-                @click.prevent="whereValue.virtual = false"
+                @click.prevent="onLearnInPerson"
                 :class="{ active: !whereValue.virtual }"
               >
                 Learn In-Person
               </button>
               <button
-                @click.prevent="whereValue.virtual = true; preRecorded = false;"
+                @click.prevent="onLearnVirtually"
                 :class="{ active: (whereValue.virtual && !preRecorded) }"
               >
                 Learn Virtually
               </button>
               <button
-                @click.prevent="preRecorded = true; whereValue.virtual = true; selectedTab = null;"
+                @click.prevent="onPreRecorded"
                 :class="{ active: preRecorded && whereValue.virtual }"
               >
                 Pre-Recorded Lessons
@@ -70,19 +70,19 @@
 
       <div class="calendar-input__fixed-nav" v-if="windowWidth <= 1400 && !showFixedSearchByDefault">
         <button
-          @click.prevent="whereValue.virtual = false"
+          @click.prevent="onLearnInPerson"
           :class="{ active: !whereValue.virtual }"
         >
           Learn In-Person
         </button>
         <button
-          @click.prevent="whereValue.virtual = true; preRecorded = false;"
+          @click.prevent="onLearnVirtually"
           :class="{ active: (whereValue.virtual && !preRecorded) }"
         >
           Learn Virtually
         </button>
         <button
-          @click.prevent="preRecorded = true; whereValue.virtual = true; selectedTab = null;"
+          @click.prevent="onPreRecorded"
           :class="{ active: preRecorded && whereValue.virtual }"
         >
           Pre-Recorded Lessons
@@ -260,10 +260,10 @@
         <transition name="slidein">
           <div
             class="calendar-input__tab calendar-input__tab--what"
-            v-if="(selectedTab == 'what' && whatValue.text) || (selectedTab == 'what' && genres.length)"
+            v-if="(selectedTab == 'what' && whatValue.text) || (selectedTab == 'what' && allGenres.length)"
           >
             <calendar-input-what-tab
-              :preloaded-genres="genres"
+              :preloaded-genres="allGenres"
               @autocomplete="setWhatAutocompleteText($event)"
               @choose-genre="chooseGenre($event)"
               ref="calendarInputWhatTab"
@@ -313,7 +313,7 @@ import CalendarInputWhereTab from "../CalendarInputWhereTab/CalendarInputWhereTa
 import NewHeader from "../../header/NewHeader/NewHeader.vue";
 import dateHelper from "../../../helpers/dateHelper";
 import urlHelper from "../../../helpers/urlHelper";
-import {mapState, mapActions} from "vuex";
+import {mapState, mapActions, mapMutations} from 'vuex'
 
 export default {
   name: "CalendarInput",
@@ -352,7 +352,12 @@ export default {
       default: null,
     },
   },
-  created() {
+  async created() {
+    if (!this.genres.length) {
+      await this.getAllGenres()
+    } else {
+      this.SET_ALL_GENRES(this.genres)
+    }
     if (this.defaultLessonType) {
       urlHelper.updateQueryParams({
         lesson_type: this.defaultLessonType,
@@ -361,6 +366,9 @@ export default {
     this.parseQueryParams();
   },
   mounted() {
+    if (window.location.search === '?learnVirtually=true') {
+      this.whereValue.virtual = true
+    }
     window.addEventListener("resize", () => {
       this.windowWidth = window.innerWidth;
     });
@@ -407,7 +415,28 @@ export default {
     };
   },
   methods: {
-    ...mapActions(['getAllInstructors']),
+    ...mapActions(['getAllInstructors', 'getAllGenres']),
+    ...mapMutations(['SET_ALL_GENRES']),
+    onPreRecorded() {
+      const params = this.buildQueryParams();
+      this.preRecorded = true
+      this.whereValue.virtual = true
+      this.selectedTab = null
+      urlHelper.updateQueryParams(params, true, true, this.preRecorded ? '/globalshop' : '/lessons')
+    },
+    onLearnVirtually() {
+      if (this.preRecorded) {
+        urlHelper.updateQueryParams({learnVirtually: true}, true, true, '/')
+      }
+      this.whereValue.virtual = true
+      this.preRecorded = false
+    },
+    onLearnInPerson() {
+      if (this.preRecorded) {
+        urlHelper.updateQueryParams({}, true, true, '/')
+      }
+      this.whereValue.virtual = false
+    },
     parseQueryParams() {
       const params = urlHelper.parseQueryParams();
 
@@ -418,8 +447,8 @@ export default {
         this.whoValue.handle = params.instructor_handle;
       }
       if (params.genre) {
-        if (this.genres.length) {
-          this.genres.map((genre) => {
+        if (this.allGenres.length) {
+          this.allGenres.map((genre) => {
             if (genre.id == params.genre) {
               this.whatValue.text = genre.title;
               this.whatValue.id = genre.id;
@@ -665,7 +694,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(['allInstructors'])
+    ...mapState(['allInstructors', 'allGenres'])
   }
 };
 </script>

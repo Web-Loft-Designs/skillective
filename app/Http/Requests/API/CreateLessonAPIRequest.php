@@ -49,7 +49,8 @@ class CreateLessonAPIRequest extends APIRequest
 			'spot_price'	=> ['required', 'numeric', 'virtual_min_price:lesson_type'],
 			'location'		=> ['required_if:lesson_type,in_person', 'nullable', 'is_exact_address'],
             'timezone_id'   => ['required_if:lesson_type,virtual,in_person_client', "valid_timezone:$lesson_type"],
-            'lesson_type'   => ['required', 'in:in_person,virtual,in_person_client']
+            'lesson_type'   => ['required', 'in:in_person,virtual,in_person_client'],
+            'preview'	    => ['required'],
 		];
 
 		return $rules;
@@ -79,6 +80,7 @@ class CreateLessonAPIRequest extends APIRequest
 			'lesson_type.in' => 'Wrong lesson type',
 			'location.required_if' => 'The location field is required when lesson type is In Person.',
 			'timezone_id.required_if' => 'The location field is required when lesson type is In Virtual.',
+            'preview.required' => 'Image needs to be uploaded',
 		];
 	}
 }

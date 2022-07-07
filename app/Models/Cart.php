@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\CartIsGuest;
 use Eloquent as Model;
 
 class Cart extends Model
@@ -14,7 +15,8 @@ class Cart extends Model
         'lesson_id',
         'instructor_id',
         'description',
-        'pre_r_lesson_id'
+        'pre_r_lesson_id',
+        'is_guest',
     ];
 
     protected $table = 'cart';
@@ -31,5 +33,16 @@ class Cart extends Model
 
     public function checkout($request, $user_repository)
     {
+    }
+
+    /**
+     * @return void
+     */
+    protected static function boot(): void
+    {
+
+        parent::boot();
+        static::addGlobalScope(new CartIsGuest());
+
     }
 }

@@ -43,7 +43,7 @@ const dateHelper = {
       const paramsStr = searchParams.toString();
       let newUrl;
       if (path) {
-        newUrl = window.location.protocol + "//" + window.location.hostname + path;
+        newUrl = window.location.protocol + "//" + window.location.host + path;
       } else {
         newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
       }

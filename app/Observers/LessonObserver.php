@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Lesson;
+use App\Notifications\InstructorChangeTimeLessonNotification;
 use Log;
 use App\Repositories\UserRepository;
 use App\Notifications\YouMayBeInterestedInLessonNotification;
@@ -40,4 +41,28 @@ class LessonObserver
             }
         }
 	}
+
+    /**
+     * @param Lesson $lesson
+     * @return void
+     */
+    public function updating(Lesson $lesson)
+    {
+
+        if($lesson->isDirty('start') || $lesson->isDirty('end'))
+        {
+
+            $students = $this->userRepository->getStudentsWhoMayBeInterestedInRegularLesson($lesson);
+
+            foreach ($students as $student) {
+                try{
+                    $student->notify(new InstructorChangeTimeLessonNotification($lesson, $student));
+                }catch (\Exception $e){
+                    Log::error("InstructorChangeTimeLessonNotification Error for #{$lesson->id} user#{{$student->id}} : " . $e->getCode() . ': ' . $e->getMessage());
+                }
+            }
+
+        }
+
+    }
 }
