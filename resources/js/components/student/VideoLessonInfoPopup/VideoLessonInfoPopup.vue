@@ -162,7 +162,7 @@ export default {
     async addToCart(lesson) {
       this.isLoading = true;
       const result = await this.addItemToCartAtStart({
-        lessonId: lesson.id,
+        lessonId: lesson.id || lesson['pre_r_lessons.id'],
         isPreRecorded: true
       });
       if (result.success || result.status == 200) {
