@@ -35,7 +35,7 @@ class InstructorBookingsAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-		
+
 		try{
             $this->bookingRepository->setPresenter("App\\Presenters\\BookingInListPresenter");
 			$bookings = $this->bookingRepository->presentResponse($this->bookingRepository->getInstructorBookings($request, Auth::user()->id));
@@ -46,7 +46,7 @@ class InstructorBookingsAPIController extends AppBaseController
 
         return $this->sendResponse($bookings);
 	}
-	
+
     /**
      * Remove the specified Booking from storage.
      * DELETE /bookings/{id}
@@ -108,7 +108,9 @@ class InstructorBookingsAPIController extends AppBaseController
 		}
 
 		try{
+
 			$booking->approve();
+
 		}catch (\Exception $e){
 			Log::error('Booking #' . $id . ' approval error:' . $e->getMessage());
 			//'Payment can\'t be processed. The payment method choosen while booking this lesson is not available.'

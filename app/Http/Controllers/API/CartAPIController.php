@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\CheckoutRequest;
+use App\Http\Requests\API\CartUserInfoRequest;
 use Illuminate\Http\Request;
 use App\Models\PromoCode;
 use App\Models\Cart;
@@ -13,12 +14,13 @@ use App\Models\Booking;
 use App\Models\PurchasedLesson;
 use App\Repositories\UserRepository;
 use App\Repositories\CartRepository;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use App\Facades\UserRegistrator;
-use App\Http\Requests\API\StudentRegisterRequest;
 use Auth;
-use Log;
+use Illuminate\Support\Facades\Cookie;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Session;
 
 
 class CartAPIController extends AppBaseController
@@ -36,16 +38,17 @@ class CartAPIController extends AppBaseController
     {
 
         $student_id = null;
-
-        if (Auth::user()) {
-            $student_id = Auth::user()->id;
-        }
-
         $guest_cart = $request->query('guest_cart');
 
+        if (Auth::user()) {
+
+            $student_id = Auth::user()->id;
+
+        }else{
+            Cookie::queue('guest_cart', $guest_cart, 84600);
+        }
 
         $cart = $this->cartRepository->getUserCart($student_id, $guest_cart);
-
 
         $this->cartRepository->setPresenter("App\\Presenters\\CartListPresenter");
         $cart = $this->cartRepository->presentResponse($cart);
@@ -72,16 +75,53 @@ class CartAPIController extends AppBaseController
 
     public function getCartSummary(Request $request)
     {
+
         $student_id = null;
-
-        if (Auth::user()) {
-            $student_id = Auth::user()->id;
-        }
-
         $guest_cart = $request->query('guest_cart');
         $promo_codes = $request->query('promo_codes');
+        $message = null;
 
-        $response = $this->cartRepository->getCartSummary($student_id, $guest_cart, $promo_codes);
+        if (Auth::user())
+        {
+            $student_id = Auth::user()->id;
+
+        }
+
+        /**
+         * Guest Cart
+         */
+        $guestCart = json_decode($guest_cart, true);
+        if( count($guestCart) <> 0 )
+        {
+            if (!Auth::user())
+            {
+                Cookie::queue('guest_cart', $guest_cart, 84600);
+            }
+
+        }else{
+
+            if( \Cookie::has('guest_cart') )
+            {
+
+                $guestCart = json_decode(\Cookie::get('guest_cart'), true);
+                $ids = Arr::pluck($guestCart, 'lesson_id');
+
+                $cart = Cart::where('is_guest', 0)
+                    ->where('student_id', \Auth::id())
+                    ->whereIn('lesson_id', $ids)
+                    ->delete();
+
+                if( $cart )
+                {
+                    $message = 'One or more lessons have been removed from your cart because you have already purchased them.';
+                }
+
+                Cookie::queue(Cookie::forget('guest_cart'));
+
+            }
+        }
+
+        $response = $this->cartRepository->getCartSummary($student_id, $guest_cart, $promo_codes, $message);
 
         return  $this->sendResponse($response);
     }
@@ -226,7 +266,13 @@ class CartAPIController extends AppBaseController
                     }
                 }
 
-                $lesson->book($user_repository, $request, $nonce ? $nonce[$key] : "", $student);
+                //dd($request);
+
+                /**
+                 * Approve Booking
+                 */
+                $lesson->book($user_repository, $request, $nonce ? $nonce[$key] : "", $student)->approve();
+
             } else {
                 array_push($appendedGenres, $cartItem->preRecordedLesson->genre_id);
 
@@ -278,10 +324,10 @@ class CartAPIController extends AppBaseController
     }
 
 
-    public function validateUserData(Request $request)
+    public function validateUserData(CartUserInfoRequest $request)
     {
         // Log::info('validateUserData:');
-        // Log::info($request);
+        //Log::info($request);
 
         if (($error = $this->_checkForLessonAvailability()) != '') {
             return $this->sendError($error, 400);
@@ -290,7 +336,7 @@ class CartAPIController extends AppBaseController
         $settingsModel = App::make('App\Models\Setting');
         $settingsModel->incrementValue('report_count_payment_form_views');
 
-        return $this->sendResponse(true, 'User data valid');
+        return $this->sendResponse(false, 'User data valid');
     }
 
     public function store(Request $request)
@@ -323,7 +369,9 @@ class CartAPIController extends AppBaseController
             $data['description'] = $request->input('description');
 
             $result = Cart::create($data);
+
         } else {
+
             $isExist = Cart::where('lesson_id', $request->input('lesson_id'))->where('student_id', Auth::user()->id)->first();
 
             if ($isExist) {

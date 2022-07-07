@@ -1,8 +1,8 @@
 <template>
   <div class="video-lessons-list">
-    <div class="video-lessons-list__list" v-if="allLessons.length">
+    <div class="video-lessons-list__list" v-if="lessons.length">
       <div
-        v-for="(lesson, lessonIndex) in allLessons"
+        v-for="(lesson, lessonIndex) in lessons"
         :key="lessonIndex"
         class="video-lesson"
       >
@@ -321,20 +321,9 @@ export default {
   },
   data() {
     return {
-      collapsed: true,
-      allLessons: []
+      collapsed: true
     };
-  },
-  created() {
-    this.allLessons = this.lessons
-    const params = urlHelper.parseQueryParams()
-    if (params?.instructorId) {
-      const arr = this.allLessons.filter(lesson => lesson.instructor_id === parseInt(params.instructorId))
-      arr.length > 0
-        ? this.allLessons = arr
-        : this.allLessons = []
-    }
-  },
+  }
 };
 </script>
 

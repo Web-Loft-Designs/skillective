@@ -7,6 +7,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    allGenres: [],
     storeErrors: {},
     storeErrorText: '',
     instructors: [],
@@ -17,6 +18,7 @@ export default new Vuex.Store({
   },
   getters: {},
   mutations: {
+    SET_ALL_GENRES: (state, genres) => state.allGenres = genres,
     SET_CHECK_OUT_STEP: (state, step) => state.checkOutStep = step,
     SET_SELECTED_DATES: (state, dates) => state.datesFromCalendar = dates,
     SET_STUDENT_INSTRUCTORS: (state, data) => state.studentInstructors = data,
@@ -42,6 +44,25 @@ export default new Vuex.Store({
     CLEAR_INPUT: (state) => state.storeErrors = {},
   },
   actions: {
+    async getAllGenres({commit}) {
+      try {
+        const res = await axios.get('/api/genres')
+        commit('SET_ALL_GENRES', res.data)
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    async getStudentGenres({commit}, params) {
+      try {
+        const res = await axios.get(
+          '/api/student/genres',
+          {params: params},
+        )
+        return res.data.data
+      } catch (e) {
+        console.log(e)
+      }
+    },
     async getStudentInstructors({commit}) {
       try {
         const res = await axios.get('/api/student/instructors')
@@ -102,6 +123,14 @@ export default new Vuex.Store({
     async virtualNotification(context, data) {
       try {
         await axios.post('/api/student/instructor/virtual-lesson-notifications', data)
+      } catch (e) {
+        commit('ERROR_HANDLER', e)
+      }
+    },
+    async getInstructorPreLessons({commit},instructorId) {
+      try {
+        const res = await axios.get(`/api/pre-r-lesson/instructor/${instructorId}`)
+        return res.data.data
       } catch (e) {
         commit('ERROR_HANDLER', e)
       }

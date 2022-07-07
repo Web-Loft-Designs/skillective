@@ -1,5 +1,5 @@
 <template>
-  <div class='become-an-instructor'>
+  <div class='become-an-instructor' id='become-an-instructor'>
     <div class='become-an-instructor__container'>
       <div class='become-an-instructor__column'>
         <div class='become-an-instructor__content'>

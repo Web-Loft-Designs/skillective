@@ -42,6 +42,7 @@ import VideoLessonsList from '../VideoLessonsList/VideoLessonsList.vue'
 import AnimLoader from '../../cart/AnimLoader/AnimLoader.vue'
 import lessonService from '../../../services/lessonService'
 import urlHelper from '../../../helpers/urlHelper'
+import {mapActions} from 'vuex'
 
 export default {
   name: 'GlobalShop',
@@ -69,6 +70,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(['getInstructorPreLessons']),
     async loadLessons(params = {}) {
       this.isLoading = true
       const data = await lessonService.preRecordedLessons({
@@ -90,7 +92,7 @@ export default {
       this.loadLessons()
     },
   },
-  created() {
+  async created() {
     const params = urlHelper.parseQueryParams()
     urlHelper.updateQueryParams({
       page: params.page === 1 ? null : params.page,
@@ -98,6 +100,12 @@ export default {
     this.$root.$on('globalShopLoadLessons', (params) => {
       this.loadLessons(params)
     })
+    if (params?.instructorId) {
+      const lessonsData = await this.getInstructorPreLessons(params.instructorId)
+      this.lessons = lessonsData.data
+      this.pagination.currentPage = lessonsData.meta.pagination.current_page
+      this.pagination.pageCount = lessonsData.meta.pagination.total_pages
+    }
   },
   data() {
     return {

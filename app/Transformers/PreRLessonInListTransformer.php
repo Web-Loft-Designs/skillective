@@ -25,9 +25,9 @@ class PreRLessonInListTransformer extends TransformerAbstract
 
         list($hours, $minutes, $seconds) = sscanf($model->duration, '%d:%d:%d');
         $duration = new DateInterval(sprintf('PT%dH%dM%dS', $hours, $minutes, $seconds));
-        
+
         return [
-            'id' => (int)$model->id,
+            'pre_r_lessons.id' => (int)$model->id,
             'instructor_id' => $model->instructor_id,
             'genre_id' => $model->genre_id,
             'genre' => $model->genre->transform(),

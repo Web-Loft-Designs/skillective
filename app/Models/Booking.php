@@ -15,7 +15,7 @@ class Booking extends Model implements Transformable
     use SoftDeletes;
 
     public $table = 'bookings';
-    
+
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
@@ -68,7 +68,7 @@ class Booking extends Model implements Transformable
     {
         return $this->belongsTo(\App\Models\Lesson::class, 'lesson_id');
 	}
-	
+
 	public function regularNotifications()
 	{
 		return $this->hasMany(\App\Models\RegularNotification::class, 'user_regular_notifications');
@@ -271,6 +271,7 @@ class Booking extends Model implements Transformable
         $virtualLessonFee = $this->getBookingVirtualFeeAmount();
         $processorFee = $this->getBookingPaymentProcessingFeeAmount($this->spot_price, ( $serviceFee+$virtualLessonFee ));
         $totalFee = $this->getBookingTotalFeeAmount();
+
 
 			// few checks to prevent not desired transactions , just an assurance
 			if (!$this->transaction_id

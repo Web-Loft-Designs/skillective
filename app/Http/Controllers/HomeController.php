@@ -2,24 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Repositories\LessonRepository;
 use App\Repositories\UserRepository;
-use Illuminate\Http\Request;
 use App\Repositories\GenreRepository;
 use App\Repositories\TestimonialRepository;
-use Cookie;
-use Illuminate\Support\Facades\Redis;
-use Vinkla\Instagram\Instagram;
-use App\Models\Lesson;
-use App\Models\User;
-use App\Models\Booking;
-use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use Auth;
 
 class HomeController extends AppBaseController
 {
     public function index(GenreRepository $genreRepository, TestimonialRepository $testimonialRepository, LessonRepository $lessonRepository, UserRepository $userRepository)
     {
+
+
+
 //        getLocationDetails('17425 Benson Rd Cottonwood, California(CA), 96022');
 		$userIpLocation = '';
 //		$geoLocation = geoip(request()->ip());

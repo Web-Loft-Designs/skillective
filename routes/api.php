@@ -141,6 +141,7 @@ Route::group(['middleware' => ['role:Instructor']], function () {
 
 	Route::post('instructor/lesson', 'InstructorLessonsAPIController@store');
 	Route::put('instructor/lesson/{lesson}', 'InstructorLessonsAPIController@update');
+    Route::post('instructor/lesson/upload-preview', 'UploadPreviewLessonAPIController@uploadPreview');
 
 
 	Route::get('instructor/discount', 'InstructorDiscountsAPIController@indexDiscounts');
@@ -192,12 +193,15 @@ Route::post('cart/checkout', 'CartAPIController@checkout');
 Route::get('cart/promo/{promo}', 'CartAPIController@checkIsPromoIsValid');
 
 Route::post('student/instructors', 'StudentInstructorsAPIController@add'); // add many
+Route::post('cart/validate-user-info', 'CartAPIController@validateUserData');
 Route::group(['middleware' => ['role:Student']], function () {
 
 
 	Route::post('cart', 'CartAPIController@store');
-	Route::post('cart/validate-user-info', 'CartAPIController@validateUserData');
+
 	Route::delete('cart/{cart}', 'CartAPIController@delete');
+
+
 
 	// Lesson Request
 	Route::post('lesson-request', 'LessonRequestAPIController@store');
@@ -237,6 +241,9 @@ Route::group(['middleware' => ['role:Student']], function () {
 	Route::post('student/payment-method', 'StudentPaymentMethodsAPIController@store'); // add student payment method
 	Route::put('student/payment-method/set-as-default/{paymentMethodToken}', 'StudentPaymentMethodsAPIController@$token'); // update student payment method
 	Route::delete('student/payment-method/{paymentMethodToken}', 'StudentPaymentMethodsAPIController@delete'); // delete student payment method data
+
+    Route::get('student/genres', 'StudentLibraryAPIController@getStudentGenres');
+
 });
 
 

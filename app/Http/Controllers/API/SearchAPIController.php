@@ -33,9 +33,7 @@ class SearchAPIController extends AppBaseController
 
         $searchStringArr = preg_split('/\s+/', $searchString, -1, PREG_SPLIT_NO_EMPTY);
 
-        $userQuery = User::with(['profile', 'roles'])
-            ->where('first_name', 'LIKE', $searchString . '%')
-            ->orWhere('last_name', 'LIKE', $searchString . '%');
+        $userQuery = User::with(['profile', 'roles']);
 
         foreach($searchStringArr as $searchString) {
             $userQuery->searchFromNameInstagram($searchString);
