@@ -62,7 +62,7 @@ class PreRLessonRepository extends BaseRepository
         $this->scopeQuery(function ($query) use ($request) {
             $query = $query->select('pre_r_lessons.*')
                 ->join('users', 'pre_r_lessons.instructor_id', '=', "users.id")
-                ->join('purchased_lessons', 'pre_r_lessons.id', '=', "purchased_lessons.pre_r_lesson_id");
+                ->leftJoin('purchased_lessons', 'pre_r_lessons.id', '=', "purchased_lessons.pre_r_lesson_id");
 
             if( Auth::check() )
             {
