@@ -58,7 +58,7 @@
                             <instructor-video-lessons
                                 :profile-data="{{ json_encode($userProfileData) }}"
                                 :instructor-id="'{{ addslashes($userProfileData['id']) }}'"
-                                :can-book="{{ $loggedUserRole==\App\Models\User::ROLE_STUDENT ? 'true' : 'false' }}"
+                                :can-book="'true'"
                                 :user-role = "{{ json_encode($loggedUserRole) }}"
                             ></instructor-video-lessons>
                         </div>
