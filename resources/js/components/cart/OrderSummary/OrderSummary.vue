@@ -34,7 +34,7 @@
       <div class="order-summary__row">
         <span class="order-summary__key">Total:</span>
         <span class="order-summary__spacer" />
-        <span class="order-summary__value">${{ total }}</span>
+        <span class="order-summary__value">${{ Number(total).toFixed(2) }}</span>
       </div>
     </div>
 
