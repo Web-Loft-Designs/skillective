@@ -321,7 +321,7 @@ class CartRepository extends BaseRepository
             $lesson = Lesson::where('id',  $item->lesson_id)->first();
 
             $data['instructor_id'] = $lesson->instructor_id;
-            $data['description'] = $item->description;
+            $data['description'] = isset($item->description) ? $item->description : '';
             $data['is_guest'] = 1;
 
             $result = Cart::create($data);
