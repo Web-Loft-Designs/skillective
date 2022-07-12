@@ -60,7 +60,7 @@ class StudentAddClientListAPIController extends AppBaseController
                 $instructorGenresIds->push($instructor->genres->pluck('id')->toArray());
 
                 $stdunInstrApi = new StudentInstructorsAPIController($this->userRepository);
-                $stdunInstrApi->addAndMarkAsFavorite($student, $instructor->id);
+                $stdunInstrApi->addAndMarkAsFavorite($instructor, $student);
 
                 $message .= 'Client ' . $student->getName() . ' added to instructor ' . $instructor->getName();
 
