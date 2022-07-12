@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\AddStudentInstructorsAPIRequest;
 use App\Http\Requests\API\RemoveStudentInstructorsAPIRequest;
+use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -101,8 +102,12 @@ class StudentInstructorsAPIController extends AppBaseController
 
 
 
-	public function addAndMarkAsFavorite($student, $instructorId)
+	public function addAndMarkAsFavorite(User $instructor, $student = [])
 	{
+
+        $student = $student ? $student : Auth::user();
+        $instructorId = $instructor->id;
+
 		/** @var User $instructor */
 		$instructor = $this->userRepository->findWithoutFail($instructorId);
 
@@ -139,38 +144,38 @@ class StudentInstructorsAPIController extends AppBaseController
 		return $this->sendResponse(true, 'Instructor updated');
 	}
 
-	public function enableGeoNotifications(Request $request)
+	public function enableGeoNotifications(Request $request, User $instructor)
 	{
-		$instructors = (array) $request->instructor;
+		//$instructors = (array) $request->instructor;
 
-        if( $instructors )
-        {
+        //if( $instructors )
+        //{
 
-            foreach ( $instructors as $item )
-            {
+            //foreach ( $instructors as $item )
+            //{
 
                 /** @var User $instructor */
-                $instructor = $this->userRepository->findWithoutFail($item);
+                $instructor = $this->userRepository->findWithoutFail($instructor->id);
 
                 if( $instructor )
                 {
 
                     if ($instructor->hasRole($this->userRepository->model()::ROLE_INSTRUCTOR)) {
-                        if (!Auth::user()->hasOwnInstructor($item))
-                            Auth::user()->instructors()->attach( $item, ['geo_notifications_allowed' => true] );
+                        if (!Auth::user()->hasOwnInstructor($instructor->id))
+                            Auth::user()->instructors()->attach( $instructor->id, ['geo_notifications_allowed' => true] );
                         else // enable just geo_notifications_allowed
-                            Auth::user()->instructors()->updateExistingPivot( $item, ['geo_notifications_allowed' => true], false );
+                            Auth::user()->instructors()->updateExistingPivot( $instructor->id, ['geo_notifications_allowed' => true], false );
                     }
 
                 }
 
-            }
+            //}
 
-        }else{
+        //}else{
 
-            return $this->sendError('Instructor not found');
+            //return $this->sendError('Instructor not found');
 
-        }
+        //}
 
 		return $this->sendResponse(true, 'Geo Notifications enabled for this Instructor');
 
@@ -193,31 +198,31 @@ class StudentInstructorsAPIController extends AppBaseController
 		return $this->sendResponse(true, 'Geo Notifications disabled for this Instructor');
 	}
 
-    public function enableVirtualLessonNotifications(Request $request)
+    public function enableVirtualLessonNotifications(User $instructor)
     {
-        $instructors = (array) $request->instructor;
+        //$instructors = (array) $request->instructor;
 
-        if( $instructors )
-        {
+        //if( $instructors )
+        //{
 
-            foreach ( $instructors as $item )
-            {
+            //foreach ( $instructors as $item )
+            //{
 
                 /** @var User $instructor */
-                $instructor = $this->userRepository->findWithoutFail($item);
+                $instructor = $this->userRepository->findWithoutFail($instructor->id);
 
                 if ($instructor->hasRole($this->userRepository->model()::ROLE_INSTRUCTOR)) {
-                    if (!Auth::user()->hasOwnInstructor($item))
-                        Auth::user()->instructors()->attach( $item, ['virtual_notifications_allowed' => true] );
+                    if (!Auth::user()->hasOwnInstructor($instructor->id))
+                        Auth::user()->instructors()->attach( $instructor->id, ['virtual_notifications_allowed' => true] );
                     else // enable just geo_notifications_allowed
-                        Auth::user()->instructors()->updateExistingPivot( $item, ['virtual_notifications_allowed' => true], false );
+                        Auth::user()->instructors()->updateExistingPivot( $instructor->id, ['virtual_notifications_allowed' => true], false );
                 }
 
-            }
+            //}
 
-        }else{
-            return $this->sendError('Instructor not found');
-        }
+        //}else{
+            //return $this->sendError('Instructor not found');
+        //}
 
         return $this->sendResponse(true, 'Virtual Lesson Notifications enabled for this Instructor');
     }
