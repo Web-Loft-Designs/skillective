@@ -228,10 +228,10 @@ Route::group(['middleware' => ['role:Student']], function () {
 	Route::post('student/instructor/favorite/{instructor}', 'StudentInstructorsAPIController@addAndMarkAsFavorite');
 	Route::delete('student/instructor/favorite/{instructor}', 'StudentInstructorsAPIController@removeFromFavorites');
 
-	Route::post('student/instructor/geo-notifications', 'StudentInstructorsAPIController@enableGeoNotifications');
+	Route::post('student/instructor/geo-notifications/{instructor}', 'StudentInstructorsAPIController@enableGeoNotifications');
 	Route::delete('student/instructor/geo-notifications/{instructor}', 'StudentInstructorsAPIController@disableGeoNotifications');
 
-	Route::post('student/instructor/virtual-lesson-notifications', 'StudentInstructorsAPIController@enableVirtualLessonNotifications');
+	Route::post('student/instructor/virtual-lesson-notifications/{instructor}', 'StudentInstructorsAPIController@enableVirtualLessonNotifications');
 	Route::delete('student/instructor/virtual-lesson-notifications/{instructor}', 'StudentInstructorsAPIController@disableVirtualLessonNotifications');
 
 	Route::get('instructors', 'InstructorsAPIController@index'); // get instructors list to add as student instructors
