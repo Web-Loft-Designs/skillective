@@ -592,16 +592,21 @@ class LessonRepository extends BaseRepository
 		}
 
 
-
 		$mathingLessonsIds = array_unique($mathingLessonsIds);
 		if (count($mathingLessonsIds)) {
-			$upcomingNearByLessons = $this->scopeQuery(function ($query) use ($mathingLessonsIds) {
-				$query = $query->whereIn('id', $mathingLessonsIds)
-					->limit(10)
-					->orderBy('start', 'asc');
-				return $query;
-			})->with(['genre', 'instructor', 'instructor.profile', 'students'])
-				->get();
+//			$upcomingNearByLessons = $this->scopeQuery(function ($query) use ($mathingLessonsIds) {
+//				$query = $query->whereIn('id', $mathingLessonsIds)
+//					->limit(10)
+//					->orderBy('start', 'asc');
+//				return $query;
+//			})->with(['genre', 'instructor', 'instructor.profile', 'students'])
+//				->get();
+
+            $upcomingNearByLessons = Lesson::whereIn('id', $mathingLessonsIds)
+                ->limit(10)
+                ->orderBy('start', 'asc')
+                ->with(['genre', 'instructor', 'instructor.profile', 'students'])
+                ->get();
 
 			return $upcomingNearByLessons;
 		}
