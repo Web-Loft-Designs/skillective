@@ -43,23 +43,11 @@ class ProfileController extends Controller
      * @param User $user
      * @return \Illuminate\View\View
      */
-    public function show(Request $request, Profile $profile)
+    public function show(Request $request, User $user)
     {
 
-        if(!$profile->id)
-        {
-            $profile = Auth::user()->profile;
-        }
-
-        $user = User::findOrFail($profile->user_id);
 		$currentUserIsAdmin = (Auth::user() && Auth::user()->hasRole(User::ROLE_ADMIN));
-    	if ($user && !$user->id && !$currentUserIsAdmin) {
-            $user = Auth::user();
-        }
-    	if (!$user){
-			return redirect(route('frontend.login'));
-		}
-		if ($user->status!=User::STATUS_ACTIVE && !$currentUserIsAdmin)
+		if ($user->status!=User::STATUS_ACTIVE && $user->status!=User::STATUS_APPROVED && !$currentUserIsAdmin)
 			return abort(404);
 		if ($user->hasRole(User::ROLE_ADMIN))
 			return abort(404);
@@ -68,12 +56,11 @@ class ProfileController extends Controller
 		$userData = $this->userRepository->presentResponse($userData)['data'];
 
 		$invitedInstructors = [];
-//		$userData['genres'] = $user->genres()->pluck('id')->toArray();
 		$isInstructor = false;
 		if ($user->hasRole(User::ROLE_INSTRUCTOR)) {
 			$isInstructor = true;
 
-			$userData['total_count_lessons'] = $this->lessonRepository->getInstructorsPastBookedLessonsCount($user->id);//$this->lessonRepository->getInstructorUpcomingLessons($user->id)->count();
+			$userData['total_count_lessons'] = $this->lessonRepository->getInstructorsPastBookedLessonsCount($user->id);
 			$userData['lessons_rate_min']    = (float)$user->myLessonsBookings()
                 ->whereRaw("( bookings.status <> '".Booking::STATUS_CANCELLED."') AND bookings.created_at>'".date('Y-m-d H:i:s', strtotime('-6 months'))."'")
                 ->min( 'spot_price' );
@@ -117,7 +104,8 @@ class ProfileController extends Controller
             'booking_fees_description' => getCurrentPageMetaValue($dashboardPage, 'booking_fees_description'),
 		];
 
-		if(Auth::user()){
+		if(Auth::user())
+        {
 			$vars['userGengres'] = $this->genreRepository->presentResponse(Auth::user() ? Auth::user()->genres : [])['data'];
 		}
 
