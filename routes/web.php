@@ -53,7 +53,7 @@ Route::post('logout', 'Auth\FrontendLoginController@logout')->name('logout');
 
 Route::get('/profile/edit/{user}', 'ProfileController@edit')->name('profile.edituser')->middleware(['role:Admin']); // edit user profile
 Route::get('/profile/edit', 'ProfileController@edit')->name('profile.edit')->middleware(['role:Instructor|Student']); // edit own profile
-Route::get('/profile/{profile?}', 'ProfileController@show')->name('profile'); // user public profile
+Route::get('/profile/{user?}', 'ProfileController@show')->name('profile'); // user public profile
 
 // Socialite Register Routes
 Route::get('/social/redirect/{provider}', ['as' => 'social.redirect', 'uses' => 'Auth\SocialController@getSocialRedirect']);
