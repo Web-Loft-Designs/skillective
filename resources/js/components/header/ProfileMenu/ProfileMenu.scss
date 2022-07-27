@@ -20,7 +20,7 @@
         display: block;
     }
 
-    >>> .nav-drop-down__list {
+    ::v-deep .nav-drop-down__list {
         top: 50px;
     }
 
@@ -47,7 +47,7 @@
             height: 26px;
         }
 
-        >>> .nav-drop-down__list {
+        ::v-deep .nav-drop-down__list {
             top: 33px;
         }
     }

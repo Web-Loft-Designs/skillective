@@ -79,7 +79,7 @@
             text-align: left;
         }
 
-        >>> .anim-loader {
+        ::v-deep .anim-loader {
             margin: 0 23px;
             padding: 0;
         }

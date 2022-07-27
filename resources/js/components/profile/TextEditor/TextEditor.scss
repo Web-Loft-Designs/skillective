@@ -27,7 +27,7 @@
         top: 40px;
         z-index: 1;
 
-        >>> .emoji-picker {
+        ::v-deep .emoji-picker {
             border-radius: 8px;
             box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.03),
                 0px 10px 30px rgba(0, 0, 0, 0.03);
@@ -106,18 +106,18 @@
         }
     }
 
-    >>> .trix-button-row {
+    ::v-deep .trix-button-row {
         padding-right: calc(1.5vw + 48px);
     }
 
-    >>> .trix-content {
+    ::v-deep .trix-content {
         border: 1px solid #dddddd;
         border-radius: 3px;
         padding: 10px 14px 11px 14px;
         min-height: 180px;
     }
 
-    >>> .trix-button-group {
+    ::v-deep .trix-button-group {
         border: 1px solid #dddddd;
         overflow: hidden;
 

@@ -80,7 +80,7 @@
         pointer-events: all;
       }
 
-      >>> li {
+      ::v-deep li {
         border-bottom: 1px solid #E4E4E4;
         padding: 0;
 

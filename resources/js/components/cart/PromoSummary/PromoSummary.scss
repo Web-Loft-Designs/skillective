@@ -122,7 +122,7 @@
           }
         }
 
-        >>> .anim-loader__bar::after {
+        ::v-deep .anim-loader__bar::after {
             width: 24px;
             height: 24px;
             border-width: 2px;

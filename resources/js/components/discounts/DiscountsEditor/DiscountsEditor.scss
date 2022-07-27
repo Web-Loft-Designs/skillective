@@ -129,7 +129,7 @@
     display: flex;
     justify-content: flex-end;
 
-    >>> {
+    ::v-deep {
       .loader-button {
         width: auto;
         min-width: 210px;
@@ -333,7 +333,7 @@
     }
 
     &__notice-table {
-      >>> .client-table__scroll {
+      ::v-deep .client-table__scroll {
         margin-right: -40px;
       }
     }
@@ -344,7 +344,7 @@
   .discounts-editor,
   .promos-editor {
     &__item-buttons {
-      >>> .loader-button {
+      ::v-deep .loader-button {
         min-width: 0;
         flex: 1;
       }

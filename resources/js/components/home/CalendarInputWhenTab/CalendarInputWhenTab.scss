@@ -168,15 +168,15 @@
     --gray-900: #F4F4F4;
     --gray-200: #f4f4f4;
 
-    & >>> .vc-pane {
+    & ::v-deep .vc-pane {
       padding: 0 30px;
     }
 
-    & >>> .vc-pane-container {
+    & ::v-deep .vc-pane-container {
       padding: 30px 0;
     }
 
-    & >>> .vc-title {
+    & ::v-deep .vc-title {
       font-family: Hind Vadodara;
       font-style: normal;
       font-weight: normal;
@@ -185,7 +185,7 @@
       color: #444444;
     }
 
-    & >>> .vc-weekday {
+    & ::v-deep .vc-weekday {
       font-family: Hind Vadodara;
       font-style: normal;
       font-weight: bold;
@@ -195,7 +195,7 @@
       padding: 28px 0 9px 0;
     }
 
-    & >>> .vc-day.is-not-in-month * {
+    & ::v-deep .vc-day.is-not-in-month * {
       opacity: 1;
       font-family: Hind Vadodara;
       font-style: normal;
@@ -207,40 +207,40 @@
       border-radius: 0;
     }
 
-    & >>> .vc-weeks, & >>> .vc-header  {
+    & ::v-deep .vc-weeks, & ::v-deep .vc-header  {
       padding: 0;
     }
 
-    & >>> .vc-day {
+    & ::v-deep .vc-day {
       min-height: 40px;
     }
 
-    & >>> .vc-highlight {
+    & ::v-deep .vc-highlight {
       width: 40px;
       height: 40px;
     }
 
-    & >>> .vc-day-content {
+    & ::v-deep .vc-day-content {
       width: 40px;
       height: 40px;
       font-weight: normal;
     }
 
-    & >>> .vc-day-content:hover, & >>> .vc-day-content:focus {
+    & ::v-deep .vc-day-content:hover, & ::v-deep .vc-day-content:focus {
       background-color: rgba(0, 0, 0, 0.04);
     }
 
-    & >>> .vc-nav-item {
+    & ::v-deep .vc-nav-item {
       color: #444;
       box-shadow: none;
       font-weight: normal;
     }
 
-    & >>> .vc-nav-item.is-active {
+    & ::v-deep .vc-nav-item.is-active {
       font-weight: bold;
     }
 
-    & >>> .vc-nav-title {
+    & ::v-deep .vc-nav-title {
       font-family: Hind Vadodara;
       font-style: normal;
       font-weight: bold;
@@ -249,7 +249,7 @@
       color: #444444;
     }
 
-    & >>> .vc-arrow {
+    & ::v-deep .vc-arrow {
       width: 40px;
       height: 40px;
       background-position: center;
@@ -257,19 +257,19 @@
       border: none;
     }
 
-    & >>> .vc-arrow svg {
+    & ::v-deep .vc-arrow svg {
       display: none;
     }
 
-    & >>> .vc-arrow.is-left {
+    & ::v-deep .vc-arrow.is-left {
       background-image: url("/images/calendar-arrow-back.svg");
     }
 
-    & >>> .vc-arrow.is-right {
+    & ::v-deep .vc-arrow.is-right {
       background-image: url("/images/calendar-arrow-forward.svg");
     }
 
-    & >>> .vc-arrows-container {
+    & ::v-deep .vc-arrows-container {
       padding: 0 30px;
       top: 22px;
     }
@@ -281,18 +281,18 @@
     padding-bottom: 40px;
 
     &__datepicker {
-      & >>> .vc-pane-container {
+      & ::v-deep .vc-pane-container {
         padding: 0;
       }
 
-      & >>> .vc-pane-layout {
+      & ::v-deep .vc-pane-layout {
         display: flex;
         flex-direction: column;
         max-width: 280px;
         margin: 0 auto;
       }
 
-      & >>> .vc-pane {
+      & ::v-deep .vc-pane {
         padding: 30px 0 0 0;
       }
     }

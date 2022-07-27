@@ -110,7 +110,7 @@
   &__preview {
     margin: 40px 0 0;
 
-    >>> canvas {
+    ::v-deep canvas {
       vertical-align: top;
     }
   }

@@ -1,9 +1,9 @@
 .time-selector {
-  &:focus-within >>> input {
+  &:focus-within ::v-deep input {
     box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
   }
 
-  >>> input {
+  ::v-deep input {
     width: 100%;
     background: #FFFFFF;
     border: 1px solid #DDDDDD;
@@ -22,15 +22,15 @@
     text-transform: uppercase;
   }
 
-  >>> .vue__time-picker {
+  ::v-deep .vue__time-picker {
     width: 100%;
   }
 
-  >>> .controls {
+  ::v-deep .controls {
     display: none;
   }
 
-  >>> .dropdown {
+  ::v-deep .dropdown {
     width: 100%;
     border: 1px solid #DDDDDD;
     border-radius: 0 0 3px 3px;
