@@ -231,7 +231,7 @@
         width: 100%;
         height: 100%;
 
-        >>> .video-js {
+        ::v-deep .video-js {
             width: 100%;
             height: 100%;
             position: relative;
@@ -390,7 +390,7 @@
         }
 
         &__video-player {
-            >>> .video-js .vjs-big-play-button {
+            ::v-deep .video-js .vjs-big-play-button {
                 width: 60px;
                 height: 60px;
                 top: calc(50% - 30px);

@@ -52,7 +52,7 @@
     }
 
     &__multiselect {
-        >>> .multiselect {
+        ::v-deep .multiselect {
             position: relative;
             color: #333;
 
