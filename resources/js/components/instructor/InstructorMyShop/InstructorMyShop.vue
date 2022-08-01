@@ -221,7 +221,7 @@ export default {
           video: video,
           preview: preview,
         },
-        lesson.id,
+        lesson['pre_r_lessons.id'],
         lesson.preview,
         documents,
       )
@@ -244,7 +244,7 @@ export default {
       if (menuItemIndex === 0) {
         this.editLesson(lesson)
       } else if (menuItemIndex === 1) {
-        this.deleteLesson(lesson.id)
+        this.deleteLesson(lesson['pre_r_lessons.id'])
       }
     },
   },
