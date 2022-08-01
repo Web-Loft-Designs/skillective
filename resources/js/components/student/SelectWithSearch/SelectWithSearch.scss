@@ -1,5 +1,5 @@
 .select-with-search {
-    >>> .v-select {
+    ::v-deep .v-select {
         font-family: Hind Vadodara;
         font-style: normal;
         font-weight: normal;
@@ -114,7 +114,7 @@
     }
 
     &--small {
-        >>> .v-select {
+        ::v-deep .v-select {
             font-size: 14px;
             line-height: 21px;
 

@@ -22,7 +22,7 @@
   }
 
   &--show-map {
-    >>> .lesson {
+    ::v-deep .lesson {
       width: calc(50% - 44px);
     }
   }
@@ -96,7 +96,7 @@
       margin-right: 10px;
     }
 
-    & >>> .select-with-search {
+    & ::v-deep .select-with-search {
       width: 160px;
     }
   }
@@ -142,7 +142,7 @@
         z-index: 1;
       }
 
-      >>> .lesson {
+      ::v-deep .lesson {
         width: calc(33.3% - 20px);
       }
 
@@ -182,7 +182,7 @@
     margin-top: 277px;
 
     &--show-map {
-      >>> .lesson {
+      ::v-deep .lesson {
         width: calc(50% - 28px);
       }
     }
@@ -209,7 +209,7 @@
     }
 
     &--show-map {
-      >>> .lesson {
+      ::v-deep .lesson {
         width: 100%;
       }
     }
@@ -221,7 +221,7 @@
     &__header {
       flex-direction: column;
 
-      >>> .green-toggle {
+      ::v-deep .green-toggle {
         justify-content: space-between;
       }
     }

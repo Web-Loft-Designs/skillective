@@ -3,7 +3,7 @@
     border-radius: 0;
     display: block;
 
-    >>> .pagination {
+    ::v-deep .pagination {
         font-family: Poppins;
         font-style: normal;
         font-weight: normal;

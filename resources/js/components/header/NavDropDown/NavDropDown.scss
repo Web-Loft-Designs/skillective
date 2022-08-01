@@ -61,7 +61,7 @@
             padding: 0;
             outline: none;
 
-            &:focus >>> .profile-menu__image, &:hover >>> .profile-menu__image {
+            &:focus ::v-deep .profile-menu__image, &:hover ::v-deep .profile-menu__image {
                 box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
             }
         }
@@ -84,8 +84,8 @@
         border-radius: 8px;
         right: 5px;
         top: 36px;
-
-        >>> li {
+    
+        ::v-deep li {
             border-bottom: 1px solid #E4E4E4;
 
             a {

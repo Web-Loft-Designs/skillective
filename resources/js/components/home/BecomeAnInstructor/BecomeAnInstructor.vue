@@ -1,13 +1,13 @@
 <template>
-  <div class='become-an-instructor' id='become-an-instructor'>
+  <div id='become-an-instructor' class='become-an-instructor'>
     <div class='become-an-instructor__container'>
       <div class='become-an-instructor__column'>
         <div class='become-an-instructor__content'>
           <h3 class='become-an-instructor__heading'>Become an Instructor</h3>
           <p class='become-an-instructor__text'>The only way to become an instructor is to be invited by Skillective or for one of the Instructors on the platform to invite you.</p>
           <form class='become-an-instructor__form'>
-            <input type='text' placeholder='Full Name' />
-            <input type='text' placeholder='Email address' />
+            <input placeholder='Full Name' type='text'/>
+            <input placeholder='Email address' type='text'/>
             <button type='submit'>Submit</button>
           </form>
           <p class='become-an-instructor__large-note'>Let us know you are insterested by submitting your e-mail address above!</p>
@@ -29,10 +29,10 @@
 
 <script>
 export default {
-  name: 'BecomeAnInstructor',
+  name: 'BecomeAnInstructor'
 }
 </script>
 
 <style lang='scss' scoped>
-@import "./BecomeAnInstructor.scss";
+@import './BecomeAnInstructor.scss';
 </style>
