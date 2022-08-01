@@ -488,112 +488,112 @@ class LessonRepository extends BaseRepository
 		})->get();
 	}
 
-	public function upcomingNearbyLessons($ip)
-	{
-		$this->resetCriteria();
-		$this->resetScope();
+    public function upcomingNearbyLessons($ip)
+    {
+        $this->resetCriteria();
+        $this->resetScope();
 
-		$userGeoCoordinates = [];
-		$preferredGenresIds = [];
-		$myFavoriteInstructors = [];
+        $userGeoCoordinates = [];
+        $preferredGenresIds = [];
+        $myFavoriteInstructors = [];
 
-		if (Auth::user() && Auth::user()->hasRole(User::ROLE_STUDENT)) {
-			$preferredGenresIds = Auth::user()->genres()->pluck('id')->all();
-			//			$myFavoriteInstructors = Auth::user()->instructors()->wherePivot('is_favorite', 1)->get()->pluck('id')->all();
-		}
+        if (Auth::user() && Auth::user()->hasRole(User::ROLE_STUDENT)) {
+            $preferredGenresIds = Auth::user()->genres()->pluck('id')->all();
+            //			$myFavoriteInstructors = Auth::user()->instructors()->wherePivot('is_favorite', 1)->get()->pluck('id')->all();
+        }
 
-		$this->pushCriteria(new LessonOnlyPublic());
+        $this->pushCriteria(new LessonOnlyPublic());
 
-		if (Auth::user() && count($userGeoLocations = Auth::user()->geoLocations()->get()) > 0) {
-			foreach ($userGeoLocations as $geoLocation) {
-				if (
-					$geoLocation->lat != ''
-					&& $geoLocation->lng != ''
-					&& $geoLocation->limit != ''
-					&& strtotime(($geoLocation->date_from . ' 00:00:00')) <= strtotime(Carbon::now($geoLocation->timezone_id)->format('Y-m-d H:i:s'))
-					&& strtotime(($geoLocation->date_to . ' 23:59:59')) >= strtotime(Carbon::now($geoLocation->timezone_id)->format('Y-m-d H:i:s'))
-				)
-					$userGeoCoordinates[] = [
-						'lat'		=> $geoLocation->lat,
-						'lng'		=> $geoLocation->lng,
-						'limit'		=> $geoLocation->limit,
-						'date_from' => $geoLocation->date_from . ' 00:00:00',
-						'date_to' 	=> $geoLocation->date_to . ' 23:59:59',
-					];
-			}
-		} else {
-			if ($ip == '127.0.0.1')
-				$ip = '208.118.229.134';
+        if (Auth::user() && count($userGeoLocations = Auth::user()->geoLocations()->get()) > 0) {
+            foreach ($userGeoLocations as $geoLocation) {
+                if (
+                    $geoLocation->lat != ''
+                    && $geoLocation->lng != ''
+                    && $geoLocation->limit != ''
+                    && strtotime(($geoLocation->date_from . ' 00:00:00')) <= strtotime(Carbon::now($geoLocation->timezone_id)->format('Y-m-d H:i:s'))
+                    && strtotime(($geoLocation->date_to . ' 23:59:59')) >= strtotime(Carbon::now($geoLocation->timezone_id)->format('Y-m-d H:i:s'))
+                )
+                    $userGeoCoordinates[] = [
+                        'lat'		=> $geoLocation->lat,
+                        'lng'		=> $geoLocation->lng,
+                        'limit'		=> $geoLocation->limit,
+                        'date_from' => $geoLocation->date_from . ' 00:00:00',
+                        'date_to' 	=> $geoLocation->date_to . ' 23:59:59',
+                    ];
+            }
+        } else {
+            if ($ip == '127.0.0.1')
+                $ip = '208.118.229.134';
 
-			$geoLocation = geoip($ip);
-			if ($geoLocation instanceof \Torann\GeoIP\Location && $geoLocation->getAttribute('country') == 'United States') {
-				$userGeoCoordinates[] = [
-					'lat'		=> $geoLocation->getAttribute('lat'),
-					'lng'		=> $geoLocation->getAttribute('lon'),
-					'limit'		=> UserGeoLocation::getDefaultLimit(),
-					'date_from' => now()->format('Y-m-d H:i:s'),
-					'date_to' 	=> now()->addDay()->format('Y-m-d H:i:s')
-				];
-			}
-		}
+            $geoLocation = geoip($ip);
+            if ($geoLocation instanceof \Torann\GeoIP\Location && $geoLocation->getAttribute('country') == 'United States') {
+                $userGeoCoordinates[] = [
+                    'lat'		=> $geoLocation->getAttribute('lat'),
+                    'lng'		=> $geoLocation->getAttribute('lon'),
+                    'limit'		=> UserGeoLocation::getDefaultLimit(),
+                    'date_from' => now()->format('Y-m-d H:i:s'),
+                    'date_to' 	=> now()->addDay()->format('Y-m-d H:i:s')
+                ];
+            }
+        }
 
-		$mathingLessonsIds = [];
-		foreach ($userGeoCoordinates as $index => $userGeoCoordinate) {
-			$nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
-			$geoMatchingLessons = $this->model->select('lessons.id', 'lessons.spots_count')
-				// ->addSelect(DB::raw("get_distance_in_miles_between_geo_locations({$userGeoCoordinate['lat']},{$userGeoCoordinate['lng']}, lat, lng) as distance"))
-				// ->whereNotNull('lat')
-				// ->whereNotNull('lng')
-				->leftJoin('bookings', function ($join) {
-					$join->on('lessons.id', '=', 'bookings.lesson_id')
-						->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ");
-				})
-				//				->leftJoin('bookings', 'lessons.id', '=', "bookings.lesson_id")
-				//				->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ")
-				->whereRaw(" ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) ")
-				->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) <= lessons.start")
-				// ->having("distance", '<', $userGeoCoordinate['limit'])
-				->havingRaw("COUNT(lessons.id) < spots_count")
-				->groupBy('lessons.id');
+        $mathingLessonsIds = [];
+        foreach ($userGeoCoordinates as $index => $userGeoCoordinate) {
+            $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
+            $geoMatchingLessons = $this->model->select('lessons.id', 'lessons.spots_count')
+                // ->addSelect(DB::raw("get_distance_in_miles_between_geo_locations({$userGeoCoordinate['lat']},{$userGeoCoordinate['lng']}, lat, lng) as distance"))
+                // ->whereNotNull('lat')
+                // ->whereNotNull('lng')
+                ->leftJoin('bookings', function ($join) {
+                    $join->on('lessons.id', '=', 'bookings.lesson_id')
+                        ->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ");
+                })
+                //				->leftJoin('bookings', 'lessons.id', '=', "bookings.lesson_id")
+                //				->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ")
+                ->whereRaw(" ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) ")
+                ->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) <= lessons.start")
+                // ->having("distance", '<', $userGeoCoordinate['limit'])
+                ->havingRaw("COUNT(lessons.id) < spots_count")
+                ->groupBy('lessons.id');
 
-			if (config('app.env') == 'prod') {
-				$geoMatchingLessons->join('users', 'lessons.instructor_id', '=', "users.id")
-					->where('users.status', User::STATUS_ACTIVE)
-					->whereNotNull('users.bt_submerchant_id')
-					->where('users.bt_submerchant_status', \Braintree_MerchantAccount::STATUS_ACTIVE);
-			}
+            if (config('app.env') == 'prod') {
+                $geoMatchingLessons->join('users', 'lessons.instructor_id', '=', "users.id")
+                    ->where('users.status', User::STATUS_ACTIVE)
+                    ->whereNotNull('users.bt_submerchant_id')
+                    ->where('users.bt_submerchant_status', \Braintree_MerchantAccount::STATUS_ACTIVE);
+            }
 
-			// if ($userGeoCoordinate['date_from'] != null && $userGeoCoordinate['date_to'] != null)
-			// 	$geoMatchingLessons->whereRaw("start BETWEEN '{$userGeoCoordinate['date_from']}' AND '{$userGeoCoordinate['date_to']}' ");
+            // if ($userGeoCoordinate['date_from'] != null && $userGeoCoordinate['date_to'] != null)
+            // 	$geoMatchingLessons->whereRaw("start BETWEEN '{$userGeoCoordinate['date_from']}' AND '{$userGeoCoordinate['date_to']}' ");
 
-			// only interested genres for students
-			if (count($preferredGenresIds))
-				$geoMatchingLessons->whereIn('lessons.genre_id', $preferredGenresIds);
-			//					if (count($preferredGenresIds) && count($myFavoriteInstructors)) {
-			//						$geoMatchingLessons->whereRaw( ' (
-			//						lessons.genre_id IN ('.implode(',', $preferredGenresIds).') )
-			//						OR
-			//						( lessons.genre_id IN ('.implode(',', $preferredGenresIds).') AND lessons.instructor_id IN ('.implode(',', $myFavoriteInstructors).')
-			//						)' );
-			//					}elseif (count($preferredGenresIds)){
-			//						$geoMatchingLessons->whereIn( 'lessons.genre_id', $preferredGenresIds );
-			//					}elseif (count($myFavoriteInstructors)){
-			//						$geoMatchingLessons->whereIn( 'lessons.instructor_id', $myFavoriteInstructors );
-			//					}
+            // only interested genres for students
+            if (count($preferredGenresIds))
+                $geoMatchingLessons->whereIn('lessons.genre_id', $preferredGenresIds);
+            //					if (count($preferredGenresIds) && count($myFavoriteInstructors)) {
+            //						$geoMatchingLessons->whereRaw( ' (
+            //						lessons.genre_id IN ('.implode(',', $preferredGenresIds).') )
+            //						OR
+            //						( lessons.genre_id IN ('.implode(',', $preferredGenresIds).') AND lessons.instructor_id IN ('.implode(',', $myFavoriteInstructors).')
+            //						)' );
+            //					}elseif (count($preferredGenresIds)){
+            //						$geoMatchingLessons->whereIn( 'lessons.genre_id', $preferredGenresIds );
+            //					}elseif (count($myFavoriteInstructors)){
+            //						$geoMatchingLessons->whereIn( 'lessons.instructor_id', $myFavoriteInstructors );
+            //					}
 
-			$geoMatchingLessons = $geoMatchingLessons->get()
-				->pluck('id')
-				->all();
+            $geoMatchingLessons = $geoMatchingLessons->get()
+                ->pluck('id')
+                ->all();
 
-			$mathingLessonsIds = array_merge(
-				$mathingLessonsIds,
-				$geoMatchingLessons
-			);
-		}
+            $mathingLessonsIds = array_merge(
+                $mathingLessonsIds,
+                $geoMatchingLessons
+            );
+        }
 
 
-		$mathingLessonsIds = array_unique($mathingLessonsIds);
-		if (count($mathingLessonsIds)) {
+        $mathingLessonsIds = array_unique($mathingLessonsIds);
+        if (count($mathingLessonsIds)) {
 //			$upcomingNearByLessons = $this->scopeQuery(function ($query) use ($mathingLessonsIds) {
 //				$query = $query->whereIn('id', $mathingLessonsIds)
 //					->limit(10)
@@ -608,11 +608,11 @@ class LessonRepository extends BaseRepository
                 ->with(['genre', 'instructor', 'instructor.profile', 'students'])
                 ->get();
 
-			return $upcomingNearByLessons;
-		}
+            return $upcomingNearByLessons;
+        }
 
-		return [];
-	}
+        return [];
+    }
 
 
 

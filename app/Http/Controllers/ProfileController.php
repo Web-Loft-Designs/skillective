@@ -46,70 +46,74 @@ class ProfileController extends Controller
     public function show(Request $request, User $user)
     {
 
-		$currentUserIsAdmin = (Auth::user() && Auth::user()->hasRole(User::ROLE_ADMIN));
-		if ($user->status!=User::STATUS_ACTIVE && $user->status!=User::STATUS_APPROVED && !$currentUserIsAdmin)
-			return abort(404);
-		if ($user->hasRole(User::ROLE_ADMIN))
-			return abort(404);
+        if( !$user->id ) {
+            $user = Auth::user();
+        }
 
-		$userData = $this->userRepository->getUserData($user->id);
-		$userData = $this->userRepository->presentResponse($userData)['data'];
+        $currentUserIsAdmin = (Auth::user() && Auth::user()->hasRole(User::ROLE_ADMIN));
+        if ($user->status!=User::STATUS_ACTIVE && $user->status!=User::STATUS_APPROVED && !$currentUserIsAdmin)
+            return abort(404);
+        if ($user->hasRole(User::ROLE_ADMIN))
+            return abort(404);
 
-		$invitedInstructors = [];
-		$isInstructor = false;
-		if ($user->hasRole(User::ROLE_INSTRUCTOR)) {
-			$isInstructor = true;
+        $userData = $this->userRepository->getUserData($user->id);
+        $userData = $this->userRepository->presentResponse($userData)['data'];
 
-			$userData['total_count_lessons'] = $this->lessonRepository->getInstructorsPastBookedLessonsCount($user->id);
-			$userData['lessons_rate_min']    = (float)$user->myLessonsBookings()
+        $invitedInstructors = [];
+        $isInstructor = false;
+        if ($user->hasRole(User::ROLE_INSTRUCTOR)) {
+            $isInstructor = true;
+
+            $userData['total_count_lessons'] = $this->lessonRepository->getInstructorsPastBookedLessonsCount($user->id);
+            $userData['lessons_rate_min']    = (float)$user->myLessonsBookings()
                 ->whereRaw("( bookings.status <> '".Booking::STATUS_CANCELLED."') AND bookings.created_at>'".date('Y-m-d H:i:s', strtotime('-6 months'))."'")
                 ->min( 'spot_price' );
-			$userData['lessons_rate_max']    = (float)$user->myLessonsBookings()
+            $userData['lessons_rate_max']    = (float)$user->myLessonsBookings()
                 ->whereRaw("( bookings.status <> '".Booking::STATUS_CANCELLED."') AND bookings.created_at>'".date('Y-m-d H:i:s', strtotime('-6 months'))."'")
                 ->max( 'spot_price' );
-			$userData['upcoming_locations']  = $this->lessonRepository->getUpcomingInstructorLocations($user->id);
-			$userData['upcoming_virtual_lessons_dates']  = $this->lessonRepository->getUpcomingInstructorVirtualLessonsDates($user->id);
+            $userData['upcoming_locations']  = $this->lessonRepository->getUpcomingInstructorLocations($user->id);
+            $userData['upcoming_virtual_lessons_dates']  = $this->lessonRepository->getUpcomingInstructorVirtualLessonsDates($user->id);
 
-			if ($currentUserIsAdmin){
-				$invitedByRequest = new Request([
-					'limit'	=> 999,
-					'invited_by' => $user->id,
-					'status'	=> 'all'
-				]);
+            if ($currentUserIsAdmin){
+                $invitedByRequest = new Request([
+                    'limit'	=> 999,
+                    'invited_by' => $user->id,
+                    'status'	=> 'all'
+                ]);
 
-				$instructorRoleId = Role::findByName(User::ROLE_INSTRUCTOR)->id;
-				$this->userRepository->setPresenter("App\\Presenters\\InstructorsInListPresenter");
-				$invitedInstructors = $this->userRepository->presentResponse($this->userRepository->getUsers($invitedByRequest, $instructorRoleId))['data']; // TODO: do we really need this data here?
-			}
+                $instructorRoleId = Role::findByName(User::ROLE_INSTRUCTOR)->id;
+                $this->userRepository->setPresenter("App\\Presenters\\InstructorsInListPresenter");
+                $invitedInstructors = $this->userRepository->presentResponse($this->userRepository->getUsers($invitedByRequest, $instructorRoleId))['data']; // TODO: do we really need this data here?
+            }
 
-		}else{
-			$userData['total_booked_lessons'] = $user->bookings()->where('status', '<>', Booking::STATUS_CANCELLED)->count();
-		}
+        }else{
+            $userData['total_booked_lessons'] = $user->bookings()->where('status', '<>', Booking::STATUS_CANCELLED)->count();
+        }
 
-		$userData['isInstructor']		 = $isInstructor;
-		$userData['isStudent']			 = !$isInstructor;
+        $userData['isInstructor']		 = $isInstructor;
+        $userData['isStudent']			 = !$isInstructor;
 
-		$template = $isInstructor ? 'instructor' : 'student';
+        $template = $isInstructor ? 'instructor' : 'student';
         $dashboardPage = getCurrentPage('instructor/dashboard');
 
-		$vars = [
-			'page_title'		=> ($isInstructor ? 'Instructor': 'Client') . " Profile",
-			'userProfileData'	=> $userData,
-			'userGenres'=> 'userGenres',
-			'siteGenres' => $this->genreRepository->presentResponse($this->genreRepository->getSiteGenres())['data'],
-			'userMedia'	=> $user->getGalleryMedia(),
-			'invitedInstructors' => $invitedInstructors,
+        $vars = [
+            'page_title'		=> ($isInstructor ? 'Instructor': 'Client') . " Profile",
+            'userProfileData'	=> $userData,
+            'userGenres'=> 'userGenres',
+            'siteGenres' => $this->genreRepository->presentResponse($this->genreRepository->getSiteGenres())['data'],
+            'userMedia'	=> $user->getGalleryMedia(),
+            'invitedInstructors' => $invitedInstructors,
             'authUserIsAdmin' => (Auth::user() && Auth::user()->hasRole('Admin')),
             'dashboardPage' => $dashboardPage,
             'booking_fees_description' => getCurrentPageMetaValue($dashboardPage, 'booking_fees_description'),
-		];
+        ];
 
-		if(Auth::user())
+        if(Auth::user())
         {
-			$vars['userGengres'] = $this->genreRepository->presentResponse(Auth::user() ? Auth::user()->genres : [])['data'];
-		}
+            $vars['userGengres'] = $this->genreRepository->presentResponse(Auth::user() ? Auth::user()->genres : [])['data'];
+        }
 
-		return view("frontend.{$template}.profile", $vars);
+        return view("frontend.{$template}.profile", $vars);
     }
 
 	public function edit(Request $request, User $user = null)
