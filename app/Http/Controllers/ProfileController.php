@@ -46,6 +46,10 @@ class ProfileController extends Controller
     public function show(Request $request, User $user)
     {
 
+        if( !$user->id ) {
+            $user = Auth::user();
+        }
+
 		$currentUserIsAdmin = (Auth::user() && Auth::user()->hasRole(User::ROLE_ADMIN));
 		if ($user->status!=User::STATUS_ACTIVE && $user->status!=User::STATUS_APPROVED && !$currentUserIsAdmin)
 			return abort(404);
