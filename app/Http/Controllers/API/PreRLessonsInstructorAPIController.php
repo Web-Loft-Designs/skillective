@@ -61,22 +61,22 @@ class PreRLessonsInstructorAPIController extends AppBaseController
                 $data['duration'] = '00:' . $data['duration'];
             }
 
-//            $content = fopen($file_path, "r");
-//
-//            $connectionString = "DefaultEndpointsProtocol=https;AccountName=skillective;AccountKey=nrKEkM7ihgQbuybiz/8NzsJJCdpwKQaxmmERc/F5x9kEXl/5RiXMet/5Mzw7QrA3jCdqUUd/9ETamRFatcheIg==;EndpointSuffix=core.windows.net";
-//
-//            $contentType = "video/mp4";
-//            $options = new CreateBlockBlobOptions();
-//            $options->setContentType($contentType);
+            $content = fopen($file_path, "r");
 
-//            try {
-//
-//                $blobClient = BlobRestProxy::createBlobService($connectionString);
-//                $blobClient->createBlockBlob("public",  $data['video'], $content, $options);
-//                echo "success";
-//            } catch (ServiceException $e) {
-//                $this->sendError($e);
-//            }
+            $connectionString = "DefaultEndpointsProtocol=https;AccountName=skillective;AccountKey=nrKEkM7ihgQbuybiz/8NzsJJCdpwKQaxmmERc/F5x9kEXl/5RiXMet/5Mzw7QrA3jCdqUUd/9ETamRFatcheIg==;EndpointSuffix=core.windows.net";
+
+            $contentType = "video/mp4";
+            $options = new CreateBlockBlobOptions();
+            $options->setContentType($contentType);
+
+            try {
+
+                $blobClient = BlobRestProxy::createBlobService($connectionString);
+                $blobClient->createBlockBlob("public",  $data['video'], $content, $options);
+                echo "success";
+            } catch (ServiceException $e) {
+                $this->sendError($e);
+            }
         }
         $preRecordedLesson = PreRecordedLesson::create($data);
 
