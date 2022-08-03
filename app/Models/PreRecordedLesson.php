@@ -49,7 +49,8 @@ class PreRecordedLesson extends Model
 
     public function getVideoUrl()
     {
-        return 'https://skillective.blob.core.windows.net/public/' . $this->video;
+        //return 'https://skillective.blob.core.windows.net/public/' . $this->video;
+        return config('app.url') . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->video;
     }
 
     public function getPreRecordedLessonServiceFeeAmount($price = null)
@@ -86,7 +87,7 @@ class PreRecordedLesson extends Model
 		if(Auth::user() != null){
 			$user_repository->updateUserData(Auth::user()->id, $request);
 		}
-        
+
         if ($paymentMethodNonce) {
             $device_data = $request->input('device_data', null);
             $paymentMethod = BraintreeProcessor::createPaymentMethod($student, $paymentMethodNonce, $device_data);
