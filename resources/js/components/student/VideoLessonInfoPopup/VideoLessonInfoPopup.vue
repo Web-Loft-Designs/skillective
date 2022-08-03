@@ -156,6 +156,7 @@ export default {
     ...mapActions(["addItemToCartAtStart"]),
     showPopup(lesson) {
       this.lesson = lesson;
+      this.lesson.id = lesson.id || lesson['pre_r_lessons.id'];
       this.errorMessage = null;
       this.opened = true;
     },
