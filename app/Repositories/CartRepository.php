@@ -111,9 +111,13 @@ class CartRepository extends BaseRepository
         $pre_r_lessons_ids = [];
 
         foreach (json_decode($product_list) as $key => $value) {
-            if (isset($value->isPreRecorded) && isset($value->lesson_id))
+            if (isset($value->isPreRecorded))
             {
-                $pre_r_lessons_ids[] = (int)$value->lesson_id;
+                if( isset($value->lesson_id) )
+                {
+                    $pre_r_lessons_ids[] = (int)$value->lesson_id;
+                }
+
             } else {
                 $lessons_ids[] = (int)$value->lesson_id;
             }
