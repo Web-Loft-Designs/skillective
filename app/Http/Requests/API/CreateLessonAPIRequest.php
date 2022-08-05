@@ -50,7 +50,7 @@ class CreateLessonAPIRequest extends APIRequest
 			'location'		=> ['required_if:lesson_type,in_person', 'nullable', 'is_exact_address'],
             'timezone_id'   => ['required_if:lesson_type,virtual,in_person_client', "valid_timezone:$lesson_type"],
             'lesson_type'   => ['required', 'in:in_person,virtual,in_person_client'],
-            'preview'	    => ['required'],
+            //'preview'	    => ['required'],
 		];
 
 		return $rules;
