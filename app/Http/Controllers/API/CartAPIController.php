@@ -259,7 +259,7 @@ class CartAPIController extends AppBaseController
                         if ($promo->discount_type == 'fixed-amount') {
                             $discountAmount = $promo->discount / $cartCount;
                             $lesson->spot_price -= $discountAmount;
-                        } else if ($discount->discount_type == 'percent') {
+                        } else if ( isset($discount->discount_type) && $discount->discount_type == 'percent') {
                             $discountAmount = $promo->discount / 100 * $lesson->spot_price;
                             $lesson->spot_price -= $discountAmount;
                         }
