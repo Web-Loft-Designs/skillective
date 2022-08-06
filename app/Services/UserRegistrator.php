@@ -108,7 +108,8 @@ class UserRegistrator {
         $inputData['password_confirm'] = $pass;
         $inputData['finish_registration_token'] = Str::random(60);
 
-        event(new Registered($student = $this->createStudent($inputData, User::STATUS_APPROVED)));
+        $student = $this->createStudent($inputData, User::STATUS_APPROVED);
+        event(new Registered($student));
 
         return $student;
     }
@@ -155,7 +156,9 @@ class UserRegistrator {
 			$user->assignRole( $userRole );
 
             $notification[] = 'email';
-            if( $data['sms_notification'] ) $notification[] = 'sms';
+            if( array_key_exists('sms_notification', $data) ) $notification[] = 'sms';
+
+            if( isset($data['dob']) && $data['dob'] === 'Invalid date' ) $data['dob'] = null;
 
 			$profile = new Profile( [
 				'address'			=> isset($data['address'])?$data['address']:'',
