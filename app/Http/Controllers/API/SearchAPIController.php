@@ -20,7 +20,13 @@ class SearchAPIController extends AppBaseController
 
         if( !$request->has('instructor') )
         {
-            $result = User::take(10)->orderBy('first_name')->get();
+            $result = User::whereHas('roles', static function (Builder $query) {
+                $query->where('name', USER::ROLE_INSTRUCTOR);
+            })
+                ->take(10)
+                ->orderBy('first_name')
+                ->get();
+
             return $this->sendResponse($result);
         }
 
