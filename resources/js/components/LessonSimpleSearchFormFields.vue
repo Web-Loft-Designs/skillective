@@ -89,7 +89,7 @@
       <select class="form-control" v-model="fields.timezone_id">
         <option value="" disabled>Select...</option>
         <option
-          v-for="timeZomeOption in timeZomeOptions"
+          v-for="timeZomeOption in timeZoneOptions"
           :value="timeZomeOption.name"
         >
           {{ timeZomeOption.name }}
@@ -213,7 +213,7 @@ export default {
       checkin: new Date(),
       checkout: new Date(),
       timeOptions: [],
-      timeZomeOptions: [],
+      timeZoneOptions: [],
       fields: {
         instructor_name: "",
         instagram_handle: "",
@@ -314,7 +314,7 @@ export default {
     this.fields.location = this.defaultLocation;
     this.lessonTypes =
       window.lessonTypes != undefined ? window.lessonTypes : [];
-    this.timeZomeOptions = ct.getAllTimezones();
+    this.timeZoneOptions = ct.getAllTimezones();
     // window.usTimezones!=undefined ? window.usTimezones : [];
     //ct.getTimezonesForCountry('US');  // getAllTimezones()
   },

@@ -41,7 +41,7 @@
             <select class="form-control" v-model="fields.timezone_id">
               <option value disabled>Select...</option>
               <option
-                v-for="timeZomeOption in timeZomeOptions"
+                v-for="timeZomeOption in timeZoneOptions"
                 :value="timeZomeOption.name"
               >{{ timeZomeOption.name }}</option>
             </select>
@@ -352,7 +352,7 @@ export default {
       // showWhenPopup: false,
       listMeta: [],
       timeOptions: [],
-      timeZomeOptions: [],
+      timeZoneOptions: [],
       // sortOrder: "start_asc",
       mapActive: true,
       // mobileShowFilter: false,
@@ -597,7 +597,7 @@ export default {
     this.listItems = this.lessons;
     this.lessonTypes =
       window.lessonTypes != undefined ? window.lessonTypes : [];
-    this.timeZomeOptions = ct.getAllTimezones();
+    this.timeZoneOptions = ct.getAllTimezones();
       // window.usTimezones != undefined ? window.usTimezones : []; 
       //ct.getTimezonesForCountry('US'); // getAllTimezones()
     if (

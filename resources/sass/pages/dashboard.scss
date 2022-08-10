@@ -5761,7 +5761,7 @@ h4 {
     }
 }
 
-.schedule-page .calendar-component-top h2 button:hover .tolltip {
+.schedule-page .calendar-component-top h2 button:hover .tooltip {
     display: block;
 }
 
@@ -5774,7 +5774,7 @@ h4 {
     height: 100vh;
 }
 
-.tolltip {
+.tooltip {
     position: absolute;
     bottom: calc(100% + 10px);
     left: 50%;
@@ -5824,7 +5824,7 @@ h4 {
     position: relative;
 
     &:hover {
-        .tolltip {
+        .tooltip {
             display: block;
         }
     }

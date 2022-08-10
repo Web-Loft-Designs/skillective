@@ -156,58 +156,6 @@ class InstructorLessonsAPIController extends AppBaseController
         {
             $input['preview'] = basename($input['preview']);
         }
-
-        if ($input['recurrence_until'] && $input['recurrence_frequencies'] != "0") {
-
-            $ty = $input['recurrence_frequencies'];
-
-            $_start = $input['start'];
-            $start = \DateTime::createFromFormat('Y-m-d H:i:s', "$_start")->getTimestamp();
-            $__start = Carbon::createFromTimestamp($start);
-
-            $_end = $input['end'];
-            $end = \DateTime::createFromFormat('Y-m-d H:i:s', "$_end")->getTimestamp();
-            $__end = Carbon::createFromTimestamp($end);
-
-
-            $_until = $input['recurrence_until'];
-            $until = \DateTime::createFromFormat('Y-m-d', "$_until")->getTimestamp();
-            $__until = Carbon::createFromTimestamp($until);
-
-
-            while ($__start->lt($__until)) {
-                $iterLessonData = $input;
-
-                $iterLessonData['start'] = $__start;
-                $iterLessonData['end'] = $__end;
-
-                if ($input['time_interval'] && $input['time_interval'] > 0) {
-                    $lesson = $this->createLessonsByInterval($iterLessonData);
-                }
-                else{
-                    $lesson = $this->lessonRepository->create($iterLessonData);
-                }
-
-                if ($ty === 'day') {
-                    $__start->addDay();
-                    $__end->addDay();
-                } else if ($ty === 'week') {
-                    $__start->addWeek();
-                    $__end->addWeek();
-                } else if ($ty === 'week2') {
-                    $__start->addWeeks(2);
-                    $__end->addWeeks(2);
-                } else if ($ty === 'month') {
-                    $__start->addMonth();
-                    $__end->addMonth();
-                }
-
-
-            }
-
-            return $this->sendResponse($this->lessonRepository->presentResponse($lesson)['data'], 'Lesson saved');
-        }
-
         if ($input['time_interval'] && $input['time_interval'] > 0) {
             $lesson = $this->createLessonsByInterval($input);
 

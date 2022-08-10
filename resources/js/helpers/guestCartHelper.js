@@ -26,7 +26,6 @@ const guestCartHelper = {
             promo => promo == newPromo
         );
 
-        console.log(promos)
         if (existsPromos.length) {
             return {
                 success: false,
