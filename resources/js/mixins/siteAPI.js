@@ -55,7 +55,6 @@ let siteAPIMixin =  {
 		},
 		apiPost : function(action, data){
 			this.apiPreSend();
-			console.log('apiPost');
 			axios.post(action, data)
 				.then(response => {
 					this.apiHandleResponse(response);
@@ -67,7 +66,6 @@ let siteAPIMixin =  {
 		},
 		apiPut : function(action, data){
 			this.apiPreSend();
-			console.log('apiPut');
 			axios.put(action, data)
 				.then(response => {
 					this.apiHandleResponse(response);

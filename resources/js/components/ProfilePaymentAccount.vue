@@ -344,7 +344,6 @@
 											// Send payload.nonce to your server.
 //											console.log('Got a payment method nonce:', payload.nonce);
 											// Display the Venmo username in your checkout UI.
-											console.log('Venmo user:', payload.details.username);
 											if ( payload.nonce != undefined ) {
 												vueComponent.sendNonceToServer(payload.nonce);
 											} else {

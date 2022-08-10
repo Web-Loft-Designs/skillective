@@ -15,11 +15,11 @@
         <form method='post' @keypress.enter.prevent @submit.prevent='onSubmit'>
           <div class='row'>
             <img
-              ref='previewImage'
               v-if='previewFileName'
-              class="video-lesson__image"
+              ref='previewImage'
+              alt='Lesson preview'
+              class='video-lesson__image'
               src='/images/upload-image.svg'
-              alt="Lesson preview"
             />
             <h2 v-if='!fields.id' class='login-box-msg col-12'>
               Add Lesson Time
@@ -50,7 +50,7 @@
                 <strong>{{ errors.genre[0] }}</strong>
               </span>
             </div>
-            <div  class='form-group col-4 has-feedback'>
+            <div class='form-group col-4 has-feedback'>
               <label>Lesson preview</label>
               <div
                 :class="{
@@ -140,7 +140,7 @@
               <select v-model='fields.timezone_id' class='form-control'>
                 <option disabled value>Select...</option>
                 <option
-                  v-for='(value, key) in timeZomeOptions'
+                  v-for='(value, key) in timeZoneOptions'
                   :key='key'
                   :value='key'
                 >
@@ -161,7 +161,6 @@
 
               <dropdown-datepicker
                 v-if='isDateInputInit'
-                key='sombun3'
                 ref='datepicker'
                 v-model='fields.date'
                 :minYear='2021'
@@ -239,28 +238,7 @@
                 :sync='true'
                 :value='isTimeIntervals'
                 :width='186'
-                @change='toggleTimeInervals'
-              />
-            </div>
-            <div
-              v-if='!fields.id'
-              class='col-lg-6 col-sm-6 col-12 form-group has-feedback'
-            >
-              <toggle-button
-                :color="{
-                  checked: '#a94442',
-                  unchecked: '#01bd00',
-                }"
-                :font-size='14'
-                :height='38'
-                :labels="{
-                  checked: 'Disable recurring',
-                  unchecked: 'Enable recurring',
-                }"
-                :sync='true'
-                :value='isReccuring'
-                :width='166'
-                @change='toggleReccuring'
+                @change='toggleTimeIntervals'
               />
             </div>
 
@@ -330,46 +308,6 @@
                 </span>
               </div>
             </div>
-
-            <div
-              v-if='isReccuring && !fields.id'
-              class='col-lg-6 col-sm-6 col-12 form-group has-feedback'
-            >
-              <label> Recurrence frequencies: </label>
-              <select
-                v-model='fields.recurrence_frequencies'
-                class='form-control'
-              >
-                <option value='0'>Disable recurring</option>
-                <option value='day'>Daily</option>
-                <option value='week'>Weekly</option>
-                <option value='week2'>Every 2 Weeks</option>
-                <option value='month'>Monthly</option>
-              </select>
-              <span v-if='errors.recurrence_frequencies' class='help-block'>
-                <strong>{{ errors.recurrence_frequencies[0] }}</strong>
-              </span>
-            </div>
-
-            <div
-              v-if='isReccuring && !fields.id'
-              class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
-            >
-              <label> Recurrence until </label>
-              <dropdown-datepicker
-                v-if='isDateInputInit'
-                ref='recurrenceUntil'
-                v-model='fields.recurrence_until'
-                :minYear='2021'
-                display-format='mdy'
-                maxDate='2030-01-01'
-                submit-format='yyyy-mm-dd'
-              ></dropdown-datepicker>
-              <span v-if='errors.recurrence_until' class='help-block'>
-                <strong>{{ errors.recurrence_until[0] }}</strong>
-              </span>
-            </div>
-
             <div
               :class="{
                 disabled: fields.count_booked === 1,
@@ -404,10 +342,10 @@
             >
               <span class='private-lesson'>
                 <span v-if='fields.spots_count === 1'>
-                  <img alt src='../../images/man-user.svg'/>
+                  <img alt src='/images/man-user.svg'/>
                 </span>
                 <span v-if='fields.spots_count > 1'>
-                  <img alt src='../../images/multiple-users-silhouette.svg'/>
+                  <img alt src='/images/multiple-users-silhouette.svg'/>
                 </span>
               </span>
               <label>Max students</label>
@@ -501,7 +439,6 @@ import {mapState} from 'vuex'
 import UploadProgressBar from './instructor/UploadProgressBar/UploadProgressBar'
 import FieldErrors from './instructor/FieldErrors/FieldErrors'
 import instructorService from '../services/instructorService'
-import urlHelper from '../helpers/urlHelper'
 
 require('jquery.maskedinput/src/jquery.maskedinput')
 
@@ -514,7 +451,7 @@ export default {
     DropdownDatepicker,
     VueTimepicker,
     CopyInput,
-    TextEditor,
+    TextEditor
   },
   mixins: [siteAPI, skillectiveHelper],
   props: ['lesson', 'userGenres', 'siteGenres', 'selectRange', 'instructorId'],
@@ -539,23 +476,20 @@ export default {
         time_interval: 0,
         interval_break: 0,
         timezone_id: '',
-        recurrence_until: null,
-        recurrence_frequencies: 0,
-        count_booked: 0,
+        count_booked: 0
       },
       timeOptions: [],
-      timeZomeOptions: [],
+      timeZoneOptions: [],
       formGenres: [],
       lessonTypes: [],
       isDateInputInit: false,
       isTimeIntervals: false,
-      isReccuring: false,
-      students: [],
+      students: []
     }
   },
   computed: {
     ...mapState(['datesFromCalendar']),
-    num: function() {
+    num() {
       if (
         this.fields.date &&
         this.fields.date_to &&
@@ -579,8 +513,7 @@ export default {
         return 0
       }
     },
-
-    numError: function() {
+    numError() {
       if (
         this.fields.date &&
         this.fields.date_to &&
@@ -611,9 +544,8 @@ export default {
       } else {
         return false
       }
-    },
+    }
   },
-
   watch: {
     datesFromCalendar: {
       handler() {
@@ -629,24 +561,24 @@ export default {
           if (this.$refs.datepicker) {
             this.$refs.datepicker.day = Number(
               moment(this.datesFromCalendar.start)
-                .format('DD'),
+                .format('DD')
             )
             this.$refs.datepicker.month = Number(
               moment(this.datesFromCalendar.start)
-                .format('MM'),
+                .format('MM')
             )
             this.$refs.datepicker.year = Number(
               moment(this.datesFromCalendar.start)
-                .format('YYYY'),
+                .format('YYYY')
             )
           }
         }, 0)
         this.openPopup()
       },
-      deep: true,
+      deep: true
     },
     fields: {
-      handler(value) {
+      handler: function(value) {
         if (value.date && value.date !== value.oldValue) {
           value.date_to = value.date
         }
@@ -659,8 +591,233 @@ export default {
           }, 1)
         }
       },
-      deep: true,
-    },
+      deep: true
+    }
+  },
+  created() {
+    this.timeOptions = this.getTimeOptions()
+    this.timeZoneOptions = {
+      'America/New_York': 'America/New_York UTC-05:00',
+      'America/Indiana/Indianapolis': 'America/Indiana/Indianapolis UTC-05:00',
+      'America/Chicago': 'America/Chicago UTC-05:00',
+      'America/Denver': 'America/Denver UTC-07:00',
+      'America/Phoenix': 'America/Phoenix UTC-07:00',
+      'America/Los_Angeles': 'America/Los_Angeles UTC-08:00',
+      'America/Anchorage': 'America/Anchorage UTC-09:00',
+      'Pacific/Honolulu': 'Pacific/Honolulu UTC-10:00',
+      'America/Chihuahua': 'America/Chihuahua UTC-07:00',
+      'America/Guatemala': 'America/Guatemala UTC-06:00',
+      'America/Regina': 'America/Regina UTC-06:00',
+      'America/Mexico_City': 'America/Mexico_City UTC-06:00',
+      'America/Bogota': 'America/Bogota UTC-05:00',
+      'America/Caracas': 'America/Caracas UTC-04:30',
+      'America/Halifax': 'America/Halifax UTC-04:00',
+      'America/Asuncion': 'America/Asuncion UTC-04:00',
+      'America/La_Paz': 'America/La_Paz UTC-04:00',
+      'America/Cuiaba': 'America/Cuiaba UTC-04:00',
+      'America/Santiago': 'America/Santiago UTC-04:00',
+      'America/St_Johns': 'America/St_Johns UTC-03:30',
+      'America/Sao_Paulo': 'America/Sao_Paulo UTC-03:00',
+      'America/Godthab': 'America/Godthab UTC-03:00',
+      'America/Cayenne': 'America/Cayenne UTC-03:00',
+      'America/Argentina/Buenos_Aires': 'America/Argentina/Buenos_Aires UTC-03:00',
+      'America/Montevideo': 'America/Montevideo UTC-03:00',
+      'Atlantic/Cape_Verde': 'Atlantic/Cape_Verde UTC-01:00',
+      'Atlantic/Azores': 'Atlantic/Azores UTC-01:00',
+      'Africa/Casablanca': 'Africa/Casablanca UTC+00:00',
+      'Atlantic/Reykjavik': 'Atlantic/Reykjavik UTC+00:00',
+      'Europe/London': 'Europe/London UTC+00:00',
+      'Europe/Berlin': 'Europe/Berlin UTC+01:00',
+      'Europe/Paris': 'Europe/Paris UTC+01:00',
+      'Africa/Lagos': 'Africa/Lagos UTC+01:00',
+      'Europe/Budapest': 'Europe/Budapest UTC+01:00',
+      'Europe/Warsaw': 'Europe/Warsaw UTC+01:00',
+      'Africa/Windhoek': 'Africa/Windhoek UTC+01:00',
+      'Europe/Istanbul': 'Europe/Istanbul UTC+02:00',
+      'Europe/Kiev': 'Europe/Kiev UTC+02:00',
+      'Africa/Cairo': 'Africa/Cairo UTC+02:00',
+      'Asia/Damascus': 'Asia/Damascus UTC+02:00',
+      'Asia/Amman': 'Europe/Amman UTC+02:00',
+      'Africa/Johannesburg': 'Africa/Johannesburg UTC+02:00',
+      'Asia/Jerusalem': 'Asia/Jerusalem UTC+02:00',
+      'Asia/Beirut': 'Asia/Beirut UTC+02:00',
+      'Asia/Baghdad': 'Asia/Baghdad UTC+03:00',
+      'Europe/Minsk': 'Europe/Minsk UTC+03:00',
+      'Asia/Riyadh': 'Asia/Riyadh UTC+03:00',
+      'Africa/Nairobi': 'Africa/Nairobi UTC+03:00',
+      'Asia/Tehran': 'Asia/Tehran UTC+03:30',
+      'Europe/Moscow': 'Europe/ Moscow UTC+04:00',
+      'Asia/Tbilisi': 'Asia/Tbilisi UTC+04:00',
+      'Asia/Yerevan': 'Asia/Yerevan UTC+04:00',
+      'Asia/Dubai': 'Asia/Dubai UTC+04:00',
+      'Asia/Baku': 'Asia/Baku UTC+04:00',
+      'Indian/Mauritius': 'Indian/Mauritius UTC+04:00',
+      'Asia/Kabul': 'Asia/Kabul UTC+04:30',
+      'Asia/Tashkent': 'Asia/Tashkent UTC+05:00',
+      'Asia/Karachi': '	Asia/Karachi UTC+05:00',
+      'Asia/Colombo': 'Asia/Colombo UTC+05:30',
+      'Asia/Kolkata': 'Asia/Kolkata UTC+05:30',
+      'Asia/Kathmandu': 'Asia/Kathmandu UTC+05:45',
+      'Asia/Almaty': 'Asia/Almaty UTC+06:00',
+      'Asia/Dhaka': 'Asia/Dhaka UTC+06:00',
+      'Asia/Yekaterinburg': 'Asia/Yekaterinburg UTC+06:00',
+      'Asia/Yangon': 'Asia/Yangon UTC+06:30',
+      'Asia/Bangkok': 'Asia/Bangkok UTC+07:00',
+      'Asia/Novosibirsk': 'Asia/Novosibirsk UTC+07:00',
+      'Asia/Krasnoyarsk': 'Asia/Krasnoyarsk UTC+08:00',
+      'Asia/Ulaanbaatar': 'Asia/Ulaanbaatar UTC+08:00',
+      'Asia/Shanghai': 'Asia/Shanghai UTC+08:00',
+      'Australia/Perth': 'Australia/Perth UTC+08:00',
+      'Asia/Singapore': 'Asia/Singapore UTC+08:00',
+      'Asia/Taipei': 'Asia/Taipei UTC+08:00',
+      'Asia/Irkutsk': 'Asia/Irkutsk UTC+09:00',
+      'Asia/Seoul': 'Asia/Seoul UTC+09:00',
+      'Asia/Tokyo': 'Asia/Tokyo UTC+09:00',
+      'Australia/Darwin': '	Australia/Darwin UTC+09:30',
+      'Australia/Adelaide': 'Australia/Adelaide UTC+09:30',
+      'Australia/Hobart': '	Australia/Hobart UTC+10:00',
+      'Asia/Yakutsk': 'Asia/Yakutsk UTC+10:00',
+      'Australia/Brisbane': '	Australia/Brisbane UTC+10:00',
+      'Pacific/Port_Moresby': 'Pacific/Port_Moresby UTC+10:00',
+      'Australia/Sydney': 'Australia/Sydney UTC+10:00',
+      'Asia/Vladivostok': 'Asia/Vladivostok UTC+11:00',
+      'Pacific/Guadalcanal': 'Pacific/Guadalcanal UTC+11:00',
+      'Pacific/Fiji': 'Pacific/Fiji UTC+12:00',
+      'Asia/Magadan': 'Asia/Magadan UTC+12:00',
+      'Pacific/Auckland': 'Pacific/Auckland UTC+12:00',
+      'Pacific/Tongatapu': 'Pacific/Tongatapu UTC+13:00',
+      'Pacific/Apia': 'Pacific/Apia UTC+13:00'
+    }
+    this.formGenres = this.userGenres
+    this.lessonTypes =
+      window.lessonTypes !== undefined ? window.lessonTypes : []
+
+    this.$root.$on('openAddLessonModal', () => {
+      this.openPopup()
+    })
+  },
+  mounted() {
+    this.initNewPlacesAutocomplete('lessonLocation')
+
+    this.$root.$on('openAddLessonWithRange', (selectRange) => {
+      if (selectRange !== null) {
+        this.fields.date = selectRange.startStr
+        this.fields.date_to = selectRange.startStr
+        this.isDateInputInit = true
+
+        this.fields.time_from = moment(selectRange.startStr)
+          .format('h:mm a')
+
+        setTimeout(() => {
+          setTimeout(() => {
+            this.fields.time_to = moment(selectRange.endStr)
+              .format('h:mm a')
+          }, 10)
+
+          if (this.$refs.datepicker) {
+            this.$refs.datepicker.day = Number(
+              moment(selectRange.startStr)
+                .format('DD')
+            )
+            this.$refs.datepicker.month = Number(
+              moment(selectRange.startStr)
+                .format('MM')
+            )
+            this.$refs.datepicker.year = Number(
+              moment(selectRange.startStr)
+                .format('YYYY')
+            )
+          }
+
+          if (this.$refs.datepickerTo) {
+            this.$refs.datepickerTo.day = Number(
+              moment(selectRange.startStr)
+                .format('DD')
+            )
+            this.$refs.datepickerTo.month = Number(
+              moment(selectRange.startStr)
+                .format('MM')
+            )
+            this.$refs.datepickerTo.year = Number(
+              moment(selectRange.startStr)
+                .format('YYYY')
+            )
+          }
+        }, 1)
+
+        this.openPopup()
+      }
+    })
+
+    this.$root.$on('lessonUpdateInit', (lesson) => {
+      this.fields = {
+        id: lesson.id,
+        genre: lesson.genre_id,
+        date: moment(lesson.start)
+          .format('YYYY-MM-DD'),
+        date_to: moment(lesson.end)
+          .format('YYYY-MM-DD'),
+        time_from: moment(lesson.start, ['YYYY-MM-DD HH:mm:ss'])
+          .format(
+            'h:mm a'
+          ),
+        spots_count: lesson.spots_count,
+        spot_price: lesson.spot_price,
+        location: lesson.location,
+        lesson_type: lesson.lesson_type,
+        timezone_id: lesson.timezone_id,
+        description: lesson.description,
+        count_booked: lesson.count_booked,
+        preview: lesson.preview
+      }
+      setTimeout(() => {
+        this.$refs.previewImage.src = lesson.preview
+        this.$refs.uploadPreviewImage.src = lesson.preview
+      }, 0)
+      this.previewFileName = lesson.preview
+
+      this.isDateInputInit = true
+
+      setTimeout(() => {
+        if (this.$refs.datepicker) {
+          this.$refs.datepicker.day = Number(
+            moment(this.fields.date)
+              .format('DD')
+          )
+          this.$refs.datepicker.month = Number(
+            moment(this.fields.date)
+              .format('MM')
+          )
+          this.$refs.datepicker.year = Number(
+            moment(this.fields.date)
+              .format('YYYY')
+          )
+        }
+
+        if (this.$refs.datepickerTo) {
+          this.$refs.datepickerTo.day = Number(
+            moment(this.fields.date_to)
+              .format('DD')
+          )
+          this.$refs.datepickerTo.month = Number(
+            moment(this.fields.date_to)
+              .format('MM')
+          )
+          this.$refs.datepickerTo.year = Number(
+            moment(this.fields.date_to)
+              .format('YYYY')
+          )
+        }
+      }, 1)
+
+      setTimeout(() => {
+        this.fields.time_to = moment(lesson.end, ['YYYY-MM-DD HH:mm:ss'])
+          .format('h:mm a')
+        this.openPopup()
+      }, 1)
+
+      this.shareLink = this.getShareLink()
+    })
   },
   methods: {
     clearPreviewFile() {
@@ -699,11 +856,8 @@ export default {
         this.fields.date = moment(today)
           .format('YYYY-MM-DD')
     },
-    toggleTimeInervals() {
+    toggleTimeIntervals() {
       this.isTimeIntervals = !this.isTimeIntervals
-    },
-    toggleReccuring() {
-      this.isReccuring = !this.isReccuring
     },
     cancelLesson(lesson) {
       this.apiDelete('/api/lesson/' + lesson)
@@ -738,7 +892,7 @@ export default {
 
       if (moment(this.fields.time_from)) {
         this.fields.time_from = moment(this.fields.time_from, [
-          'h:mm A',
+          'h:mm A'
         ])
           .format('HH:mm:ss')
       }
@@ -746,7 +900,7 @@ export default {
       if (moment(this.fields.time_to)) {
         this.fields.time_to = moment(this.fields.time_to, ['h:mm A'])
           .format(
-            'HH:mm:ss',
+            'HH:mm:ss'
           )
       }
       if (this.fields.id > 0)
@@ -820,253 +974,19 @@ export default {
     initNewPlacesAutocomplete(_ref) {
       var thisComponent = this
       var autocomplete = this.initializeLocationField(this.$refs[_ref], [
-        'address',
+        'address'
       ])
       google.maps.event.addListener(autocomplete, 'place_changed', function() {
         thisComponent.fields.location = thisComponent.$refs[_ref].value
       })
-    },
-  },
-  created: function() {
-    this.timeOptions = this.getTimeOptions()
-    this.timeZomeOptions = {
-      'America/New_York': 'America/New_York UTC-05:00',
-      'America/Indiana/Indianapolis': 'America/Indiana/Indianapolis UTC-05:00',
-      'America/Chicago': 'America/Chicago UTC-05:00',
-      'America/Denver': 'America/Denver UTC-07:00',
-      'America/Phoenix': 'America/Phoenix UTC-07:00',
-      'America/Los_Angeles': 'America/Los_Angeles UTC-08:00',
-      'America/Anchorage': 'America/Anchorage UTC-09:00',
-      'Pacific/Honolulu': 'Pacific/Honolulu UTC-10:00',
-      'America/Chihuahua': 'America/Chihuahua UTC-07:00',
-      'America/Guatemala': 'America/Guatemala UTC-06:00',
-      'America/Regina': 'America/Regina UTC-06:00',
-      'America/Mexico_City': 'America/Mexico_City UTC-06:00',
-      'America/Bogota': 'America/Bogota UTC-05:00',
-      'America/Caracas': 'America/Caracas UTC-04:30',
-      'America/Halifax': 'America/Halifax UTC-04:00',
-      'America/Asuncion': 'America/Asuncion UTC-04:00',
-      'America/La_Paz': 'America/La_Paz UTC-04:00',
-      'America/Cuiaba': '	America/Cuiaba UTC-04:00',
-      'America/Santiago': '	America/Santiago UTC-04:00',
-      'America/St_Johns': 'America/St_Johns UTC-03:30',
-      'America/Sao_Paulo': '	America/Sao_Paulo UTC-03:00',
-      'America/Santiago': '	America/Godthab UTC-03:00',
-      'America/Cayenne': '	America/Cayenne UTC-03:00',
-      'America/Argentina/Buenos_Aires':
-        'America/Argentina/Buenos_Aires UTC-03:00',
-      'America/Montevideo': '	America/Montevideo UTC-03:00',
-      'Atlantic/Cape_Verde': 'Atlantic/Cape_Verde UTC-01:00',
-      'Atlantic/Azores': 'Atlantic/Azores UTC-01:00',
-      'Africa/Casablanca': 'Africa/Casablanca UTC+00:00',
-      'Atlantic/Reykjavik': 'Atlantic/Reykjavik UTC+00:00',
-      'Europe/London': 'Europe/London UTC+00:00',
-      'Europe/Berlin': 'Europe/Berlin UTC+01:00',
-      'Europe/Paris': 'Europe/Paris UTC+01:00',
-      'Africa/Lagos': 'Africa/Lagos UTC+01:00',
-      'Europe/Budapest': 'Europe/Budapest UTC+01:00',
-      'Europe/Warsaw': 'Europe/Warsaw UTC+01:00',
-      'Africa/Windhoek': 'Africa/Windhoek UTC+01:00',
-      'Europe/Istanbul': 'Europe/Istanbul UTC+02:00',
-      'Europe/Kiev': 'Europe/Kiev UTC+02:00',
-      'Africa/Cairo': 'Africa/Cairo UTC+02:00',
-      'Asia/Damascus': 'Asia/Damascus UTC+02:00',
-      'Asia/Amman': 'Europe/Amman UTC+02:00',
-      'Africa/Johannesburg': 'Africa/Johannesburg UTC+02:00',
-      'Asia/Jerusalem': 'Asia/Jerusalem UTC+02:00',
-      'Asia/Beirut': 'Asia/Beirut UTC+02:00',
-      'Asia/Baghdad': 'Asia/Baghdad UTC+03:00',
-      'Europe/Minsk': 'Europe/Minsk UTC+03:00',
-      'Asia/Riyadh': 'Asia/Riyadh UTC+03:00',
-      'Africa/Nairobi': 'Africa/Nairobi UTC+03:00',
-      'Asia/Tehran': 'Asia/Tehran UTC+03:30',
-      'Europe/Moscow': 'Europe/ Moscow UTC+04:00',
-      'Asia/Tbilisi': 'Asia/Tbilisi UTC+04:00',
-      'Asia/Yerevan': 'Asia/Yerevan UTC+04:00',
-      'Asia/Dubai': 'Asia/Dubai UTC+04:00',
-      'Asia/Baku': 'Asia/Baku UTC+04:00',
-      'Indian/Mauritius': 'Indian/Mauritius UTC+04:00',
-      'Asia/Kabul': 'Asia/Kabul UTC+04:30',
-      'Asia/Tashkent': 'Asia/Tashkent UTC+05:00',
-      'Asia/Karachi': '	Asia/Karachi UTC+05:00',
-      'Asia/Colombo': 'Asia/Colombo UTC+05:30',
-      'Asia/Kolkata': 'Asia/Kolkata UTC+05:30',
-      'Asia/Kathmandu': 'Asia/Kathmandu UTC+05:45',
-      'Asia/Almaty': 'Asia/Almaty UTC+06:00',
-      'Asia/Dhaka': 'Asia/Dhaka UTC+06:00',
-      'Asia/Yekaterinburg': 'Asia/Yekaterinburg UTC+06:00',
-      'Asia/Yangon': 'Asia/Yangon UTC+06:30',
-      'Asia/Bangkok': 'Asia/Bangkok UTC+07:00',
-      'Asia/Novosibirsk': 'Asia/Novosibirsk UTC+07:00',
-      'Asia/Krasnoyarsk': 'Asia/Krasnoyarsk UTC+08:00',
-      'Asia/Ulaanbaatar': 'Asia/Ulaanbaatar UTC+08:00',
-      'Asia/Shanghai': 'Asia/Shanghai UTC+08:00',
-      'Australia/Perth': 'Australia/Perth UTC+08:00',
-      'Asia/Singapore': 'Asia/Singapore UTC+08:00',
-      'Asia/Taipei': 'Asia/Taipei UTC+08:00',
-      'Asia/Irkutsk': 'Asia/Irkutsk UTC+09:00',
-      'Asia/Seoul': 'Asia/Seoul UTC+09:00',
-      'Asia/Tokyo': 'Asia/Tokyo UTC+09:00',
-      'Australia/Darwin': '	Australia/Darwin UTC+09:30',
-      'Australia/Adelaide': '	Australia/Adelaide UTC+09:30',
-      'Australia/Hobart': '	Australia/Hobart UTC+10:00',
-      'Asia/Yakutsk': 'Asia/Yakutsk UTC+10:00',
-      'Australia/Brisbane': '	Australia/Brisbane UTC+10:00',
-      'Pacific/Port_Moresby': 'Pacific/Port_Moresby UTC+10:00',
-      'Australia/Sydney': 'Australia/Sydney UTC+10:00',
-      'Asia/Vladivostok': 'Asia/Vladivostok UTC+11:00',
-      'Pacific/Guadalcanal': 'Pacific/Guadalcanal UTC+11:00',
-      'Pacific/Fiji': 'Pacific/Fiji UTC+12:00',
-      'Asia/Magadan': 'Asia/Magadan UTC+12:00',
-      'Pacific/Auckland': 'Pacific/Auckland UTC+12:00',
-      'Pacific/Tongatapu': 'Pacific/Tongatapu UTC+13:00',
-      'Pacific/Apia': 'Pacific/Apia UTC+13:00',
     }
-    this.formGenres = this.userGenres
-    this.lessonTypes =
-      window.lessonTypes !== undefined ? window.lessonTypes : []
-
-    this.$root.$on('openAddLessonModal', () => {
-      this.openPopup()
-    })
-  },
-  mounted() {
-    this.initNewPlacesAutocomplete('lessonLocation')
-
-    this.$root.$on('openAddLessonWithRange', (selectRange) => {
-      if (selectRange !== null) {
-        this.fields.date = selectRange.startStr
-        this.fields.date_to = selectRange.startStr
-        this.isDateInputInit = true
-
-        this.fields.time_from = moment(selectRange.startStr)
-          .format('h:mm a')
-
-        setTimeout(() => {
-          setTimeout(() => {
-            this.fields.time_to = moment(selectRange.endStr)
-              .format('h:mm a')
-          }, 10)
-
-          if (this.$refs.datepicker) {
-            this.$refs.datepicker.day = Number(
-              moment(selectRange.startStr)
-                .format('DD'),
-            )
-            this.$refs.datepicker.month = Number(
-              moment(selectRange.startStr)
-                .format('MM'),
-            )
-            this.$refs.datepicker.year = Number(
-              moment(selectRange.startStr)
-                .format('YYYY'),
-            )
-          }
-
-          if (this.$refs.datepickerTo) {
-            this.$refs.datepickerTo.day = Number(
-              moment(selectRange.startStr)
-                .format('DD'),
-            )
-            this.$refs.datepickerTo.month = Number(
-              moment(selectRange.startStr)
-                .format('MM'),
-            )
-            this.$refs.datepickerTo.year = Number(
-              moment(selectRange.startStr)
-                .format('YYYY'),
-            )
-          }
-        }, 1)
-
-        this.openPopup()
-      }
-    })
-
-    this.$root.$on('lessonUpdateInit', (lesson) => {
-      const parser = new DOMParser()
-      const currentLocation = parser.parseFromString(
-        lesson.location,
-        'text/html',
-      ).body.textContent
-
-      this.fields = {
-        id: lesson.id,
-        genre: lesson.genre_id,
-        date: moment(lesson.start)
-          .format('YYYY-MM-DD'),
-        date_to: moment(lesson.end)
-          .format('YYYY-MM-DD'),
-        time_from: moment(lesson.start, ['YYYY-MM-DD HH:mm:ss'])
-          .format(
-            'h:mm a',
-          ),
-        spots_count: lesson.spots_count,
-        spot_price: lesson.spot_price,
-        location: currentLocation,
-        lesson_type: lesson.lesson_type,
-        timezone_id: lesson.timezone_id,
-        description: lesson.description,
-        count_booked: lesson.count_booked,
-        preview: lesson.preview
-      }
-      setTimeout(() => {
-        this.$refs.previewImage.src = lesson.preview
-        this.$refs.uploadPreviewImage.src = lesson.preview
-      }, 0)
-      this.previewFileName = lesson.preview
-
-      this.isDateInputInit = true
-
-      setTimeout(() => {
-        if (this.$refs.datepicker) {
-          this.$refs.datepicker.day = Number(
-            moment(this.fields.date)
-              .format('DD'),
-          )
-          this.$refs.datepicker.month = Number(
-            moment(this.fields.date)
-              .format('MM'),
-          )
-          this.$refs.datepicker.year = Number(
-            moment(this.fields.date)
-              .format('YYYY'),
-          )
-        }
-
-        if (this.$refs.datepickerTo) {
-          this.$refs.datepickerTo.day = Number(
-            moment(this.fields.date_to)
-              .format('DD'),
-          )
-          this.$refs.datepickerTo.month = Number(
-            moment(this.fields.date_to)
-              .format('MM'),
-          )
-          this.$refs.datepickerTo.year = Number(
-            moment(this.fields.date_to)
-              .format('YYYY'),
-          )
-        }
-      }, 1)
-
-      setTimeout(() => {
-        (this.fields.time_to = moment(lesson.end, [
-          'YYYY-MM-DD HH:mm:ss',
-        ])
-          .format('h:mm a')),
-          this.openPopup()
-      }, 1)
-
-      this.shareLink = this.getShareLink()
-    })
-  },
+  }
 }
 </script>
 
 <style lang='scss'>
 @import './instructor/AddLessonPopup/AddLessonPopup.scss';
-@import "./student/VideoLessonsList/VideoLessonsList.scss";
+@import './student/VideoLessonsList/VideoLessonsList.scss';
 .pac-container {
   z-index: 10000 !important;
 }
