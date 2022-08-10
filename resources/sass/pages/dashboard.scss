@@ -2707,11 +2707,11 @@
                 opacity: 0;
                 transition: all 0.25s ease;
 
-                &:hover .share-tooltip {
+                &:hover .share-tooltip-block {
                     display: flex;
                 }
 
-                .share-tooltip {
+                .share-tooltip-block {
                     position: absolute;
                     bottom: 89%;
                     left: 50%;
@@ -5761,7 +5761,7 @@ h4 {
     }
 }
 
-.schedule-page .calendar-component-top h2 button:hover .tooltip {
+.schedule-page .calendar-component-top h2 button:hover .tooltip-block {
     display: block;
 }
 
@@ -5774,7 +5774,7 @@ h4 {
     height: 100vh;
 }
 
-.tooltip {
+.tooltip-block {
     position: absolute;
     bottom: calc(100% + 10px);
     left: 50%;
@@ -5820,11 +5820,12 @@ h4 {
 }
 
 .dashboard-page .calendar-component .calendar-component-top h2 button,
-.dashboard-page .calendar-component .calendar-component-top h2 a {
-    position: relative;
+.dashboard-page .calendar-component .calendar-component-top h2 a,
+.profile-section .calendar-component .calendar-component-top h2 button {
+    position: relative!important;
 
     &:hover {
-        .tooltip {
+        .tooltip-block {
             display: block;
         }
     }

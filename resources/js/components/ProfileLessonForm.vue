@@ -820,9 +820,6 @@ export default {
     })
   },
   methods: {
-    getImage(name) {
-      return require(`/images/${name}`)
-    },
     clearPreviewFile() {
       this.previewFileName = null
       this.$refs.uploadPreviewImage.src = '/images/upload-image.svg'

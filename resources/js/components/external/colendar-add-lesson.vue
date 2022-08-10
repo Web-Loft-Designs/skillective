@@ -7,7 +7,7 @@
           <img alt src='/images/plus-icon.svg'/>
           <span>Add Time</span>
 
-          <div class='tolltip bottom'>
+          <div class='tooltip-block bottom'>
             click here to add additional time slots in increments that you wish
             to be booked. Most lessons are 30-mins or an hour!
           </div>
