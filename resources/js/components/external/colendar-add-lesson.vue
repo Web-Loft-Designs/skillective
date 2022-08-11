@@ -618,3 +618,8 @@ export default {
   }
 }
 </script>
+<style>
+.fc-day-grid-event {
+  cursor: pointer;
+}
+</style>
