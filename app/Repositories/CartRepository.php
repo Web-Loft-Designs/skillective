@@ -129,7 +129,8 @@ class CartRepository extends BaseRepository
                 $join->on('lessons.id', '=', 'bookings.lesson_id')
                     ->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ");
             })
-            ->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")->with(["genre", 'instructor', 'instructor.discounts']);
+            //->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")->with(["genre", 'instructor', 'instructor.discounts']);
+            ->with(["genre", 'instructor', 'instructor.discounts']);
 
         $cart = $lessons->get(["lessons.*"]);
 
