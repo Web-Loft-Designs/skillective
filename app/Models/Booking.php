@@ -185,6 +185,7 @@ class Booking extends Model implements Transformable
 			}
 			$this->setStatusAttribute( self::STATUS_CANCELLED );
 			$this->transaction_status = 'cancelled';
+			$this->has_cancellation_request = 0;
 			if ($cancelledBy)
 				$this->cancelled_by = $cancelledBy;
 			$this->save();
