@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Requests\API\BecomeAnInstructorRequest;
 use App\Models\User;
 use App\Http\Requests\API\ContactUsAPIRequest;
 use App\Http\Controllers\AppBaseController;
@@ -31,18 +32,22 @@ class ContactUsAPIController extends AppBaseController
 		$this->userRepository = $userRepository;
 	}
 
-    public function becomeInstructor(Request $request)
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse|void
+     */
+    public function becomeInstructor(BecomeAnInstructorRequest $request)
     {
-        $guest_email = $request->input('email');
 
-        if (!$guest_email) {
-            return $this->sendError('Please, enter valid email');
-        }
+        $email = $request->input('email');
+        $name = $request->input('fullName');
 
-        (new User)->forceFill([
-            'name' => 'Their name',
-            'email' => 'louis@skillective.com',
-        ])->notify(new GuestBecomeInstructor($guest_email));
+        $user = User::create([
+            'first_name' => $name,
+            'email' => $email,
+        ]);
+
+        $user->notify(new GuestBecomeInstructor($email));
 
         $this->sendResponse('ok');
     }
