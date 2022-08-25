@@ -313,10 +313,10 @@ class CartRepository extends BaseRepository
         foreach ( $guestCart as $item )
         {
 
-            $data = array();
+            $data = [];
 
             $data['student_id'] = Auth::user()->id;
-            $data['lesson_id'] = $item->lesson_id;
+            $data['lesson_id'] = (isset($item->isPreRecorded) && $item->isPreRecorded) ? null : $item->lesson_id;
             $data['pre_r_lesson_id'] = (isset($item->isPreRecorded) && $item->isPreRecorded) ? $item->lesson_id : null;
 
             $lesson = Lesson::where('id',  $item->lesson_id)->first();
