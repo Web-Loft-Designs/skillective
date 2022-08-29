@@ -14,7 +14,7 @@ export default new Vuex.Store({
     studentInstructors: [],
     allInstructors: [],
     datesFromCalendar: {},
-    checkOutStep: 1,
+    checkOutStep: 1
   },
   getters: {},
   mutations: {
@@ -41,10 +41,10 @@ export default new Vuex.Store({
         state.storeErrorText = 'Unable to process your request'
       }
     },
-    CLEAR_INPUT: (state) => state.storeErrors = {},
+    CLEAR_INPUT: (state) => state.storeErrors = {}
   },
   actions: {
-    async getAllGenres({commit}) {
+    async getAllGenres({ commit }) {
       try {
         const res = await axios.get('/api/genres')
         commit('SET_ALL_GENRES', res.data)
@@ -52,18 +52,18 @@ export default new Vuex.Store({
         console.log(e)
       }
     },
-    async getStudentGenres({commit}, params) {
+    async getStudentGenres({ commit }, params) {
       try {
         const res = await axios.get(
           '/api/student/genres',
-          {params: params},
+          { params: params }
         )
         return res.data.data
       } catch (e) {
         console.log(e)
       }
     },
-    async getStudentInstructors({commit}) {
+    async getStudentInstructors({ commit }) {
       try {
         const res = await axios.get('/api/student/instructors')
         commit('SET_STUDENT_INSTRUCTORS', res.data.data.data)
@@ -71,8 +71,8 @@ export default new Vuex.Store({
         commit('ERROR_HANDLER', e)
       }
     },
-    
-    async getAllInstructors({commit}) {
+
+    async getAllInstructors({ commit }) {
       try {
         const res = await axios.get(
           `/api/search/instructors`)
@@ -81,23 +81,23 @@ export default new Vuex.Store({
         commit('ERROR_HANDLER', e)
       }
     },
-    async getInstructors({commit}, instructorId) {
+    async getInstructors({ commit }, instructorId) {
       try {
-        const res = await axios.get(`/api/relation-instructors/${instructorId}`)
+        const res = await axios.get(`/api/relation-instructors/${ instructorId }`)
         commit('SET_INSTRUCTORS', res.data.data)
       } catch (e) {
         commit('ERROR_HANDLER', e)
       }
     },
-    async addToClientList({commit}, instructorId) {
+    async addToClientList({ commit }, instructorId) {
       try {
         await axios.post('/api/add-to-client-list',
-          {instructor_id: instructorId})
+          { instructor_id: instructorId })
       } catch (e) {
         commit('ERROR_HANDLER', e)
       }
     },
-    async createToClientList({commit}, data) { // data :
+    async createToClientList({ commit }, data) { // data :
       // {instructor_id,first_name,last_name,instagram_handle,zip,email,mobile_phone,newsletter}
       try {
         const res = await axios.post('/api/create-to-client-list', data)
@@ -106,7 +106,7 @@ export default new Vuex.Store({
         commit('ERROR_HANDLER', e)
       }
     },
-    async addStudentToInstructorList({commit}, data) { // data : { studentId, [instructorId] }
+    async addStudentToInstructorList({ commit }, data) { // data : { studentId, [instructorId] }
       try {
         await axios.post(`/api/student/instructors`, data)
       } catch (e) {
@@ -127,16 +127,23 @@ export default new Vuex.Store({
         commit('ERROR_HANDLER', e)
       }
     },
-    async getInstructorPreLessons({commit},instructorId) {
+    async getInstructorPreLessons({ commit }, instructorId) {
       try {
-        const res = await axios.get(`/api/pre-r-lesson/instructor/${instructorId}`)
+        const res = await axios.get(`/api/pre-r-lesson/instructor/${ instructorId }`)
         return res.data.data
       } catch (e) {
         commit('ERROR_HANDLER', e)
       }
     },
+    async sendInstructorRequest(context, instructor) {
+      try {
+        await axios.post('/api/become-instructor', instructor)
+      } catch (e) {
+        return e.response
+      }
+    }
   },
   modules: {
-    cart,
-  },
+    cart
+  }
 })
