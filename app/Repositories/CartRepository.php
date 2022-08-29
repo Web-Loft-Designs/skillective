@@ -337,7 +337,7 @@ class CartRepository extends BaseRepository
                 $lessonAlreadyPurchased = PurchasedLesson::where('pre_r_lesson_id',  $data['pre_r_lesson_id'])->where('student_id', Auth::user()->id)->first();
             }
 
-            if(!is_null($lessonAlreadyPurchased)) $result = Cart::create($data);
+            if(!$lessonAlreadyPurchased) $result = Cart::create($data);
 
         }
 
