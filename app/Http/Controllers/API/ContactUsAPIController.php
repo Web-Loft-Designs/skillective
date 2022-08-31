@@ -6,9 +6,7 @@ use App\Http\Requests\API\BecomeAnInstructorRequest;
 use App\Models\User;
 use App\Http\Requests\API\ContactUsAPIRequest;
 use App\Http\Controllers\AppBaseController;
-use Response;
 use App\Models\Setting;
-use Illuminate\Support\Facades\Mail;
 use App\Notifications\ContactUsNotification;
 use Notification;
 use Log;
@@ -47,7 +45,13 @@ class ContactUsAPIController extends AppBaseController
             'email' => $email,
         ]);
 
-        $user->notify(new GuestBecomeInstructor($email));
+        $administrators = $this->userRepository->getAdministrators();
+        foreach ($administrators as $administrator)
+        {
+            $administrator->notify(new GuestBecomeInstructor($email));
+        }
+
+        //$user->notify(new GuestBecomeInstructor($email));
 
         $this->sendResponse('ok');
     }
