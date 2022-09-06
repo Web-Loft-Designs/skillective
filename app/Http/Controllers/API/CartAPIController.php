@@ -206,7 +206,7 @@ class CartAPIController extends AppBaseController
             $promo = PromoCode::where('name', '=', $promo)->first();
 
             if (empty($promo)) {
-               continue;
+                continue;
             }
 
             $promo_codes[$promo->id] = $promo;
