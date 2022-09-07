@@ -562,8 +562,6 @@ export default {
 
       axios.get('/api/lesson/' + info.event.id)
         .then(({data}) => {
-
-          console.log(data.data.data)
           this.$root.$emit('lessonUpdateInit', data.data.data)
         })
     },
