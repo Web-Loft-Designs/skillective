@@ -12,7 +12,11 @@
       @modalClosed='clearFormAndClosePopup'
     >
       <div class='modal-add-lesson'>
-        <form method='post' @keypress.enter.prevent @submit.prevent='onSubmit'>
+        <form
+          method='post'
+          @keypress.enter.prevent
+          @submit.prevent='onSubmit'
+        >
           <div class='row'>
             <img
               v-if='previewFileName'
@@ -21,14 +25,28 @@
               class='video-lesson__image'
               src='/images/upload-image.svg'
             />
-            <h2 v-if='!fields.id' class='login-box-msg col-12'>
+            <h2
+              v-if='!fields.id'
+              class='login-box-msg col-12'
+            >
               Add Lesson Time
             </h2>
-            <h2 v-else class='login-box-msg col-12'>Edit Lesson</h2>
+            <h2
+              v-else
+              class='login-box-msg col-12'
+            >
+              Edit Lesson
+            </h2>
 
-            <div v-if='fields.id' class='form-group col-12'>
+            <div
+              v-if='fields.id'
+              class='form-group col-12'
+            >
               <label>Share link</label>
-              <copy-input :value='shareLink' readonly/>
+              <copy-input
+                :value='shareLink'
+                readonly
+              />
             </div>
 
             <div
@@ -36,7 +54,11 @@
               class='col-12 form-group has-feedback'
             >
               <label>Genre</label>
-              <select v-model='fields.genre' class='form-control' name='genre'>
+              <select
+                v-model='fields.genre'
+                class='form-control'
+                name='genre'
+              >
                 <option value></option>
                 <option
                   v-for='(genre, key) in formGenres'
@@ -46,7 +68,10 @@
                   {{ genre.title }}
                 </option>
               </select>
-              <span v-if='errors.genre' class='help-block'>
+              <span
+                v-if='errors.genre'
+                class='help-block'
+              >
                 <strong>{{ errors.genre[0] }}</strong>
               </span>
             </div>
@@ -64,7 +89,7 @@
                   accept='image/png, image/jpeg'
                   name='upload-preview-input'
                   type='file'
-                  @change='previewFileChanged($event)'
+                  @change='previewFileChanged'
                 />
                 <label for='upload-preview-input'>Upload a file</label>
                 <div class='add-lesson-popup__upload-image'>
@@ -82,12 +107,24 @@
                   v-if='previewFileName'
                   class='add-lesson-popup__upload-actions'
                 >
-                  <button title='Reupload file' @click.prevent='reuploadPreviewFile()'>
-                    <img alt='Reupload file' src='/images/upload-cloud-outline.svg'/>
+                  <button
+                    title='Reupload file'
+                    @click.prevent='reuploadPreviewFile()'
+                  >
+                    <img
+                      alt='Reupload file'
+                      src='/images/upload-cloud-outline.svg'
+                    />
                     Reupload file
                   </button>
-                  <button title='Remove file' @click.prevent='clearPreviewFile()'>
-                    <img alt='Remove file' src='/images/upload-trash.svg'/>
+                  <button
+                    title='Remove file'
+                    @click.prevent='clearPreviewFile()'
+                  >
+                    <img
+                      alt='Remove file'
+                      src='/images/upload-trash.svg'
+                    />
                     Remove file
                   </button>
                 </div>
@@ -100,7 +137,10 @@
               class='form-group col-4 has-feedback'
             >
               <label>Type of Lesson</label>
-              <select v-model='fields.lesson_type' class='form-control'>
+              <select
+                v-model='fields.lesson_type'
+                class='form-control'
+              >
                 <option
                   v-for='(lessonTypeTitle, lessonTypeName) in lessonTypes'
                   :key='lessonTypeName'
@@ -109,7 +149,10 @@
                   {{ lessonTypeTitle }}
                 </option>
               </select>
-              <span v-if='errors.lesson_type' class='help-block'>
+              <span
+                v-if='errors.lesson_type'
+                class='help-block'
+              >
                 <strong>{{ errors.lesson_type[0] }}</strong>
               </span>
             </div>
@@ -127,7 +170,10 @@
                 type='text'
                 value
               />
-              <span v-if='errors.location' class='help-block'>
+              <span
+                v-if='errors.location'
+                class='help-block'
+              >
                 <strong>{{ errors.location[0] }}</strong>
               </span>
             </div>
@@ -137,8 +183,16 @@
               class='col-12 form-group has-feedback'
             >
               <label>Time Zone</label>
-              <select v-model='fields.timezone_id' class='form-control'>
-                <option disabled value>Select...</option>
+              <select
+                v-model='fields.timezone_id'
+                class='form-control'
+              >
+                <option
+                  disabled
+                  value
+                >
+                  Select...
+                </option>
                 <option
                   v-for='(value, key) in timeZoneOptions'
                   :key='key'
@@ -147,7 +201,10 @@
                   {{ value }}
                 </option>
               </select>
-              <span v-if='errors.timezone_id' class='help-block'>
+              <span
+                v-if='errors.timezone_id'
+                class='help-block'
+              >
                 <strong>{{ errors.timezone_id[0] }}</strong>
               </span>
             </div>
@@ -169,7 +226,10 @@
                 submit-format='yyyy-mm-dd'
               ></dropdown-datepicker>
 
-              <span v-if='errors.date' class='help-block'>
+              <span
+                v-if='errors.date'
+                class='help-block'
+              >
                 <strong>{{ errors.date[0] }}</strong>
               </span>
             </div>
@@ -192,7 +252,10 @@
                 @change='timeFormChange'
                 @open="clearTimepicker('timeFrom')"
               ></vue-timepicker>
-              <span v-if='errors.time_from' class='help-block'>
+              <span
+                v-if='errors.time_from'
+                class='help-block'
+              >
                 <strong>{{ errors.time_from[0] }}</strong>
               </span>
             </div>
@@ -215,7 +278,10 @@
                 @open="clearTimepicker('timeTo')"
               ></vue-timepicker>
 
-              <span v-if='errors.time_to' class='help-block'>
+              <span
+                v-if='errors.time_to'
+                class='help-block'
+              >
                 <strong>{{ errors.time_to[0] }}</strong>
               </span>
             </div>
@@ -225,6 +291,7 @@
               class='col-lg-6 col-sm-6 col-12 form-group has-feedback'
             >
               <toggle-button
+                v-model='isTimeIntervals'
                 :color="{
                   checked: '#a94442',
                   unchecked: '#01bd00',
@@ -236,10 +303,72 @@
                   unchecked: 'Enable time intervals',
                 }"
                 :sync='true'
-                :value='isTimeIntervals'
                 :width='186'
-                @change='toggleTimeIntervals'
               />
+            </div>
+
+            <div
+              v-if='!fields.id'
+              class='col-lg-6 col-sm-6 col-12 form-group has-feedback'
+            >
+              <toggle-button
+                v-model='isRecurring'
+                :color="{
+                  checked: '#a94442',
+                  unchecked: '#01bd00',
+                }"
+                :font-size='14'
+                :height='38'
+                :labels="{
+                  checked: 'Disable recurring',
+                  unchecked: 'Enable recurring',
+                }"
+                :width='166'
+              />
+            </div>
+
+            <div
+              v-if='isRecurring && !fields.id'
+              class='col-lg-6 col-sm-6 col-12 form-group has-feedback'
+            >
+              <label> Recurrence frequencies: </label>
+              <select
+                v-model='fields.recurrence_frequencies'
+                class='form-control'
+              >
+                <option value='0'>Disable recurring</option>
+                <option value='day'>Daily</option>
+                <option value='week'>Weekly</option>
+                <option value='week2'>Every 2 Weeks</option>
+                <option value='month'>Monthly</option>
+              </select>
+              <span
+                v-if='errors.recurrence_frequencies'
+                class='help-block'
+              >
+                <strong>{{ errors.recurrence_frequencies[0] }}</strong>
+              </span>
+            </div>
+            <div
+              v-if='isRecurring && !fields.id'
+              class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
+            >
+              <label> Recurrence until </label>
+              <dropdown-datepicker
+                v-if='isDateInputInit'
+                ref='recurrenceUntil'
+                v-model='fields.recurrence_until'
+                :minYear='2022'
+                display-format='mdy'
+                maxDate='2030-01-01'
+                submit-format='yyyy-mm-dd'
+              ></dropdown-datepicker>
+              <span
+                v-if='errors.recurrence_until'
+                class='help-block'
+              >
+                <strong>{{ errors.recurrence_until[0] }}</strong>
+              </span>
             </div>
 
             <div class='time-intervals-dropdowns'>
@@ -254,7 +383,10 @@
                 '
               >
                 <label>Time Intervals</label>
-                <select v-model='fields.time_interval' class='form-control'>
+                <select
+                  v-model='fields.time_interval'
+                  class='form-control'
+                >
                   <option value='0'>No intervals</option>
                   <option value='30'>30 min</option>
                   <option value='60'>1 hour</option>
@@ -263,7 +395,10 @@
                   <option value='180'>3 hours</option>
                   <option value='240'>4 hours</option>
                 </select>
-                <span v-if='errors.time_interval' class='help-block'>
+                <span
+                  v-if='errors.time_interval'
+                  class='help-block'
+                >
                   <strong>{{ errors.time_interval[0] }}</strong>
                 </span>
               </div>
@@ -279,14 +414,20 @@
                 '
               >
                 <label>Interval Breaks</label>
-                <select v-model='fields.interval_break' class='form-control'>
+                <select
+                  v-model='fields.interval_break'
+                  class='form-control'
+                >
                   <option value='0'>No breaks</option>
                   <option value='15'>15 min</option>
                   <option value='30'>30 min</option>
                   <option value='45'>45 min</option>
                   <option value='60'>1 hour</option>
                 </select>
-                <span v-if='errors.interval_break' class='help-block'>
+                <span
+                  v-if='errors.interval_break'
+                  class='help-block'
+                >
                   <strong>{{ errors.interval_break[0] }}</strong>
                 </span>
               </div>
@@ -303,7 +444,10 @@
                   disabled
                   type='number'
                 />
-                <span v-if='numError' class='help-block'>
+                <span
+                  v-if='numError'
+                  class='help-block'
+                >
                   <strong>{{ numError }}</strong>
                 </span>
               </div>
@@ -331,7 +475,10 @@
                 <span class='per-lesson'>Per lesson</span>
               </div>
 
-              <span v-if='errors.spot_price' class='maw-200 help-block'>
+              <span
+                v-if='errors.spot_price'
+                class='maw-200 help-block'
+              >
                 <strong>{{ errors.spot_price[0] }}</strong>
               </span>
             </div>
@@ -342,10 +489,16 @@
             >
               <span class='private-lesson'>
                 <span v-if='fields.spots_count === 1'>
-                  <img alt src='/images/man-user.svg'/>
+                  <img
+                    alt
+                    src='/images/man-user.svg'
+                  />
                 </span>
                 <span v-if='fields.spots_count > 1'>
-                  <img alt src='/images/multiple-users-silhouette.svg'/>
+                  <img
+                    alt
+                    src='/images/multiple-users-silhouette.svg'
+                  />
                 </span>
               </span>
               <label>Max students</label>
@@ -357,7 +510,10 @@
                 type='number'
                 @input='replaceInput'
               />
-              <span v-if='errors.spots_count' class='help-block'>
+              <span
+                v-if='errors.spots_count'
+                class='help-block'
+              >
                 <strong>{{ errors.spots_count[0] }}</strong>
               </span>
             </div>
@@ -367,8 +523,15 @@
               class='form-group col-12 has-feedback'
             >
               <label>What I am teaching, offering or sharing:</label>
-              <text-editor v-model='fields.description' name='description' placeholder='provide a description'/>
-              <span v-if='errors.description' class='help-block'>
+              <text-editor
+                v-model='fields.description'
+                name='description'
+                placeholder='provide a description'
+              />
+              <span
+                v-if='errors.description'
+                class='help-block'
+              >
                 <strong>{{ errors.description[0] }}</strong>
               </span>
             </div>
@@ -380,10 +543,16 @@
               </span>
             </div>
             <div class='col-12'>
-              <div v-if='errorText' class='has-error'>
+              <div
+                v-if='errorText'
+                class='has-error'
+              >
                 {{ errorText }}
               </div>
-              <div v-if='successText' class='has-success'>
+              <div
+                v-if='successText'
+                class='has-success'
+              >
                 {{ successText }}
               </div>
             </div>
@@ -435,7 +604,7 @@ import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
 import CopyInput from './discounts/CopyInput/CopyInput'
 import shareHelper from '../helpers/shareHelper'
 import TextEditor from './profile/TextEditor/TextEditor'
-import {mapState} from 'vuex'
+import { mapState } from 'vuex'
 import UploadProgressBar from './instructor/UploadProgressBar/UploadProgressBar'
 import FieldErrors from './instructor/FieldErrors/FieldErrors'
 import instructorService from '../services/instructorService'
@@ -457,10 +626,13 @@ export default {
   props: ['lesson', 'userGenres', 'siteGenres', 'selectRange', 'instructorId'],
   data() {
     return {
+      isRecurring: false,
       uploadPreviewProgress: 0,
       previewFileName: null,
       shareLink: '',
       fields: {
+        recurrence_until: null,
+        recurrence_frequencies: 0,
         preview: '',
         genre: null,
         date: '',
@@ -547,6 +719,18 @@ export default {
     }
   },
   watch: {
+    isRecurring() {
+      if (!this.isRecurring) {
+        this.fields.recurrence_until = null
+        this.fields.recurrence_frequencies = 0
+      }
+    },
+    isTimeIntervals() {
+      if (!this.isTimeIntervals) {
+        this.fields.time_interval = 0
+        this.fields.interval_break = 0
+      }
+    },
     datesFromCalendar: {
       handler() {
         if (this.datesFromCalendar.type === 'timeGridWeek') {
@@ -578,7 +762,7 @@ export default {
       deep: true
     },
     fields: {
-      handler: function(value) {
+      handler: function (value) {
         if (value.date && value.date !== value.oldValue) {
           value.date_to = value.date
         }
@@ -856,9 +1040,6 @@ export default {
         this.fields.date = moment(today)
           .format('YYYY-MM-DD')
     },
-    toggleTimeIntervals() {
-      this.isTimeIntervals = !this.isTimeIntervals
-    },
     cancelLesson(lesson) {
       this.apiDelete('/api/lesson/' + lesson)
     },
@@ -903,9 +1084,9 @@ export default {
             'HH:mm:ss'
           )
       }
-      if (this.fields.id > 0)
-        this.apiPut('/api/instructor/lesson/' + this.fields.id, this.fields)
-      else this.apiPost('/api/instructor/lesson', this.fields)
+      this.fields.id
+        ? this.apiPut('/api/instructor/lesson/' + this.fields.id, this.fields)
+        : this.apiPost('/api/instructor/lesson', this.fields)
     },
     componentHandlePostResponse(responseData) {
       this.clearFormAndClosePopup()
@@ -969,6 +1150,8 @@ export default {
       this.$refs.timeFrom.minute = ''
       this.$refs.timeFrom.apm = ''
       this.fields.lesson_type = 'in_person'
+      this.isRecurring = false
+      this.isTimeIntervals = false
       this.clearPreviewFile()
     },
     initNewPlacesAutocomplete(_ref) {
@@ -976,7 +1159,7 @@ export default {
       var autocomplete = this.initializeLocationField(this.$refs[_ref], [
         'address'
       ])
-      google.maps.event.addListener(autocomplete, 'place_changed', function() {
+      google.maps.event.addListener(autocomplete, 'place_changed', function () {
         thisComponent.fields.location = thisComponent.$refs[_ref].value
       })
     }
