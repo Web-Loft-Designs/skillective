@@ -56,19 +56,19 @@
 				this.apiPost('/api/invite-instructor', this.fields);
 			},
 			componentHandlePostResponse(responseData) {
-				this.updateCountNotifications();
+				this.updateCountNotifications(responseData);
 				this.clearSubmittedForm();
 				this.formSubmitted = true;
 				setTimeout(() => {
 					this.formSubmitted = false;
 				},1000)
 			},
-			updateCountNotifications(){
+			updateCountNotifications(responseData){
 				this.countSentInvites++;
 				var _countSentContainer = $('.count-sent-instructor-invitations:first');
 				if (_countSentContainer.length==1){
 					var _countSent = parseInt(_countSentContainer.text());
-					$('.count-sent-instructor-invitations').text( _countSent + 1 );
+					$('.count-sent-instructor-invitations').text( responseData.data );
 				}
 
 				var _countAvailableContainer = $('.count-available-instructor-invitations:first')
