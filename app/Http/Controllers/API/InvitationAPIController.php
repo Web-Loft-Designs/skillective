@@ -107,7 +107,8 @@ class InvitationAPIController extends AppBaseController
 			return $this->sendError('Message hasn\'t been sent', 400 );
 		}
 
-        return $this->sendResponse(true, $successMessage);
+        $count = intval(Auth::user()->getMaxAllowedInstructorInvites() - Auth::user()->instructorInvitations()->count());
+        return $this->sendResponse($count, $successMessage);
     }
 
 	public function inviteStudent(InviteStudentAPIRequest $request)
