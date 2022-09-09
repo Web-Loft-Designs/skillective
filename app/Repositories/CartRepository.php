@@ -319,25 +319,50 @@ class CartRepository extends BaseRepository
         foreach ( $guestCart as $item )
         {
 
-            $data = [];
-
-            $data['student_id'] = Auth::user()->id;
-            $data['lesson_id'] = (isset($item->isPreRecorded) && $item->isPreRecorded) ? null : $item->lesson_id;
-            $data['pre_r_lesson_id'] = (isset($item->isPreRecorded) && $item->isPreRecorded) ? $item->lesson_id : null;
-
-            $lesson = Lesson::where('id',  $item->lesson_id)->first();
-
-            $data['instructor_id'] = $lesson->instructor_id;
-            $data['description'] = isset($item->description) ? $item->description : '';
-            $data['is_guest'] = 1;
-
-            $lessonAlreadyPurchased = null;
-            if($data['pre_r_lesson_id'])
+            $check = true;
+            if( isset($item->isPreRecorded) && $item->isPreRecorded )
             {
-                $lessonAlreadyPurchased = PurchasedLesson::where('pre_r_lesson_id',  $data['pre_r_lesson_id'])->where('student_id', Auth::user()->id)->first();
+
+                $less = Cart::where('student_id', Auth::user()->id)
+                    ->where('pre_r_lesson_id', $item->lesson_id)
+                    ->first();
+
+                if( $less ) $check = false;
+
+            }else{
+
+                $less = Cart::where('student_id', Auth::user()->id)
+                    ->where('lesson_id', $item->lesson_id)
+                    ->first();
+
+                if( $less ) $check = false;
+
             }
 
-            if(!$lessonAlreadyPurchased) $result = Cart::create($data);
+            if( $check )
+            {
+
+                $data = [];
+
+                $data['student_id'] = Auth::user()->id;
+                $data['lesson_id'] = (isset($item->isPreRecorded) && $item->isPreRecorded) ? null : $item->lesson_id;
+                $data['pre_r_lesson_id'] = (isset($item->isPreRecorded) && $item->isPreRecorded) ? $item->lesson_id : null;
+
+                $lesson = Lesson::where('id',  $item->lesson_id)->first();
+
+                $data['instructor_id'] = $lesson->instructor_id;
+                $data['description'] = isset($item->description) ? $item->description : '';
+                $data['is_guest'] = 1;
+
+                $lessonAlreadyPurchased = null;
+                if($data['pre_r_lesson_id'])
+                {
+                    $lessonAlreadyPurchased = PurchasedLesson::where('pre_r_lesson_id',  $data['pre_r_lesson_id'])->where('student_id', Auth::user()->id)->first();
+                }
+
+                if(!$lessonAlreadyPurchased) $result = Cart::create($data);
+
+            }
 
         }
 
