@@ -1,38 +1,38 @@
 <template>
-  <div class="dashboard-booking-item">
-    <div class="dashboard-bookings-item--header">
-      <span class="genre"> {{ genre.title }}</span>
-      <div class="dashboard-bookings-item--header-right">
-        <span class="price"> ${{ bookings_summ }} </span>
+  <div class='dashboard-booking-item'>
+    <div class='dashboard-bookings-item--header'>
+      <span class='genre'> {{ genre.title }}</span>
+      <div class='dashboard-bookings-item--header-right'>
+        <span class='price'> ${{ bookings_summ }} </span>
         <span
-          @click="toggleOppened"
+          @click='toggleOppened'
           :class="{ 'dropdown-icon': true, 'dropdown-icon--active': isOpened }"
         >
-          <img src="/images/b-drop-icon.png" alt="" />
+          <img src='/images/b-drop-icon.png' alt=''/>
         </span>
       </div>
     </div>
-    <div class="dashboard-bookings-item--content">
-      <div class="dashboard-bookings-item--content-top">
-        <div class="left-side">
+    <div class='dashboard-bookings-item--content'>
+      <div class='dashboard-bookings-item--content-top'>
+        <div class='left-side'>
           <ul>
-            <li class="b-radial">
-              <div class="b-students-count">
+            <li class='b-radial'>
+              <div class='b-students-count'>
                 <div
-                  v-if="count_booked == spots_count"
-                  class="progress-success"
+                  v-if='count_booked == spots_count'
+                  class='progress-success'
                 >
-                  <img src="/images/b-check-icon.png" alt="" />
+                  <img src='/images/b-check-icon.png' alt=''/>
                 </div>
                 <radial-progress-bar
-                  :diameter="24"
-                  :completed-steps="count_booked"
-                  :total-steps="spots_count"
-                  startColor="#8ADA00"
-                  stopColor="#8ADA00"
-                  innerStrokeColor="#F4F4F6"
-                  :strokeWidth="4"
-                  :innerStrokeWidth="4"
+                  :diameter='24'
+                  :completed-steps='count_booked'
+                  :total-steps='spots_count'
+                  startColor='#8ADA00'
+                  stopColor='#8ADA00'
+                  innerStrokeColor='#F4F4F6'
+                  :strokeWidth='4'
+                  :innerStrokeWidth='4'
                   v-else
                 >
                 </radial-progress-bar>
@@ -41,19 +41,19 @@
                 </span>
               </div>
 
-              <span v-if="new_bookings_count > 0" class="new-bookings-alert">
+              <span v-if='new_bookings_count > 0' class='new-bookings-alert'>
                 {{ new_bookings_count }} New Bookings
               </span>
 
               <span
-                v-if="cancelationBookings.length > 0"
-                class="cancel-bookings-alert"
+                v-if='cancelationBookings.length > 0'
+                class='cancel-bookings-alert'
               >
                 {{ cancelationBookings.length }} Cancellation Requests
               </span>
             </li>
             <li v-if="lesson_type === 'virtual'">
-              <img src="/images/b-virtual-icon.png" alt="" /> Virtual Lesson
+              <img src='/images/b-virtual-icon.png' alt=''/> Virtual Lesson
             </li>
             <li
               v-if="
@@ -61,18 +61,18 @@
                 lesson_type === 'in_person_client'
               "
             >
-              <img src="/images/b-person-icon.png" alt="" />
-              <span v-html="formatedLocation" />
+              <img src='/images/b-person-icon.png' alt=''/>
+              <span v-html='formatedLocation'/>
             </li>
             <li>
-              <img src="/images/b-time-icon.png" alt="" /> {{ lessonStart }} -
+              <img src='/images/b-time-icon.png' alt=''/> {{ lessonStart }} -
               {{ lessonEnd }}, ${{ spot_price }}/client
             </li>
           </ul>
         </div>
-        <div class="right-side">
-          <span class="price price--mobile"> ${{ bookings_summ }} </span>
-          <div class="cd--control-outer">
+        <div class='right-side'>
+          <span class='price price--mobile'> ${{ bookings_summ }} </span>
+          <div class='cd--control-outer'>
             <dashboard-booking-item-countdown
               v-if="
                 listLoaded == true &&
@@ -81,26 +81,26 @@
                 !isPastLesson(end) &&
                 bookings.length > 0
               "
-              :lesson="lesson"
+              :lesson='lesson'
             >
             </dashboard-booking-item-countdown>
           </div>
-          <div v-if="showOnly != 'past'" class="more-wrap">
-            <button @click="toggleDropdown" class="more">
-              <img src="/images/b-dots-icon.png" alt="" />
+          <div v-if="showOnly != 'past'" class='more-wrap'>
+            <button @click='toggleDropdown' class='more'>
+              <img src='/images/b-dots-icon.png' alt=''/>
             </button>
-            <div v-if="isDropdownOpened" class="more-dropdown">
+            <div v-if='isDropdownOpened' class='more-dropdown'>
               <ul>
-                <li v-if="count_booked < 2" @click="editLesson(lesson)">
+                <li v-if='count_booked < 2' @click='editLesson(lesson)'>
                   Edit
                 </li>
-                <li @click="deleteLesson">Delete</li>
+                <li @click='deleteLesson'>Delete</li>
               </ul>
             </div>
           </div>
         </div>
 
-        <div class="cd--control-outer cd--control-outer--mobile">
+        <div class='cd--control-outer cd--control-outer--mobile'>
           <dashboard-booking-item-countdown
             v-if="
               listLoaded == true &&
@@ -109,13 +109,13 @@
               !isPastLesson(end) &&
               bookings.length > 0
             "
-            :lesson="lesson"
+            :lesson='lesson'
           >
           </dashboard-booking-item-countdown>
         </div>
       </div>
-      <div v-if="isOpened" class="dashboard-bookings-item--content-bottom">
-        <div v-if="showOnly !== 'past'" class="tabs-inner">
+      <div v-if='isOpened' class='dashboard-bookings-item--content-bottom'>
+        <div v-if="showOnly !== 'past'" class='tabs-inner'>
           <ul>
             <!--            <li-->
             <!--	            @click="selectTab('new')"-->
@@ -131,86 +131,86 @@
             </li>
           </ul>
 
-          <div class="tab-inner" v-if="active === 'new'">
-            <div class="pending-bookings">
+          <div class='tab-inner' v-if="active === 'new'">
+            <div class='pending-bookings'>
               <table>
                 <thead>
-                  <tr>
-                    <th>Photo</th>
-                    <th>Student</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th></th>
-                  </tr>
+                <tr>
+                  <th>Photo</th>
+                  <th>Student</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th></th>
+                </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(booking, index) in newBookings" :key="index">
-                    <td class="width-fix-avatar">
-                      <img :src="booking.student.profile.image" />
-                    </td>
-                    <td class="width-fix-fullname">
-                      {{ booking.student.full_name }}
-                    </td>
-                    <td class="width-fix">
-                      <div class="width-fix-content">
-                        {{ booking.student.email }}
-                      </div>
-                    </td>
-                    <td class="width-fix">
-                      <div class="width-fix-content">
-                        {{ booking.student.profile.mobile_phone }}
-                      </div>
-                    </td>
-                    <td v-if="listLoaded == true">
-                      <a
-                        href="#"
-                        @click.prevent="cancelBooking(booking)"
-                        class="btn-cancel"
-                        v-if="
+                <tr v-for='(booking, index) in newBookings' :key='index'>
+                  <td class='width-fix-avatar'>
+                    <img :src='booking.student.profile.image'/>
+                  </td>
+                  <td class='width-fix-fullname'>
+                    {{ booking.student.full_name }}
+                  </td>
+                  <td class='width-fix'>
+                    <div class='width-fix-content'>
+                      {{ booking.student.email }}
+                    </div>
+                  </td>
+                  <td class='width-fix'>
+                    <div class='width-fix-content'>
+                      {{ booking.student.profile.mobile_phone }}
+                    </div>
+                  </td>
+                  <td v-if='listLoaded == true'>
+                    <a
+                      href='#'
+                      @click.prevent='cancelBooking(booking)'
+                      class='btn-cancel'
+                      v-if="
                           booking.status != 'cancelled' && !isPastLesson(start)
                         "
-                        >Cancel</a
-                      >
-                    </td>
-                  </tr>
+                    >Cancel</a
+                    >
+                  </td>
+                </tr>
                 </tbody>
               </table>
 
-              <div class="pending-bookings--mobile">
+              <div class='pending-bookings--mobile'>
                 <div
-                  class="mobile--user-b-item"
-                  v-for="(booking, index) in newBookings"
-                  :key="index"
+                  class='mobile--user-b-item'
+                  v-for='(booking, index) in newBookings'
+                  :key='index'
                 >
-                  <div class="user-left">
-                    <img :src="booking.student.profile.image" />
+                  <div class='user-left'>
+                    <img :src='booking.student.profile.image'/>
                   </div>
-                  <div class="user-right">
+                  <div class='user-right'>
                     <ul>
                       <li>
-                        <span class="k"> Student </span>
-                        <span class="v"> {{ booking.student.full_name }} </span>
+                        <span class='k'> Student </span>
+                        <span class='v'> {{ booking.student.full_name }} </span>
                       </li>
                       <li>
-                        <span class="k"> Email </span>
-                        <span class="v"> {{ booking.student.email }} </span>
+                        <span class='k'> Email </span>
+                        <span class='v'> {{ booking.student.email }} </span>
                       </li>
                       <li>
-                        <span class="k"> Phone </span>
-                        <span class="v">
+                        <span class='k'> Phone </span>
+                        <span class='v'>
                           {{ booking.student.profile.mobile_phone }}
                         </span>
                       </li>
                     </ul>
-                    <div class="user-b-bottom">
+                    <div class='user-b-bottom'>
                       <a
-                        href="#"
-                        @click.prevent="cancelBooking(booking)"
-                        class="btn-cancel"
+                        href='#'
+                        @click.prevent='cancelBooking(booking)'
+                        class='btn-cancel'
                         v-if="
                           booking.status != 'cancelled' && !isPastLesson(start)
                         "
-                        >Cancel</a
+                      >Cancel</a
                       >
                     </div>
                   </div>
@@ -219,84 +219,84 @@
             </div>
           </div>
 
-          <div class="tab-inner" v-if="active === 'cancellation'">
-            <div class="pending-bookings">
+          <div class='tab-inner' v-if="active === 'cancellation'">
+            <div class='pending-bookings'>
               <table>
                 <thead>
-                  <tr>
-                    <th>Photo</th>
-                    <th>Student</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th></th>
-                  </tr>
+                <tr>
+                  <th>Photo</th>
+                  <th>Student</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th></th>
+                </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="(booking, index) in cancelationBookings"
-                    :key="index"
-                  >
-                    <td><img :src="booking.student.profile.image" /></td>
-                    <td>{{ booking.student.full_name }}</td>
-                    <td class="width-fix">
-                      <div class="width-fix-content">
-                        {{ booking.student.email }}
-                      </div>
-                    </td>
-                    <td class="width-fix">
-                      <div class="width-fix-content">
-                        {{ booking.student.profile.mobile_phone }}
-                      </div>
-                    </td>
-                    <td v-if="listLoaded == true">
-                      <a
-                        href="#"
-                        @click.prevent="cancelBooking(booking)"
-                        class="btn-cancel"
-                        v-if="
+                <tr
+                  v-for='(booking, index) in cancelationBookings'
+                  :key='index'
+                >
+                  <td><img :src='booking.student.profile.image'/></td>
+                  <td>{{ booking.student.full_name }}</td>
+                  <td class='width-fix'>
+                    <div class='width-fix-content'>
+                      {{ booking.student.email }}
+                    </div>
+                  </td>
+                  <td class='width-fix'>
+                    <div class='width-fix-content'>
+                      {{ booking.student.profile.mobile_phone }}
+                    </div>
+                  </td>
+                  <td v-if='listLoaded == true'>
+                    <a
+                      href='#'
+                      @click.prevent='cancelBooking(booking)'
+                      class='btn-cancel'
+                      v-if="
                           booking.status != 'cancelled' && !isPastLesson(start)
                         "
-                        >Cancel</a
-                      >
-                    </td>
-                  </tr>
+                    >Cancel</a
+                    >
+                  </td>
+                </tr>
                 </tbody>
               </table>
-              <div class="pending-bookings--mobile">
+              <div class='pending-bookings--mobile'>
                 <div
-                  class="mobile--user-b-item"
-                  v-for="(booking, index) in cancelationBookings"
-                  :key="index"
+                  class='mobile--user-b-item'
+                  v-for='(booking, index) in cancelationBookings'
+                  :key='index'
                 >
-                  <div class="user-left">
-                    <img :src="booking.student.profile.image" />
+                  <div class='user-left'>
+                    <img :src='booking.student.profile.image'/>
                   </div>
-                  <div class="user-right">
+                  <div class='user-right'>
                     <ul>
                       <li>
-                        <span class="k"> Student </span>
-                        <span class="v"> {{ booking.student.full_name }} </span>
+                        <span class='k'> Student </span>
+                        <span class='v'> {{ booking.student.full_name }} </span>
                       </li>
                       <li>
-                        <span class="k"> Email </span>
-                        <span class="v"> {{ booking.student.email }} </span>
+                        <span class='k'> Email </span>
+                        <span class='v'> {{ booking.student.email }} </span>
                       </li>
                       <li>
-                        <span class="k"> Phone </span>
-                        <span class="v">
+                        <span class='k'> Phone </span>
+                        <span class='v'>
                           {{ booking.student.profile.mobile_phone }}
                         </span>
                       </li>
                     </ul>
-                    <div class="user-b-bottom">
+                    <div class='user-b-bottom'>
                       <a
-                        href="#"
-                        @click.prevent="cancelBooking(booking)"
-                        class="btn-cancel"
+                        href='#'
+                        @click.prevent='cancelBooking(booking)'
+                        class='btn-cancel'
                         v-if="
                           booking.status != 'cancelled' && !isPastLesson(start)
                         "
-                        >Cancel</a
+                      >Cancel</a
                       >
                     </div>
                   </div>
@@ -306,108 +306,108 @@
           </div>
         </div>
 
-        <div class="aprooved-bookings">
+        <div class='aprooved-bookings'>
           <h3>
             Bookings ({{ approvedBookings.length }})
             <button
               v-if="showOnly !== 'past' && bookings_students.length > 0"
-              @click="notifyAll"
+              @click='notifyAll'
             >
               Notify clients
             </button>
           </h3>
           <table>
             <thead>
-              <tr>
-                <th class="b-th-image">Photo</th>
-                <th class="b-th-name">Student</th>
-                <th class="b-th-email">Email</th>
-                <th class="b-th-phone">Phone</th>
-                <th></th>
-              </tr>
+            <tr>
+              <th class='b-th-image'>Photo</th>
+              <th class='b-th-name'>Student</th>
+              <th class='b-th-email'>Email</th>
+              <th class='b-th-phone'>Phone</th>
+              <th></th>
+            </tr>
             </thead>
             <tbody>
-              <tr v-for="(booking, index) in approvedBookings" :key="index">
-                <td class="width-fix">
-                  <div class="width-fix-content">
-                    <img :src="booking.student.profile.image" />
-                  </div>
-                </td>
-                <td class="width-fix-fullname">
-                  {{ booking.student.full_name }}
-                </td>
-                <td class="width-fix">
-                  <div class="width-fix-content">
-                    {{ booking.student.email }}
-                  </div>
-                </td>
-                <td class="width-fix">
-                  <div class="width-fix-content">
-                    {{ booking.student.profile.mobile_phone }}
-                  </div>
-                </td>
-                <td>
-                  <a
-                    class="btn-notify"
-                    @click="notifyClient(booking.student.profile)"
-                    v-if="!isPastLesson(lesson.start)"
-                    >Notify</a
-                  >
-                  <span
-                    class="btn btn-cancel"
-                    @click="cancelBooking(booking)"
-                    v-if="
+            <tr v-for='(booking, index) in approvedBookings' :key='index'>
+              <td class='width-fix'>
+                <div class='width-fix-content'>
+                  <img :src='booking.student.profile.image'/>
+                </div>
+              </td>
+              <td class='width-fix-fullname'>
+                {{ booking.student.full_name }}
+              </td>
+              <td class='width-fix'>
+                <div class='width-fix-content'>
+                  {{ booking.student.email }}
+                </div>
+              </td>
+              <td class='width-fix'>
+                <div class='width-fix-content'>
+                  {{ booking.student.profile.mobile_phone }}
+                </div>
+              </td>
+              <td>
+                <a
+                  class='btn-notify'
+                  @click='notifyClient(booking.student.profile)'
+                  v-if='!isPastLesson(lesson.start)'
+                >Notify</a
+                >
+                <span
+                  class='btn btn-cancel'
+                  @click='cancelBooking(booking)'
+                  v-if="
                       booking.status != 'cancelled' &&
                       !isPastLesson(lesson.start)
                     "
-                    >Cancel</span
-                  >
-                </td>
-              </tr>
+                >Cancel</span
+                >
+              </td>
+            </tr>
             </tbody>
           </table>
 
-          <div class="pending-bookings--mobile">
+          <div class='pending-bookings--mobile'>
             <div
-              class="mobile--user-b-item"
-              v-for="(booking, index) in approvedBookings"
-              :key="index"
+              class='mobile--user-b-item'
+              v-for='(booking, index) in approvedBookings'
+              :key='index'
             >
-              <div class="user-left">
-                <img :src="booking.student.profile.image" />
+              <div class='user-left'>
+                <img :src='booking.student.profile.image'/>
               </div>
-              <div class="user-right">
+              <div class='user-right'>
                 <ul>
                   <li>
-                    <span class="k"> Student </span>
-                    <span class="v"> {{ booking.student.full_name }} </span>
+                    <span class='k'> Student </span>
+                    <span class='v'> {{ booking.student.full_name }} </span>
                   </li>
                   <li>
-                    <span class="k"> Email </span>
-                    <span class="v"> {{ booking.student.email }} </span>
+                    <span class='k'> Email </span>
+                    <span class='v'> {{ booking.student.email }} </span>
                   </li>
                   <li>
-                    <span class="k"> Phone </span>
-                    <span class="v">
+                    <span class='k'> Phone </span>
+                    <span class='v'>
                       {{ booking.student.profile.mobile_phone }}
                     </span>
                   </li>
                 </ul>
-                <div class="user-b-bottom">
+                <div class='user-b-bottom'>
                   <a
-                    class="btn-notify"
-                    @click="notifyClient(booking.student.profile)"
-                    v-if="!isPastLesson(lesson.start)"
-                    >Notify</a
+                    class='btn-notify'
+                    @click='notifyClient(booking.student.profile)'
+                    v-if='!isPastLesson(lesson.start)'
+                  >Notify</a
                   >
                   <span
-                    class="btn btn-cancel"
-                    @click="cancelBooking(booking)"
+                    class='btn btn-cancel'
+                    @click='cancelBooking(booking)'
                     v-if="
                       booking.status != 'cancelled' &&
                       !isPastLesson(lesson.start)
                     "
-                    >Cancel</span
+                  >Cancel</span
                   >
                 </div>
               </div>
@@ -433,15 +433,15 @@ export default {
     approveBooking: null,
     cancelBooking: null,
     getBookings: null,
-    showOnly: String,
+    showOnly: String
   },
   components: {
-    RadialProgressBar,
+    RadialProgressBar
   },
   data() {
     return {
       genre: {
-        title: '',
+        title: ''
       },
       spots_count: 0,
       spot_price: '',
@@ -451,7 +451,7 @@ export default {
       start: '',
       isOpened: false,
       active: 'new',
-      isDropdownOpened: false,
+      isDropdownOpened: false
     }
   },
   methods: {
@@ -463,7 +463,7 @@ export default {
         start.getTime() -
         new Date(
           nowDate.toLocaleString('en-us', {
-            timeZone: this.lesson.timezone_id_name,
+            timeZone: this.lesson.timezone_id_name
           })
         ).getTime()
       if (diff < 0) return true
@@ -497,7 +497,7 @@ export default {
     },
     notifyAll() {
       this.$root.$emit('initNotificationsForm', this.bookings_students)
-    },
+    }
   },
   computed: {
     formatedLocation: function () {
@@ -629,7 +629,7 @@ export default {
       return moment(this.lesson.end_prepared ?? this.lesson.end).format(
         'MMMM DD h:mm A'
       )
-    },
+    }
   },
   watch: {
     lesson: function () {
@@ -642,7 +642,7 @@ export default {
 
       this.start = this.lesson.start
       this.end = this.lesson.end
-    },
+    }
   },
   mounted() {
     this.genre = this.lesson.genre
@@ -654,6 +654,6 @@ export default {
 
     this.start = this.lesson.start
     this.end = this.lesson.end
-  },
+  }
 }
 </script>
