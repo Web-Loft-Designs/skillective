@@ -952,7 +952,7 @@ export default {
     setTimeout(function () {
       window.jQuery('.mask-input').mask('99/99/9999')
     }, 200)
-    this.paymentMethods = this.userPaymentMethodsФ
+    this.paymentMethods = this.userPaymentMethods
   },
 }
 </script>
