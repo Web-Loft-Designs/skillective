@@ -73,6 +73,10 @@ class CartRepository extends BaseRepository
 
             $cart = $cart->merge($preRCart);
 
+            if($product_list){
+                $cart = $cart->merge($this->addToCart($product_list));
+            }
+
             foreach ($cart as $index => $cartItem) {
                 if ($cartItem->lesson_id) {
                     if (!$cartItem->lesson || $cartItem->count_booked >= $cartItem->lesson->spots_count) {
