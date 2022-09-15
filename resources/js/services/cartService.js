@@ -2,17 +2,14 @@ import axios from "axios";
 import guestCartHelper from "../helpers/guestCartHelper";
 
 const cartService = {
-    async fetchCartItems(guestMode) {
+    async fetchCartItems() {
         const response = await axios
-            .get(
-                guestMode
-                    ? `/api/cart?guest_cart=${guestCartHelper.getProductsString()}`
-                    : "/api/cart"
-            )
-            .catch(e => {
-                console.log(e);
-            });
-        return response.data.data.data;
+          .get(
+            '/api/cart',
+            { params: { guest_cart: guestCartHelper.getProductsString() } }
+          )
+          .catch(e => console.log(e))
+        return response.data.data.data
     },
     async addItemToCartAtStart(data, guestMode) {
         if (guestMode) {
@@ -35,7 +32,7 @@ const cartService = {
         }
     },
     async removeItemFromCart(id, guestMode) {
-        if (guestMode) {
+        if (guestMode || guestCartHelper.isLessonInGuestCart(id)) {
             guestCartHelper.removeProduct(id);
         } else {
             await axios.delete("/api/cart/" + id).catch(e => {

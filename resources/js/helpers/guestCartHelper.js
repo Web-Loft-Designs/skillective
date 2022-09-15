@@ -82,6 +82,9 @@ const guestCartHelper = {
     },
     isEmpty() {
         return this.getProducts().length <= 0;
+    },
+    isLessonInGuestCart(id) {
+        return this.getProducts().some(el => el.lesson_id === id)
     }
 };
 
