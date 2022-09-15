@@ -73,9 +73,7 @@ class CartRepository extends BaseRepository
 
             $cart = $cart->merge($preRCart);
 
-            if($product_list){
-                $cart = $cart->merge($this->addToCart($product_list));
-            }
+
 
             foreach ($cart as $index => $cartItem) {
                 if ($cartItem->lesson_id) {
@@ -92,6 +90,13 @@ class CartRepository extends BaseRepository
                     $cartItem->discounts = $cartItem->preRecordedLesson->instructor->discounts;
                     $handledDiscounts = Discount::validateDiscount($cartItem->discounts, $cart);
                     $cartItem->discounts = $handledDiscounts;
+                }
+            }
+
+            if($product_list){
+                $unauthorized_cart = $this->addToCart($product_list);
+                foreach ($unauthorized_cart as $item){
+                    $cart[] = $item;
                 }
             }
 
@@ -133,7 +138,7 @@ class CartRepository extends BaseRepository
                 $join->on('lessons.id', '=', 'bookings.lesson_id')
                     ->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ");
             })
-            ->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")
+            //->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")
             ->with(["genre", 'instructor', 'instructor.discounts']);
 
         $cart = $lessons->get(["lessons.*"]);

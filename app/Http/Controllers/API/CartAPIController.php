@@ -46,6 +46,7 @@ class CartAPIController extends AppBaseController
 
         }
         Cookie::queue('guest_cart', $guest_cart, 84600);
+
         $cart = $this->cartRepository->getUserCart($student_id, $guest_cart);
 
         $this->cartRepository->setPresenter("App\\Presenters\\CartListPresenter");
