@@ -43,7 +43,7 @@ class CartRepository extends BaseRepository
                         $join->on('lessons.id', '=', 'bookings.lesson_id')
                             ->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ");
                     })
-                    ->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")
+                    //->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")
                     ->groupBy('cart.id');
 
                 return $query;
@@ -73,6 +73,8 @@ class CartRepository extends BaseRepository
 
             $cart = $cart->merge($preRCart);
 
+
+
             foreach ($cart as $index => $cartItem) {
                 if ($cartItem->lesson_id) {
                     if (!$cartItem->lesson || $cartItem->count_booked >= $cartItem->lesson->spots_count) {
@@ -88,6 +90,13 @@ class CartRepository extends BaseRepository
                     $cartItem->discounts = $cartItem->preRecordedLesson->instructor->discounts;
                     $handledDiscounts = Discount::validateDiscount($cartItem->discounts, $cart);
                     $cartItem->discounts = $handledDiscounts;
+                }
+            }
+
+            if($product_list){
+                $unauthorized_cart = $this->addToCart($product_list);
+                foreach ($unauthorized_cart as $item){
+                    $cart[] = $item;
                 }
             }
 
@@ -129,7 +138,7 @@ class CartRepository extends BaseRepository
                 $join->on('lessons.id', '=', 'bookings.lesson_id')
                     ->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ");
             })
-            ->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")
+            //->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")
             ->with(["genre", 'instructor', 'instructor.discounts']);
 
         $cart = $lessons->get(["lessons.*"]);
