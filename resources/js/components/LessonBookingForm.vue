@@ -257,7 +257,7 @@
       </div>
 
       <!-- Payment Method form -->
-      <div v-if="bookingStep != 3" class="section-payments">
+      <div v-if="bookingStep === 2" class="section-payments">
         <div class="payment-information">
           <h3 class="custom-padding">
             Please Submit Payment to Reserve your spot
@@ -280,7 +280,7 @@
             </label>
           </div>
         </div>
-        <div v-if="bookingStep == 2">
+        <div>
           <div
             class="payment-option"
             :class="{ active: paymentMethod === 'CreditCard' }"
@@ -952,7 +952,7 @@ export default {
     setTimeout(function () {
       window.jQuery('.mask-input').mask('99/99/9999')
     }, 200)
-    this.paymentMethods = this.userPaymentMethodsФ
+    this.paymentMethods = this.userPaymentMethods
   },
 }
 </script>
