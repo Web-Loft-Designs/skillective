@@ -41,16 +41,17 @@
 }
 
 .profile-info-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    width: 100%;
-
+    .profile-info-block {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
     .profile-avatar {
-        flex: 0 0 200px;
-        max-width: 200px;
+        flex: 0 0 150px;
+        max-width: 150px;
         width: 100%;
-        height: 200px;
+        height: 150px;
         position: relative;
 
         & > div {
@@ -73,7 +74,6 @@
         flex: 0 0 100%;
         max-width: calc(100% - 200px);
         width: 100%;
-        padding-left: 46px;
 
         .d-flex {
             margin-top: 20px;
@@ -86,10 +86,10 @@
 
         p {
             color: #444444;
-            font-family: "Hind Vadodara";
+            font-family: 'Hind Vadodara';
             font-size: 16px;
             font-weight: 400;
-
+            margin: 0;
             span {
                 &:first-child {
                     margin-right: 10px;
@@ -106,10 +106,13 @@
 
     h2 {
         color: #333333;
-        font-family: "Poppins";
+        font-family: 'Poppins';
         font-size: 28px;
         font-weight: 600;
-        margin-bottom: 5px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
         .toggle-favorite-container {
             display: inline-block;
@@ -133,29 +136,30 @@
 
         a {
             color: #333333;
-            font-family: "Poppins";
+            font-family: 'Poppins';
             font-size: 20px;
             font-weight: 600;
+            margin-right: 5px;
         }
     }
 
     .profile-info-middle {
         display: flex;
         flex-wrap: wrap;
-        margin-top: 50px;
+        margin-top: 20px;
         flex: 0 0 100%;
         max-width: 100%;
         width: 100%;
 
         .profile-label {
             color: #aaaaaa;
-            font-family: "Hind Vadodara";
+            font-family: 'Hind Vadodara';
             font-size: 16px;
             font-weight: 400;
 
             a {
                 color: #0aab14;
-                font-family: "Hind Vadodara";
+                font-family: 'Hind Vadodara';
                 font-size: 14px;
                 font-weight: 700;
             }
@@ -175,7 +179,7 @@
                 border-radius: 2px;
                 background-color: #f4f4f4;
                 color: #444444;
-                font-family: "Hind Vadodara";
+                font-family: 'Hind Vadodara';
                 font-size: 14px;
                 font-weight: 600;
                 padding: 4px 5px;
@@ -191,6 +195,27 @@
             flex: 0 0 25%;
             max-width: 25%;
             width: 100%;
+        }
+    }
+}
+
+.student {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    .profile-avatar {
+        flex: 0 0 200px;
+        max-width: 200px;
+        height: 200px;
+        .vue-dropzone {
+            height: 200px;
+        }
+    }
+    .profile-info-text {
+        padding-left: 45px;
+        h2 {
+            justify-content: start;
         }
     }
 }
@@ -212,7 +237,7 @@
         height: 40px;
         padding: 0;
         color: #0aab14;
-        font-family: "Hind Vadodara";
+        font-family: 'Hind Vadodara';
         font-size: 16px;
         font-weight: 600;
         border: none;
@@ -227,7 +252,7 @@
         td {
             border-top: 1px solid #dddddd;
             color: #444444;
-            font-family: "Hind Vadodara";
+            font-family: 'Hind Vadodara';
             font-size: 16px;
             font-weight: 400;
             padding: 14px 0;
@@ -238,14 +263,14 @@
 
             a {
                 color: #0aab14;
-                font-family: "Hind Vadodara";
+                font-family: 'Hind Vadodara';
                 font-size: 16px;
                 font-weight: 400;
             }
 
             strong {
                 color: #444444;
-                font-family: "Hind Vadodara";
+                font-family: 'Hind Vadodara';
                 font-size: 16px;
                 font-weight: 600;
             }
@@ -270,7 +295,7 @@
         height: 40px;
         padding: 0;
         color: #0aab14;
-        font-family: "Hind Vadodara";
+        font-family: 'Hind Vadodara';
         font-size: 16px;
         font-weight: 600;
         border: none;
@@ -290,7 +315,7 @@
 
             &.has-video {
                 &::before {
-                    content: "";
+                    content: '';
                     display: block;
                     width: 100%;
                     height: 100%;
@@ -305,13 +330,13 @@
                 }
 
                 &::after {
-                    content: "";
+                    content: '';
                     display: block;
                     width: 100%;
                     height: 100%;
                     z-index: 3;
                     pointer-events: none;
-                    background-image: url("../../images/play-icon.png");
+                    background-image: url('../../images/play-icon.png');
                     background-size: 18px 23px;
                     background-position: center center;
                     background-repeat: no-repeat;
@@ -334,7 +359,7 @@
 
     span {
         color: #aaaaaa;
-        font-family: "Hind Vadodara";
+        font-family: 'Hind Vadodara';
         font-size: 12px;
         font-weight: 400;
         z-index: 2;
@@ -347,7 +372,7 @@
 
 .fc-toolbar h2 {
     color: #444444;
-    font-family: "Hind Vadodara";
+    font-family: 'Hind Vadodara';
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 0;
@@ -362,7 +387,7 @@
     min-height: 58px;
     line-height: 58px;
     color: #aaaaaa;
-    font-family: "Hind Vadodara";
+    font-family: 'Hind Vadodara';
     font-size: 16px;
     font-weight: 600;
     border: 2px solid transparent;
@@ -373,7 +398,7 @@
     background-color: #f4f4f4;
     border-radius: 2px;
     color: #444444;
-    font-family: "Hind Vadodara";
+    font-family: 'Hind Vadodara';
     font-size: 16px;
     font-weight: 600;
     pointer-events: auto;
@@ -410,7 +435,7 @@
 
     span {
         color: #aaaaaa;
-        font-family: "Hind Vadodara";
+        font-family: 'Hind Vadodara';
         font-size: 14px;
         font-weight: 400;
         text-align: center;
@@ -435,7 +460,7 @@
     color: transparent !important;
     background-color: transparent !important;
     border-color: transparent !important;
-    background-image: url("../../images/img-prev.png") !important;
+    background-image: url('../../images/img-prev.png') !important;
     background-repeat: no-repeat !important;
     background-position: center center !important;
     background-size: 16px 16px !important;
@@ -445,7 +470,7 @@
     color: transparent !important;
     background-color: transparent !important;
     border-color: transparent !important;
-    background-image: url("../../images/img-next.png") !important;
+    background-image: url('../../images/img-next.png') !important;
     background-repeat: no-repeat !important;
     background-position: center center !important;
     background-size: 16px 16px !important;
@@ -471,7 +496,7 @@
         border-radius: 2px;
         background-color: #f4f4f4;
         color: #444444;
-        font-family: "Hind Vadodara";
+        font-family: 'Hind Vadodara';
         font-size: 16px;
         font-weight: 400;
         width: 66px;
@@ -503,7 +528,7 @@
 
         h2 {
             color: #444444;
-            font-family: "Hind Vadodara";
+            font-family: 'Hind Vadodara';
             font-size: 19px;
             font-weight: 600;
             max-width: 80px;
@@ -617,7 +642,7 @@
 
 .fc-unthemed .fc-timeGridWeek-view th {
     color: #aaaaaa;
-    font-family: "Hind Vadodara";
+    font-family: 'Hind Vadodara';
     font-size: 14px;
     font-weight: 400;
     line-height: 16px;
@@ -625,7 +650,7 @@
 
     a {
         color: #aaaaaa;
-        font-family: "Hind Vadodara";
+        font-family: 'Hind Vadodara';
         font-size: 14px;
         font-weight: 400;
         line-height: 16px;
@@ -655,7 +680,7 @@
 .fc-timeGrid-view .fc-event {
     background-color: #ebffd7;
     color: #444444;
-    font-family: "Hind Vadodara";
+    font-family: 'Hind Vadodara';
     font-size: 12px;
     font-weight: 700;
     border: 0;
@@ -676,7 +701,7 @@
 
     .fc-time {
         color: #aaaaaa;
-        font-family: "Hind Vadodara";
+        font-family: 'Hind Vadodara';
         font-size: 12px;
         font-weight: 400;
         line-height: 14px;
@@ -750,7 +775,7 @@
 
     .fc-title {
         color: #444444;
-        font-family: "Hind Vadodara";
+        font-family: 'Hind Vadodara';
         font-size: 10px;
         font-weight: 700;
         flex: 0 0 100%;
@@ -767,7 +792,7 @@
 
     .fc-title {
         color: #444444;
-        font-family: "Hind Vadodara";
+        font-family: 'Hind Vadodara';
         font-size: 14px;
         font-weight: 600;
         margin-bottom: 10px;
@@ -775,7 +800,7 @@
 
     .fc-time {
         color: #444444;
-        font-family: "Hind Vadodara";
+        font-family: 'Hind Vadodara';
         font-size: 14px;
         font-weight: 400;
     }
@@ -811,7 +836,7 @@
     top: 10px;
     right: 10px;
     color: #99c56c;
-    font-family: "Hind Vadodara";
+    font-family: 'Hind Vadodara';
     font-size: 14px;
     font-weight: 400;
 }
@@ -857,10 +882,34 @@
 }
 
 @media (max-width: 586px) {
-    .profile-info-wrapper .profile-avatar {
-        flex: 0 0 100%;
-        max-width: 100%;
+    .profile-info-wrapper {
+        .profile-info-block {
+            flex-direction: column;
+            .profile-info-text {
+                order: 2;
+                flex: 0 0 100%;
+                max-width: 100% !important;
+                padding-left: 0;
+            }
+            .profile-avatar {
+                order: 1;
+            }
+        }
     }
+    .student {
+        .profile-avatar {
+            max-width: 100%;
+            flex: 0 0 100%;
+        }
+    }
+    .avatar-upload-custom .vue-dropzone {
+        height: 150px!important;
+    }
+
+    //.profile-info-wrapper .profile-avatar {
+    //    flex: 0 0 100%;
+    //    max-width: 100%;
+    //}
 
     .profile-info-wrapper .profile-avatar > div {
         max-width: 150px;
@@ -971,10 +1020,10 @@
         border: 0;
         background-color: rgba(10, 171, 20, 0.75);
         color: #ffffff;
-        font-family: "Hind Vadodara";
+        font-family: 'Hind Vadodara';
         font-size: 14px;
         font-weight: 600;
-        height: 200px;
+        height: 150px;
         overflow: hidden;
 
         //.dz-preview {
@@ -982,11 +1031,11 @@
         //}
 
         .dz-default::before {
-            content: "";
+            content: '';
             display: block;
             width: 20px;
             height: 18px;
-            background-image: url("../../images/photo-avatar.png");
+            background-image: url('../../images/photo-avatar.png');
             background-size: contain;
             margin: 5px auto 5px;
         }
@@ -1013,7 +1062,7 @@
             &.active {
                 a {
                     color: #333333;
-                    font-family: "Hind Vadodara";
+                    font-family: 'Hind Vadodara';
                     font-size: 16px;
                     font-weight: 600;
                 }
@@ -1021,7 +1070,7 @@
 
             a {
                 color: #888888;
-                font-family: "Hind Vadodara";
+                font-family: 'Hind Vadodara';
                 font-size: 16px;
                 font-weight: 400;
             }
@@ -1030,12 +1079,28 @@
 }
 
 @media (max-width: 992px) {
+    .profile-info-wrapper {
+        .profile-info-block {
+            justify-content: center;
+            .profile-info-text {
+                max-width: calc(100% - 450px);
+            }
+        }
+    }
     .profile-info .form-wrap .genres-wrapper {
         column-count: 2;
     }
 }
 
 @media (max-width: 767px) {
+    .profile-info-wrapper {
+        .profile-info-block {
+            justify-content: center;
+            .profile-info-text {
+                max-width: calc(100% - 200px);
+            }
+        }
+    }
     .sticky-nav {
         position: static !important;
         top: auto !important;
@@ -1121,7 +1186,7 @@
 
     .edit {
         color: #0aab14 !important;
-        font-family: "Hind Vadodara" !important;
+        font-family: 'Hind Vadodara' !important;
         font-size: 14px !important;
         font-weight: 700 !important;
     }
@@ -1135,7 +1200,7 @@
 
 .link-style {
     color: #0aab14;
-    font-family: "Hind Vadodara ";
+    font-family: 'Hind Vadodara ';
     font-size: 16px;
     font-weight: 600;
     margin-top: 16px;
@@ -1148,7 +1213,7 @@
     background-color: #fff;
     padding: 5px 13px;
     color: #444;
-    font-family: "Hind Vadodara";
+    font-family: 'Hind Vadodara';
     font-size: 16px;
     font-weight: 400;
     position: relative;
