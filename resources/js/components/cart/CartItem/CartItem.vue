@@ -170,6 +170,8 @@ export default {
           return 'Virtual'
         case 'in_person_client':
           return 'In Person'
+        case 'in_person':
+          return 'In Person'
         default:
           return 'Pre-Recorded'
       }
