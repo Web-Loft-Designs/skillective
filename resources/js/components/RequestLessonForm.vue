@@ -1,8 +1,8 @@
 <template>
   <div id='lesson-form-container'>
-    <div class='d-grid gap-2 d-md-block'>
+    <div class='d-flex justify-content-center'>
       <button
-        class='btn green btn-sm text-wrap'
+        class='btn green btn-sm text-wrap mb-0'
         :class="{'disabledBtn': checkInstructors}"
         type='button'
         data-toggle='tooltip'
@@ -1537,6 +1537,7 @@ export default {
     transition: all 0.25s ease;
     outline: none !important;
     box-shadow: none !important;
+    width: 180px;
 
     &:hover {
       background-image: linear-gradient(180deg, #0ea510 0%, #038202 100%);

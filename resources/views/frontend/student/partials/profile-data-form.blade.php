@@ -1,4 +1,4 @@
-<div class="profile-info-wrapper">
+<div class="profile-info-wrapper student">
 
 	<?php
 	if (Auth::user() && !Auth::user()->hasRole('Admin'))
