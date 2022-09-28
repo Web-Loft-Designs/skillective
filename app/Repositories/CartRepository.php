@@ -371,11 +371,15 @@ class CartRepository extends BaseRepository
 
                 if(!$lessonAlreadyPurchased) $result = Cart::create($data);
 
+            }else{
+                session()->flash('guestCartCheck', 'We have removed some lessons from the basket, as they were already purchased by you earlier.');
             }
 
         }
 
-        return true;
+        return response()->json([
+            'status' => true
+        ]);
 
     }
 }
