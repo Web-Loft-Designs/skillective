@@ -18,7 +18,13 @@
 
                         <div class="col-lg-7 col-12 padding-l-30">
                             @if(Auth::user() && Auth::user()->id==$userProfileData['id'])
-                                <colendar-add-lesson :current-user-can-book="{{ $currentUserCanBook?'true':'false' }}" v-bind:user-genres="{{  json_encode($userProfileData['genres']) }}" v-bind:site-genres="{{  json_encode($siteGenres) }}" v-bind:lessons="{}" :instructor-id="{{ $userProfileData['id'] }}" :booking-fees-description="'{{ isset($booking_fees_description) ? preg_replace('/\n|\r/', '', addslashes($booking_fees_description)) : '' }}'"></colendar-add-lesson>
+                                <colendar-add-lesson
+                                    :current-user-can-book="{{ $currentUserCanBook?'true':'false' }}"
+                                    v-bind:user-genres="{{  json_encode($userProfileData['genres']) }}"
+                                    v-bind:site-genres="{{  json_encode($siteGenres) }}" v-bind:lessons="{}"
+                                    :instructor-id="{{ $userProfileData['id'] }}"
+                                    :booking-fees-description="'{{ isset($booking_fees_description) ? preg_replace('/\n|\r/', '', addslashes($booking_fees_description)) : '' }}'"
+                                ></colendar-add-lesson>
                             @elseif($authUserIsAdmin)
                                 <colendar-small
                                     :current-user-can-book="{{ $currentUserCanBook?'true':'false' }}"
@@ -58,7 +64,7 @@
                             <instructor-video-lessons
                                 :profile-data="{{ json_encode($userProfileData) }}"
                                 :instructor-id="'{{ addslashes($userProfileData['id']) }}'"
-                                :can-book="'true'"
+                                :can-book="true"
                                 :user-role = "{{ json_encode($loggedUserRole) }}"
                             ></instructor-video-lessons>
                         </div>

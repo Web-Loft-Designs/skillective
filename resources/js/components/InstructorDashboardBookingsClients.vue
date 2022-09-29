@@ -51,9 +51,6 @@ export default {
   data() {
     return { active: "bookings" };
   },
-  mounted: function(){
-    console.log(this.bookings)
-  },
   methods: {
     selectTab(selectedTab) {
       this.active = selectedTab;
