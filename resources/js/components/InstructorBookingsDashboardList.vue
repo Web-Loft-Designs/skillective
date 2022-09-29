@@ -186,8 +186,6 @@ export default {
       this.listLoaded = false
       let queryParams = {}
 
-      console.log(this.listLoaded)
-
       queryParams.type = this.showOnly
       queryParams.limit = 20
       queryParams.sort = this.sort

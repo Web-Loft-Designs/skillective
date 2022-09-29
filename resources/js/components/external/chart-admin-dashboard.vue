@@ -53,7 +53,6 @@
             this.fillData();
             axios.get('/api/admin/reports/other')
                 .then(response => {
-                   console.log(response)
                     this.reportData = response.data.data;
                 }).catch(error => {
                 this.reportData = {}

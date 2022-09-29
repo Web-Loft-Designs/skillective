@@ -256,7 +256,6 @@
                 this.$root.$emit('goalFormOpen');
             },
             componentHandleGetResponse(responseData) {
-                console.log(responseData)
                 this.incomes = responseData.data;
             },
             convertTo: function (n,d){

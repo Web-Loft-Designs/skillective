@@ -30,8 +30,7 @@ export default new Vuex.Store({
       if (error.response !== undefined && error.response.status === 422) {
         state.storeErrors = error.response.data.errors || {}
         state.storeErrorText = error.response.data.message
-      } else if (error.response !== undefined && error.response.status ===
-        419) {
+      } else if (error.response !== undefined && error.response.status === 419) {
         state.storeErrorText = error.response.data.message ||
           'Unable to process your request. Reload the page please and try again'
       } else if (error.response !== undefined) {
