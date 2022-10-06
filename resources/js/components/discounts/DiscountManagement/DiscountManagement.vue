@@ -1,60 +1,74 @@
 <template>
-  <div class="discount-management">
-    <div class="discount-management__container">
-      <div class="discount-management__sidebar">
-        <h1 class="discount-management__title">Discount Management</h1>
-        <ul class="discount-management__tabs">
-          <li v-for="(tab, tabIndex) in tabs" :key="tabIndex">
-            <button @click="activeTab = tab.code" :class="{
-              'discount-management__tab': true,
-              'discount-management__tab--active': activeTab == tab.code,
-            }">{{ tab.title }}</button>
+  <div class='discount-management'>
+    <div class='discount-management__container'>
+      <div class='discount-management__sidebar'>
+        <h1 class='discount-management__title'>Discount Management</h1>
+        <ul class='discount-management__tabs'>
+          <li
+            v-for='(tab, tabIndex) in tabs'
+            :key='tabIndex'
+          >
+            <button
+              :class="{
+                'discount-management__tab': true,
+                'discount-management__tab--active': activeTab === tab.code,
+              }"
+              @click='activeTab = tab.code'
+            >
+              {{ tab.title }}
+            </button>
           </li>
         </ul>
       </div>
-      <div class="discount-management__content">
-        
-        <div class="discount-management__content-tab" v-if="activeTab == 'discount'">
-          <discounts-editor />
+      <div class='discount-management__content'>
+        <div
+          v-if="activeTab === 'discount'"
+          class='discount-management__content-tab'
+        >
+          <discounts-editor/>
         </div>
-
-        <div class="discount-management__content-tab" v-if="activeTab == 'promo'">
-          <promos-editor />
+        <div
+          v-if="activeTab === 'promo'"
+          class='discount-management__content-tab'
+        >
+          <promos-editor/>
         </div>
-
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import DiscountsEditor from "../DiscountsEditor/DiscountsEditor.vue";
-import PromosEditor from "../PromosEditor/PromosEditor.vue";
+import DiscountsEditor from '../DiscountsEditor/DiscountsEditor.vue'
+import PromosEditor from '../PromosEditor/PromosEditor.vue'
 
 export default {
-  name: "DiscountManagement",
+  name: 'DiscountManagement',
   components: {
     DiscountsEditor,
-    PromosEditor,
+    PromosEditor
   },
   data() {
     return {
-      activeTab: "discount",
+      activeTab: 'discount',
       tabs: [
         {
-          code: "discount",
-          title: "Discount",
+          code: 'discount',
+          title: 'Discount'
         },
         {
-          code: "promo",
-          title: "Promo code",
-        },
-      ],
+          code: 'promo',
+          title: 'Promo code'
+        }
+      ]
     }
-  },
-};
+  }
+}
 </script>
 
-<style lang="scss" scoped>
-@import "./DiscountManagement.scss";
+<style
+  lang='scss'
+  scoped
+>
+@import './DiscountManagement.scss';
 </style>
