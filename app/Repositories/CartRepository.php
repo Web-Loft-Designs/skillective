@@ -93,13 +93,6 @@ class CartRepository extends BaseRepository
                 }
             }
 
-            if($product_list){
-                $unauthorized_cart = $this->addToCart($product_list);
-                foreach ($unauthorized_cart as $item){
-                    $cart[] = $item;
-                }
-            }
-
             return $cart;
 
         } else if ($product_list) {
