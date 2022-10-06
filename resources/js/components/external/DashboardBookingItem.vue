@@ -539,7 +539,6 @@ export default {
         const students = []
 
         this.bookings.forEach((item) => {
-          console.log(item)
           if (
             (item.status == 'payment_in_escrow' &&
               !item.has_cancellation_request) ||
