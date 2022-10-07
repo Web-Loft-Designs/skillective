@@ -19,15 +19,6 @@
     @endif
 
     <div class="profile-info-text">
-        <h2>
-        @if ($userProfileData['profile']['instagram_handle'])
-            <a href="https://instagram.com/{{ $userProfileData['profile']['instagram_handle'] }}" target="_blank">{{ '@' . $userProfileData['profile']['instagram_handle'] }}</a>
-        @endif
-
-        @if ($userProfileData['isInstructor']==true && Auth::user() && Auth::user()->hasRole('Student'))
-            <favorite-instructor v-bind:instructor-id="{{ $userProfileData['id'] }}" v-bind:is-favorite="{{ Auth::user()->hasOwnFavoriteInstructor($userProfileData['id']) ? 'true' : 'false' }}"></favorite-instructor>
-        @endif
-        </h2>
         <p>{{ $userProfileData['full_name'] }} <br/>
            {{ $userProfileData['profile']['city'] }} <br/>
            {{ $userProfileData['profile']['state'] }}
@@ -64,6 +55,15 @@
 {{--            <p><strong>{{ number_format($userProfileData['profile']['instagram_followers_count']) }}</strong> Followers</p>--}}
         </div>
     </div>
+    <h2>
+            @if ($userProfileData['profile']['instagram_handle'])
+                <a href="https://instagram.com/{{ $userProfileData['profile']['instagram_handle'] }}" target="_blank">{{ '@' . $userProfileData['profile']['instagram_handle'] }}</a>
+            @endif
+
+            @if ($userProfileData['isInstructor']==true && Auth::user() && Auth::user()->hasRole('Student'))
+                <favorite-instructor v-bind:instructor-id="{{ $userProfileData['id'] }}" v-bind:is-favorite="{{ Auth::user()->hasOwnFavoriteInstructor($userProfileData['id']) ? 'true' : 'false' }}"></favorite-instructor>
+            @endif
+            </h2>
     <div class="profile-info-middle">
         <div class="profile-info-about-us">
             <p class="profile-label">About instructor:

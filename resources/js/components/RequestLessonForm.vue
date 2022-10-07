@@ -2,27 +2,27 @@
   <div id='lesson-form-container'>
     <div class='d-grid gap-2 d-md-block'>
       <button
-        class='btn green btn-sm text-wrap'
-        :class="{'disabledBtn': checkInstructors}"
-        type='button'
-        data-toggle='tooltip'
         v-if='showCreateBtn'
+        :class="{'disabledBtn': checkInstructors}"
         :disabled='checkInstructors'
-        data-placement='bottom'
-        @click='showJoinModal'
         :title='tooltipContent()'
+        class='btn green btn-sm text-wrap'
+        data-placement='bottom'
+        data-toggle='tooltip'
+        type='button'
+        @click='showJoinModal'
       >
         Add me to {{ instructorName }}'s Client List
       </button>
     </div>
     <!--    modal1-->
     <div
-      class='modal'
       id='joinClient'
-      tabindex='0'
-      role='dialog'
-      aria-labelledby='exampleModalCenterTitle'
       aria-hidden='true'
+      aria-labelledby='exampleModalCenterTitle'
+      class='modal'
+      role='dialog'
+      tabindex='0'
     >
       <div
         class='modal-dialog modal-dialog-centered'
@@ -30,7 +30,12 @@
       >
         <div class='modal-content'>
           <div class='modal-header'>
-            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+            <button
+              aria-label='Close'
+              class='close'
+              data-dismiss='modal'
+              type='button'
+            >
               <span aria-hidden='true'>&times;</span>
             </button>
           </div>
@@ -41,9 +46,9 @@
           </div>
           <div class='modal-footer'>
             <button
-              type='button'
               aria-label='Close'
               class='btn green btn-sm'
+              type='button'
               @click='successJoinedToClient'
             >
               Join client list
@@ -54,31 +59,37 @@
     </div>
     <!--    modal3-->
     <div
-      class='modal'
-      tabindex='-1'
-      role='dialog'
       id='registeredModal'
+      class='modal'
+      role='dialog'
+      tabindex='-1'
     >
-      <div class='modal-dialog' role='document'>
+      <div
+        class='modal-dialog'
+        role='document'
+      >
         <div class='modal-content'>
           <div class='modal-body'>
-            <form novalidate class='needs-validation'>
+            <form
+              class='needs-validation'
+              novalidate
+            >
               <h3 class='form-title'>Join {{ instructorName }}'s Client List</h3>
               <div class='d-flex flex-wrap'>
                 <div class='label-w-100'>
                   <label>Complete name</label>
                 </div>
                 <div
-                  class='form-group first-name has-feedback'
                   :class="{'has-error': ($v.modalData.first_name.$dirty && !$v.modalData.first_name.required)}"
+                  class='form-group first-name has-feedback'
                 >
                   <input
-                    type='text'
+                    v-model='modalData.first_name'
+                    :class="{'is-invalid': ($v.modalData.first_name.$dirty && !$v.modalData.first_name.required)}"
                     class='form-control'
                     name='first_name'
-                    v-model='modalData.first_name'
                     placeholder='First Name'
-                    :class="{'is-invalid': ($v.modalData.first_name.$dirty && !$v.modalData.first_name.required)}"
+                    type='text'
                   />
                   <span v-if='$v.modalData.first_name.$dirty && !$v.modalData.first_name.required'>First name can't be empty</span>
                 </div>
@@ -86,31 +97,30 @@
                   Please choose a username.
                 </div>
                 <div
-                  class='form-group last-name has-feedback'
                   :class="{'has-error': ($v.modalData.last_name.$dirty && !$v.modalData.last_name.required)}"
+                  class='form-group last-name has-feedback'
                 >
                   <input
-                    type='text'
+                    v-model='modalData.last_name'
+                    :class="{'is-invalid': ($v.modalData.last_name.$dirty && !$v.modalData.last_name.required)}"
                     class='form-control'
                     name='last_name'
-                    v-model='modalData.last_name'
                     placeholder='Last Name'
-                    :class="{'is-invalid': ($v.modalData.last_name.$dirty && !$v.modalData.last_name.required)}"
+                    type='text'
                   />
                   <span v-if='$v.modalData.last_name.$dirty && !$v.modalData.last_name.required'>Last name can't be empty</span>
                 </div>
                 <div class='form-group'>
                   <label>Instagram Handle</label>
                   <input
-                    type='text'
+                    v-model='modalData.instagram_handle'
                     class='form-control'
                     name='instagram_handle'
-                    v-model='modalData.instagram_handle'
                     placeholder='@instagram_name'
+                    type='text'
                   />
                 </div>
                 <div
-                  class='form-group input-zip has-feedback'
                   :class="{'has-error':
                   ($v.modalData.zip.$dirty && !$v.modalData.zip.required)
                   ||
@@ -118,14 +128,11 @@
                   ||
                   ($v.modalData.zip.$dirty && !$v.modalData.zip.valid)
                 }"
+                  class='form-group input-zip has-feedback'
                 >
                   <label>ZIP</label>
                   <input
-                    type='text'
-                    class='form-control'
-                    name='zip'
                     v-model.number='modalData.zip'
-                    placeholder='ZIP code'
                     :class="{'is-invalid':
                     ($v.modalData.zip.$dirty && !$v.modalData.zip.required)
                     ||
@@ -133,36 +140,39 @@
                     ||
                     ($v.modalData.zip.$dirty && !$v.modalData.zip.valid)
                     }"
+                    class='form-control'
+                    name='zip'
+                    placeholder='ZIP code'
+                    type='text'
                   />
                   <span v-if='$v.modalData.zip.$dirty && !$v.modalData.zip.required'>ZIP code can't be empty</span>
                   <span v-else-if='$v.modalData.zip.$dirty && !$v.modalData.zip.numeric'>ZIP code must be numeric</span>
                   <span v-else-if='$v.modalData.zip.$dirty && !$v.modalData.zip.valid'>The zip format is invalid</span>
                 </div>
                 <div
-                  class='form-group w-50'
                   :class="{'has-error':
                   ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required)
                   ||
                   ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.valid)
                 }"
+                  class='form-group w-50'
                 >
                   <label>Phone number</label>
                   <masked-input
-                    class='form-control'
                     v-model='modalData.mobile_phone'
-                    :placeholder="'+1 (___) ___ ____'"
-                    mask='\+1 (111) 111 1111'
                     :class="{'is-invalid':
                     ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required
                     ||
                     ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.valid))
                     }"
+                    :placeholder="'+1 (___) ___ ____'"
+                    class='form-control'
+                    mask='\+1 (111) 111 1111'
                   />
                   <span v-if='$v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required'>Phone number can't be empty</span>
                   <span v-else-if='$v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.valid'>The mobile phone format is invalid</span>
                 </div>
                 <div
-                  class='form-group'
                   :class="{'has-error':
                   ($v.modalData.email.$dirty && !$v.modalData.email.required)
                   ||
@@ -170,15 +180,11 @@
                   ||
                    storeErrors.email
                 }"
+                  class='form-group'
                 >
                   <label>Email</label>
                   <input
-                    type='email'
-                    name='email'
                     v-model.trim='modalData.email'
-                    @input='changeEmail'
-                    placeholder='Email'
-                    class='form-control'
                     :class="{'is-invalid':
                     ($v.modalData.email.$dirty && !$v.modalData.email.required)
                     ||
@@ -186,6 +192,11 @@
                     ||
                     storeErrors.email
                     }"
+                    class='form-control'
+                    name='email'
+                    placeholder='Email'
+                    type='email'
+                    @input='changeEmail'
                   />
                   <span v-if='$v.modalData.email.$dirty && !$v.modalData.email.required'>Email can't be empty</span>
                   <span v-else-if='$v.modalData.email.$dirty && !$v.modalData.email.email'>Error email format</span>
@@ -195,20 +206,24 @@
                   <span v-if='$v.modalData.mobile_phone.$dirty && !modalData.accept_terms'>Please accept terms of service</span>
                 </div>
                 <div
-                  class='form-group checkbox-wrapper has-feedback'
                   :class="{'has-error': $v.modalData.mobile_phone.$dirty && !modalData.accept_terms}"
+                  class='form-group checkbox-wrapper has-feedback'
                 >
                   <div class='field'>
                     <label for='accept-terms'>
                       <input
-                        v-model='modalData.accept_terms'
-                        type='checkbox'
                         id='accept-terms'
+                        v-model='modalData.accept_terms'
                         :value='1'
+                        type='checkbox'
                       />
                       <span class='checkmark'></span>
                       I agree to the
-                      <a href='/terms' target='_blank'>terms of service</a>
+                      <a
+                        href='/terms'
+                        target='_blank'
+                      >terms of service
+                      </a>
                     </label>
                   </div>
                   <span v-if='$v.modalData.mobile_phone.$dirty && !modalData.accept_terms'>Please accept terms of service</span>
@@ -219,16 +234,16 @@
                   <div class='field'>
                     <label for='sms-notification'>
                       <input
-                        v-model='modalData.sms_notification'
-                        type='checkbox'
                         id='sms-notification'
+                        v-model='modalData.sms_notification'
                         :value='false'
+                        type='checkbox'
                       />
                       <span class='checkmark'></span>
                       By clicking this box, you represent that you have the authority to agree to receive SMS messages on the telephone number that you provided to us. Message frequency depends upon your activity. Standard message and data rates may apply. SMS messaging is not available in all areas. Not all mobile devices or handsets may be supported. Skillective and the mobile carriers are not liable for delayed or undelivered messages
                     </label>
                   </div>
-                </div>                
+                </div>
                 <div class='form-group'>
                   <loader-button
                     :isLoading='loadingBtn'
@@ -244,12 +259,12 @@
     </div>
     <!--    modal4-->
     <div
-      class='modal'
       id='successAdded'
-      tabindex='-1'
-      role='dialog'
-      aria-labelledby='exampleModalCenterTitle'
       aria-hidden='true'
+      aria-labelledby='exampleModalCenterTitle'
+      class='modal'
+      role='dialog'
+      tabindex='-1'
     >
       <div
         class='modal-dialog modal-dialog-centered'
@@ -258,12 +273,17 @@
         <div class='modal-content'>
           <div class='modal-header'>
             <h5
-              class='modal-title'
               id='exampleModalLongTitle'
+              class='modal-title'
             >
               Welcome!
             </h5>
-            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+            <button
+              aria-label='Close'
+              class='close'
+              data-dismiss='modal'
+              type='button'
+            >
               <span aria-hidden='true'>&times;</span>
             </button>
           </div>
@@ -278,10 +298,10 @@
           </div>
           <div class='modal-footer'>
             <button
-              type='button'
               aria-label='Close'
               class='btn green btn-sm'
               data-dismiss='modal'
+              type='button'
               @click='openAllInstructorsModal'
             >
               Join other Instructor's client lists here
@@ -290,16 +310,33 @@
         </div>
       </div>
     </div>
-    <div class='modal' id='instructorsModal' tabindex='-1' role='dialog' aria-labelledby='instructorsModalLabel'
-         aria-hidden='true'>
-      <div class='modal-dialog' role='document'>
+    <div
+      id='instructorsModal'
+      aria-hidden='true'
+      aria-labelledby='instructorsModalLabel'
+      class='modal'
+      role='dialog'
+      tabindex='-1'
+    >
+      <div
+        class='modal-dialog'
+        role='document'
+      >
         <div class='modal-content'>
           <div class='modal-header'>
-            <h5 class='modal-title text-center' id='instructorsModalLabel'>
+            <h5
+              id='instructorsModalLabel'
+              class='modal-title text-center'
+            >
               Would you like to be added to other instructor's client lists? <br>
-            <span class="text-center"> Check the boxes below </span>
+              <span class='text-center'> Check the boxes below </span>
             </h5>
-            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+            <button
+              aria-label='Close'
+              class='close'
+              data-dismiss='modal'
+              type='button'
+            >
               <span aria-hidden='true'>&times;</span>
             </button>
           </div>
@@ -312,9 +349,9 @@
                       <div class='field'>
                         <label for='select-all-instructors'>
                           <input
+                            id='select-all-instructors'
                             v-model='selectAll'
                             type='checkbox'
-                            id='select-all-instructors'
                             @input='onSelectAll'
                           />
                           <span class='checkmark'></span>
@@ -328,9 +365,9 @@
                 </div>
               </li>
               <li
-                class='list-group-item'
                 v-for='instructor in instructors'
                 :key='instructor.id'
+                class='list-group-item'
               >
                 <div class='input-group align-items-center flex-nowrap'>
                   <div class='input-group-prepend'>
@@ -338,10 +375,10 @@
                       <div class='field'>
                         <label :for='`accept-terms-instructors${instructor.id}`'>
                           <input
-                            v-model='selectedInstructors'
-                            type='checkbox'
                             :id='`accept-terms-instructors${instructor.id}`'
+                            v-model='selectedInstructors'
                             :value='`${instructor.id}`'
+                            type='checkbox'
                           />
                           <span class='checkmark'></span>
                         </label>
@@ -350,13 +387,16 @@
                   </div>
                   <div class='d-flex justify-content-between align-items-center px-5 m-0 w-100'>
                     <div class='instructor-avatar'>
-                      <img :src='instructor.profile.image' alt='instructor avatar'>
+                      <img
+                        :src='instructor.profile.image'
+                        alt='instructor avatar'
+                      >
                     </div>
                     <div class='d-flex w-100 pl-4 flex-column mt-0 align-items-center'>
                       <h3 class='title'>{{ instructor.full_name }}</h3>
                       <a
-                        class='inst'
                         :href='`https://www.instagram.com/${instructor.profile.instagram_handle}`'
+                        class='inst'
                         target='_blank'
                       >
                         @{{ instructor.profile.instagram_handle }}
@@ -376,76 +416,101 @@
           </div>
           <div class='modal-footer'>
             <loader-button
-              class='lesson__button'
               :disabled='!selectedInstructors.length'
               :is-loading='loadingAdd'
-              text="Add me to these instructors client lists"
+              class='lesson__button'
+              text='Add me to these instructors client lists'
               @click='addToInstructorsList'
             />
           </div>
         </div>
       </div>
     </div>
-    <div class='modal' id='addedOtherInstructors' tabindex='-1' role='dialog'
-         aria-labelledby='addedOtherInstructorsLabel'
-         aria-hidden='true'>
-      <div class='modal-dialog' role='document'>
+    <div
+      id='addedOtherInstructors'
+      aria-hidden='true'
+      aria-labelledby='addedOtherInstructorsLabel'
+      class='modal'
+      role='dialog'
+      tabindex='-1'
+    >
+      <div
+        class='modal-dialog'
+        role='document'
+      >
         <div class='modal-content'>
           <div class='modal-header'>
-            <h5 class='modal-title' id='addedOtherInstructorsLabel'>Thank you from all of us!</h5>
-            <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+            <h5
+              id='addedOtherInstructorsLabel'
+              class='modal-title'
+            >Thank you from all of us!
+            </h5>
+            <button
+              aria-label='Close'
+              class='close'
+              data-dismiss='modal'
+              type='button'
+            >
               <span aria-hidden='true'>&times;</span>
             </button>
           </div>
           <div class='modal-body'>
             <p>
-              You should have received an email to create a password and login.  Once logged in, you will be able to view all of your instructors. We appreciate you joining us!
+              You should have received an email to create a password and login. Once logged in, you will be able to view all of your instructors. We appreciate you joining us!
             </p>
             <strong>
               {{ instructorNames.join(', ') }}.
             </strong>
           </div>
           <div class='modal-footer'>
-            <button type='button' data-dismiss='modal' class='btn green'>Ok</button>
+            <button
+              class='btn green'
+              data-dismiss='modal'
+              type='button'
+            >Ok
+            </button>
           </div>
         </div>
       </div>
     </div>
     <magnific-popup-modal
-      class='ie-fix'
-      @modalClosed='clearFormAndClosePopup'
-      :show='false'
+      ref='modal'
       :config='{
         closeOnBgClick: true,
         showCloseBtn: true,
         enableEscapeKey: false,
       }'
-      ref='modal'
+      :show='false'
+      class='ie-fix'
+      @modalClosed='clearFormAndClosePopup'
     >
       <div class='modal-add-lesson'>
         <form
-          method='post'
-          @keypress.enter.prevent
-          @submit.prevent='onSubmit'
           v-if='
             lessonRequestCreated === false &&
             lessonRequestCancelled === false &&
             lessonRequestAccepted === false
           '
+          method='post'
+          @keypress.enter.prevent
+          @submit.prevent='onSubmit'
         >
-          <input type='hidden' v-model='fields.instructor_id' />
+          <input
+            v-model='fields.instructor_id'
+            type='hidden'
+          />
           <div class='row'>
             <h2 class='login-box-msg col-12'>Request a Lesson</h2>
             <div
-              class='col-12 form-group has-feedback'
               :class="{ 'has-error': errors.genre }"
+              class='col-12 form-group has-feedback'
             >
               <label>Genre</label>
               <select
-                class='form-control'
-                name='genre'
                 v-model='fields.genre'
                 :disabled='fieldsDisabled'
+                class='form-control'
+                name='genre'
               >
                 <option value></option>
                 <option
@@ -456,107 +521,122 @@
                   {{ genre.title }}
                 </option>
               </select>
-              <span class='help-block' v-if='errors.genre'>
+              <span
+                v-if='errors.genre'
+                class='help-block'
+              >
                 <strong>{{ errors.genre[0] }}</strong>
               </span>
             </div>
 
             <div
-              class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
               :class="{ 'has-error': errors.date }"
+              class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
             >
               <label>Date from</label>
               <!--<datepicker :monday-first="false" :typeable="true" :input-class="'mask-input'" v-model="fields.date" name="date" :placeholder="'mm/dd/yyyy'" :format="'MM/dd/yyyy'"></datepicker>-->
               <dropdown-datepicker
                 v-if='isDateInputInit'
-                :disabled='fieldsDisabled'
-                display-format='mdy'
-                v-model='fields.date'
-                submit-format='yyyy-mm-dd'
-                :minYear='2021'
                 ref='datepicker'
+                v-model='fields.date'
+                :disabled='fieldsDisabled'
+                :minYear='2021'
+                display-format='mdy'
                 maxDate='2030-01-01'
+                submit-format='yyyy-mm-dd'
               ></dropdown-datepicker>
 
-              <span class='help-block' v-if='errors.date'>
+              <span
+                v-if='errors.date'
+                class='help-block'
+              >
                 <strong>{{ errors.date[0] }}</strong>
               </span>
             </div>
             <div
-              class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
               :class="{ 'has-error': errors.date }"
+              class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
             >
               <label>Date to </label>
               <!--<datepicker :monday-first="false" :typeable="true" :input-class="'mask-input'" v-model="fields.date" name="date" :placeholder="'mm/dd/yyyy'" :format="'MM/dd/yyyy'"></datepicker>-->
               <dropdown-datepicker
                 v-if='isDateInputInit'
-                display-format='mdy'
-                v-model='fields.date_to'
-                submit-format='yyyy-mm-dd'
                 key='sombun5'
                 ref='datepickerTo'
+                v-model='fields.date_to'
                 :minYear='2021'
+                display-format='mdy'
                 maxDate='2030-01-01'
+                submit-format='yyyy-mm-dd'
               ></dropdown-datepicker>
 
-              <span class='help-block' v-if='errors.date_to'>
+              <span
+                v-if='errors.date_to'
+                class='help-block'
+              >
                 <strong>{{ errors.date_to[0] }}</strong>
               </span>
             </div>
             <div
-              class='time-from col-lg-6 col-sm-6 col-12 form-group has-feedback'
               :class="{ 'has-error': errors.time_from }"
+              class='time-from col-lg-6 col-sm-6 col-12 form-group has-feedback'
             >
               <label>Time from</label>
               <vue-timepicker
-                :minute-interval='15'
-                v-model='fields.time_from'
-                placeholder='Start Time'
-                format='h:mm a'
-                close-on-complete
                 ref='timeFrom'
+                v-model='fields.time_from'
+                :minute-interval='15'
+                apm-label='AM/PM'
+                close-on-complete
+                format='h:mm a'
                 hour-label='Hour'
                 minute-label='Minute'
-                apm-label='AM/PM'
+                placeholder='Start Time'
                 @change='timeFormChange'
                 @open="clearTimepicker('timeFrom')"
               ></vue-timepicker>
-              <span class='help-block' v-if='errors.time_from'>
+              <span
+                v-if='errors.time_from'
+                class='help-block'
+              >
                 <strong>{{ errors.time_from[0] }}</strong>
               </span>
             </div>
 
             <div
-              class='time-to col-lg-6 col-sm-6 col-12 form-group has-feedback'
               :class="{ 'has-error': errors.time_to }"
+              class='time-to col-lg-6 col-sm-6 col-12 form-group has-feedback'
             >
               <label>Time to</label>
               <vue-timepicker
-                :minute-interval='15'
-                v-model='fields.time_to'
-                placeholder='End Time'
-                format='h:mm a'
-                close-on-complete
                 ref='timeTo'
+                v-model='fields.time_to'
+                :minute-interval='15'
+                apm-label='AM/PM'
+                close-on-complete
+                format='h:mm a'
                 hour-label='Hour'
                 minute-label='Minute'
-                apm-label='AM/PM'
+                placeholder='End Time'
                 @open="clearTimepicker('timeTo')"
               ></vue-timepicker>
 
-              <span class='help-block' v-if='errors.time_to'>
+              <span
+                v-if='errors.time_to'
+                class='help-block'
+              >
                 <strong>{{ errors.time_to[0] }}</strong>
               </span>
             </div>
             <div
-              class='form-group col-4 has-feedback'
               :class="{ 'has-error': errors.lesson_type }"
+              class='form-group col-4 has-feedback'
             >
               <label>Type of Lesson</label>
               <select
-                class='form-control'
                 v-model='fields.lesson_type'
                 :disabled='fieldsDisabled'
+                class='form-control'
               >
                 <option
                   v-for='(lessonTypeTitle, lessonTypeName) in lessonTypes'
@@ -566,156 +646,200 @@
                   {{ lessonTypeTitle }}
                 </option>
               </select>
-              <span class='help-block' v-if='errors.lesson_type'>
+              <span
+                v-if='errors.lesson_type'
+                class='help-block'
+              >
                 <strong>{{ errors.lesson_type[0] }}</strong>
               </span>
             </div>
 
             <div
-              class='form-group col-8 has-feedback'
-              :class="{ 'has-error': errors.location }"
               v-if="fields.lesson_type === 'in_person'"
+              :class="{ 'has-error': errors.location }"
+              class='form-group col-8 has-feedback'
             >
               <label>Location</label>
               <input
-                type='text'
+                ref='lessonLocation'
+                v-model='fields.location'
+                :disabled='fieldsDisabled'
                 class='form-control'
                 name='location'
+                type='text'
                 value
-                v-model='fields.location'
-                ref='lessonLocation'
-                :disabled='fieldsDisabled'
               />
-              <span class='help-block' v-if='errors.location'>
+              <span
+                v-if='errors.location'
+                class='help-block'
+              >
                 <strong>{{ errors.location[0] }}</strong>
               </span>
             </div>
 
             <div
-              class='col-8 form-group has-feedback'
-              :class="{ 'has-error': errors.timezone_id }"
               v-if="fields.lesson_type === 'virtual'"
+              :class="{ 'has-error': errors.timezone_id }"
+              class='col-8 form-group has-feedback'
             >
               <label>Time Zone</label>
               <select
-                class='form-control'
                 v-model='fields.timezone_id'
                 :disabled='fieldsDisabled'
+                class='form-control'
               >
-                <option value disabled>Select...</option>
+                <option
+                  disabled
+                  value
+                >Select...
+                </option>
                 <option
                   v-for='(value, key) in timeZomeOptions'
-                  :value='key'
                   :key='key'
+                  :value='key'
                 >
                   {{ value }}
                 </option>
               </select>
-              <span class='help-block' v-if='errors.timezone_id'>
+              <span
+                v-if='errors.timezone_id'
+                class='help-block'
+              >
                 <strong>{{ errors.timezone_id[0] }}</strong>
               </span>
             </div>
 
             <div
-              class='form-group col-lg-9 col-sm-9 col-12 has-feedback align-end'
               :class="{ 'has-error': errors.lesson_price }"
+              class='form-group col-lg-9 col-sm-9 col-12 has-feedback align-end'
             >
               <label v-if='priceError'>{{ priceError }}</label>
               <div class='d-flex'>
                 <span class='dollar-wrapper'>
                   <!--<masked-input class="form-control" v-model="fields.lesson_price" mask="111.11" />-->
                   <input
-                    type='number'
-                    step='0.01'
-                    class='form-control'
                     v-model='fields.lesson_price'
                     :disabled='fieldsDisabled'
+                    class='form-control'
+                    step='0.01'
+                    type='number'
                   />
                 </span>
                 <span class='per-lesson'>per lesson</span>
               </div>
 
-              <span class='help-block' v-if='errors.lesson_price'>
+              <span
+                v-if='errors.lesson_price'
+                class='help-block'
+              >
                 <strong>{{ errors.lesson_price[0] }}</strong>
               </span>
             </div>
 
             <div
               v-if="fields.lesson_type === 'in_person'"
-              class='form-group col-lg-3 col-sm-3 col-12 has-feedback'
               :class="{ 'has-error': errors.count_participants }"
+              class='form-group col-lg-3 col-sm-3 col-12 has-feedback'
             >
               <span class='private-lesson'>
                 <span v-if='fields.count_participants === 1'>
-                  <img src='../../images/man-user.svg' alt />
+                  <img
+                    alt
+                    src='../../images/man-user.svg'
+                  />
                 </span>
                 <span v-if='fields.count_participants > 1'>
-                  <img src='../../images/multiple-users-silhouette.svg' alt />
+                  <img
+                    alt
+                    src='../../images/multiple-users-silhouette.svg'
+                  />
                 </span>
               </span>
               <label>Max students</label>
               <input
-                @input='replaceInput'
-                class='form-control'
-                min='1'
-                max='100'
                 v-model.number='fields.count_participants'
+                class='form-control'
+                max='100'
+                min='1'
                 type='number'
+                @input='replaceInput'
               />
-              <span class='help-block' v-if='errors.count_participants'>
+              <span
+                v-if='errors.count_participants'
+                class='help-block'
+              >
                 <strong>{{ errors.count_participants[0] }}</strong>
               </span>
             </div>
 
             <div
               v-if='fields.id == null && loggedInStudent === true'
-              class='form-group col-12 has-feedback'
               :class="{ 'has-error': errors.student_note }"
+              class='form-group col-12 has-feedback'
             >
               <label>Description</label>
               <textarea
+                v-model='fields.student_note'
                 :disabled='fieldsDisabled'
                 class='form-control'
                 name='student_note'
-                v-model='fields.student_note'
               ></textarea>
-              <span class='help-block' v-if='errors.student_note'>
+              <span
+                v-if='errors.student_note'
+                class='help-block'
+              >
                 <strong>{{ errors.student_note[0] }}</strong>
               </span>
             </div>
-            <div v-else class='form-group col-12'>
+            <div
+              v-else
+              class='form-group col-12'
+            >
               <label>Client Note</label>
               <p>{{ fields.student_note ? fields.student_note : '-' }}</p>
             </div>
 
             <div
               v-if='fields.id != null && loggedInStudent === false'
-              class='form-group col-12 has-feedback'
               :class="{ 'has-error': errors.instructor_note }"
+              class='form-group col-12 has-feedback'
             >
               <label>Description</label>
               <textarea
+                v-model='fields.instructor_note'
                 class='form-control'
                 name='instructor_note'
-                v-model='fields.instructor_note'
               ></textarea>
-              <span class='help-block' v-if='errors.instructor_note'>
+              <span
+                v-if='errors.instructor_note'
+                class='help-block'
+              >
                 <strong>{{ errors.instructor_note[0] }}</strong>
               </span>
             </div>
 
             <div class='col-12'>
-              <div v-if='errorText' class='has-error'>{{ errorText }}</div>
-              <div v-if='successText' class='has-success'>
+              <div
+                v-if='errorText'
+                class='has-error'
+              >{{ errorText }}
+              </div>
+              <div
+                v-if='successText'
+                class='has-success'
+              >
                 {{ successText }}
               </div>
             </div>
 
-            <div class='col-12 mt-30' v-if='fields.id == null'>
+            <div
+              v-if='fields.id == null'
+              class='col-12 mt-30'
+            >
               <button
-                @keypress.enter.prevent
-                type='submit'
                 class='btn btn-primary btn-block'
+                type='submit'
+                @keypress.enter.prevent
               >
                 Submit Request
               </button>
@@ -723,18 +847,18 @@
             <div class='col-12 mt-30'>
               <div class='g-buttons-wrap'>
                 <button
-                  @keypress.enter.prevent
-                  type='submit'
-                  class='btn btn-primary btn-block'
                   v-if='fields.id != null && loggedInStudent === false'
+                  class='btn btn-primary btn-block'
+                  type='submit'
+                  @keypress.enter.prevent
                 >
                   Accept Request
                 </button>
                 <button
-                  @click='cancelLessonRequest'
-                  type='button'
-                  class='btn btn-danger btn-block'
                   v-if='fields.id != null'
+                  class='btn btn-danger btn-block'
+                  type='button'
+                  @click='cancelLessonRequest'
                 >
                   Cancel Request
                 </button>
@@ -743,17 +867,20 @@
           </div>
         </form>
         <div
-          id='lesson-request-sent'
           v-if='lessonRequestCreated === true'
+          id='lesson-request-sent'
           v-html='requestSentConfirmation'
         ></div>
         <div
-          id='lesson-request-cancelled'
           v-if='lessonRequestCancelled === true'
+          id='lesson-request-cancelled'
         >
           Request has been cancelled.
         </div>
-        <div id='lesson-request-accepted' v-if='lessonRequestAccepted === true'>
+        <div
+          v-if='lessonRequestAccepted === true'
+          id='lesson-request-accepted'
+        >
           Request has been accepted. Lesson created.
         </div>
       </div>
@@ -769,16 +896,16 @@ import skillectiveHelper from '../mixins/skillectiveHelper.js'
 import MagnificPopupModal from './external/MagnificPopupModal'
 import DropdownDatepicker from 'vue-dropdown-datepicker'
 import VueTimepicker from 'vue2-timepicker/src/vue-timepicker.vue'
-import {mapActions, mapMutations, mapState} from 'vuex'
-import {email, numeric, required} from 'vuelidate/lib/validators'
+import { mapActions, mapMutations, mapState } from 'vuex'
+import { email, numeric, required } from 'vuelidate/lib/validators'
 import LoaderButton from './cart/LoaderButton/LoaderButton'
 import ct from 'countries-and-timezones'
 
 require('jquery.maskedinput/src/jquery.maskedinput')
 
-$(function() {
+$(function () {
   $('[data-toggle="tooltip"]')
-  .tooltip()
+    .tooltip()
 })
 
 export default {
@@ -806,12 +933,12 @@ export default {
   ],
   validations: {
     modalData: {
-      first_name: {required},
-      last_name: {required},
-      zip: {required, numeric, valid: v => /^[0-9]{5}(\-[0-9]{4})?$/.test(v)},
-      email: {email, required},
-      mobile_phone: {required, valid: v => /^((\+1)|(\+37))\s\([0-9]{3}\)\s[0-9]{3}\s[0-9]{4}$/.test(v)},
-      accept_terms: {checked: v => v}
+      first_name: { required },
+      last_name: { required },
+      zip: { required, numeric, valid: v => /^[0-9]{5}(\-[0-9]{4})?$/.test(v) },
+      email: { email, required },
+      mobile_phone: { required, valid: v => /^((\+1)|(\+37))\s\([0-9]{3}\)\s[0-9]{3}\s[0-9]{4}$/.test(v) },
+      accept_terms: { checked: v => v }
     }
   },
   data() {
@@ -828,7 +955,7 @@ export default {
         instagram_handle: '',
         newsletter: true,
         accept_terms: false,
-        sms_notification: false,
+        sms_notification: false
       },
       fields: {
         id: null,
@@ -865,18 +992,18 @@ export default {
     }
   },
   watch: {
-    selectRange: function() {
+    selectRange: function () {
       this.isDateInputInit = true
 
       if (this.selectRange !== null) {
         this.fields.date = this.selectRange.startStr
         this.fields.date_to = this.selectRange.startStr
         this.fields.time_from = moment(this.selectRange.startStr)
-        .format(
-          'H:mm:ss'
-        )
+          .format(
+            'H:mm:ss'
+          )
         this.fields.time_to = moment(this.selectRange.endStr)
-        .format('H:mm:ss')
+          .format('H:mm:ss')
         this.$refs.modal.open()
       }
     }
@@ -886,7 +1013,7 @@ export default {
     checkInstructors() {
       return this.studentInstructors.some(instructor => instructor.id === this.instructorId)
     },
-    priceError: function() {
+    priceError: function () {
       if (
         !this.fields.time_from ||
         !this.fields.time_to ||
@@ -900,7 +1027,7 @@ export default {
 
       let countSpots =
         moment(moment(this.fields.time_from, ['h:mm A']))
-        .diff(moment(this.fields.time_to, ['h:mm A'])) / 60000 / 30
+          .diff(moment(this.fields.time_to, ['h:mm A'])) / 60000 / 30
 
       if (
         Math.abs(Number(this.lessonBlockMinPrice) * Number(countSpots)) >
@@ -913,7 +1040,7 @@ export default {
     }
   },
   methods: {
-     ...mapActions([
+    ...mapActions([
       'addToClientList',
       'createToClientList',
       'addStudentToInstructorList',
@@ -933,8 +1060,8 @@ export default {
       await this.addStudentToInstructorList(data)
       await this.addToClientList(this.selectedInstructors)
       this.instructorNames = this.instructors
-      .filter(instructor => instructors.includes(instructor.id))
-      .map(instructor => instructor.full_name)
+        .filter(instructor => instructors.includes(instructor.id))
+        .map(instructor => instructor.full_name)
       this.loadingAdd = false
       this.addingNotification()
       this.closeAllInstructorsModal()
@@ -1006,7 +1133,7 @@ export default {
     closeForm() {
       this.openRegisteredModal = false
       $('#registeredModal').modal('hide')
-      this.modalData = {newsletter: true}
+      this.modalData = { newsletter: true }
       this.$v.$reset()
     },
     tooltipContent() {
@@ -1014,14 +1141,14 @@ export default {
     },
     async addingNotification() {
       if (this.loggedInStudent) {
-      let data = {
-        instructor: []
-      }
-      this.selectedInstructors.length
-        ? data.instructor = this.selectedInstructors
-        : data.instructor.push(this.instructorId)
-      await this.geoNotification(data)
-      await this.virtualNotification(data)
+        let data = {
+          instructor: []
+        }
+        this.selectedInstructors.length
+          ? data.instructor = this.selectedInstructors
+          : data.instructor.push(this.instructorId)
+        await this.geoNotification(data)
+        await this.virtualNotification(data)
       }
     },
     async successJoinedToClient() {
@@ -1064,18 +1191,18 @@ export default {
     timeFormChange() {
       if (moment(this.fields.time_from)) {
         this.fields.time_to = moment(this.fields.time_from, ['h:mm a'])
-        .add('30', 'minutes')
-        .format('h:mm a')
+          .add('30', 'minutes')
+          .format('h:mm a')
       }
     },
     onSubmit() {
       if (moment(this.fields.date))
         this.fields.date = moment(this.fields.date)
-        .format('YYYY-MM-DD')
+          .format('YYYY-MM-DD')
 
       if (moment(this.fields.date_to))
         this.fields.date_to = moment(this.fields.date_to)
-        .format('YYYY-MM-DD')
+          .format('YYYY-MM-DD')
 
       if (this.fields.lesson_type === 'virtual') {
         this.fields.count_participants = 1
@@ -1085,14 +1212,14 @@ export default {
         this.fields.time_from = moment(this.fields.time_from, [
           'h:mm A'
         ])
-        .format('HH:mm:ss')
+          .format('HH:mm:ss')
       }
 
       if (moment(this.fields.time_to)) {
         this.fields.time_to = moment(this.fields.time_to, ['h:mm A'])
-        .format(
-          'HH:mm:ss'
-        )
+          .format(
+            'HH:mm:ss'
+          )
       }
       if (this.fields.id > 0)
         this.apiPost(
@@ -1188,7 +1315,7 @@ export default {
       google.maps.event.addListener(
         autocomplete,
         'place_changed',
-        function() {
+        function () {
           thisComponent.fields.location = thisComponent.$refs[_ref].value
           console.log(thisComponent.$refs[_ref].value)
         }
@@ -1204,7 +1331,7 @@ export default {
   },
 
   async created() {
-    await this.getStudentInstructors()
+    if (this.loggedInStudent) await this.getStudentInstructors()
     this.timeOptions = this.getTimeOptions()
     this.timeZomeOptions = ct.getAllTimezones()
 
@@ -1330,17 +1457,17 @@ export default {
         id: lessonRequest.id,
         genre: lessonRequest.genre_id,
         date: moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
-        .format(
-          'YYYY-MM-DD'
-        ),
+          .format(
+            'YYYY-MM-DD'
+          ),
         date_to: moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
-        .format(
-          'YYYY-MM-DD'
-        ),
+          .format(
+            'YYYY-MM-DD'
+          ),
         time_from: moment(lessonRequest.start)
-        .format('h:mm a'),
+          .format('h:mm a'),
         time_to: moment(lessonRequest.end)
-        .format('h:mm a'),
+          .format('h:mm a'),
         count_participants: lessonRequest.count_participants + '',
         lesson_price: lessonRequest.lesson_price,
         location: lessonRequest.location,
@@ -1353,31 +1480,31 @@ export default {
       setTimeout(() => {
         this.$refs.datepicker.year = Number(
           moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
-          .format('YYYY')
+            .format('YYYY')
         )
         this.$refs.datepicker.month = Number(
           moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
-          .format('MM')
+            .format('MM')
         )
         this.$refs.datepicker.day = Number(
           moment(lessonRequest.start, ['YYYY-MM-DD H:mm:ss'])
-          .format('DD')
+            .format('DD')
         )
 
         this.$refs.datepickerTo.year = Number(
           moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
-          .format('YYYY')
+            .format('YYYY')
         )
         this.$refs.datepickerTo.month = Number(
           moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
-          .format('MM')
+            .format('MM')
         )
         this.$refs.datepickerTo.day = Number(
           moment(lessonRequest.end, ['YYYY-MM-DD H:mm:ss'])
-          .format('DD')
+            .format('DD')
         )
       }, 10)
-      
+
       this.fieldsDisabled =
         this.fields.id != null && this.loggedInStudent === true
 
@@ -1393,7 +1520,7 @@ export default {
         this.openPopup()
       }
       window.jQuery('.mask-input')
-      .mask('99/99/9999')
+        .mask('99/99/9999')
     }, 100)
   }
 }
@@ -1406,13 +1533,11 @@ export default {
   font-size: 16px;
   font-weight: 400;
 }
-
 .instructor-avatar {
   position: relative;
   width: 125px;
   height: 125px;
   margin-top: 40px;
-
   img {
     position: absolute;
     top: 0;
@@ -1422,7 +1547,6 @@ export default {
     border-radius: 50%;
   }
 }
-
 .profile-genres span {
   background-color: #f4f4f4;
   border-radius: 2px;
@@ -1437,7 +1561,6 @@ export default {
   padding: 4px 5px;
   text-align: center;
 }
-
 .inst {
   font-family: Hind Vadodara, sans-serif;
   font-style: normal;
@@ -1448,100 +1571,83 @@ export default {
   display: flex;
   align-items: center;
   padding: 5px 0;
-
   &:hover, &:visited {
     color: #AAAAAA;
   }
 }
-
 .modal-open, .modal {
   padding-right: 0 !important
 }
-
 .form-title {
   font-size: 25px;
   text-align: center;
-
 }
-
 .disabled-scroll {
   overflow: hidden;
 }
-
 .btn {
   font-size: 14px;
   margin-bottom: 8px;
 }
-
 .modal-body {
   font-size: 14px;
 }
-
 #successAdded {
   .modal-body {
     font-size: 20px;
   }
 }
-
 #otherInstructorsListTitle {
   font-size: 14px;
 }
-
 .tooltip {
   font-size: 10px;
 }
-
 #instructorsModal {
   .modal-title {
     span {
       font-size: 12px;
     }
   }
-
   .modal-body {
     ul {
       overflow-y: auto;
       height: 530px;
     }
   }
-
   .modal-footer {
     justify-content: center;
-
     button {
       width: 100%;
     }
   }
 }
-
 #successAdded {
   .modal-footer {
     justify-content: center;
-
     button {
       width: 100%;
     }
   }
 }
-
 .green {
+  color: #fff;
+  font-family: Poppins;
+  font-size: 14px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  background-image: linear-gradient(180deg, #11cf13 0%, #01bd00 100%);
+  transition: all 0.25s ease;
+  outline: none !important;
+  box-shadow: none !important;
+  width: 180px;
+  &:hover {
+    background-image: linear-gradient(180deg, #0ea510 0%, #038202 100%);
     color: #fff;
-    font-family: Poppins;
-    font-size: 14px;
-    font-weight: 400;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 3px;
-    background-image: linear-gradient(180deg, #11cf13 0%, #01bd00 100%);
-    transition: all 0.25s ease;
-    outline: none !important;
-    box-shadow: none !important;
-
-    &:hover {
-      background-image: linear-gradient(180deg, #0ea510 0%, #038202 100%);
-      color: #fff;
-    }
+  }
 }
 .disabledBtn {
   background-image: linear-gradient(180deg, #737473 0%, #7a7b7a 100%);

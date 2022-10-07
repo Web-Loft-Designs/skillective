@@ -55,7 +55,6 @@
                 this.apiDelete('/api/lesson/' + lesson.id);
             },
 			editLesson(lesson){
-                console.log('emit.lessonUpdateInit');
 				this.$root.$emit('lessonUpdateInit', lesson);
 			},
 			componentHandleDeleteResponse(responseData){

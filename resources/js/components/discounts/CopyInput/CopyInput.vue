@@ -1,16 +1,25 @@
 <template>
-  <div :class="{
+  <div
+    :class="{
       'copy-input': true,
       'copy-input--show-effect': showEffect,
-    }">
+    }"
+  >
     <input
-      type="text"
-      ref="copyInput"
-      :value="value"
-      :readonly="readonly"
+      ref='copyInput'
+      :readonly='readonly'
+      :value='value'
+      type='text'
+      @change="$emit('promo-changed', $event.target.value.trim())"
     />
-    <button title="Copy" @click.prevent="copyValue()">
-      <img alt="Copy" src="/images/copy-icon.svg" />
+    <button
+      title='Copy'
+      @click.prevent='copyValue'
+    >
+      <img
+        alt='Copy'
+        src='/images/copy-icon.svg'
+      />
       Copy
       <span>Copied</span>
     </button>
@@ -19,38 +28,41 @@
 
 <script>
 export default {
-  name: "CopyInput",
+  name: 'CopyInput',
   props: {
     readonly: {
       type: Boolean,
-      default: false,
+      default: false
     },
     value: {
       type: String,
-      default: "",
-    },
+      default: ''
+    }
   },
   data() {
     return {
       showEffect: false,
-      timeout: null,
+      timeout: null
     }
   },
   methods: {
     copyValue() {
       if (!this.timeout) {
-        navigator.clipboard.writeText(this.$refs.copyInput.value);
-        this.showEffect = true;
+        navigator.clipboard.writeText(this.$refs.copyInput.value)
+        this.showEffect = true
         this.timeout = setTimeout(() => {
-          this.showEffect = false;
-          this.timeout = null;
-        }, 3000);
+          this.showEffect = false
+          this.timeout = null
+        }, 3000)
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
-<style lang="scss" scoped>
-@import "./CopyInput.scss";
+<style
+  lang='scss'
+  scoped
+>
+@import './CopyInput.scss';
 </style>

@@ -43,7 +43,7 @@ class CartRepository extends BaseRepository
                         $join->on('lessons.id', '=', 'bookings.lesson_id')
                             ->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ");
                     })
-                    ->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")
+                    //->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")
                     ->groupBy('cart.id');
 
                 return $query;
@@ -72,6 +72,8 @@ class CartRepository extends BaseRepository
             $preRCart = $this->get();
 
             $cart = $cart->merge($preRCart);
+
+
 
             foreach ($cart as $index => $cartItem) {
                 if ($cartItem->lesson_id) {
@@ -129,7 +131,7 @@ class CartRepository extends BaseRepository
                 $join->on('lessons.id', '=', 'bookings.lesson_id')
                     ->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ");
             })
-            ->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")
+            //->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")
             ->with(["genre", 'instructor', 'instructor.discounts']);
 
         $cart = $lessons->get(["lessons.*"]);
@@ -362,11 +364,15 @@ class CartRepository extends BaseRepository
 
                 if(!$lessonAlreadyPurchased) $result = Cart::create($data);
 
+            }else{
+                session()->flash('guestCartCheck', 'We have removed some lessons from the basket, as they were already purchased by you earlier.');
             }
 
         }
 
-        return true;
+        return response()->json([
+            'status' => true
+        ]);
 
     }
 }

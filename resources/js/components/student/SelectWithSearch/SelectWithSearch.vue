@@ -1,91 +1,63 @@
 <template>
-    <div :class="{
-        'select-with-search': true,
-        'select-with-search--small': type == 'small',
-        'select-with-search--form': type == 'form',
-    }">
-        <vue-select 
-            :options="options" 
-            v-model="selectedValue" 
-            :placeholder="placeholder" 
-            :clearable="false"
-            :disabled="disabled"
-        />
-    </div>
+  <div
+    :class="{
+      'select-with-search': true,
+      'select-with-search--small': type === 'small',
+      'select-with-search--form': type === 'form',
+    }"
+  >
+    <vue-select
+      v-model='selectedValue'
+      :clearable='false'
+      :disabled='disabled'
+      :options='options'
+      :placeholder='placeholder'
+      @input="$emit('value-changed', selectedValue.value)"
+    />
+  </div>
 </template>
 
 <script>
-import { VueSelect } from 'vue-select';
-import 'vue-select/dist/vue-select.css';
+import { VueSelect } from 'vue-select'
+import 'vue-select/dist/vue-select.css'
 
 export default {
-    name: "SelectWithSearch",
-    components: {
-        VueSelect,
+  name: 'SelectWithSearch',
+  components: {
+    VueSelect
+  },
+  props: {
+    value: {
+      default: null
     },
-    props: {
-        value: {
-            default: null,
-        },
-        options: {
-            type: Array,
-            default: () => {
-                return [];
-            },
-        },
-        placeholder: {
-            type: String,
-            default: "",
-        },
-        type: {
-            type: String,
-            default: null,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
+    options: {
+      type: Array,
+      default: () => []
     },
-    data() {
-        return {
-            selectedValue: this.options[0],
-        }
+    placeholder: {
+      type: String,
+      default: ''
     },
-    mounted() {
-        this.checkValueChanged();
+    type: {
+      type: String,
+      default: null
     },
-    watch: {
-        value() {
-            this.checkValueChanged();
-        },
-        selectedValue(newValue) {
-            
-            this.$emit("value-changed", newValue);
-        },
-    },
-    methods: {
-        checkValueChanged() {
-            
-            if (this.value) {
-                this.options.forEach((op) => {
-                    if ((op.value && op.value == this.value) || (op == this.value)) {
-                        // this.selectedValue = op;
-                        console.log(this.selectedValue)
-                    }
-                });
-            }
-        },
-        selectByValue(val) {
-            this.options.map((option) => {
-                if (option.value == val) {
-                    this.selectedValue = option;
-                }
-            });
-        },
-    },
+    disabled: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+      selectedValue: this.value
+    }
+  }
 }
 </script>
 
-<style lang="scss" scoped>
-@import "./SelectWithSearch.scss";
+<style
+  lang='scss'
+  scoped
+>
+@import './SelectWithSearch.scss';
 </style>

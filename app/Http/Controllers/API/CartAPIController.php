@@ -41,10 +41,8 @@ class CartAPIController extends AppBaseController
         $guest_cart = $request->query('guest_cart');
 
         if (Auth::user()) {
-
             $student_id = Auth::user()->id;
-
-        }else{
+        } else {
             Cookie::queue('guest_cart', $guest_cart, 84600);
         }
 

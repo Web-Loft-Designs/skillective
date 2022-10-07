@@ -108,7 +108,7 @@
                         @include('include/login-popup')
                     @endif
 
-                    @if ((Auth::user() && $loggedUserRole == \App\Models\User::ROLE_INSTRUCTOR && \Request::is('instructor/*')) || (Auth::user() && $loggedUserRole == \App\Models\User::ROLE_INSTRUCTOR && \Request::is('profile/'))))
+                    @if ((Auth::user() && $loggedUserRole == \App\Models\User::ROLE_INSTRUCTOR && \Request::is('instructor/*')) || (Auth::user() && $loggedUserRole == \App\Models\User::ROLE_INSTRUCTOR  && \Request::is('profile'))))
                         <profile-lesson-form v-bind:user-genres="{{ json_encode($userGenres) }}"
                             v-bind:site-genres="{{ json_encode($siteGenres) }}"
                             :instructor-id="{{ Auth::user()->id }}" ref="addModal">

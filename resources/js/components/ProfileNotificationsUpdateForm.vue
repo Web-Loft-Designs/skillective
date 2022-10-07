@@ -59,7 +59,6 @@
 		},
         created : function() {
 			this.fields.notification_methods = _.intersection(_.keys(this.availableNotificationMethods), this.userNotificationMethods);
-			console.log(this.fields.notification_methods);
         }
 	}
 </script>

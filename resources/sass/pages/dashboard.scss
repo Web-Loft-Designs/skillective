@@ -5820,7 +5820,8 @@ h4 {
 }
 
 .dashboard-page .calendar-component .calendar-component-top h2 button,
-.dashboard-page .calendar-component .calendar-component-top h2 a {
+.dashboard-page .calendar-component .calendar-component-top h2 a,
+.profile-section .calendar-component .calendar-component-top h2 button{
     position: relative;
 
     &:hover {

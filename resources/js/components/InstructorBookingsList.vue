@@ -248,9 +248,6 @@ export default {
     },
   },
   created: function () {
-
-    console.log(this.bookingsMeta)
-
     if (
       this.bookingsMeta != undefined &&
       this.bookingsMeta.pagination != undefined
