@@ -11,38 +11,24 @@
         else
 			$editRoute = route('profile.edituser', ['user'=>$userProfileData['id']]);
     ?>
-        <h2>
-        @if ($userProfileData['profile']['instagram_handle'])
-            <a href="https://instagram.com/{{ $userProfileData['profile']['instagram_handle'] }}" target="_blank">{{ '@' . $userProfileData['profile']['instagram_handle'] }}</a>
-        @endif
 
-        @if ($userProfileData['isInstructor']==true && Auth::user() && Auth::user()->hasRole('Student'))
-            <favorite-instructor v-bind:instructor-id="{{ $userProfileData['id'] }}" v-bind:is-favorite="{{ Auth::user()->hasOwnFavoriteInstructor($userProfileData['id']) ? 'true' : 'false' }}"></favorite-instructor>
-        @endif
-        </h2>
+    @if(Auth::user() && (Auth::user ()->id==$userProfileData['id'] || Auth::user()->hasRole('Admin') ) )
+        @include('frontend.partials.profile.avatar-upload')
+    @else
+        @include('frontend.partials.profile.avatar')
+    @endif
 
-    <div class="profile-info-block">
-        <div class="profile-info-text">
-            <p>
-                {{ $userProfileData['full_name'] }} <br/>
-                {{ $userProfileData['profile']['city'] }} <br/>
-                {{ $userProfileData['profile']['state'] }}
-            </p>
+    <div class="profile-info-text">
+        <p>{{ $userProfileData['full_name'] }} <br/>
+           {{ $userProfileData['profile']['city'] }} <br/>
+           {{ $userProfileData['profile']['state'] }}
+        </p>
+        <div class="d-flex flex-column">
             @if ($userProfileData['total_count_lessons'] >= 25)
-                <div class="d-flex flex-column">
-                    <p class='mb-3'><strong>{{ $userProfileData['total_count_lessons'] }}</strong> Lessons Held</p>
-                </div>
+            <p class='mb-3'><strong>{{ $userProfileData['total_count_lessons'] }}</strong> Lessons Held</p>
             @endif
-        </div>
-        @if(Auth::user() && (Auth::user ()->id==$userProfileData['id'] || Auth::user()->hasRole('Admin') ) )
-            @include('frontend.partials.profile.avatar-upload')
-        @else
-            @include('frontend.partials.profile.avatar')
-        @endif
-    </div>
-
-    <?php
-        $loggedInStudent = ( Auth::user() && Auth::user()->hasRole('Student') );
+            <?php
+            $loggedInStudent = ( Auth::user() && Auth::user()->hasRole('Student') );
             if(Auth::user()){
                 if (Auth::user()->hasRole('Student')) {
                     $studentId = Auth::user()['id'];
@@ -50,24 +36,34 @@
             }else{
                 $studentId = null;
             }
-    ?>
-    @if ($userProfileData['isInstructor']==true && ( !Auth::user() || $loggedInStudent ) )
-        <request-lesson-form
-            :instructor-name="{{ json_encode($userProfileData['full_name']) }}"
-            :show-create-btn="true"
-            student-id="{{$studentId}}"
-            :user-genres="{{  json_encode($userProfileData['genres']) }}"
-            :site-genres="{{  json_encode($siteGenres) }}"
-            :instructor-id="{{ $userProfileData['id'] }}"
-            {{--:select-range="selectRangeTrigger"--}}
-            :logged-in-student="{{ $loggedInStudent ? 'true' : 'false' }}"
-            {{--:booking-fees-description="'{{ isset($booking_fees_description) ? preg_replace('/\n|\r/', '', addslashes($booking_fees_description)) : '' }}'"--}}
-            :request-sent-confirmation="'{{ preg_replace('/\n|\r/', '', addslashes($lesson_request_created)) }}'"
-            :lesson-block-min-price="{{ $userProfileData['profile']['lesson_block_min_price'] }}"
-        ></request-lesson-form>
-    @endif
-    {{--<p><strong>{{ number_format($userProfileData['profile']['instagram_followers_count']) }}</strong> Followers</p>--}}
+            ?>
+            @if ($userProfileData['isInstructor']==true && ( !Auth::user() || $loggedInStudent ) )
+                <request-lesson-form
+                        :instructor-name="{{ json_encode($userProfileData['full_name']) }}"
+                        :show-create-btn="true"
+                        student-id="{{$studentId}}"
+                        :user-genres="{{  json_encode($userProfileData['genres']) }}"
+                        :site-genres="{{  json_encode($siteGenres) }}"
+                        :instructor-id="{{ $userProfileData['id'] }}"
+                        {{--:select-range="selectRangeTrigger"--}}
+                        :logged-in-student="{{ $loggedInStudent ? 'true' : 'false' }}"
+                        {{--:booking-fees-description="'{{ isset($booking_fees_description) ? preg_replace('/\n|\r/', '', addslashes($booking_fees_description)) : '' }}'"--}}
+                        :request-sent-confirmation="'{{ preg_replace('/\n|\r/', '', addslashes($lesson_request_created)) }}'"
+                        :lesson-block-min-price="{{ $userProfileData['profile']['lesson_block_min_price'] }}"
+                ></request-lesson-form>
+            @endif
+{{--            <p><strong>{{ number_format($userProfileData['profile']['instagram_followers_count']) }}</strong> Followers</p>--}}
+        </div>
+    </div>
+    <h2>
+            @if ($userProfileData['profile']['instagram_handle'])
+                <a href="https://instagram.com/{{ $userProfileData['profile']['instagram_handle'] }}" target="_blank">{{ '@' . $userProfileData['profile']['instagram_handle'] }}</a>
+            @endif
 
+            @if ($userProfileData['isInstructor']==true && Auth::user() && Auth::user()->hasRole('Student'))
+                <favorite-instructor v-bind:instructor-id="{{ $userProfileData['id'] }}" v-bind:is-favorite="{{ Auth::user()->hasOwnFavoriteInstructor($userProfileData['id']) ? 'true' : 'false' }}"></favorite-instructor>
+            @endif
+            </h2>
     <div class="profile-info-middle">
         <div class="profile-info-about-us">
             <p class="profile-label">About instructor:

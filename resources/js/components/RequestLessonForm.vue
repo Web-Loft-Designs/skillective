@@ -1,12 +1,12 @@
 <template>
   <div id='lesson-form-container'>
-    <div class='d-flex justify-content-center'>
+    <div class='d-grid gap-2 d-md-block'>
       <button
         v-if='showCreateBtn'
         :class="{'disabledBtn': checkInstructors}"
         :disabled='checkInstructors'
         :title='tooltipContent()'
-        class='btn green btn-sm text-wrap mb-0'
+        class='btn green btn-sm text-wrap'
         data-placement='bottom'
         data-toggle='tooltip'
         type='button'
