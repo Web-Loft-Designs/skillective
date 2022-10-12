@@ -62,7 +62,7 @@ class PreRLessonRepository extends BaseRepository
         $this->scopeQuery(function ($query) use ($request) {
             $query = $query->select('pre_r_lessons.*')
                 ->join('users', 'pre_r_lessons.instructor_id', '=', "users.id")
-                ->leftJoin('purchased_lessons', 'pre_r_lessons.id', '=', "purchased_lessons.pre_r_lesson_id");
+                ->join('purchased_lessons', 'pre_r_lessons.id', '=', "purchased_lessons.pre_r_lesson_id");
 
             if( Auth::check() )
             {
@@ -75,8 +75,8 @@ class PreRLessonRepository extends BaseRepository
                     $userGenres = Auth()->user()->genres()->orderBy('title', 'desc')->get()->pluck('id')->toArray();
                     $ids_ordered = implode(',', $userGenres);
                     $query->groupBy('pre_r_lessons.id')
-                        ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'asc')
-                        ->orderBy(DB::raw('FIELD(pre_r_lessons.genre_id, '.$ids_ordered.') + COUNT(`purchased_lessons`.`id`), COUNT(`purchased_lessons`.`id`)'), 'asc');
+                        ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'desc')
+                        ->orderBy(DB::raw('FIELD(pre_r_lessons.genre_id, '.$ids_ordered.') + COUNT(`purchased_lessons`.`id`), COUNT(`purchased_lessons`.`id`)'), 'desc');
 
                 }
 
