@@ -314,6 +314,7 @@ export default {
       }
     },
     eventRender: function (info) {
+      let calendarApi = this.$refs.fullCalendarSmall.getApi()
       if (moment(info.event.start, "x") <= moment(new Date(), "x")) {
         info.el.className = info.el.className + " last-event";
       }
@@ -334,11 +335,22 @@ export default {
         '<span class="spot-left">Spots left: ' +
         count +
         "</span>";
-
       if (!this.lessonIdParsed) {
         const params = urlHelper.parseQueryParams();
+        axios
+          .get(
+            "/api/instructor/" +
+            this.instructorId +
+            "/lessons?" +
+            this.triggerView +
+            "=" +
+            moment(params.date).format("YYYY-MM-DD")
+          ).then(res => {
+            this.events = res.data.data
+        })
+        calendarApi.gotoDate(params.date)
         if (params.lessonId) {
-          if (params.lessonId == info.event.id) {
+          if (params.lessonId === info.event.id) {
             this.lessonIdParsed = true;
             this.dateClick(info);
           }

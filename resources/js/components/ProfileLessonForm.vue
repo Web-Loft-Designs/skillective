@@ -1028,7 +1028,8 @@ export default {
       this.uploadPreviewProgress = 101
     },
     getShareLink() {
-      return shareHelper.buildShareLink(this.instructorId, this.fields.id)
+      console.log(this.fields,'zxc')
+      return shareHelper.buildShareLink(this.instructorId, this.fields.id, this.fields.date)
     },
     initDateFrom() {
       const today = new Date()

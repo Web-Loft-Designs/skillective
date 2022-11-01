@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <div class='d-flex flex-wrap' v-if='selectedLesson != null'>
+  <div class='d-flex flex-wrap' v-if='selectedLesson != null'>
       <img
         ref='previewImage'
         class="video-lesson__image"
@@ -107,7 +106,6 @@
         <div v-if='successText' class='has-success'>{{ successText }}</div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
