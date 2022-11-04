@@ -90,8 +90,6 @@ import MagnificPopupModal from './MagnificPopupModal'
 import siteAPI from '../../mixins/siteAPI.js'
 import countriesAndTimezones from 'countries-and-timezones'
 
-let FileSaver = require('file-saver')
-
 export default {
   components: {
     FullCalendar,
@@ -134,31 +132,34 @@ export default {
       calendarApi.gotoDate(params.date)
       axios
         .get(
-          "/api/instructor/" +
+          '/api/instructor/' +
           this.instructorId +
-          "/lessons?" +
+          '/lessons?' +
           this.triggerView +
-          "=" +
-          moment(params.date).format("YYYY-MM-DD")
+          '=' +
+          moment(params.date).format('YYYY-MM-DD')
         ).then(res => {
         this.events = res.data.data
       })
     }
   },
   methods: {
-    clearFormAndClosePopup() {},
+    clearFormAndClosePopup() {
+    },
     removeIt(id) {
       let temp = null
-      this.events.forEach(function (item, key) { if (item.id == id) temp = key})
+      this.events.forEach(function (item, key) {
+        if (item.id === id) temp = key
+      })
       this.events.splice(temp, 1)
     },
-    openSend() {``},
+    openSend() {
+      ``
+    },
     scrollDown: function () {
       let calendarApi = this.$refs.fullCalendarSmall.getApi()
       let currentTimeHour = calendarApi.scrollTime.split(':')[0]
-      if (currentTimeHour == '14') {
-        return
-      } else {
+      if (currentTimeHour != '14') {
         let newTime = Number(currentTimeHour)
         newTime += 1
         if (newTime < 10) {
@@ -171,9 +172,7 @@ export default {
     scrollUp: function () {
       let calendarApi = this.$refs.fullCalendarSmall.getApi()
       let currentTimeHour = calendarApi.scrollTime.split(':')[0]
-      if (currentTimeHour == '00') {
-        return
-      } else {
+      if (currentTimeHour != '00') {
         let newTime = Number(currentTimeHour)
         newTime -= 1
         if (newTime < 10) {
@@ -230,14 +229,7 @@ export default {
           })
         }
         axios
-          .get(
-            '/api/instructor/' +
-            this.instructorId +
-            '/lessons?' +
-            this.triggerView +
-            '=' +
-            moment(info.view.currentStart).format('YYYY-MM-DD')
-          )
+          .get(`/api/instructor/${ this.instructorId }/lessons?${ this.triggerView }=${ moment(info.view.currentStart).format('YYYY-MM-DD') }`)
           .then((response) => {
             this.events = response.data.data
             this.events = this.events.map(function (item) {
@@ -252,15 +244,11 @@ export default {
               )
               let today = new Date()
               let isDstObserved = false
-              if (today.getTimezoneOffset() < stdTimezoneOffset) {
-                isDstObserved = true
-              }
+              if (today.getTimezoneOffset() < stdTimezoneOffset) isDstObserved = true
               let _tzOffset = 1
-              if (isDstObserved) {
-                _tzOffset = lessonTimeZoneObj.dstOffset * 60 * 1000
-              } else {
-                _tzOffset = lessonTimeZoneObj.utcOffset * 60 * 1000
-              }
+              isDstObserved
+                ? _tzOffset = lessonTimeZoneObj.dstOffset * 60 * 1000
+                : _tzOffset = lessonTimeZoneObj.utcOffset * 60 * 1000
               let dummyStart =
                 new Date(item.start.replace(/\s/, 'T')).getTime() -
                 userTzOffset -
@@ -280,7 +268,7 @@ export default {
             this.loader.hide()
             this.loader = null
           })
-          .catch((error) => {
+          .catch(() => {
             this.events = []
             this.loader.hide()
             this.loader = null
@@ -294,15 +282,29 @@ export default {
       let count =
         parseInt(info.event.extendedProps.spots_count) -
         parseInt(info.event.extendedProps.count_booked)
-      if (count === 1) {
-        info.el.className = info.el.className + ' red-event'
-      } else if (count === 2) {
-        info.el.className = info.el.className + ' yellow-event'
-      } else if (count > 2) {
-        info.el.className = info.el.className + ' green-event'
-      } else {
-        info.el.className = info.el.className + ' grey-event'
+      switch (count) {
+        case 1:
+          info.el.className = info.el.className + ' red-event'
+          break
+        case 2:
+          info.el.className = info.el.className + ' yellow-event'
+          break
+        case count > 2:
+          info.el.className = info.el.className + ' green-event'
+          break
+        default:
+          info.el.className = info.el.className + ' grey-event'
+          break
       }
+      // if (count === 1) {
+      //   info.el.className = info.el.className + ' red-event'
+      // } else if (count === 2) {
+      //   info.el.className = info.el.className + ' yellow-event'
+      // } else if (count > 2) {
+      //   info.el.className = info.el.className + ' green-event'
+      // } else {
+      //   info.el.className = info.el.className + ' grey-event'
+      // }
       info.el.innerHTML =
         info.el.innerHTML +
         '<span class="spot-left">Spots left: ' +
@@ -321,10 +323,6 @@ export default {
     selectOverlap: function () {
       return true
     },
-    // selected: function (info) {
-    //   console.log(info);
-    //   // this.selectRangeTrigger = info;
-    // },
     selected: function (info) {
       let calendarApi = this.$refs.fullCalendar.getApi()
       calendarApi.changeView('timeGridWeek')
@@ -336,14 +334,7 @@ export default {
         lat: info.event.extendedProps.lat,
         lng: info.event.extendedProps.lng,
         title: info.event.title,
-        fullDate:
-          moment(info.event.start).format('MMM') +
-          ' ' +
-          moment(info.event.start).format('DD') +
-          ', ' +
-          moment(info.event.start).format('hh:mma') +
-          ' - ' +
-          moment(info.event.end).format('hh:mma'),
+        fullDate: `${ moment(info.event.start).format('MMM') } ${ moment(info.event.start).format('DD') }, ${ moment(info.event.start).format('hh:mma') } - ${ moment(info.event.end).format('hh:mma') }`,
         location: info.event.extendedProps.location,
         price: info.event.extendedProps.spot_price,
         students: info.event.extendedProps.students,
@@ -352,40 +343,6 @@ export default {
     },
     closeModal: function () {
       this.$refs.modal.close()
-    },
-    downloadExportedFile: function () {
-      if (this.loader == null) {
-        this.loader = this.$loading.show({
-          zIndex: 9999999
-        })
-      }
-      let calendarApi = this.$refs.fullCalendarSmall.getApi()
-      // this.scrollTime1 = moment(this.events[0].start).count('hh:mm:ss');
-      let currentTime = moment(calendarApi.view.currentStart).format(
-        'YYYY-MM-DD'
-      )
-      calendarApi.scrollTime = moment(this.events[0].start).format('HH:mm:ss')
-      calendarApi.scrollToTime(moment(this.events[0].start).format('HH:mm:ss'))
-      return axios
-        .get('/api/instructor/lessons/export?month=' + currentTime, {
-          responseType: 'blob'
-        })
-        .then((response) => {
-          FileSaver.saveAs(response.data, 'lessons-list.xlsx')
-          this.loader.hide()
-          this.loader = null
-        })
-        .catch((error) => {
-          this.loader.hide()
-          this.loader = null
-        })
-      //				this.$http.get('/api/lessons/export', {responseType: 'arraybuffer'})
-      //					.then(response => {
-      //						    this.downloadFile(response, 'lessons-list', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', '.xlsx')
-      //                        }, response => {
-      //                            // Manage errors
-      //                        }
-      //			        );
     }
   }
 }
