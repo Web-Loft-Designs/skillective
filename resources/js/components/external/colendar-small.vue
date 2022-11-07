@@ -282,29 +282,15 @@ export default {
       let count =
         parseInt(info.event.extendedProps.spots_count) -
         parseInt(info.event.extendedProps.count_booked)
-      switch (count) {
-        case 1:
-          info.el.className = info.el.className + ' red-event'
-          break
-        case 2:
-          info.el.className = info.el.className + ' yellow-event'
-          break
-        case count > 2:
-          info.el.className = info.el.className + ' green-event'
-          break
-        default:
-          info.el.className = info.el.className + ' grey-event'
-          break
+      if (count === 1) {
+        info.el.className = info.el.className + ' red-event'
+      } else if (count === 2) {
+        info.el.className = info.el.className + ' yellow-event'
+      } else if (count > 2) {
+        info.el.className = info.el.className + ' green-event'
+      } else {
+        info.el.className = info.el.className + ' grey-event'
       }
-      // if (count === 1) {
-      //   info.el.className = info.el.className + ' red-event'
-      // } else if (count === 2) {
-      //   info.el.className = info.el.className + ' yellow-event'
-      // } else if (count > 2) {
-      //   info.el.className = info.el.className + ' green-event'
-      // } else {
-      //   info.el.className = info.el.className + ' grey-event'
-      // }
       info.el.innerHTML =
         info.el.innerHTML +
         '<span class="spot-left">Spots left: ' +
