@@ -145,7 +145,7 @@ Route::group(['middleware' => ['role:Instructor']], function () {
 
 
 	Route::get('instructor/discount', 'InstructorDiscountsAPIController@indexDiscounts');
-	Route::get('instructor/promo', 'InstructorDiscountsAPIController@indexPromoCodes');
+	Route::get('instructor/promo/{id}', 'InstructorDiscountsAPIController@indexPromoCodes');
 	Route::post('instructor/discount', 'InstructorDiscountsAPIController@storeDiscount');
 	Route::post('instructor/promo', 'InstructorDiscountsAPIController@storePromoCode');
 
