@@ -35,9 +35,9 @@ class InstructorDiscountsAPIController extends AppBaseController
         return  $this->sendResponse($discounts);
     }
 
-    public function indexPromoCodes()
+    public function indexPromoCodes($id)
     {
-        $promos = $this->promoCodeRepository->getInstrucorsPromos();
+        $promos = $this->promoCodeRepository->getInstructorPromos($id);
 
         return  $this->sendResponse($promos);
     }

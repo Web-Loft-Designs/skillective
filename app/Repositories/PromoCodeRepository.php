@@ -42,4 +42,14 @@ class PromoCodeRepository extends BaseRepository
     {
         return $this->presenter->present($data);
     }
+
+    public function getInstructorPromos($id)
+    {
+
+        $promos = $this->where('instructor_id', $id)->orderBy('created_at', 'desc')->get();
+
+
+        return $promos;
+    }
+
 }

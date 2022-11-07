@@ -351,6 +351,11 @@ export default {
       }
     }
   },
+  props: {
+    instructorId: {
+      type: Number
+    }
+  },
   watch: {
     viewMode(newValue) {
       if (newValue === 'list') {
@@ -403,7 +408,7 @@ export default {
       }
     },
     async loadPromos() {
-      this.promos = await discountPromoService.getPromos()
+      this.promos = await discountPromoService.getPromos(this.instructorId)
       this.isLoading = false
     },
     generatePromoId() {

@@ -19,7 +19,8 @@ class InstructorDiscountManagementController extends Controller
         $vars = [
             'page_title' => 'Discount Management',
             'siteGenres'	=> $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
-            'userGenres'	=> $genreRepository->presentResponse(Auth::user()->genres)['data']
+            'userGenres'	=> $genreRepository->presentResponse(Auth::user()->genres)['data'],
+            'user' => Auth::user(),
         ];
 
         return view('frontend.instructor.discount-management', $vars);

@@ -1,4 +1,4 @@
 @extends('layouts.app-frontend')
 @section('content')
-    <discount-management></discount-management>
+    <discount-management :instructor-id="{{ $user['id'] }}"></discount-management>
 @endsection
