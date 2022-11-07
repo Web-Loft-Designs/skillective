@@ -370,7 +370,7 @@ export default {
       this.apiPut(`/api/admin/instructors/featured/${user.id}`);
     },
     setPriority: function (user) {
-      console.log(user.priority)
+      // console.log(user.priority)
       this.apiPut(`/api/admin/instructors/priority/${user.id}`, {
         priority: user.priority,
       });

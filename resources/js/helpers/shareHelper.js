@@ -1,7 +1,7 @@
 const shareHelper = {
 
-  buildShareLink(instructorId, lessonId) {
-    return `${ window.location.protocol }//${ window.location.hostname }/profile/${ instructorId }?lessonId=${ lessonId }`;
+  buildShareLink(instructorId, lessonId, date) {
+    return `${ window.location.protocol }//${ window.location.hostname }/profile/${ instructorId }?lessonId=${ lessonId }&date=${date}`;
   },
   
 };

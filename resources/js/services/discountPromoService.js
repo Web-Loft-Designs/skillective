@@ -10,9 +10,9 @@ const discountPromoService = {
       })
     return response.data.data
   },
-  async getPromos() {
+  async getPromos(id) {
     const response = await axios
-      .get('/api/instructor/promo')
+      .get(`/api/instructor/promo/${id}`)
       .catch(e => {
         console.log(e)
       })
