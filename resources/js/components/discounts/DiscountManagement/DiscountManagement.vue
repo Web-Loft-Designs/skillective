@@ -31,7 +31,7 @@
           v-if="activeTab === 'promo'"
           class='discount-management__content-tab'
         >
-          <promos-editor/>
+          <promos-editor :instructor-id='instructorId'/>
         </div>
       </div>
     </div>
@@ -61,6 +61,11 @@ export default {
           title: 'Promo code'
         }
       ]
+    }
+  },
+  props: {
+    instructorId: {
+      type: Number
     }
   }
 }
