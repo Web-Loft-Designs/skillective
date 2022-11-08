@@ -108,11 +108,16 @@
                         @include('include/login-popup')
                     @endif
 
-                    @if ((Auth::user() && $loggedUserRole == \App\Models\User::ROLE_INSTRUCTOR && \Request::is('instructor/*')) || (Auth::user() && $loggedUserRole == \App\Models\User::ROLE_INSTRUCTOR  && \Request::is('profile'))))
+                    @if ( (Auth::user() && $loggedUserRole == \App\Models\User::ROLE_INSTRUCTOR && \Request::is('instructor/*'))
+                            || (Auth::user() && $loggedUserRole == \App\Models\User::ROLE_INSTRUCTOR  && \Request::is('profile')))
+
+
                         <profile-lesson-form v-bind:user-genres="{{ json_encode($userGenres) }}"
                             v-bind:site-genres="{{ json_encode($siteGenres) }}"
                             :instructor-id="{{ Auth::user()->id }}" ref="addModal">
                         </profile-lesson-form>
+
+
                     @endif
 
 
@@ -120,7 +125,13 @@
                         <magnific-popup-modal-success class="panding-popup" :show="false"
                             :config="{closeOnBgClick:true,showCloseBtn:true,enableEscapeKey:false}" ref="modalSuccess">
                             <panding-popup :modal-window="modalSuccess"
-                                :registration-confirmation-text="'@if (isset($settings['instructor_registration_confirmation_text']) && $settings['instructor_registration_confirmation_text']){!! $settings['instructor_registration_confirmation_text'] !!}@else{{ 'Your request is being reviewed by Skillective. You will be notified via email to complete profile once request approved.' }}@endif'"></panding-popup>
+                                :registration-confirmation-text="'@if (isset($settings['instructor_registration_confirmation_text'])
+                                && $settings['instructor_registration_confirmation_text'])
+                                {!! $settings['instructor_registration_confirmation_text'] !!}
+                                @else{{ 'Your request is being reviewed by Skillective. You will be notified via email
+                                to complete profile once request approved.' }}@endif'">
+
+                            </panding-popup>
                         </magnific-popup-modal-success>
                     @endif
                 </div>
