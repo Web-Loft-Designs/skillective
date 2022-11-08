@@ -242,6 +242,11 @@ export default {
     DatePicker,
     FieldErrors
   },
+  props: {
+    instructorId: {
+      type: Number
+    }
+  },
   data() {
     return {
       isLoading: true,
@@ -366,7 +371,7 @@ export default {
       }
     },
     async loadDiscounts() {
-      this.discounts = await discountPromoService.getDiscounts()
+      this.discounts = await discountPromoService.getDiscounts(this.instructorId)
       this.isLoading = false
     },
     confirmDelete(text, action) {
