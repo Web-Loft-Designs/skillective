@@ -25,7 +25,7 @@
           v-if="activeTab === 'discount'"
           class='discount-management__content-tab'
         >
-          <discounts-editor/>
+          <discounts-editor :instructor-id='instructorId'/>
         </div>
         <div
           v-if="activeTab === 'promo'"
