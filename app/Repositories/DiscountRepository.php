@@ -22,27 +22,17 @@ class DiscountRepository extends BaseRepository
 
 
 
-	public function getInstructorsDiscounts()
-	{
-		$instructor_id = Auth::user()->id;
-
-		$this->resetCriteria();
-		$this->resetScope();
-
-
-		$this->scopeQuery(function ($query) use ($instructor_id) {
-			$query->where('instructor_id', $instructor_id)
-				->orderBy('created_at', 'desc');
-			return $query;
-		});
-
-
-		return $this->get(['discounts.*']);
-	}
-
-
     public function presentResponse($data)
     {
         return $this->presenter->present($data);
+    }
+
+    public function getInstructorsDiscounts($id)
+    {
+
+        $discounts = $this->where('instructor_id', $id)->orderBy('created_at', 'desc')->get();
+
+        return $discounts;
+
     }
 }

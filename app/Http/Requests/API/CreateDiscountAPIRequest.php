@@ -34,6 +34,8 @@ class CreateDiscountAPIRequest extends APIRequest
       'start'      => ['required', 'date_format:Y-m-d', 'future_date'],
       'finish'      => ['required', 'date_format:Y-m-d', 'future_date'],
       'discount'      => ['required'],
+      'users_count' => ['required'],
+      'lessons_for_apply' => ['required'],
     ];
 
     return $rules;

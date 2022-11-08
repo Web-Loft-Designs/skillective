@@ -2,17 +2,17 @@ import axios from 'axios'
 import urlHelper from '../helpers/urlHelper'
 
 const discountPromoService = {
-  async getDiscounts() {
+  async getDiscounts(instructorId) {
     const response = await axios
-      .get('/api/instructor/discount')
+      .get(`/api/instructor/discount/${instructorId}`)
       .catch(e => {
         console.log(e)
       })
     return response.data.data
   },
-  async getPromos(id) {
+  async getPromos(instructorId) {
     const response = await axios
-      .get(`/api/instructor/promo/${id}`)
+      .get(`/api/instructor/promo/${instructorId}`)
       .catch(e => {
         console.log(e)
       })
