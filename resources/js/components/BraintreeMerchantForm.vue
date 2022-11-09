@@ -276,11 +276,12 @@
           <input
             :disabled='isAdminForm'
             type='text'
-            class='form-control'
+            class='form-control mb-2'
             required
             v-model='merchantAccountDetails.tax_id'
           />
-          <span class='btn-grn-link'>Why do we need this?</span>
+          <span data-toggle="modal" data-target="#taxInfoPopup" class='btn-grn-link'>Why do we need this?</span>
+          <TaxIdReminderPopup/>
           <span
             class='help-block'
             v-if='errors.first_name'
@@ -288,7 +289,6 @@
             <strong>{{ errors.tax_id[0] }}</strong>
           </span>
         </div>
-
         <div
           v-if='!isAdminForm && merchantAccountDetails.id == null'
           class='form-group checkbox-wrapper has-feedback'
@@ -351,11 +351,13 @@ import $ from 'jquery'
 
 require('jquery.maskedinput/src/jquery.maskedinput')
 import DropdownDatepicker from 'vue-dropdown-datepicker'
+import TaxIdReminderPopup from './instructor/TaxIdReminderPopup/TaxIdReminderPopup'
 
 export default {
   components: {
     MaskedInput,
-    DropdownDatepicker
+    DropdownDatepicker,
+    TaxIdReminderPopup
   },
   mixins: [siteAPI],
   props: ['usStates', 'savedMerchantAccountDetails', 'isAdminForm'],
