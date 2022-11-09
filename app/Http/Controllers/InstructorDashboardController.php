@@ -60,7 +60,8 @@ class InstructorDashboardController extends Controller
 			'siteGenres'	=> $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
 			'userGenres'	=> $genreRepository->presentResponse(Auth::user()->genres)['data'],
 			'clients'		=> $clients,
-			'bookings'		=> $lessons
+			'bookings'		=> $lessons,
+            'tax_id'        => Auth::user()->tax_id
         ];
 
 		$lessonRepo->setPresenter("App\\Presenters\\LessonSinglePresenter");
