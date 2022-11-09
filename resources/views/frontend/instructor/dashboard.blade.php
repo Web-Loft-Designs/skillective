@@ -8,11 +8,13 @@
     $invitation_form_title= isset($pageMeta['invitation_form_title']) ? $pageMeta['invitation_form_title'] : '';
     $invitation_form_description= isset($pageMeta['invitation_form_description']) ? $pageMeta['invitation_form_description'] : '';
     $booking_fees_description= isset($pageMeta['booking_fees_description']) ? preg_replace('/\n|\r/', '', $pageMeta['booking_fees_description']) : '';
-
     ?>
 
     <div class="dashboard-page">
         <div class="container">
+            @if(!$tax_id)
+                <tax-id-reminder-popup></tax-id-reminder-popup>
+            @endif
             <div class="row">
 
                 @if (isset($upcomingLesson))

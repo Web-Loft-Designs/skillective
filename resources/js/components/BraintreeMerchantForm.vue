@@ -281,7 +281,7 @@
             v-model='merchantAccountDetails.tax_id'
           />
           <span data-toggle="modal" data-target="#taxInfoPopup" class='btn-grn-link'>Why do we need this?</span>
-          <TaxIdReminderPopup/>
+          <TaxIdPopup/>
           <span
             class='help-block'
             v-if='errors.first_name'
@@ -351,13 +351,13 @@ import $ from 'jquery'
 
 require('jquery.maskedinput/src/jquery.maskedinput')
 import DropdownDatepicker from 'vue-dropdown-datepicker'
-import TaxIdReminderPopup from './instructor/TaxIdReminderPopup/TaxIdReminderPopup'
+import TaxIdPopup from './instructor/TaxIdPopups/TaxIdPopup'
 
 export default {
   components: {
     MaskedInput,
     DropdownDatepicker,
-    TaxIdReminderPopup
+    TaxIdPopup
   },
   mixins: [siteAPI],
   props: ['usStates', 'savedMerchantAccountDetails', 'isAdminForm'],
