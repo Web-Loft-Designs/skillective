@@ -25,12 +25,13 @@ class InstructorMerchantAPIController extends AppBaseController
     {
 		$user = Auth::user();
 		try{
-            $user->tax_id = $request->taxId;
-            $user->legal_name = $request->legalName;
-            $user->save();
-
 			$merchantAccount = BraintreeProcessor::createMerchant($user, $request->all());
-			if ($merchantAccount!=false){
+			if ($merchantAccount!=false)
+            {
+                $user->tax_id = $request->taxId;
+                $user->legal_name = $request->legalName;
+                $user->save();
+
 				$userRepository->setUserSubMerchantId($user, $merchantAccount->id);
 				$userRepository->updateUserSubMerchantStatus( $merchantAccount->id, \Braintree_MerchantAccount::STATUS_PENDING, '' );
 				return $this->sendResponse(BraintreeProcessor::_prepareMerchantAccountOutput($merchantAccount), 'Merchant account created and will be verified soon');
@@ -45,12 +46,18 @@ class InstructorMerchantAPIController extends AppBaseController
 	{
 		$user = Auth::user();
 		try{
-            $user->tax_id = $request['taxId'];
-            $user->legal_name = $request['legalName'];
-            $user->save();
 
 			$merchantAccount = BraintreeProcessor::updateMerchant($user, $request);
-			return $this->sendResponse(BraintreeProcessor::_prepareMerchantAccountOutput($merchantAccount), 'Merchant account created and will be verified soon');
+
+            if ($merchantAccount != false)
+            {
+                $user->tax_id = $request->taxId;
+                $user->legal_name = $request->legalName;
+                $user->save();
+
+                return $this->sendResponse(BraintreeProcessor::_prepareMerchantAccountOutput($merchantAccount), 'Merchant account created and will be verified soon');
+            }
+
 		}catch (\Exception $e){
 
 			Log::info($e);
