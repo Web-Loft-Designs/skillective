@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddColumnTaxIdToUsersTable extends Migration
+class AddColumnTaxIdLegalNameToUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,8 @@ class AddColumnTaxIdToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('tax_id', 200)->nullable()->after('email');
+            $table->string('tax_id', 15)->nullable()->after('email');
+            $table->string('legal_name', 50)->nullable()->after('tax_id');
         });
     }
 
