@@ -25,6 +25,10 @@ class InstructorMerchantAPIController extends AppBaseController
     {
 		$user = Auth::user();
 		try{
+            $user->tax_id = $request->taxId;
+            $user->legal_name = $request->legalName;
+            $user->save();
+
 			$merchantAccount = BraintreeProcessor::createMerchant($user, $request->all());
 			if ($merchantAccount!=false){
 				$userRepository->setUserSubMerchantId($user, $merchantAccount->id);
@@ -41,6 +45,10 @@ class InstructorMerchantAPIController extends AppBaseController
 	{
 		$user = Auth::user();
 		try{
+            $user->tax_id = $request['taxId'];
+            $user->legal_name = $request['legalName'];
+            $user->save();
+
 			$merchantAccount = BraintreeProcessor::updateMerchant($user, $request);
 			return $this->sendResponse(BraintreeProcessor::_prepareMerchantAccountOutput($merchantAccount), 'Merchant account created and will be verified soon');
 		}catch (\Exception $e){

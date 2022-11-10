@@ -17,9 +17,8 @@ yarn-error.log
 /.hgignore
 package-lock.json
 package.json
-/public/css/app-front.css
-/public/css/app.css
-/public/js/app.js
-/public/js/app.js.LICENSE.txt
-/webpack.mix.js
-public
+public/css/app-front.css
+public/css/app.css
+public/js/app.js
+public/mix-manifest.json
+

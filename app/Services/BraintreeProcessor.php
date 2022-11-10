@@ -504,6 +504,16 @@ class BraintreeProcessor {
 				],
 				'ssn' => isset($inputData['individual_ssn']) ? $inputData['individual_ssn'] : null
 			],
+            'business' => [
+                'legalName' => $inputData['legalName'],
+                'taxId' => $inputData['taxId'],
+                'address' => [
+                    'streetAddress' => $inputData['individual_streetAddress'],
+                    'locality' => $inputData['individual_locality'],
+                    'region' => $inputData['individual_region'],
+                    'postalCode' => $inputData['individual_postalCode']
+                ]
+            ],
 			'funding' => [
 				'destination' => Braintree_MerchantAccount::FUNDING_DESTINATION_BANK, // TODO: Bank or Venmo instructor to decide
 				'email' => isset($inputData['funding_email']) ? $inputData['funding_email'] :null, // optional
