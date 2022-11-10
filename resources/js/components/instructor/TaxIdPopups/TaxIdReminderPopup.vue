@@ -13,7 +13,7 @@
           class='learn-more' target='_blank'
         >visit the IRS website</a> to learn more about a 1099-K form.
         </div>
-          <a href='/profile/edit#merchant-account-trigger' class='btn active enter-tax'>Enter your Tax ID</a>
+          <a href='/profile/edit#re-enter-bank' class='btn enter-tax'>Enter your Tax ID</a>
       </div>
     </div>
   </div>
@@ -36,7 +36,7 @@ export default {
 
 <style scoped>
 .btn.enter-tax {
-  background-color: #8ada00;
+  background-image: linear-gradient(180deg,#11cf13,#01bd00);
   color: #fff;
   max-width: fit-content;
   margin-left: auto;

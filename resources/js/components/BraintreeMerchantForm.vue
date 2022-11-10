@@ -236,7 +236,7 @@
           >
         </div>
 
-        <div class='form-group has-feedback'>
+        <div id='re-enter-bank' class='form-group has-feedback'>
           <label>Re-enter Bank Account Number for Confirmation</label>
           <input
             :disabled='isAdminForm'
@@ -278,17 +278,35 @@
             type='text'
             class='form-control mb-2'
             required
-            v-model='merchantAccountDetails.tax_id'
+            v-model='merchantAccountDetails.taxId'
           />
           <span data-toggle="modal" data-target="#taxInfoPopup" class='btn-grn-link'>Why do we need this?</span>
           <TaxIdPopup/>
           <span
             class='help-block'
-            v-if='errors.first_name'
+            v-if='errors.taxId'
           >
-            <strong>{{ errors.tax_id[0] }}</strong>
+            <strong>{{ errors.taxId[0] }}</strong>
           </span>
         </div>
+
+        <div class='form-group has-feedback'>
+          <label>Legal Name</label>
+          <input
+            :disabled='isAdminForm'
+            type='text'
+            class='form-control mb-2'
+            required
+            v-model='merchantAccountDetails.legalName'
+          />
+          <span
+            class='help-block'
+            v-if='errors.legalName'
+          >
+            <strong>{{ errors.legalName[0] }}</strong>
+          </span>
+        </div>
+
         <div
           v-if='!isAdminForm && merchantAccountDetails.id == null'
           class='form-group checkbox-wrapper has-feedback'
@@ -365,7 +383,8 @@ export default {
     return {
       usePersonalInfo: false,
       merchantAccountDetails: {
-        tax_id: null,
+        taxId: null,
+        legalName: null,
         id: null,
         status: '',
         funding_accountNumber_to_show: '',
