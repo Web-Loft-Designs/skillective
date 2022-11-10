@@ -169,6 +169,10 @@ class ProfileController extends Controller
 			if ($savedMerchantAccountDetails!=null && $savedMerchantAccountDetails['status']=='active' && $user->bt_submerchant_status=='pending'){
 				$this->userRepository->updateUserSubMerchantStatus( $user->bt_submerchant_id, \Braintree_MerchantAccount::STATUS_ACTIVE );
 			}
+
+            $savedMerchantAccountDetails['taxId'] = Auth::user()->tax_id;
+            $savedMerchantAccountDetails['legalName'] = Auth::user()->legal_name;
+
 			$vars['savedMerchantAccountDetails']  = $savedMerchantAccountDetails;
 
 		}
@@ -187,6 +191,7 @@ class ProfileController extends Controller
 			$vars['paymentMethods'] = BraintreeProcessor::getSavedCustomerPaymentMethods($user);
 			$vars['paymentEnvironment'] = config('services.braintree.environment');
 		}
+
 		return view("frontend.{$template}.profile-edit", $vars);
 	}
 }
