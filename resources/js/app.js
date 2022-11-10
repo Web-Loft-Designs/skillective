@@ -308,9 +308,12 @@ Vue.component(
     "instructor-bookings-list",
     require("./components/InstructorBookingsList.vue").default
 );
-
+import TaxIdReminderPopup from "./components/instructor/TaxIdPopups/TaxIdReminderPopup.vue";
+Vue.component(
+  "tax-id-reminder-popup",
+  TaxIdReminderPopup
+);
 import InstructorDashboardBookingsClients from "./components/InstructorDashboardBookingsClients.vue";
-
 Vue.component(
     "instructor-dashboard-bookings-clients",
     InstructorDashboardBookingsClients
