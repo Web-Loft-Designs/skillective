@@ -429,6 +429,10 @@ export default {
         userProfileData != undefined ? userProfileData.profile.state : ''
       this.merchantAccountDetails.individual_postalCode =
         userProfileData != undefined ? userProfileData.profile.zip : ''
+      this.merchantAccountDetails.taxId =
+        userProfileData != undefined ? userProfileData.profile.taxId : ''
+      this.merchantAccountDetails.legalName =
+        userProfileData != undefined ? userProfileData.profile.legalName : ''
     },
     profileDataToMerchantAccountDetails() {
       this.apiGet('/api/user')
