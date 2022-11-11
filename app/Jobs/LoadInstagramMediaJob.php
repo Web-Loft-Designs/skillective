@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -56,7 +57,7 @@ class LoadInstagramMediaJob implements ShouldQueue
 						$mediaExists = $user->media()->where('collection_name', 'instagram')->where('file_name', $filename)->count();
 						
 
-                        if (count($mediaBasename) == 0) {
+                        if ($mediaExists == 0) {
                             try {
                                 $user->addInstagramMedia($m->media_url);
                             } catch (Exception $e) {
