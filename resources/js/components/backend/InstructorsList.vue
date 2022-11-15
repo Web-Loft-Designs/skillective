@@ -68,7 +68,12 @@
             placeholder="Search instructor"
           />
         </div>
-        <div v-if="invitedByInstagramHandle == null">
+        <div class='invite-buttons' v-if="invitedByInstagramHandle == null">
+          <modal-invate
+            :text-title="'Resend invite'"
+            :text-button="'Resend invite Instructors'"
+            :invite-type="'resend-instructors'"
+          ></modal-invate>
           <modal-invate
             :text-title="'Invite instructors'"
             :text-button="'Invite Instructors'"
@@ -547,3 +552,10 @@ export default {
   },
 };
 </script>
+
+<style lang='scss' scoped>
+.invite-buttons {
+  display: flex;
+  align-items: center;
+}
+</style>
