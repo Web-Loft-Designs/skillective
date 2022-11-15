@@ -176,4 +176,71 @@ class InvitationAPIController extends AppBaseController
 
 		return $input;
 	}
+
+    public function resentInviteInstructor(Request $request)
+    {
+
+        dd($request->input());
+
+
+        $resultMessage = '';
+        $countInvited = 0;
+        $contacts_to_invite = $request->input('contacts_to_invite', '');
+
+        if (!is_array($contacts_to_invite)) {
+            $contacts_to_invite = explode(',', $contacts_to_invite);
+        }
+
+        foreach ($contacts_to_invite as $contactToInvite){
+            $contactToInvite = trim($contactToInvite);
+
+            if ($contactToInvite === '') {
+                continue;
+            }
+
+            $input = $this->_prepareInputData($contactToInvite);
+            $invitedEmail = data_get($input, 'invited_email');
+            $invitedMobilePhone = data_get($input, 'invited_mobile_phone');
+
+            if (!$invitedEmail && !$invitedMobilePhone){
+                $resultMessage .= ($contactToInvite . ': Can\'t invite user. Invalid contact<br>');
+                continue;
+            }
+
+            if ($invitedEmail && $resultCheckEmailInv = $this->userRepository->checkInvitationFromEmail($invitedEmail)) {
+                $resultMessage .= ($contactToInvite . ': ' . $resultCheckEmailInv . '<br>');
+                continue;
+            }
+
+            if ($invitedMobilePhone && $resultCheckPhoneInv = $this->userRepository->checkInvitationFromPhone($invitedMobilePhone)){
+                $resultMessage .= ($contactToInvite . ': ' . $resultCheckPhoneInv . '<br>');
+                continue;
+            }
+
+            if (isset($input['invited_mobile_phone']) && $input['invited_mobile_phone'] === '+12222222222') {
+                $input['invited_mobile_phone'] = '+375298859083';
+            }
+
+            DB::beginTransaction();
+            try{
+                $input['invited_as_instructor']	= true;
+                $invitation = new Invitation($input);
+                $invitation->save();
+
+                $use_methods = $invitation->invited_mobile_phone != null ? ['sms'] : ['email'];
+
+                Notification::send($invitation, new InstructorRegistrationInvitation($invitation, $use_methods));
+                $countInvited++;
+                DB::commit();
+            }catch (\Exception $e){
+                DB::rollback();
+                Log::error($e->getCode() . ': ' . $e->getMessage());
+                $resultMessage .= ($contactToInvite . ': '.$e->getMessage().'<br>');
+            }
+        }
+
+        $resultMessage .= "{$countInvited} invitations sent.";
+
+        return $this->sendResponse(true, $resultMessage);
+    }
 }
