@@ -180,7 +180,7 @@ class InvitationAPIController extends AppBaseController
     public function resentInviteInstructor(Request $request)
     {
 
-        dd($request->input());
+        dd($request->all());
 
 
         $resultMessage = '';
