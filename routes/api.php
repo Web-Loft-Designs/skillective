@@ -298,7 +298,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['role:Admin']], function () 
 	Route::delete('users/delete/{user}', 'Backend\UsersAPIController@deleteUser');
 
 	Route::post('/invite-instructors', 'Backend\InvitationAPIController@inviteInstructors');
-	Route::post('/resend-invite-instructor', 'Backend\InvitationAPIController@resentInviteInstructor');
+	Route::post('/invite-resend-instructors', 'Backend\InvitationAPIController@inviteResendInstructors');
 	Route::post('/invite-students', 'Backend\InvitationAPIController@inviteStudents');
 
 	Route::get('/reports/demographic', 'Backend\ReportsAPIController@demographic');

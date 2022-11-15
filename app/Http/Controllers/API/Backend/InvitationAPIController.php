@@ -2,19 +2,12 @@
 
 namespace App\Http\Controllers\API\Backend;
 
-use App\Http\Requests\API\InviteStudentAPIRequest;
-use App\Http\Requests\API\InviteInstructorAPIRequest;
-use App\Models\Setting;
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
 use App\Repositories\ProfileRepository;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Invitation;
-use App\Models\User;
-use App\Models\Profile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Notifications\InstructorRegistrationInvitation;
 use App\Notifications\StudentRegistrationInvitation;
@@ -177,15 +170,12 @@ class InvitationAPIController extends AppBaseController
 		return $input;
 	}
 
-    public function resentInviteInstructor(Request $request)
+    public function inviteResendInstructors(Request $request)
     {
-
-        dd($request->all());
-
-
         $resultMessage = '';
         $countInvited = 0;
         $contacts_to_invite = $request->input('contacts_to_invite', '');
+
 
         if (!is_array($contacts_to_invite)) {
             $contacts_to_invite = explode(',', $contacts_to_invite);
@@ -207,12 +197,13 @@ class InvitationAPIController extends AppBaseController
                 continue;
             }
 
-            if ($invitedEmail && $resultCheckEmailInv = $this->userRepository->checkInvitationFromEmail($invitedEmail)) {
+
+            if ($invitedEmail && $resultCheckEmailInv = $this->userRepository->checkResendInvitationFromEmail($invitedEmail)) {
                 $resultMessage .= ($contactToInvite . ': ' . $resultCheckEmailInv . '<br>');
                 continue;
             }
 
-            if ($invitedMobilePhone && $resultCheckPhoneInv = $this->userRepository->checkInvitationFromPhone($invitedMobilePhone)){
+            if ($invitedMobilePhone && $resultCheckPhoneInv = $this->userRepository->checkResendInvitationFromPhone($invitedMobilePhone)){
                 $resultMessage .= ($contactToInvite . ': ' . $resultCheckPhoneInv . '<br>');
                 continue;
             }
