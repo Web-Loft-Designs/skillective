@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Invitation;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use InfyOm\Generator\Common\BaseRepository;
 
 class InvitationRepository extends BaseRepository
@@ -16,6 +17,10 @@ class InvitationRepository extends BaseRepository
     ];
 
     /**
+     * @var bool
+     */
+    protected $skipPresenter = true;
+    /**
      * Configure the Model
      **/
     public function model()
@@ -23,10 +28,10 @@ class InvitationRepository extends BaseRepository
         return Invitation::class;
     }
 
-	/**
-	 * @var bool
-	 */
-	protected $skipPresenter = true;
+    public function presenter()
+    {
+        return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
+    }
 
 	public function findUserInvitation($invitation_token){
 		return $this->findWhere(
@@ -43,4 +48,25 @@ class InvitationRepository extends BaseRepository
 		$totalInvites = $this->model->where('invited_as_instructor', 1)->count();
 		return $countMonths>0 ? number_format($totalInvites / $countMonths, 1) : $totalInvites;
 	}
+
+    public function getInvitations(Request $request)
+    {
+
+        $defaultPerPage = 25;
+
+        if ($request->filled('limit') && $request->input('limit') > 0)
+            return $this->paginate($request->input('limit'), ['invitations.*']);
+        else
+            return $this->paginate($defaultPerPage, ['invitations.*']);
+
+    }
+
+    public function presentResponse($data)
+    {
+        $data = $this->presenter->present($data);
+
+        return $data;
+    }
+
+
 }
