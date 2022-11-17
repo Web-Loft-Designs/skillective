@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Criteria\InvitationSearchCriteria;
 use App\Models\Invitation;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -53,6 +54,9 @@ class InvitationRepository extends BaseRepository
     public function getInvitations(Request $request, $roleID)
     {
 
+        if ($request->filled('s'))
+            $this->pushCriteria(new InvitationSearchCriteria($request->get('s')));
+
         $defaultPerPage = 25;
         $perPage = $defaultPerPage;
         if ($roleID == 2)
@@ -73,6 +77,5 @@ class InvitationRepository extends BaseRepository
 
         return $data;
     }
-
 
 }
