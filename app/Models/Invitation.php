@@ -6,8 +6,9 @@ use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use Prettus\Repository\Contracts\Transformable;
 
-class Invitation extends Model
+class Invitation extends Model implements Transformable
 {
 	use Notifiable, SoftDeletes;
 
@@ -95,4 +96,14 @@ class Invitation extends Model
 
 		parent::save($options);
 	}
+
+    public function transform()
+    {
+        return [
+            'id' => $this->id,
+            'email' => $this->invited_email,
+        ];
+    }
+
+
 }

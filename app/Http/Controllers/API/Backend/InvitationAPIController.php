@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API\Backend;
 
+use App\Models\User;
+use App\Repositories\InvitationRepository;
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
 use App\Repositories\ProfileRepository;
@@ -12,6 +14,8 @@ use Illuminate\Support\Facades\Log;
 use App\Notifications\InstructorRegistrationInvitation;
 use App\Notifications\StudentRegistrationInvitation;
 use Illuminate\Support\Facades\Notification;
+use Spatie\Permission\Models\Role;
+
 
 class InvitationAPIController extends AppBaseController
 {
@@ -24,13 +28,15 @@ class InvitationAPIController extends AppBaseController
 
     private $emailRegexp;
     private $phoneRegexp;
+    private $invitationRepository;
 
-    public function __construct(UserRepository $userRepository, ProfileRepository $profileRepository)
+    public function __construct(UserRepository $userRepository, ProfileRepository $profileRepository, InvitationRepository $invitationRepository)
     {
         $this->userRepository = $userRepository;
         $this->profileRepository = $profileRepository;
 		$this->emailRegexp = getInviteEmailValidationRegexp();
 		$this->phoneRegexp = getInviteMobilePhoneValidationRegexp();
+        $this->invitationRepository = $invitationRepository;
     }
 
     public function inviteInstructors(Request $request)
@@ -233,5 +239,14 @@ class InvitationAPIController extends AppBaseController
         $resultMessage .= "{$countInvited} invitations sent.";
 
         return $this->sendResponse(true, $resultMessage);
+    }
+
+    public  function getInvitations(Request $request)
+    {
+        $roleID = Role::findByName(User::ROLE_INSTRUCTOR)->id;
+        $invitations = $this->invitationRepository
+            ->presentResponse($this->invitationRepository->getInvitations($request, $roleID));
+
+        return $this->sendResponse($invitations);
     }
 }
