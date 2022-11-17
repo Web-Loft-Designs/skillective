@@ -35,8 +35,8 @@
             On Review
           </button>
           <button
-            :class="{ active: showOnly == 'invited' }"
-            @click.prevent="toggleShowOnly('invited')"
+            :class="{ active: showOnly == 'get-invitations' }"
+            @click.prevent="toggleShowOnly('get-invitations')"
           >
             Invited
           </button>
@@ -79,7 +79,7 @@
         </div>
         <div v-if='invitedByInstagramHandle == null' class='invite-buttons'>
           <modal-invate
-            v-if='showOnly === "invited"'
+            v-if='showOnly === "get-invitations"'
             :invite-type="'resend-instructors'"
             :text-button="'Resend invite Instructors'"
             :text-title="'Resend invite'"
@@ -106,56 +106,14 @@
       <div v-if='errorText' class='has-error'>{{ errorText }}</div>
       <div v-if='successText' class='has-success'>{{ successText }}</div>
 
-      <table v-if='showOnly === "invited"' class='table table-invited'>
+      <table v-if='showOnly === "get-invitations"' class='table table-invited'>
         <thead>
         <tr>
-          <th class='cb-td-with-start' scope='col'>
-              <span class='checkbox-wrapper'>
-                <label for='checkAll'>
-                  <input
-                    id='checkAll'
-                    v-model='allSelected'
-                    :indeterminate.prop='indeterminate'
-                    type='checkbox'
-                    @change='selectAll'
-                  />
-                  <span
-                    :class='{ indeterminate: indeterminate === true }'
-                    class='checkmark'
-                  ></span>
-                </label>
-              </span>
-          </th>
-          <th class='w-55 hidden-in-mobile'></th>
           <th>Email</th>
-          <th></th>
         </tr>
         </thead>
         <tbody>
         <tr v-for='(user, index) in listItems' :key='index'>
-          <td class='cb-td-with-start'>
-              <span
-                class='checkbox-wrapper cb--with-start'
-              ><label
-              ><input
-                v-model='selectedItems'
-                :value='user.id'
-                type='checkbox'
-                @change='select'
-              /><span class='checkmark'></span
-              ></label>
-                <img
-                  :class="{ 'not-favorite': !user.isFeatured }"
-                  class='icon-w-a'
-                  src='/images/star.svg'
-                  style='cursor: pointer'
-                  @click='toggleFeatured(user)'
-                />
-              </span>
-          </td>
-          <td class='hidden-in-mobile'>
-            <img :src='user.profile.image' alt=''/>
-          </td>
           <td>
             <div>{{ user.email }}</div>
           </td>
@@ -529,21 +487,25 @@ export default {
     },
     getUsers() {
       let queryParams = {}
-
       queryParams.status = this.showOnly
 
       if (this.pagination.current_page != undefined)
         queryParams.page = this.pagination.current_page
       else queryParams.page = 1
-
       if (this.searchString != '') queryParams.s = this.searchString
-      if (this.invitedBy != null) queryParams.invited_by = this.invitedBy
 
+      if (this.invitedBy != null) queryParams.invited_by = this.invitedBy
       this.updateUrlQueryParams(queryParams)
 
-      this.apiGet('/api/admin/instructors', {
-        params: queryParams
-      })
+      if (this.showOnly === 'get-invitations') {
+        this.apiGet('/api/admin/get-invitations', {
+          params: queryParams
+        })
+      } else {
+        this.apiGet('/api/admin/instructors', {
+          params: queryParams
+        })
+      }
     },
     componentHandleGetResponse(responseData) {
       this.listItems = responseData.data.data
@@ -628,10 +590,14 @@ export default {
   display: flex;
   align-items: center;
 }
+.table-page .table-invited th {
+  text-align: left !important;
+}
 .table.table-invited tr {
   border-top: 1px solid #ddd;
 }
-.table.table-invited td:last-child {
-  text-align: left;
+.table.table-invited td {
+  text-align: left !important;
+  padding: 15px !important;
 }
 </style>
