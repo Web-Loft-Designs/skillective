@@ -35,8 +35,8 @@
             On Review
           </button>
           <button
-            :class="{ active: showOnly == 'get-invitations' }"
-            @click.prevent="toggleShowOnly('get-invitations')"
+            :class="{ active: showOnly == 'invited' }"
+            @click.prevent="toggleShowOnly('invited')"
           >
             Invited
           </button>
@@ -79,12 +79,13 @@
         </div>
         <div v-if='invitedByInstagramHandle == null' class='invite-buttons'>
           <modal-invate
-            v-if='showOnly === "get-invitations"'
+            v-if='showOnly === "invited"'
             :invite-type="'resend-instructors'"
             :text-button="'Resend invite Instructors'"
             :text-title="'Resend invite'"
           ></modal-invate>
           <modal-invate
+            v-else
             :invite-type="'instructors'"
             :text-button="'Invite Instructors'"
             :text-title="'Invite instructors'"
@@ -106,7 +107,10 @@
       <div v-if='errorText' class='has-error'>{{ errorText }}</div>
       <div v-if='successText' class='has-success'>{{ successText }}</div>
 
-      <table v-if='showOnly === "get-invitations"' class='table table-invited'>
+      <table
+        v-if='showOnly === "invited"'
+        class='table table-invited'
+      >
         <thead>
         <tr>
           <th>Email</th>
@@ -121,7 +125,10 @@
         </tbody>
       </table>
 
-      <table v-else class='table'>
+      <table
+        v-else
+        class='table'
+      >
         <thead>
         <tr>
           <th class='cb-td-with-start' scope='col'>
@@ -174,7 +181,7 @@
               </span>
           </td>
           <td class='hidden-in-mobile'>
-            <img :src='user.profile.image' alt=''/>
+            <img :src='user.profile.image'/>
           </td>
           <td>
             <input v-if='user.isFeatured' v-model='user.priority' class='hp-priority' type='number'/>
@@ -497,8 +504,8 @@ export default {
       if (this.invitedBy != null) queryParams.invited_by = this.invitedBy
       this.updateUrlQueryParams(queryParams)
 
-      if (this.showOnly === 'get-invitations') {
-        this.apiGet('/api/admin/get-invitations', {
+      if (this.showOnly === 'invited') {
+        this.apiGet('/api/admin/invited', {
           params: queryParams
         })
       } else {
@@ -590,14 +597,17 @@ export default {
   display: flex;
   align-items: center;
 }
-.table-page .table-invited th {
-  text-align: left !important;
-}
-.table.table-invited tr {
-  border-top: 1px solid #ddd;
-}
-.table.table-invited td {
-  text-align: left !important;
-  padding: 15px !important;
+.table-page .table-invited {
+  th {
+    text-align: left !important;
+    padding-left: 15px;
+  }
+  tr {
+    border-top: 1px solid #ddd;
+  }
+  td {
+    text-align: left !important;
+    padding: 15px !important;
+  }
 }
 </style>
