@@ -20,13 +20,10 @@ use App\Criteria\UserIdCriteria;
 use App\Criteria\UserInvitedByCriteria;
 use App\Criteria\UserFilterByNameCriteria;
 use App\Criteria\UserFilterByInstagranHandleCriteria;
-use App\Criteria\InstructorFilterByLessonPriceRangeCriteria;
-use App\Criteria\OnlyOnboardedActiveMerchantInstructorsCriteria;
 use App\Criteria\InstructorFilterByLocationCriteria;
 use App\Criteria\UserFilterByGenreCriteria;
 use Carbon\Carbon;
 use Spatie\Permission\Models\Role;
-use Log;
 
 /**
  * Class UserRepository

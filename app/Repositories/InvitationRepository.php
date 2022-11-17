@@ -6,6 +6,7 @@ use App\Models\Invitation;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use InfyOm\Generator\Common\BaseRepository;
+use Cookie;
 
 class InvitationRepository extends BaseRepository
 {
@@ -49,15 +50,20 @@ class InvitationRepository extends BaseRepository
 		return $countMonths>0 ? number_format($totalInvites / $countMonths, 1) : $totalInvites;
 	}
 
-    public function getInvitations(Request $request)
+    public function getInvitations(Request $request, $roleID)
     {
 
         $defaultPerPage = 25;
+        $perPage = $defaultPerPage;
+        if ($roleID == 2)
+            $perPage = Cookie::get('adminInstructorsPerPage', $defaultPerPage);
+        elseif ($roleID == 3)
+            $perPage = Cookie::get('adminStudentsPerPage', $defaultPerPage);
 
         if ($request->filled('limit') && $request->input('limit') > 0)
             return $this->paginate($request->input('limit'), ['invitations.*']);
         else
-            return $this->paginate($defaultPerPage, ['invitations.*']);
+            return $this->paginate($perPage, ['invitations.*']);
 
     }
 
