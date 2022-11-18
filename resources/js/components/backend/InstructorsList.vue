@@ -547,7 +547,6 @@ export default {
     }
   },
   created: function () {
-    this.listItems = this.instructors
     if (
       this.instructorsMeta != undefined &&
       this.instructorsMeta.pagination != undefined
@@ -567,6 +566,7 @@ export default {
       this.invitedBy = this.getUrlParameter('invited_by')
 
     this.debouncedGetUsers = _.debounce(this.searchUsers, 500)
+    this.getUsers()
   },
   watch: {
     searchString: function (newSearchString, oldSearchString) {
