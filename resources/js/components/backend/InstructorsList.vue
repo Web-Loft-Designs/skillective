@@ -77,9 +77,9 @@
             type='text'
           />
         </div>
-        <div v-if='invitedByInstagramHandle == null' class='invite-buttons'>
+        <div v-if='!invitedByInstagramHandle' class='invite-buttons'>
           <button
-            v-if='showOnly === "invited"'
+            v-if='isResendInvite'
             :disabled='!selectedItems.length'
             class='btn-green'
             @click='resendInvite'>
@@ -111,7 +111,7 @@
       <div v-if='invitedMessage.error' class='has-error mt-2'>{{ invitedMessage.error }}</div>
 
       <table
-        v-if='showOnly === "invited"'
+        v-if='isResendInvite'
         class='table table-invited'
       >
         <thead>
@@ -124,7 +124,7 @@
                     v-model='allSelected'
                     :indeterminate.prop='indeterminate'
                     type='checkbox'
-                    @change='selectAllInvited'
+                    @change='selectAll'
                   />
                   <span
                     :class='{ indeterminate: indeterminate === true }'
@@ -441,29 +441,19 @@ export default {
     },
     selectAll() {
       this.selectedItems = []
-
       if (this.allSelected) {
         this.indeterminate = false
-        for (let user in this.listItems) {
-          this.selectedItems.push(this.listItems[user].id.toString())
-        }
-      }
-    },
-    selectAllInvited() {
-      this.selectedItems = []
-
-      if (this.allSelected) {
-        this.indeterminate = false
-        for (let user in this.listItems) {
-          this.selectedItems.push(this.listItems[user].email.toString())
-        }
+        this.listItems.forEach(user => {
+          this.isResendInvite
+            ? this.selectedItems.push(user.email)
+            : this.selectedItems.push(user.id)
+        })
       }
     },
     toggleFeatured: function (user) {
       this.apiPut(`/api/admin/instructors/featured/${ user.id }`)
     },
     setPriority: function (user) {
-      // console.log(user.priority)
       this.apiPut(`/api/admin/instructors/priority/${ user.id }`, {
         priority: user.priority
       })
@@ -603,7 +593,7 @@ export default {
     },
     async resendInvite() {
       try {
-        const res = await axios.post('/api/admin/invite-resend-instructor', this.selectedItems.toString())
+        const res = await axios.post('/api/admin/invite-resend-instructors', this.selectedItems.toString())
         this.invitedMessage.success = res.data.message
         this.selectedItems = []
         this.allSelected = false
@@ -642,6 +632,9 @@ export default {
     }
   },
   computed: {
+    isResendInvite() {
+      return this.showOnly === 'invited'
+    },
     firstListItemNumber: function () {
       return (
         this.pagination.current_page * this.pagination.per_page -
