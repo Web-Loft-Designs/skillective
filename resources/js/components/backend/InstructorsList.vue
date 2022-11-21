@@ -113,11 +113,41 @@
       >
         <thead>
         <tr>
+          <th class='cb-td-with-start' scope='col'>
+              <span class='checkbox-wrapper'>
+                <label for='checkAll2'>
+                  <input
+                    id='checkAll2'
+                    v-model='allSelected'
+                    :indeterminate.prop='indeterminate'
+                    type='checkbox'
+                    @change='selectAllInvited'
+                  />
+                  <span
+                    :class='{ indeterminate: indeterminate === true }'
+                    class='checkmark'
+                  ></span>
+                </label>
+              </span>
+          </th>
           <th>Email</th>
         </tr>
         </thead>
         <tbody>
         <tr v-for='(user, index) in listItems' :key='index'>
+          <td class='cb-td-with-start'>
+              <span class='checkbox-wrapper cb--with-start'>
+                <label>
+                  <input
+                    v-model='selectedItems'
+                    :value='user.email'
+                    type='checkbox'
+                    @change='selectInvited'
+                  />
+                  <span class='checkmark'></span>
+                </label>
+              </span>
+          </td>
           <td>
             <div>{{ user.email }}</div>
           </td>
@@ -396,13 +426,23 @@ export default {
         return ''
       }
     },
-    selectAll: function () {
+    selectAll() {
       this.selectedItems = []
 
       if (this.allSelected) {
         this.indeterminate = false
         for (let user in this.listItems) {
           this.selectedItems.push(this.listItems[user].id.toString())
+        }
+      }
+    },
+    selectAllInvited() {
+      this.selectedItems = []
+
+      if (this.allSelected) {
+        this.indeterminate = false
+        for (let user in this.listItems) {
+          this.selectedItems.push(this.listItems[user].email.toString())
         }
       }
     },
@@ -421,7 +461,19 @@ export default {
       this.$root.$emit('initNotificationsForm', temp)
     },
     select: function () {
-      if (this.listItems.length == this.selectedItems.length) {
+      if (this.listItems.length === this.selectedItems.length) {
+        this.allSelected = 1
+        this.indeterminate = false
+      } else if (this.selectedItems.length === 0) {
+        this.allSelected = 0
+        this.indeterminate = false
+      } else {
+        this.allSelected = 0
+        this.indeterminate = true
+      }
+    },
+    selectInvited() {
+      if (this.listItems.length === this.selectedItems.length) {
         this.allSelected = 1
         this.indeterminate = false
       } else if (this.selectedItems.length === 0) {
