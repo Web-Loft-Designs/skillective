@@ -53,7 +53,7 @@
       >
         <div class='d-flex responsive-mobile align-items-center'>
           <div
-            v-if='selectedItems.length > 0'
+            v-if="selectedItems.length > 0 && showOnly !== 'invited' "
             class='d-flex align-items-center'
           >
             <span
@@ -77,13 +77,14 @@
             type='text'
           />
         </div>
-        <div v-if='invitedByInstagramHandle == null' class='invite-buttons'>
-          <modal-invate
-            v-if='showOnly === "invited"'
-            :invite-type="'resend-instructors'"
-            :text-button="'Resend invite Instructors'"
-            :text-title="'Resend invite'"
-          ></modal-invate>
+        <div v-if='!invitedByInstagramHandle' class='invite-buttons'>
+          <button
+            v-if='isResendInvite'
+            :disabled='!selectedItems.length'
+            class='btn-green'
+            @click='resendInvite'>
+            Resend Invite Instructors
+          </button>
           <modal-invate
             v-else
             :invite-type="'instructors'"
@@ -106,20 +107,56 @@
     <div class='table-responsives'>
       <div v-if='errorText' class='has-error'>{{ errorText }}</div>
       <div v-if='successText' class='has-success'>{{ successText }}</div>
+      <div v-if='invitedMessage.success' class='has-success mt-2'>{{ invitedMessage.success }}</div>
+      <div v-if='invitedMessage.error' class='has-error mt-2'>{{ invitedMessage.error }}</div>
 
       <table
-        v-if='showOnly === "invited"'
+        v-if='isResendInvite'
         class='table table-invited'
       >
         <thead>
         <tr>
-          <th>Email</th>
+          <th class='cb-td-with-start' scope='col'>
+              <span class='checkbox-wrapper'>
+                <label for='checkAll'>
+                  <input
+                    id='checkAll'
+                    v-model='allSelected'
+                    :indeterminate.prop='indeterminate'
+                    type='checkbox'
+                    @change='selectAll'
+                  />
+                  <span
+                    :class='{ indeterminate: indeterminate === true }'
+                    class='checkmark'
+                  ></span>
+                </label>
+              </span>
+          </th>
+          <th class='email-header'>Email</th>
         </tr>
         </thead>
         <tbody>
         <tr v-for='(user, index) in listItems' :key='index'>
+          <td class='cb-td-with-start'>
+              <span class='checkbox-wrapper cb--with-start'>
+                <label>
+                  <input
+                    v-model='selectedItems'
+                    :value='user.email'
+                    type='checkbox'
+                    @change='select'
+                  />
+                  <span class='checkmark'></span>
+                </label>
+              </span>
+          </td>
           <td>
-            <div>{{ user.email }}</div>
+<!--            @/resources/images/default_profile_image.png-->
+            <div class='d-flex align-items-center'>
+              <img :src="require('../../../images/default_profile_image.png').default" class='mr-4'>
+              <div> {{ user.email }}</div>
+            </div>
           </td>
         </tr>
         </tbody>
@@ -341,6 +378,8 @@
 import siteAPI from '../../mixins/siteAPI.js'
 import skillectiveHelper from '../../mixins/skillectiveHelper.js'
 import Paginate from 'vuejs-paginate'
+import axios from 'axios'
+import zx from '../../../../resources/images/default_profile_image.png'
 
 export default {
   mixins: [siteAPI, skillectiveHelper],
@@ -369,7 +408,11 @@ export default {
       },
       reloadUsers: true,
       loginAsUserId: null,
-      csrf: null
+      csrf: null,
+      invitedMessage: {
+        success: null,
+        error: null
+      }
     }
   },
   methods: {
@@ -396,21 +439,21 @@ export default {
         return ''
       }
     },
-    selectAll: function () {
+    selectAll() {
       this.selectedItems = []
-
       if (this.allSelected) {
         this.indeterminate = false
-        for (let user in this.listItems) {
-          this.selectedItems.push(this.listItems[user].id.toString())
-        }
+        this.listItems.forEach(user => {
+          this.isResendInvite
+            ? this.selectedItems.push(user.email)
+            : this.selectedItems.push(user.id)
+        })
       }
     },
     toggleFeatured: function (user) {
       this.apiPut(`/api/admin/instructors/featured/${ user.id }`)
     },
     setPriority: function (user) {
-      // console.log(user.priority)
       this.apiPut(`/api/admin/instructors/priority/${ user.id }`, {
         priority: user.priority
       })
@@ -421,7 +464,7 @@ export default {
       this.$root.$emit('initNotificationsForm', temp)
     },
     select: function () {
-      if (this.listItems.length == this.selectedItems.length) {
+      if (this.listItems.length === this.selectedItems.length) {
         this.allSelected = 1
         this.indeterminate = false
       } else if (this.selectedItems.length === 0) {
@@ -436,6 +479,7 @@ export default {
       this.showOnly = status
       this.allSelected = 0
       this.selectedItems = []
+      this.invitedMessage = {}
       this.pagination.current_page = 1
       this.getUsers()
     },
@@ -539,11 +583,25 @@ export default {
       this.getUsers()
     },
     componentHandlePostResponse(responseData) {
-      if (this.reloadUsers == true) this.getUsers()
+      if (this.reloadUsers === true) {
+        this.getUsers()
+      }
       this.reloadUsers = true
     },
     showUserPublicProfile(userId) {
       window.location = '/profile/' + userId
+    },
+    async resendInvite() {
+      try {
+        const res = await axios.post('/api/admin/invite-resend-instructors', this.selectedItems.toString())
+        this.invitedMessage.success = res.data.message
+        this.selectedItems = []
+        this.allSelected = false
+        this.indeterminate = false
+      }
+      catch (error){
+        this.invitedMessage.error = error
+      }
     }
   },
   created: function () {
@@ -574,6 +632,9 @@ export default {
     }
   },
   computed: {
+    isResendInvite() {
+      return this.showOnly === 'invited'
+    },
     firstListItemNumber: function () {
       return (
         this.pagination.current_page * this.pagination.per_page -
@@ -609,5 +670,15 @@ export default {
     text-align: left !important;
     padding: 15px !important;
   }
+}
+.btn-green {
+  border: none;
+  width: 100% !important;
+}
+.btn-green:disabled {
+  background: #b5b5b5 !important;
+}
+.email-header{
+  padding-left: 70px !important;
 }
 </style>

@@ -3,7 +3,7 @@
     inviteType === 'resend-instructors' ? 'margin-right: 5px' : null
   ">
     <button class='btn-green' @click.pervetn='OpenModal'>
-      <img v-if="inviteType !== 'resend-instructors'" src='/images/add-user.png' alt=''>
+      <img src='/images/add-user.png' alt=''>
       {{textButton }}
     </button>
     <magnific-popup-modal
