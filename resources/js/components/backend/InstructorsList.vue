@@ -82,7 +82,8 @@
             v-if='isResendInvite'
             :disabled='!selectedItems.length'
             class='btn-green'
-            @click='resendInvite'>
+            @click='resendInvite'
+          >
             Resend Invite Instructors
           </button>
           <modal-invate
@@ -152,7 +153,6 @@
               </span>
           </td>
           <td>
-<!--            @/resources/images/default_profile_image.png-->
             <div class='d-flex align-items-center'>
               <img :src="require('../../../images/default_profile_image.png').default" class='mr-4'>
               <div> {{ user.email }}</div>
@@ -379,7 +379,6 @@ import siteAPI from '../../mixins/siteAPI.js'
 import skillectiveHelper from '../../mixins/skillectiveHelper.js'
 import Paginate from 'vuejs-paginate'
 import axios from 'axios'
-import zx from '../../../../resources/images/default_profile_image.png'
 
 export default {
   mixins: [siteAPI, skillectiveHelper],
@@ -593,13 +592,14 @@ export default {
     },
     async resendInvite() {
       try {
-        const res = await axios.post('/api/admin/invite-resend-instructors', this.selectedItems.toString())
+        const res = await axios.post('/api/admin/invite-resend-instructors', {
+          contacts_to_invite: this.selectedItems.toString()
+        })
         this.invitedMessage.success = res.data.message
         this.selectedItems = []
         this.allSelected = false
         this.indeterminate = false
-      }
-      catch (error){
+      } catch (error) {
         this.invitedMessage.error = error
       }
     }
@@ -678,7 +678,7 @@ export default {
 .btn-green:disabled {
   background: #b5b5b5 !important;
 }
-.email-header{
+.email-header {
   padding-left: 70px !important;
 }
 </style>
