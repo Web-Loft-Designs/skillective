@@ -53,7 +53,7 @@
       >
         <div class='d-flex responsive-mobile align-items-center'>
           <div
-            v-if='selectedItems.length > 0'
+            v-if="selectedItems.length > 0 && showOnly !== 'invited' "
             class='d-flex align-items-center'
           >
             <span
@@ -78,12 +78,13 @@
           />
         </div>
         <div v-if='invitedByInstagramHandle == null' class='invite-buttons'>
-          <modal-invate
+          <button
             v-if='showOnly === "invited"'
-            :invite-type="'resend-instructors'"
-            :text-button="'Resend invite Instructors'"
-            :text-title="'Resend invite'"
-          ></modal-invate>
+            :disabled='!selectedItems.length'
+            class='btn-green'
+            @click='resendInvite'>
+            Resend Invite Instructors
+          </button>
           <modal-invate
             v-else
             :invite-type="'instructors'"
@@ -106,6 +107,8 @@
     <div class='table-responsives'>
       <div v-if='errorText' class='has-error'>{{ errorText }}</div>
       <div v-if='successText' class='has-success'>{{ successText }}</div>
+      <div v-if='invitedMessage.success' class='has-success mt-2'>{{ invitedMessage.success }}</div>
+      <div v-if='invitedMessage.error' class='has-error mt-2'>{{ invitedMessage.error }}</div>
 
       <table
         v-if='showOnly === "invited"'
@@ -115,9 +118,9 @@
         <tr>
           <th class='cb-td-with-start' scope='col'>
               <span class='checkbox-wrapper'>
-                <label for='checkAll2'>
+                <label for='checkAll'>
                   <input
-                    id='checkAll2'
+                    id='checkAll'
                     v-model='allSelected'
                     :indeterminate.prop='indeterminate'
                     type='checkbox'
@@ -142,14 +145,16 @@
                     v-model='selectedItems'
                     :value='user.email'
                     type='checkbox'
-                    @change='selectInvited'
+                    @change='select'
                   />
                   <span class='checkmark'></span>
                 </label>
               </span>
           </td>
           <td>
-            <div>{{ user.email }}</div>
+<!--            @/resources/images/default_profile_image.png-->
+            <img :src="zx" alt=''>
+            <div> {{ user.email }}</div>
           </td>
         </tr>
         </tbody>
@@ -371,6 +376,8 @@
 import siteAPI from '../../mixins/siteAPI.js'
 import skillectiveHelper from '../../mixins/skillectiveHelper.js'
 import Paginate from 'vuejs-paginate'
+import axios from 'axios'
+import zx from '../../../../resources/images/default_profile_image.png'
 
 export default {
   mixins: [siteAPI, skillectiveHelper],
@@ -399,7 +406,11 @@ export default {
       },
       reloadUsers: true,
       loginAsUserId: null,
-      csrf: null
+      csrf: null,
+      invitedMessage: {
+        success: null,
+        error: null
+      }
     }
   },
   methods: {
@@ -472,22 +483,11 @@ export default {
         this.indeterminate = true
       }
     },
-    selectInvited() {
-      if (this.listItems.length === this.selectedItems.length) {
-        this.allSelected = 1
-        this.indeterminate = false
-      } else if (this.selectedItems.length === 0) {
-        this.allSelected = 0
-        this.indeterminate = false
-      } else {
-        this.allSelected = 0
-        this.indeterminate = true
-      }
-    },
     toggleShowOnly(status) {
       this.showOnly = status
       this.allSelected = 0
       this.selectedItems = []
+      this.invitedMessage = {}
       this.pagination.current_page = 1
       this.getUsers()
     },
@@ -591,11 +591,25 @@ export default {
       this.getUsers()
     },
     componentHandlePostResponse(responseData) {
-      if (this.reloadUsers == true) this.getUsers()
+      if (this.reloadUsers === true) {
+        this.getUsers()
+      }
       this.reloadUsers = true
     },
     showUserPublicProfile(userId) {
       window.location = '/profile/' + userId
+    },
+    async resendInvite() {
+      try {
+        const res = await axios.post('/api/admin/invite-resend-instructor', this.selectedItems.toString())
+        this.invitedMessage.success = res.data.message
+        this.selectedItems = []
+        this.allSelected = false
+        this.indeterminate = false
+      }
+      catch (error){
+        this.invitedMessage.error = error
+      }
     }
   },
   created: function () {
@@ -661,5 +675,12 @@ export default {
     text-align: left !important;
     padding: 15px !important;
   }
+}
+.btn-green {
+  border: none;
+  width: 100% !important;
+}
+.btn-green:disabled {
+  background: #b5b5b5 !important;
 }
 </style>
