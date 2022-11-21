@@ -133,12 +133,11 @@
                 </label>
               </span>
           </th>
-          <th>Email</th>
+          <th class='email-header'>Email</th>
         </tr>
         </thead>
         <tbody>
         <tr v-for='(user, index) in listItems' :key='index'>
-          <td><img :src="require('../../../images/about-2.jpg')" alt='123123'></td>
           <td class='cb-td-with-start'>
               <span class='checkbox-wrapper cb--with-start'>
                 <label>
@@ -154,8 +153,10 @@
           </td>
           <td>
 <!--            @/resources/images/default_profile_image.png-->
-            <img :src="zx" alt=''>
-            <div> {{ user.email }}</div>
+            <div class='d-flex align-items-center'>
+              <img :src="require('../../../images/default_profile_image.png').default" class='mr-4'>
+              <div> {{ user.email }}</div>
+            </div>
           </td>
         </tr>
         </tbody>
@@ -683,5 +684,8 @@ export default {
 }
 .btn-green:disabled {
   background: #b5b5b5 !important;
+}
+.email-header{
+  padding-left: 70px !important;
 }
 </style>
