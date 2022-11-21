@@ -610,11 +610,6 @@ class UserRepository extends BaseRepository
             return 'Seems this user already has an account on our site.';
         }
 
-        if(Invitation::where('invited_email', $email)->where('invited_by', '!=', auth()->id())->exists()) {
-            return 'Another instructor has already invited this user.';
-        }
-
-
         $invitation = Invitation::where('invited_email', $email)
             ->where('invited_by', auth()->id())->first();
 
@@ -631,10 +626,6 @@ class UserRepository extends BaseRepository
     {
         if($this->where('mobile_phone', $phone)->exists()) {
             return 'Seems this user already has an account on our site.';
-        }
-
-        if(Invitation::where('invited_mobile_phone', $phone)->where('invited_by', '!=', auth()->id())->exists()) {
-            return 'Another instructor has already invited this user.';
         }
 
         $invitation = Invitation::where('invited_mobile_phone', $phone)
