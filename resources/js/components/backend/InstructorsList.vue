@@ -138,6 +138,7 @@
         </thead>
         <tbody>
         <tr v-for='(user, index) in listItems' :key='index'>
+          <td><img :src="require('../../../images/about-2.jpg')" alt='123123'></td>
           <td class='cb-td-with-start'>
               <span class='checkbox-wrapper cb--with-start'>
                 <label>
