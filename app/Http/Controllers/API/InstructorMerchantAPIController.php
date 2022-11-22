@@ -44,6 +44,8 @@ class InstructorMerchantAPIController extends AppBaseController
 
 	public function update(BraintreeUpdateMerchantRequest $request)
 	{
+        $request->taxId = str_replace(['-',',','/','.',';',':',' ','"', "'"], '', trim($request->taxId));
+
 		$user = Auth::user();
 		try{
 

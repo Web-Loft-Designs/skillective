@@ -20,13 +20,10 @@ use App\Criteria\UserIdCriteria;
 use App\Criteria\UserInvitedByCriteria;
 use App\Criteria\UserFilterByNameCriteria;
 use App\Criteria\UserFilterByInstagranHandleCriteria;
-use App\Criteria\InstructorFilterByLessonPriceRangeCriteria;
-use App\Criteria\OnlyOnboardedActiveMerchantInstructorsCriteria;
 use App\Criteria\InstructorFilterByLocationCriteria;
 use App\Criteria\UserFilterByGenreCriteria;
 use Carbon\Carbon;
 use Spatie\Permission\Models\Role;
-use Log;
 
 /**
  * Class UserRepository
@@ -602,6 +599,42 @@ class UserRepository extends BaseRepository
 
         if(Invitation::where('invited_instagram_handle', $handle)->where('invited_by', auth()->id())->exists()) {
             return 'You have already invited this instructor.';
+        }
+
+        return null;
+    }
+
+    public function checkResendInvitationFromEmail($email)
+    {
+        if($this->where('email', $email)->exists()) {
+            return 'Seems this user already has an account on our site.';
+        }
+
+        $invitation = Invitation::where('invited_email', $email)
+            ->where('invited_by', auth()->id())->first();
+
+        if($invitation) {
+            $invitation->delete();
+
+            return null;
+        }
+
+        return null;
+    }
+
+    public function checkResendInvitationFromPhone($phone)
+    {
+        if($this->where('mobile_phone', $phone)->exists()) {
+            return 'Seems this user already has an account on our site.';
+        }
+
+        $invitation = Invitation::where('invited_mobile_phone', $phone)
+            ->where('invited_by', auth()->id())->first();
+
+        if($invitation) {
+            $invitation->delete();
+
+            return null;
         }
 
         return null;
