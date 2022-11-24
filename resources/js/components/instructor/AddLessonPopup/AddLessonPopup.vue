@@ -58,7 +58,7 @@
               <input
                 id='upload-video-input'
                 ref='uploadVideoInput'
-                accept='video/mp4'
+                accept='video/mp4,video/quicktime'
                 name='upload-video-input'
                 type='file'
                 @change='videoFileChanged($event)'
@@ -76,7 +76,7 @@
                 {{ videoFileName || 'Upload Lesson file' }}
               </span>
               <span class='add-lesson-popup__upload-formats'>
-                MP4, AVI up to 5GB
+                MOV, MP4, AVI up to 5GB
               </span>
               <div
                 v-if='editMode && videoFileName'
