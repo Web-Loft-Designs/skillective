@@ -14,40 +14,40 @@
     >
       <div v-if="usersToNotify.length == 0">No users to notify selected</div>
       <div v-if="usersToNotify.length > 0" class="w-100">
-<!--        <div v-if="mode !== 'simple'" class="calender-form">-->
-<!--          <div class="calendar-component">-->
-<!--            <div class="calendar-component-top">-->
-<!--              <h2>Choose lesson</h2>-->
-<!--            </div>-->
-<!--            <div class="calendar-component-body">-->
-<!--              <FullCalendar-->
-<!--                :header="{-->
-<!--                  left: 'prev',-->
-<!--                  center: 'title',-->
-<!--                  right: 'next',-->
-<!--                }"-->
-<!--                :footer="{-->
-<!--                  right: 'timeGridDay,timeGridWeek,dayGridMonth',-->
-<!--                }"-->
-<!--                :showNonCurrentDates="false"-->
-<!--                :fixedWeekCount="false"-->
-<!--                :firstDay="0"-->
-<!--                :defaultView="'dayGridMonth'"-->
-<!--                :navLinks="true"-->
-<!--                :nowIndicator="true"-->
-<!--                :plugins="calendarPlugins"-->
-<!--                :events="events"-->
-<!--                :dayRender="dayRender"-->
-<!--                :eventRender="eventRender"-->
-<!--                :eventTimeFormat="eventTimeFormat"-->
-<!--                :selectable="false"-->
-<!--                :datesRender="viewRender"-->
-<!--                @eventClick="dateClick"-->
-<!--                ref="fullCalendarModal"-->
-<!--              ></FullCalendar>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
+        <div v-show="mode !== 'simple'" class="calender-form">
+          <div class="calendar-component">
+            <div class="calendar-component-top">
+              <h2>Choose lesson</h2>
+            </div>
+            <div class="calendar-component-body">
+              <FullCalendar
+                :header="{
+                  left: 'prev',
+                  center: 'title',
+                  right: 'next',
+                }"
+                :footer="{
+                  right: 'timeGridDay,timeGridWeek,dayGridMonth',
+                }"
+                :showNonCurrentDates="false"
+                :fixedWeekCount="false"
+                :firstDay="0"
+                :defaultView="'dayGridMonth'"
+                :navLinks="true"
+                :nowIndicator="true"
+                :plugins="calendarPlugins"
+                :events="events"
+                :dayRender="dayRender"
+                :eventRender="eventRender"
+                :eventTimeFormat="eventTimeFormat"
+                :selectable="false"
+                :datesRender="viewRender"
+                @eventClick="dateClick"
+                ref="fullCalendarModal"
+              ></FullCalendar>
+            </div>
+          </div>
+        </div>
         <div class="block-form">
           <h2 v-if="usersToNotify.length == 1">
             Notify {{ usersToNotify[0].full_name }}
@@ -73,21 +73,21 @@
                 <strong>{{ errors.message[0] }}</strong>
               </span>
             </div>
-            <!--<label v-if="!isStudent" class="col-12">Notify via</label>-->
-            <!--<div  v-if="!isStudent" class="form-group d-flex flex-wrap checkbox-wrapper has-feedback" :class="{ 'has-error' : errors.notification_methods }">-->
+            <label v-if="!isStudent" class="col-12">Notify via</label>
+            <div  v-if="!isStudent" class="form-group d-flex flex-wrap checkbox-wrapper has-feedback" :class="{ 'has-error' : errors.notification_methods }">
 
-            <!--<div class="field mr-4 mb-2" v-for="(notificationMethodName, notificationMethodKey) in availableNotificationMethods">-->
-            <!--<label :for="'method-'+notificationMethodKey" v-if="notificationMethodVisible(notificationMethodKey)">-->
-            <!--<input v-model="fields.notification_methods" type="checkbox" :id="'method-'+notificationMethodKey" :value="notificationMethodKey">-->
-            <!--<span class="checkmark"></span>-->
-            <!-- - {{ notificationMethodName.replace(' Messages', '') }}-->
-            <!--</label>-->
-            <!--</div>-->
+            <div class="field mr-4 mb-2" v-for="(notificationMethodName, notificationMethodKey) in availableNotificationMethods">
+            <label :for="'method-'+notificationMethodKey" v-if="notificationMethodVisible(notificationMethodKey)">
+            <input v-model="fields.notification_methods" type="checkbox" :id="'method-'+notificationMethodKey" :value="notificationMethodKey">
+            <span class="checkmark"></span>
+             - {{ notificationMethodName.replace(' Messages', '') }}
+            </label>
+            </div>
 
-            <!--<span class="help-block" v-if="errors.notification_methods">-->
-            <!--<strong>{{ errors.notification_methods[0] }}</strong>-->
-            <!--</span>-->
-            <!--</div>-->
+            <span class="help-block" v-if="errors.notification_methods">
+            <strong>{{ errors.notification_methods[0] }}</strong>
+            </span>
+            </div>
 
             <div v-if="errorText" class="has-error col-12">{{ errorText }}</div>
             <div v-if="successText" class="has-success col-12">
@@ -158,9 +158,9 @@ export default {
     MagnificPopupModal,
   },
   methods: {
-    // notificationMethodVisible(notificationMethodKey){
-    // 	return this.recepientsAvailableNotificationMethods.indexOf(notificationMethodKey)!==-1
-    // },
+    notificationMethodVisible(notificationMethodKey){
+    	return this.recepientsAvailableNotificationMethods.indexOf(notificationMethodKey)!==-1
+    },
     getInitialFieldsData() {
       return {
         notification_methods: [],
@@ -345,58 +345,58 @@ export default {
     this.recepientsAvailableNotificationMethods = this.availableNotificationMethods;
   },
   mounted() {
-    //     if (this.upcomingLesson) {
-    //       const currentLesson = this.upcomingLesson;
+        if (this.upcomingLesson) {
+          const currentLesson = this.upcomingLesson;
 
-    //       if (currentLesson) {
-    //         this.fields.message = `${currentLesson.instructor.full_name}
-    // Has just opened time on their calendar for:
-    // ${currentLesson.genre.title}
-    // ${
-    //   currentLesson.location
-    //     ? "Location: " + currentLesson.location
-    //     : "Virtual Lesson"
-    // }
-    // Date: ${moment(currentLesson.start).format("MM/DD/YYYY")}
-    // Time: ${moment(currentLesson.end).format("hh:mma")} To ${moment(
-    //           currentLesson.start
-    //         ).format("hh:mma")}
-    // Price: ($${currentLesson.spot_price})`;
-    //       }
-    //     }
+          if (currentLesson) {
+            this.fields.message = `${currentLesson.instructor.full_name}
+    Has just opened time on their calendar for:
+    ${currentLesson.genre.title}
+    ${
+      currentLesson.location
+        ? "Location: " + currentLesson.location
+        : "Virtual Lesson"
+    }
+    Date: ${moment(currentLesson.start).format("MM/DD/YYYY")}
+    Time: ${moment(currentLesson.end).format("hh:mma")} To ${moment(
+              currentLesson.start
+            ).format("hh:mma")}
+    Price: ($${currentLesson.spot_price})`;
+          }
+        }
 
     if (this.mode !== "simple") {
       this.$root.$on("initNotificationsForm", (usersToNotify) => {
         this.usersToNotify = usersToNotify;
 
-        // if(usersToNotify.length==1){
-        // 	var userMethods = [];
-        // 	for (var prop in this.usersToNotify[0].profile.notification_methods){;
-        // 		if (this.usersToNotify[0].profile.notification_methods.hasOwnProperty(prop))
-        // 			userMethods.push(this.usersToNotify[0].profile.notification_methods[prop]);
-        // 	}
-        // 	this.recepientsAvailableNotificationMethods = userMethods;
-        // }
+        if(usersToNotify.length==1){
+        	var userMethods = [];
+        	for (var prop in this.usersToNotify[0].profile.notification_methods){;
+        		if (this.usersToNotify[0].profile.notification_methods.hasOwnProperty(prop))
+        			userMethods.push(this.usersToNotify[0].profile.notification_methods[prop]);
+        	}
+        	this.recepientsAvailableNotificationMethods = userMethods;
+        }
 
-        // axios.get('/api/instructor/lessons?month='+moment().format('YYYY-MM-DD'))
-        //     .then(response => {
-        //         this.events = response.data.data;
-        //         this.events.forEach(function(item) {
-        //             item.title = item.genre.title;
-        //             item.date = moment(item.start).format('YYYY-MM-DD');
-        //             $('[data-date="'+item.date+'"]').addClass('has-event');
-        //         });
-        //         this.events = this.events.filter(function (item) {
-        //             return moment().diff(item.end) <= 0
-        //         })
-        //
-        //         this.loader.hide();
-        //                 this.loader = null;
-        //     }).catch(error => {
-        //     this.events = [];
-        //     this.loader.hide();
-        //     //         this.loader = null;
-        // });
+        axios.get('/api/instructor/lessons?month='+moment().format('YYYY-MM-DD'))
+            .then(response => {
+                this.events = response.data.data;
+                this.events.forEach(function(item) {
+                    item.title = item.genre.title;
+                    item.date = moment(item.start).format('YYYY-MM-DD');
+                    $('[data-date="'+item.date+'"]').addClass('has-event');
+                });
+                this.events = this.events.filter(function (item) {
+                    return moment().diff(item.end) <= 0
+                })
+
+                this.loader.hide();
+                        this.loader = null;
+            }).catch(error => {
+            this.events = [];
+            this.loader.hide();
+            //         this.loader = null;
+        });
 
         this.openPopup();
       });
@@ -406,15 +406,15 @@ export default {
           this.usersToNotify.push({ id: item });
         });
 
-        // if(usersToNotify.length==1){
-        //    var userMethods = [];
-        //    console.log(this.usersToNotify)
-        //    for (var prop in this.usersToNotify[0].profile.notification_methods){
-        // 		if (this.usersToNotify[0].profile.notification_methods.hasOwnProperty(prop))
-        // 		    userMethods.push(this.usersToNotify[0].profile.notification_methods[prop]);
-        //    }
-        // 	this.recepientsAvailableNotificationMethods = userMethods;
-        // }
+        if(usersToNotify.length==1){
+           var userMethods = [];
+           console.log(this.usersToNotify)
+           for (var prop in this.usersToNotify[0].profile.notification_methods){
+        		if (this.usersToNotify[0].profile.notification_methods.hasOwnProperty(prop))
+        		    userMethods.push(this.usersToNotify[0].profile.notification_methods[prop]);
+           }
+        	this.recepientsAvailableNotificationMethods = userMethods;
+        }
         this.fields.message = "";
         this.openPopup();
       });
@@ -422,3 +422,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.notification-form .calender-form{
+  max-width: 100% !important;
+  margin-top: 50px;
+}
+</style>
