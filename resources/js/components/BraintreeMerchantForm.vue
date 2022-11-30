@@ -267,14 +267,13 @@
 						><strong>{{ errors.funding_routingNumber[0] }}</strong></span
 					>
 				</div>
-
 				<div class="form-group has-feedback">
 					<label>Tax Identification</label>
 					<input
 						:disabled="isAdminForm"
 						type="text"
 						class="form-control mb-2"
-						required
+            :required=" merchantAccountDetails.id == null || taxPlaceHolder == '' "
 						:placeholder="taxPlaceHolder"
 						v-model="merchantAccountDetails.taxId"
 					/>
