@@ -478,6 +478,7 @@ export default {
     },
     notifyClient(client) {
       this.$root.$emit('initNotificationsForm', [client])
+      this.$root.$emit('initNotificationsForm', [client],this.lesson )
     },
     toggleDropdown() {
       this.isDropdownOpened = !this.isDropdownOpened
@@ -496,7 +497,7 @@ export default {
       this.isDropdownOpened = false
     },
     notifyAll() {
-      this.$root.$emit('initNotificationsForm', this.bookings_students)
+      this.$root.$emit('initNotificationsForm', this.bookings_students,this.lesson)
     }
   },
   computed: {
