@@ -53,9 +53,14 @@ class InstructorMerchantAPIController extends AppBaseController
 
             if ($merchantAccount != false)
             {
-                $user->tax_id = $request->taxId;
-                $user->legal_name = $request->legalName;
-                $user->save();
+
+                if($request->taxId !== null) {
+                    $user->update([
+                        'tax_id' => $request->taxId,
+                        'legal_name' => $request->legalName,
+                    ]);
+                }
+
 
                 return $this->sendResponse(BraintreeProcessor::_prepareMerchantAccountOutput($merchantAccount), 'Merchant account created and will be verified soon');
             }
