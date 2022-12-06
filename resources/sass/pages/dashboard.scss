@@ -4867,7 +4867,7 @@
     border-radius: 5px;
     background-color: #ffffff;
     width: 100%;
-    max-width: 400px;
+    max-width: 800px;
 
     label {
         color: #444444;
@@ -4901,14 +4901,13 @@
         }
 
         .calender-form {
-            flex: 0 0 100%;
             max-width: 100%;
             width: 100%;
         }
     }
 
     .form-group textarea.form-control {
-        min-height: 170px;
+        min-height: 270px;
     }
 
     .Modal__inner {
