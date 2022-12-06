@@ -13,7 +13,7 @@
 			ref="modalNotification"
 		>
 			<div v-if="usersToNotify.length == 0">No users to notify selected</div>
-			<div v-if="usersToNotify.length > 0" class="w-100">
+			<div v-if="usersToNotify.length > 0" class="w-100 d-flex popup-notify">
 				<div v-if="!noCalendar" class="calender-form">
 					<div class="calendar-component">
 						<div class="calendar-component-top">
@@ -111,12 +111,9 @@
 							{{ successText }}
 						</div>
 						<div class="col-12">
-							<span @click="sendNotifications" class="btn btn-default btn-block"
-								>Send
-								{{
-									usersToNotify.length == 1 ? 'Notification' : 'Notifications'
-								}}</span
-							>
+							<span @click="sendNotifications" class="btn btn-default btn-block">
+								Send Notification
+							</span>
 						</div>
 						<!--<div class="col-xs-4">-->
 						<!--<span class="btn btn-danger" @click="clearFormAndClosePopup">Close Form</span>-->
@@ -468,4 +465,20 @@ More info: ${shareHelper.buildShareLink(this.currentLesson.instructor_id, this.c
 	max-width: 100% !important;
 	margin-top: 50px;
 }
+
+.block-form {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+}
+
+ @media (max-width: 900px) {
+	.popup-notify {
+		flex-direction: column;
+	}
+
+	.block-form {
+		justify-content: flex-start !important;
+	}
+ }
 </style>
