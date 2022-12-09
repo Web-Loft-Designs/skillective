@@ -4,9 +4,9 @@ namespace App\Repositories;
 
 use App\Models\Cart;
 use App\Models\PurchasedLesson;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cookie;
 use InfyOm\Generator\Common\BaseRepository;
 use App\Models\Booking;
 use App\Models\Lesson;
@@ -34,7 +34,6 @@ class CartRepository extends BaseRepository
 
         if ($student_id) {
             $this->scopeQuery(function ($query) use ($student_id) {
-                $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
                 $query
                     ->select('cart.*')
                     ->where('cart.student_id', $student_id)
@@ -42,9 +41,7 @@ class CartRepository extends BaseRepository
                     ->leftJoin('bookings', function ($join) {
                         $join->on('lessons.id', '=', 'bookings.lesson_id')
                             ->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ");
-                    })
-                    //->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")
-                    ->groupBy('cart.id');
+                    })->groupBy('cart.id');
 
                 return $query;
             })->with(['lesson', 'lesson.instructor', 'lesson.instructor.discounts' => function ($q) {
@@ -52,7 +49,7 @@ class CartRepository extends BaseRepository
                 $q->whereRaw("'$nowOnServer' < discounts.finish");
             }]);
 
-            $cart = $this->get(['cart.*', 'count_booked']);
+            $carts = $this->get(['cart.*', 'count_booked']);
 
             $this->resetScope();
 
@@ -71,34 +68,32 @@ class CartRepository extends BaseRepository
 
             $preRCart = $this->get();
 
-            $cart = $cart->merge($preRCart);
+            $carts = $carts->merge($preRCart);
 
+            foreach ($carts as $index => $cartItem) {
 
-
-            foreach ($cart as $index => $cartItem) {
                 if ($cartItem->lesson_id) {
                     if (!$cartItem->lesson || $cartItem->count_booked >= $cartItem->lesson->spots_count) {
-                        unset($cart[$index]);
+                        unset($carts[$index]);
                     }
                 }
 
                 if ($cartItem->lesson_id) {
                     $cartItem->discounts = $cartItem->lesson->instructor->discounts;
-                    $handledDiscounts = Discount::validateDiscount($cartItem->discounts, $cart);
+                    $handledDiscounts = Discount::validateDiscount($cartItem->discounts, $carts);
                     $cartItem->discounts = $handledDiscounts;
                 } else if ($cartItem->pre_r_lesson_id) {
                     $cartItem->discounts = $cartItem->preRecordedLesson->instructor->discounts;
-                    $handledDiscounts = Discount::validateDiscount($cartItem->discounts, $cart);
+                    $handledDiscounts = Discount::validateDiscount($cartItem->discounts, $carts);
                     $cartItem->discounts = $handledDiscounts;
                 }
             }
 
-            return $cart;
+            return $carts;
 
         } else if ($product_list) {
 
             return $this->addToCart($product_list);
-
         }
     }
 
@@ -108,15 +103,13 @@ class CartRepository extends BaseRepository
      */
     public function addToCart($product_list)
     {
-
         $lessons_ids = [];
         $pre_r_lessons_ids = [];
 
         foreach (json_decode($product_list) as $key => $value) {
-            if (isset($value->isPreRecorded))
-            {
-                if( isset($value->lesson_id) )
-                {
+
+            if (isset($value->isPreRecorded)) {
+                if( isset($value->lesson_id) ) {
                     $pre_r_lessons_ids[] = (int)$value->lesson_id;
                 }
 
@@ -125,50 +118,62 @@ class CartRepository extends BaseRepository
             }
         }
 
-        $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
         $lessons = Lesson::whereIn('lessons.id', $lessons_ids)
             ->leftJoin('bookings', function ($join) {
                 $join->on('lessons.id', '=', 'bookings.lesson_id')
                     ->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ");
-            })
-            //->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")
-            ->with(["genre", 'instructor', 'instructor.discounts']);
+            })->with(["genre", 'instructor', 'instructor.discounts']);
 
-        $cart = $lessons->get(["lessons.*"]);
+       $carts = $lessons->get(["lessons.*"]);
 
-        $preRCart = PreRecordedLesson::whereIn("pre_r_lessons.id", $pre_r_lessons_ids)->with(["genre", "instructor"])->get(["pre_r_lessons.*"]);
+       $preRCart = PreRecordedLesson::whereIn("pre_r_lessons.id", $pre_r_lessons_ids)->with(["genre", "instructor"])->get(["pre_r_lessons.*"]);
 
-        $cart = $cart->merge($preRCart);
+        $carts = $carts->merge($preRCart);
 
-        foreach ($cart as $key => $value) {
-            $metaCartItem = [];
-
+        foreach ($carts as $key => $value) {
             if ($value instanceof Lesson) {
                 $metaCartItem = [
                     "lesson_id" => $value->id,
                     "instructor_id" => $value->instructor_id,
                 ];
-                $cart[$key] = new Cart($metaCartItem);
+                $carts[$key] = new Cart($metaCartItem);
+                $carts[$key]->lesson()->associate($value);
+
             } else {
                 $metaCartItem = [
                     "pre_r_lesson_id" => $value->id,
                     "instructor_id" => $value->instructor_id,
                 ];
 
-                $cart[$key] = new Cart($metaCartItem);
+                $carts[$key] = new Cart($metaCartItem);
+                $carts[$key]->lesson()->associate($value);
             }
-
         }
 
-        return $cart;
+        foreach ($carts as $index => $cartItem) {
+            if ($cartItem->lesson_id) {
+                if (!$cartItem->lesson || $cartItem->count_booked >= $cartItem->lesson->spots_count) {
+                    unset($carts[$index]);
+                }
+            }
+            if ($cartItem->lesson_id) {
+                $cartItem->discounts = $cartItem->lesson->instructor->discounts;
+                $handledDiscounts = Discount::validateDiscount($cartItem->discounts, $carts);
+                $cartItem->discounts = $handledDiscounts;
+            } else if ($cartItem->pre_r_lesson_id) {
+                $cartItem->discounts = $cartItem->preRecordedLesson->instructor->discounts;
+                $handledDiscounts = Discount::validateDiscount($cartItem->discounts, $carts);
+                $cartItem->discounts = $handledDiscounts;
+            }
+        }
 
+        return $carts;
     }
 
 
     public function getLessonsCountInCart($student_id, $guest_cart)
     {
         $cart = $this->getUserCart($student_id, $guest_cart);
-
         return  count($cart);
     }
 
@@ -176,26 +181,22 @@ class CartRepository extends BaseRepository
     public function getCartSummary($student_id, $guest_cart, $promos, $message = null)
     {
         $cart = $this->getUserCart($student_id, $guest_cart);
-
         $response =  array("count" => 0, "total" => 0, "subtotal" => 0, "fee" => 0, "discount" => 0);
-
         $discounts = [];
         $promo_codes = [];
 
         foreach (json_decode($promos) as $key => $promo) {
             $promo = PromoCode::where('name', '=', $promo)->first();
-
             if (empty($promo)) {
                 continue;
             }
-
             $promo_codes[$promo->id] = $promo;
         }
 
         foreach ($cart as $key => $cartItem) {
+            if ($cartItem->lesson->instructor->discounts) {
+                foreach ($cartItem->lesson->instructor->discounts as $discountKey => $discount) {
 
-            if ($cartItem->discounts) {
-                foreach ($cartItem->discounts as $discountKey => $discount) {
                     if ($discount->isActivate) {
                         $discounts[$discount->id] = $discount;
                     }
@@ -206,16 +207,15 @@ class CartRepository extends BaseRepository
         $cartCount = count($cart);
 
         foreach ($cart as $key => $cartItem) {
-
             if ($cartItem->lesson_id) {
                 $booking = new Booking();
-
                 $virtual_fee = round($booking->getBookingVirtualFeeAmount($cartItem->lesson), 2);
-
                 $finishPrice = $cartItem->lesson->spot_price;
 
                 foreach ($discounts as $discountKey => $discount) {
-                    if ($discount->lesson_type == "all" || $discount->lesson_type == 'virtual' && $cartItem->lesson->lesson_type == 'virtual' || $discount->lesson_type == 'in-person' && $cartItem->lesson->lesson_type == 'in_person') {
+                    if ($discount->lesson_type == "all" || $discount->lesson_type == 'virtual'
+                        && $cartItem->lesson->lesson_type == 'virtual' || $discount->lesson_type == 'in-person'
+                        && $cartItem->lesson->lesson_type == 'in_person') {
 
                         if ($discount->discount_type == 'fixed-amount') {
                             $discountAmount = $discount->discount / $cartCount;
@@ -230,7 +230,9 @@ class CartRepository extends BaseRepository
                 }
 
                 foreach ($promo_codes as $promoKey => $promo) {
-                    if ($promo->lesson_type == "all" || $promo->lesson_type == 'virtual' && $cartItem->lesson->lesson_type == 'virtual' || $promo->lesson_type == 'in-person' && $cartItem->lesson->lesson_type == 'in_person') {
+                    if ($promo->lesson_type == "all" || $promo->lesson_type == 'virtual'
+                        && $cartItem->lesson->lesson_type == 'virtual' || $promo->lesson_type == 'in-person'
+                        && $cartItem->lesson->lesson_type == 'in_person') {
 
                         if ($promo->discount_type == 'fixed-amount') {
                             $discountAmount = $promo->discount / $cartCount;
@@ -245,16 +247,13 @@ class CartRepository extends BaseRepository
                 }
 
                 $service_fee = round($booking->getBookingServiceFeeAmount($finishPrice), 2);
-
                 $processor_fee = round($booking->getBookingPaymentProcessingFeeAmount($finishPrice, $service_fee + $virtual_fee), 2);
-
                 $response["count"] += 1;
                 $response["subtotal"] += round($cartItem->lesson->spot_price, 2);
                 $response["fee"] += $service_fee + $virtual_fee + $processor_fee;
                 $response["total"] += round($finishPrice + $service_fee + $virtual_fee + $processor_fee, 2);
             } else {
                 $preRecordedLesson = new PreRecordedLesson();
-
                 $finishPrice = $cartItem->preRecordedLesson->price;
 
                 foreach ($discounts as $discountKey => $discount) {
@@ -307,9 +306,10 @@ class CartRepository extends BaseRepository
         return $this->presenter->present($data);
     }
 
+
     /**
      * @param Request $request
-     * @return bool
+     * @return false|JsonResponse
      */
     public function storeGuestCart(Request $request)
     {
@@ -318,8 +318,7 @@ class CartRepository extends BaseRepository
 
         $guestCart = json_decode(\Cookie::get('guest_cart'));
 
-        foreach ( $guestCart as $item )
-        {
+        foreach ( $guestCart as $item ){
 
             $check = true;
             if( isset($item->isPreRecorded) && $item->isPreRecorded )
