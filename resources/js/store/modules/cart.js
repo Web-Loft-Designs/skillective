@@ -57,6 +57,9 @@ export default {
     },
     async updateCartTotal(state, total) {
       state.cart.total = total
+      if (state.cart.total.total) {
+        state.cart.total.total = +state.cart.total.total.toFixed(2)
+      }
     },
     async setGuestMode(state, guestMode) {
       state.guestMode = guestMode
