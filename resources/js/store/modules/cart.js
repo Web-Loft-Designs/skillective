@@ -56,7 +56,7 @@ export default {
       state.cart.dotNeeded = visible || state.cart.items.length > 0
     },
     async updateCartTotal(state, total) {
-      state.cart.total = total
+      state.cart.total = Number(total).toFixed(2)
     },
     async setGuestMode(state, guestMode) {
       state.guestMode = guestMode
