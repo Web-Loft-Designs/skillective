@@ -21,6 +21,7 @@ class InstructorMerchantAPIController extends AppBaseController
         return $this->sendResponse($merchant);
     }
 
+
     public function create(BraintreeCreateMerchantRequest $request, UserRepository $userRepository)
     {
 		$user = Auth::user();
