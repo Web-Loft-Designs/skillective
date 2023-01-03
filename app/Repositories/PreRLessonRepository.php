@@ -60,13 +60,13 @@ class PreRLessonRepository extends BaseRepository
         }
 
         $this->scopeQuery(function ($query) use ($request) {
+
             $query = $query->select('pre_r_lessons.*')
-                ->join('users', 'pre_r_lessons.instructor_id', '=', "users.id")
-                ->join('purchased_lessons', 'pre_r_lessons.id', '=', "purchased_lessons.pre_r_lesson_id");
+                ->join('users', 'pre_r_lessons.instructor_id', '=', "users.id");
+//                ->join('purchased_lessons', 'pre_r_lessons.id', '=', "purchased_lessons.pre_r_lesson_id");
 
             if( Auth::check() )
             {
-
                 if (Auth::user()->hasRole(User::ROLE_INSTRUCTOR)){
                     $query->groupBy('pre_r_lessons.id')
                         ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'asc');
@@ -82,8 +82,8 @@ class PreRLessonRepository extends BaseRepository
 
             }else{
 
-                $query->groupBy('pre_r_lessons.id')
-                    ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'asc');
+                $query->groupBy('pre_r_lessons.id');
+//                    ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'asc');
 
             }
 
