@@ -68,15 +68,15 @@ class PreRLessonRepository extends BaseRepository
             if( Auth::check() )
             {
                 if (Auth::user()->hasRole(User::ROLE_INSTRUCTOR)){
-                    $query->groupBy('pre_r_lessons.id')
-                        ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'asc');
+                    $query->groupBy('pre_r_lessons.id');
+//                        ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'asc');
                 }else if ( Auth::user()->hasRole(User::ROLE_STUDENT) ){
 
                     $userGenres = Auth()->user()->genres()->orderBy('title', 'desc')->get()->pluck('id')->toArray();
                     $ids_ordered = implode(',', $userGenres);
-                    $query->groupBy('pre_r_lessons.id')
-                        ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'desc')
-                        ->orderBy(DB::raw('FIELD(pre_r_lessons.genre_id, '.$ids_ordered.') + COUNT(`purchased_lessons`.`id`), COUNT(`purchased_lessons`.`id`)'), 'desc');
+                    $query->groupBy('pre_r_lessons.id');
+//                        ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'desc')
+//                        ->orderBy(DB::raw('FIELD(pre_r_lessons.genre_id, '.$ids_ordered.') + COUNT(`purchased_lessons`.`id`), COUNT(`purchased_lessons`.`id`)'), 'desc');
 
                 }
 
