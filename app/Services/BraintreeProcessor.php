@@ -382,44 +382,6 @@ class BraintreeProcessor {
 		}
 	}
 
-    private function _buildMerchantAccountParametersFromInputData($inputData){
-        $merchantAccountParams = [
-            'individual' => [
-                'firstName' => $inputData['individual_firstName'],
-                'lastName' => $inputData['individual_lastName'],
-                'email' => $inputData['individual_email'],
-                'phone' => trim(prepareMobileForTwilio($inputData['individual_phone']), '+'),
-                'dateOfBirth' => $inputData['individual_dateOfBirth'],
-                'address' => [
-                    'streetAddress' => $inputData['individual_streetAddress'],
-                    'locality' => $inputData['individual_locality'],
-                    'region' => $inputData['individual_region'],
-                    'postalCode' => $inputData['individual_postalCode']
-                ],
-                'ssn' => isset($inputData['individual_ssn']) ? $inputData['individual_ssn'] : null
-            ],
-            'business' => [
-                'legalName' => $inputData['legalName'],
-                'taxId' => $inputData['taxId'],
-                'address' => [
-                    'streetAddress' => $inputData['individual_streetAddress'],
-                    'locality' => $inputData['individual_locality'],
-                    'region' => $inputData['individual_region'],
-                    'postalCode' => $inputData['individual_postalCode']
-                ]
-            ],
-            'funding' => [
-                'destination' => Braintree_MerchantAccount::FUNDING_DESTINATION_BANK, // TODO: Bank or Venmo instructor to decide
-                'email' => isset($inputData['funding_email']) ? $inputData['funding_email'] :null, // optional
-                'mobilePhone' => isset($inputData['funding_mobilePhone']) ? trim(prepareMobileForTwilio($inputData['funding_mobilePhone']), '+') :null, // optional
-                'accountNumber' => isset($inputData['funding_accountNumber']) ? $inputData['funding_accountNumber'] : null, // TODO : required with  Braintree_MerchantAccount::FUNDING_DESTINATION_BANK , instructor must provide
-                'routingNumber' => isset($inputData['funding_routingNumber']) ? $inputData['funding_routingNumber'] : null // TODO : required with  Braintree_MerchantAccount::FUNDING_DESTINATION_BANK , instructor must provide
-            ]
-        ];
-
-        return $merchantAccountParams;
-    }
-
 	public function createMerchant($user, $inputData){
 		if (!$user->hasRole(User::ROLE_INSTRUCTOR)){
 			throw new \Exception('Merchant accounts can be created for Instructors only');
@@ -434,8 +396,7 @@ class BraintreeProcessor {
 		$merchantAccountParams['tosAccepted'] = $inputData['tosAccepted'];
 		$merchantAccountParams['masterMerchantAccountId'] = config('services.braintree.master_merchant_account_id');
 		$merchantAccountParams['id'] = 'instructor_' . $user->id;
-        if ($merchantAccountParams['individual']['ssn']==null)
-            unset($merchantAccountParams['individual']['ssn']);
+
 
 		$result = $this->gateway->merchantAccount()->create($merchantAccountParams);
 		if ($result->success){
@@ -457,14 +418,14 @@ class BraintreeProcessor {
 		}
 
 		$merchantAccountParams = $this->_buildMerchantAccountParametersFromInputData($inputData);
-		if ($merchantAccountParams['funding']['accountNumber']==null){
+
+		if ($merchantAccountParams['funding']['accountNumber'] == null){
 			unset($merchantAccountParams['funding']['destination']);
 			unset($merchantAccountParams['funding']['accountNumber']);
 		}
-		if ($merchantAccountParams['individual']['ssn']==null)
-			unset($merchantAccountParams['individual']['ssn']);
 
 		$result = $this->gateway->merchantAccount()->update($user->bt_submerchant_id, $merchantAccountParams);
+
 		if ($result->success){
 			return $result->merchantAccount;
 		}else{
@@ -510,7 +471,7 @@ class BraintreeProcessor {
 			'individual_email'			=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->email : '',
 			'individual_phone'			=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->phone : '',
 			'individual_dateOfBirth'	=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->dateOfBirth : '',
-			'individual_ssn' 			=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->ssnLast4 : '',
+//			'individual_ssn' 			=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->ssnLast4 : '',
 			'individual_streetAddress'	=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->addressDetails->streetAddress : '',
 			'individual_locality'		=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->addressDetails->locality : '',
 			'individual_region'			=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->addressDetails->region : '',
@@ -527,7 +488,43 @@ class BraintreeProcessor {
 		return str_replace('Braintree\\', '', get_class($paymentMethod));
 	}
 
+	private function _buildMerchantAccountParametersFromInputData($inputData){
+		$merchantAccountParams = [
+			'individual' => [
+				'firstName' => $inputData['individual_firstName'],
+				'lastName' => $inputData['individual_lastName'],
+				'email' => $inputData['individual_email'],
+				'phone' => trim(prepareMobileForTwilio($inputData['individual_phone']), '+'),
+				'dateOfBirth' => $inputData['individual_dateOfBirth'],
+				'address' => [
+					'streetAddress' => $inputData['individual_streetAddress'],
+					'locality' => $inputData['individual_locality'],
+					'region' => $inputData['individual_region'],
+					'postalCode' => $inputData['individual_postalCode']
+				],
+//				'ssn' => isset($inputData['individual_ssn']) ? $inputData['individual_ssn'] : ""
+			],
+            'business' => [
+                'legalName' => $inputData['legalName'],
+                'taxId' => $inputData['taxId'],
+                'address' => [
+                    'streetAddress' => $inputData['individual_streetAddress'],
+                    'locality' => $inputData['individual_locality'],
+                    'region' => $inputData['individual_region'],
+                    'postalCode' => $inputData['individual_postalCode']
+                ]
+            ],
+			'funding' => [
+				'destination' => Braintree_MerchantAccount::FUNDING_DESTINATION_BANK, // TODO: Bank or Venmo instructor to decide
+				'email' => isset($inputData['funding_email']) ? $inputData['funding_email'] :null, // optional
+				'mobilePhone' => isset($inputData['funding_mobilePhone']) ? trim(prepareMobileForTwilio($inputData['funding_mobilePhone']), '+') :null, // optional
+				'accountNumber' => isset($inputData['funding_accountNumber']) ? $inputData['funding_accountNumber'] : null, // TODO : required with  Braintree_MerchantAccount::FUNDING_DESTINATION_BANK , instructor must provide
+				'routingNumber' => isset($inputData['funding_routingNumber']) ? $inputData['funding_routingNumber'] : null // TODO : required with  Braintree_MerchantAccount::FUNDING_DESTINATION_BANK , instructor must provide
+			]
+		];
 
+		return $merchantAccountParams;
+	}
 
 	private function _resultErrorsForResponse($result){
 		$returnError = '';
