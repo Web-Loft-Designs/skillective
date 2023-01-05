@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Lesson;
 use App\Models\Booking;
 use App\Models\LessonRequest;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserGeoLocation;
 use Illuminate\Http\Request;
