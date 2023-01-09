@@ -391,62 +391,62 @@
               </div>
             </div>
           </div>
-          <div
-            class="payment-option"
-            :class="{ active: paymentMethod === 'VenmoAccount' }"
-          >
-            <div>
-              <div
-                class="payment-option-header"
-                @click="paymentMethod = 'VenmoAccount'"
-              >
-                <label>Venmo</label>
-                <img src="/images/venmo.png" alt />
-              </div>
-              <div
-                class="payment-option-body"
-                v-if="paymentMethod === 'VenmoAccount'"
-              >
-                <div v-if="this.selectedPaymentMethodObj == null">
-                  <p>Pay with</p>
-                  <div
-                    id="venmo-button"
-                    class="btn btn-block"
-                    style="
-                      background: rgb(61, 149, 206)
-                        url('/images/venmo_logo_white.png') repeat scroll 0% 0%;
-                      display: block;
-                      background-repeat: no-repeat;
-                      background-size: 110px 21px;
-                      background-position: center;
-                    "
-                    v-if="venmoNotSupported == false"
-                  ></div>
-                </div>
-                <button
-                  v-if="this.selectedPaymentMethodObj != null"
-                  type="button"
-                  class="btn btn-block"
-                  @click="book"
-                >
-                  Submit Payment
-                </button>
-                <div
-                  v-if="errorText && paymentMethod === 'VenmoAccount'"
-                  class="has-error"
-                  v-html="errorText"
-                ></div>
-                <div
-                  v-if="
-                    this.selectedPaymentMethodObj == null &&
-                    venmoNotSupported == true
-                  "
-                >
-                  Browser does not support Venmo
-                </div>
-              </div>
-            </div>
-          </div>
+<!--          <div-->
+<!--            class="payment-option"-->
+<!--            :class="{ active: paymentMethod === 'VenmoAccount' }"-->
+<!--          >-->
+<!--            <div>-->
+<!--              <div-->
+<!--                class="payment-option-header"-->
+<!--                @click="paymentMethod = 'VenmoAccount'"-->
+<!--              >-->
+<!--                <label>Venmo</label>-->
+<!--                <img src="/images/venmo.png" alt />-->
+<!--              </div>-->
+<!--              <div-->
+<!--                class="payment-option-body"-->
+<!--                v-if="paymentMethod === 'VenmoAccount'"-->
+<!--              >-->
+<!--                <div v-if="this.selectedPaymentMethodObj == null">-->
+<!--                  <p>Pay with</p>-->
+<!--                  <div-->
+<!--                    id="venmo-button"-->
+<!--                    class="btn btn-block"-->
+<!--                    style="-->
+<!--                      background: rgb(61, 149, 206)-->
+<!--                        url('/images/venmo_logo_white.png') repeat scroll 0% 0%;-->
+<!--                      display: block;-->
+<!--                      background-repeat: no-repeat;-->
+<!--                      background-size: 110px 21px;-->
+<!--                      background-position: center;-->
+<!--                    "-->
+<!--                    v-if="venmoNotSupported == false"-->
+<!--                  ></div>-->
+<!--                </div>-->
+<!--                <button-->
+<!--                  v-if="this.selectedPaymentMethodObj != null"-->
+<!--                  type="button"-->
+<!--                  class="btn btn-block"-->
+<!--                  @click="book"-->
+<!--                >-->
+<!--                  Submit Payment-->
+<!--                </button>-->
+<!--                <div-->
+<!--                  v-if="errorText && paymentMethod === 'VenmoAccount'"-->
+<!--                  class="has-error"-->
+<!--                  v-html="errorText"-->
+<!--                ></div>-->
+<!--                <div-->
+<!--                  v-if="-->
+<!--                    this.selectedPaymentMethodObj == null &&-->
+<!--                    venmoNotSupported == true-->
+<!--                  "-->
+<!--                >-->
+<!--                  Browser does not support Venmo-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
         </div>
       </div>
 
@@ -748,93 +748,94 @@ export default {
                   ).then(function () {})
                 }
               )
-            } else if (vueComponent.paymentMethod == 'VenmoAccount') {
-              var forPayPal = true
-              vueComponent.collectDeviceDataForBraintree(
-                clientInstance,
-                forPayPal
-              )
-              braintree.venmo.create(
-                {
-                  client: clientInstance,
-                  allowNewBrowserTab: true,
-                },
-                function (venmoErr, venmoInstance) {
-                  if (venmoErr) {
-                    vueComponent.errorText = venmoErr.message
-                    console.error('Error creating Venmo:', venmoErr)
-                    return
-                  }
-
-                  // Verify browser support before proceeding.
-                  if (!venmoInstance.isBrowserSupported()) {
-                    vueComponent.venmoNotSupported = true
-                    return
-                  }
-                  var venmoButton = document.getElementById('venmo-button')
-                  venmoButton.style.display = 'block' // Assumes that venmoButton is initially display: none.
-                  venmoButton.addEventListener('click', function () {
-                    venmoButton.disabled = true
-
-                    Cookies.set('currentOrderDetails', {
-                      fields: vueComponent.fields,
-                      paymentMethod: vueComponent.paymentMethod,
-                      bookingStep: vueComponent.bookingStep,
-                      useSavedMethod: vueComponent.useSavedMethod,
-                    })
-
-                    venmoInstance.tokenize(function (tokenizeErr, payload) {
-                      venmoButton.removeAttribute('disabled')
-                      if (tokenizeErr) {
-                        if (tokenizeErr.code === 'VENMO_CANCELED') {
-                          vueComponent.errorText =
-                            'App is not available or user aborted payment flow'
-                        } else if (tokenizeErr.code === 'VENMO_APP_CANCELED') {
-                          vueComponent.errorText = 'User canceled payment flow'
-                        } else {
-                          vueComponent.errorText =
-                            'An error occurred:' + tokenizeErr.message
-                        }
-                      } else {
-                        if (payload.nonce != undefined) {
-                          vueComponent.fields.payment_method_nonce =
-                            payload.nonce
-                          vueComponent.book()
-                        } else {
-                          vueComponent.errorText = "Can't process your data."
-                        }
-                      }
-                    })
-                  })
-
-                  if (venmoInstance.hasTokenizationResult()) {
-                    venmoInstance.tokenize(function (tokenizeErr, payload) {
-                      if (tokenizeErr) {
-                        if (tokenizeErr.code === 'VENMO_CANCELED') {
-                          vueComponent.errorText =
-                            'App is not available or user aborted payment flow'
-                        } else if (tokenizeErr.code === 'VENMO_APP_CANCELED') {
-                          vueComponent.errorText = 'User canceled payment flow'
-                        } else {
-                          vueComponent.errorText =
-                            'An error occurred:' + tokenizeErr.message
-                        }
-                      } else {
-                        console.log('Venmo user:', payload.details.username)
-                        if (payload.nonce != undefined) {
-                          vueComponent.fields.payment_method_nonce =
-                            payload.nonce
-                          vueComponent.book()
-                        } else {
-                          vueComponent.errorText = "Can't process your data."
-                        }
-                      }
-                    })
-                    return
-                  }
-                }
-              )
             }
+            //  else if (vueComponent.paymentMethod == 'VenmoAccount') {
+            //   var forPayPal = true
+            //   vueComponent.collectDeviceDataForBraintree(
+            //     clientInstance,
+            //     forPayPal
+            //   )
+            //   braintree.venmo.create(
+            //     {
+            //       client: clientInstance,
+            //       allowNewBrowserTab: true,
+            //     },
+            //     function (venmoErr, venmoInstance) {
+            //       if (venmoErr) {
+            //         vueComponent.errorText = venmoErr.message
+            //         console.error('Error creating Venmo:', venmoErr)
+            //         return
+            //       }
+            //
+            //       // Verify browser support before proceeding.
+            //       if (!venmoInstance.isBrowserSupported()) {
+            //         vueComponent.venmoNotSupported = true
+            //         return
+            //       }
+            //       var venmoButton = document.getElementById('venmo-button')
+            //       venmoButton.style.display = 'block' // Assumes that venmoButton is initially display: none.
+            //       venmoButton.addEventListener('click', function () {
+            //         venmoButton.disabled = true
+            //
+            //         Cookies.set('currentOrderDetails', {
+            //           fields: vueComponent.fields,
+            //           paymentMethod: vueComponent.paymentMethod,
+            //           bookingStep: vueComponent.bookingStep,
+            //           useSavedMethod: vueComponent.useSavedMethod,
+            //         })
+            //
+            //         venmoInstance.tokenize(function (tokenizeErr, payload) {
+            //           venmoButton.removeAttribute('disabled')
+            //           if (tokenizeErr) {
+            //             if (tokenizeErr.code === 'VENMO_CANCELED') {
+            //               vueComponent.errorText =
+            //                 'App is not available or user aborted payment flow'
+            //             } else if (tokenizeErr.code === 'VENMO_APP_CANCELED') {
+            //               vueComponent.errorText = 'User canceled payment flow'
+            //             } else {
+            //               vueComponent.errorText =
+            //                 'An error occurred:' + tokenizeErr.message
+            //             }
+            //           } else {
+            //             if (payload.nonce != undefined) {
+            //               vueComponent.fields.payment_method_nonce =
+            //                 payload.nonce
+            //               vueComponent.book()
+            //             } else {
+            //               vueComponent.errorText = "Can't process your data."
+            //             }
+            //           }
+            //         })
+            //       })
+            //
+            //       if (venmoInstance.hasTokenizationResult()) {
+            //         venmoInstance.tokenize(function (tokenizeErr, payload) {
+            //           if (tokenizeErr) {
+            //             if (tokenizeErr.code === 'VENMO_CANCELED') {
+            //               vueComponent.errorText =
+            //                 'App is not available or user aborted payment flow'
+            //             } else if (tokenizeErr.code === 'VENMO_APP_CANCELED') {
+            //               vueComponent.errorText = 'User canceled payment flow'
+            //             } else {
+            //               vueComponent.errorText =
+            //                 'An error occurred:' + tokenizeErr.message
+            //             }
+            //           } else {
+            //             console.log('Venmo user:', payload.details.username)
+            //             if (payload.nonce != undefined) {
+            //               vueComponent.fields.payment_method_nonce =
+            //                 payload.nonce
+            //               vueComponent.book()
+            //             } else {
+            //               vueComponent.errorText = "Can't process your data."
+            //             }
+            //           }
+            //         })
+            //         return
+            //       }
+            //     }
+            //   )
+            // }
           }
         )
       }
