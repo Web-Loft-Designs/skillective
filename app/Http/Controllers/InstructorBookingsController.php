@@ -4,13 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Auth;
-use Session;
 use App\Repositories\BookingRepository;
 use App\Repositories\GenreRepository;
 use App\Repositories\LessonRequestRepository;
 use App\Repositories\LessonRepository;
 use Log;
-use App\Models\Booking;
+
 
 class InstructorBookingsController extends Controller
 {
@@ -29,31 +28,6 @@ class InstructorBookingsController extends Controller
      */
     public function index(BookingRepository $bookingRepository, GenreRepository $genreRepository, LessonRepository $lessonRepo, Request $request)
     {
-		// try{
-		// 	if (!$request->has('type'))
-		// 		$request->request->add(['type'	=> 'pending']);
-		// 	if ($request->filled('booking')){
-		// 		$request->request->add(['booking' => $request->input('booking')]);
-		// 		// redeclare type
-		// 		$request->request->add(['type'	=> 'pending_cancellation']);
-
-		// 		$bookingToShow = $bookingRepository->findWithoutFail($request->input('booking'));
-		// 		if (!$bookingToShow)
-		// 			abort(404);
-		// 	}
-        //     if ($request->get('type') == 'lesson_requests'){
-        //         $this->lessonRequestRepository->setPresenter("App\\Presenters\\LessonRequestInListPresenter");
-        //         $bookings = $this->lessonRequestRepository->presentResponse($this->lessonRequestRepository->getUserLessonRequests($request, Auth::user()->id));
-        //     }else{
-        //         $bookingRepository->setPresenter("App\\Presenters\\BookingInListPresenter");
-        //         $bookings = $bookingRepository->presentResponse($bookingRepository->getInstructorBookings($request, Auth::user()->id));
-        //     }
-		// }catch (\Exception $e){
-        //     Log::info('test');
-		// 	Log::error('getInstructorBookings : ' . $e->getMessage());
-		// 	$bookings = ['data'=>[]];
-        // }
-        
 
         try{
 			$request = new Request([
@@ -81,7 +55,6 @@ class InstructorBookingsController extends Controller
         ];
         
 
-        
 
 		return view('frontend.instructor.bookings', $vars);
     }
