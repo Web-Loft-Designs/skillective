@@ -20,7 +20,7 @@ use App\Facades\UserRegistrator;
 use Auth;
 use Illuminate\Support\Facades\Cookie;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Session;
+
 
 
 class CartAPIController extends AppBaseController
