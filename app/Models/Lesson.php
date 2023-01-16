@@ -253,14 +253,12 @@ class Lesson extends Model implements Transformable
 		$booking->payment_method_token	= $paymentMethod['token'];
 		$booking->payment_method_type	= $paymentMethod['type'];
 
-
 		$service_fee = $booking->getBookingServiceFeeAmount($this->spot_price);
 		$virtual_fee = $booking->getBookingVirtualFeeAmount($this);
 		$booking->service_fee = $service_fee;
 		$booking->virtual_fee  = $virtual_fee;
 		$booking->processor_fee		= $booking->getBookingPaymentProcessingFeeAmount($this->spot_price, $service_fee + $virtual_fee);
 		$booking->save();
-
 
 
 		if ($this->lesson_type == 'in_person_client' && $request->input('location')) {
@@ -278,8 +276,6 @@ class Lesson extends Model implements Transformable
 			$this->save();
 		}
 
-
-		if(Auth::user() != null){
 			if ($this->instructor->clients()->where('client_id', $student->id)->count() == 0) {
 				\Log::info('add instructor client');
 				$this->instructor->clients()->attach($student);
@@ -288,7 +284,6 @@ class Lesson extends Model implements Transformable
 				\Log::info('add client instructor');
 				$student->instructors()->attach($this->instructor);
 			}
-		}
 
 		return $booking;
 	}
