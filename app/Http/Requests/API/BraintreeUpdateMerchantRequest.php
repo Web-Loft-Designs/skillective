@@ -38,7 +38,7 @@ class BraintreeUpdateMerchantRequest extends BraintreeCreateMerchantRequest
             'individual_postalCode'		=> getPostCodeValidationRules(),
             'individual_dateOfBirth'	=> getDOBValidationRules(),
             'individual_phone'			=> getMobilePhoneValidationRules(),
-//            'individual_ssn'			=> ['sometimes', 'nullable'],
+            'individual_ssn'			=> ['sometimes', 'nullable'],
             'funding_email'				=> ['sometimes', 'nullable', 'email'],
             'funding_mobilePhone'		=> getFundingMobilePhoneValidationRules(),
             'funding_routingNumber'		=> ['required'],

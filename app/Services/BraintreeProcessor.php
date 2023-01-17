@@ -423,6 +423,9 @@ class BraintreeProcessor {
 			unset($merchantAccountParams['funding']['destination']);
 			unset($merchantAccountParams['funding']['accountNumber']);
 		}
+        if ($merchantAccountParams['individual']['ssn'] == null){
+            unset($merchantAccountParams['individual']['ssn']);
+        }
 
 		$result = $this->gateway->merchantAccount()->update($user->bt_submerchant_id, $merchantAccountParams);
 
@@ -437,9 +440,7 @@ class BraintreeProcessor {
 	public function getMerchantAccountDetails($user){
 		if ($user->bt_submerchant_id){
 			try{
-				/*
-				 * @var \Braintree_MerchantAccount $merchantAccount
-				 */
+
 				$merchantAccount = $this->gateway->merchantAccount()->find( $user->bt_submerchant_id );
 
 				return $this->_prepareMerchantAccountOutput($merchantAccount);
@@ -471,7 +472,7 @@ class BraintreeProcessor {
 			'individual_email'			=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->email : '',
 			'individual_phone'			=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->phone : '',
 			'individual_dateOfBirth'	=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->dateOfBirth : '',
-//			'individual_ssn' 			=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->ssnLast4 : '',
+			'individual_ssn' 			=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->ssnLast4 : '',
 			'individual_streetAddress'	=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->addressDetails->streetAddress : '',
 			'individual_locality'		=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->addressDetails->locality : '',
 			'individual_region'			=> isset($merchantAccount->individualDetails) ? $merchantAccount->individualDetails->addressDetails->region : '',
@@ -481,6 +482,14 @@ class BraintreeProcessor {
 			'funding_mobilePhone'		=> isset($merchantAccount->fundingDetails) ? $merchantAccount->fundingDetails->mobilePhone : '',
 			'funding_accountNumber'		=> isset($merchantAccount->fundingDetails) ? $merchantAccount->fundingDetails->accountNumberLast4 : '',
 			'funding_routingNumber'		=> isset($merchantAccount->fundingDetails) ? $merchantAccount->fundingDetails->routingNumber : '',
+
+            'business_legalName'		=> isset($merchantAccount->businessDetails) ? $merchantAccount->businessDetails->legalName : '',
+            'business_dbaName'		    => isset($merchantAccount->businessDetails) ? $merchantAccount->businessDetails->dbaName : '',
+            'business_taxId'		    => isset($merchantAccount->businessDetails) ? $merchantAccount->businessDetails->taxId : '',
+            'business_address_streetAddress'		=> isset($merchantAccount->businessDetails) ? $merchantAccount->businessDetails->streetAddress : '',
+            'business_address_locality'		=> isset($merchantAccount->businessDetails) ? $merchantAccount->businessDetails->locality : '',
+            'business_address_region'		=> isset($merchantAccount->businessDetails) ? $merchantAccount->businessDetails->region : '',
+            'business_address_postalCode'	=> isset($merchantAccount->businessDetails) ? $merchantAccount->businessDetails->postalCode : '',
 		];
 	}
 
@@ -502,7 +511,7 @@ class BraintreeProcessor {
 					'region' => $inputData['individual_region'],
 					'postalCode' => $inputData['individual_postalCode']
 				],
-//				'ssn' => isset($inputData['individual_ssn']) ? $inputData['individual_ssn'] : ""
+				'ssn' => isset($inputData['individual_ssn']) ? $inputData['individual_ssn'] : ""
 			],
             'business' => [
                 'legalName' => $inputData['legalName'],
