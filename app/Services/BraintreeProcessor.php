@@ -440,11 +440,9 @@ class BraintreeProcessor {
 	public function getMerchantAccountDetails($user){
 		if ($user->bt_submerchant_id){
 			try{
-				/*
-				 * @var \Braintree_MerchantAccount $merchantAccount
-				 */
+
 				$merchantAccount = $this->gateway->merchantAccount()->find( $user->bt_submerchant_id );
-//                dd($merchantAccount);
+
 				return $this->_prepareMerchantAccountOutput($merchantAccount);
 			}catch (\Exception $e){
 				Log::channel('braintree')->info("Submerchant Account with id {$user->bt_submerchant_id} Not Found. User Merchant Data reset");
