@@ -38,13 +38,11 @@ class BraintreeCreateMerchantRequest extends APIRequest
 			'individual_postalCode'		=> getPostCodeValidationRules(),
 			'individual_dateOfBirth'	=> getDOBValidationRules(),
 			'individual_phone'			=> getMobilePhoneValidationRules(),
-//			'individual_ssn'			=> getSSNValidationRules(),
-
+			'individual_ssn'			=> getSSNValidationRules(),
 			'funding_email'				=> ['sometimes', 'nullable', 'email'],
 			'funding_mobilePhone'		=> getFundingMobilePhoneValidationRules(),
 			'funding_accountNumber'		=> ['required'],
 			'funding_routingNumber'		=> ['required'],
-
 			'tosAccepted'		=> ['accepted']
 		];
 
