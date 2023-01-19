@@ -25,13 +25,16 @@ class InstructorMerchantAPIController extends AppBaseController
     public function create(BraintreeCreateMerchantRequest $request, UserRepository $userRepository)
     {
 		$user = Auth::user();
+
 		try{
 			$merchantAccount = BraintreeProcessor::createMerchant($user, $request->all());
+
 			if ($merchantAccount!=false)
             {
-                $user->tax_id = $request->taxId;
-                $user->legal_name = $request->legalName;
-                $user->save();
+                $user->update([
+                    'tax_id' => isset($merchantAccount->businessDetails) ? $merchantAccount->businessDetails->taxId : null,
+                    'legal_name' => isset($merchantAccount->businessDetails) ? $merchantAccount->businessDetails->legalName : null,
+                ]);
 
 				$userRepository->setUserSubMerchantId($user, $merchantAccount->id);
 				$userRepository->updateUserSubMerchantStatus( $merchantAccount->id, \Braintree_MerchantAccount::STATUS_PENDING, '' );
@@ -46,22 +49,16 @@ class InstructorMerchantAPIController extends AppBaseController
 
 	public function update(BraintreeUpdateMerchantRequest $request)
 	{
-        $request['taxId'] = str_replace(['-',',','/','.',';',':',' ','"', "'"], '', trim($request->taxId));
-        if(strlen($request->taxId) == 9) {
-            $request['individual_ssn'] = $request->taxId;
-        }
-
 		$user = Auth::user();
 		try{
 			$merchantAccount = BraintreeProcessor::updateMerchant($user, $request);
-            if ($merchantAccount != false)
-            {
-                if($request->taxId !== null) {
-                    $user->update([
-                        'tax_id' => $request->taxId,
-                        'legal_name' => $request->legalName,
+            if ($merchantAccount != false) {
+
+                   $user->update([
+                        'tax_id' => $merchantAccount->businessDetails->taxId,
+                        'legal_name' => $merchantAccount->businessDetails->legalName,
                     ]);
-                }
+
                 return $this->sendResponse(BraintreeProcessor::_prepareMerchantAccountOutput($merchantAccount), 'Merchant account created and will be verified soon');
             }
 		}catch (\Exception $e){
