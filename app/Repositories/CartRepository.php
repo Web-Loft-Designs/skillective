@@ -194,11 +194,20 @@ class CartRepository extends BaseRepository
         }
 
         foreach ($cart as $key => $cartItem) {
-            if ($cartItem->lesson->instructor->discounts) {
-                foreach ($cartItem->lesson->instructor->discounts as $discountKey => $discount) {
-
-                    if ($discount->isActivate) {
-                        $discounts[$discount->id] = $discount;
+            if ($cartItem->lesson_id) {
+                if ($cartItem->lesson->instructor->discounts) {
+                    foreach ($cartItem->lesson->instructor->discounts as $discountKey => $discount) {
+                        if ($discount->isActivate) {
+                            $discounts[$discount->id] = $discount;
+                        }
+                    }
+                }
+            } elseif ($cartItem->pre_r_lesson_id) {
+                if ($cartItem->preRecordedLesson->instructor->discounts) {
+                    foreach ($cartItem->preRecordedLesson->instructor->discounts as $discountKey => $discount) {
+                        if ($discount->isActivate) {
+                            $discounts[$discount->id] = $discount;
+                        }
                     }
                 }
             }
