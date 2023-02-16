@@ -7,6 +7,7 @@ use App\Models\PurchasedLesson;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use InfyOm\Generator\Common\BaseRepository;
 use App\Models\Booking;
 use App\Models\Lesson;
@@ -376,7 +377,7 @@ class CartRepository extends BaseRepository
             }
 
         }
-
+        Cookie::queue(Cookie::forget('guest_cart'));
         return response()->json([
             'status' => true
         ]);
