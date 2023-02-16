@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Profile;
-use InfyOm\Generator\Common\BaseRepository;
+
 use File;
 use Image;
 use Illuminate\Support\Facades\Storage;

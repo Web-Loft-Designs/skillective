@@ -6,12 +6,11 @@ use App\Models\Booking;
 use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Http\Request;
-use InfyOm\Generator\Common\BaseRepository;
-use DB;
-use Auth;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
-use Cookie;
 use App\Criteria\InstructorClientSearchCriteria;
 use App\Criteria\StudentInstructorSearchCriteria;
 use App\Criteria\UserSearchCriteria;
@@ -20,13 +19,11 @@ use App\Criteria\UserIdCriteria;
 use App\Criteria\UserInvitedByCriteria;
 use App\Criteria\UserFilterByNameCriteria;
 use App\Criteria\UserFilterByInstagranHandleCriteria;
-use App\Criteria\InstructorFilterByLessonPriceRangeCriteria;
-use App\Criteria\OnlyOnboardedActiveMerchantInstructorsCriteria;
 use App\Criteria\InstructorFilterByLocationCriteria;
 use App\Criteria\UserFilterByGenreCriteria;
 use Carbon\Carbon;
 use Spatie\Permission\Models\Role;
-use Log;
+
 
 /**
  * Class UserRepository
@@ -450,16 +447,6 @@ class UserRepository extends BaseRepository
 				    AND user_geo_locations.date_to >='{$lesson->start->format('Y-m-d')}'
 				  ) AND ";
 			}
-
-			//"(
-			//    (
-			//        get_distance_in_miles_between_geo_locations({$lesson->lat},{$lesson->lng}, user_geo_locations.lat, user_geo_locations.lng) <= user_geo_locations.limit
-			//    )
-			//    AND user_geo_locations.date_from <='{$lesson->start->format('Y-m-d')}'
-			//    AND user_geo_locations.date_to >='{$lesson->start->format('Y-m-d')}'
-			//) AND
-			//users.id IN (".implode(',', $studentsWithFavoriteLessonInstructor).")"
-
 			$query = $query->join('user_geo_locations', 'users.id', '=', "user_geo_locations.user_id")
 				->leftJoin('user_genre', 'users.id', '=', "user_genre.user_id")
 				->whereIn('users.id', $studentsWithFavoriteLessonInstructor)

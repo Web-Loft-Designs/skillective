@@ -8,7 +8,7 @@ use App\Models\LessonRequest;
 use App\Models\User;
 use App\Models\UserGeoLocation;
 use Illuminate\Http\Request;
-use InfyOm\Generator\Common\BaseRepository;
+
 use Auth;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;

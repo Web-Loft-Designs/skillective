@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Testimonial;
-use InfyOm\Generator\Common\BaseRepository;
+
 
 /**
  * Class TestimonialRepository

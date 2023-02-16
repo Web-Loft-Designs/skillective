@@ -6,17 +6,14 @@ use App\Models\Booking;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Profile;
-use App\Models\Genre;
 use App\Models\Setting;
 use App\Repositories\GenreRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\LessonRepository;
 use App\Models\UserGeoLocation;
-use Session;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use App\Facades\BraintreeProcessor;
-use Log;
 
 class ProfileController extends Controller
 {
@@ -45,14 +42,13 @@ class ProfileController extends Controller
      */
     public function show(Request $request, Profile $profile)
     {
-
         if(!$profile->id)
         {
             $profile = Auth::user()->profile;
         }
-
         $user = User::findOrFail($profile->user_id);
 		$currentUserIsAdmin = (Auth::user() && Auth::user()->hasRole(User::ROLE_ADMIN));
+
     	if ($user && !$user->id && !$currentUserIsAdmin) {
             $user = Auth::user();
         }
@@ -68,7 +64,6 @@ class ProfileController extends Controller
 		$userData = $this->userRepository->presentResponse($userData)['data'];
 
 		$invitedInstructors = [];
-//		$userData['genres'] = $user->genres()->pluck('id')->toArray();
 		$isInstructor = false;
 		if ($user->hasRole(User::ROLE_INSTRUCTOR)) {
 			$isInstructor = true;

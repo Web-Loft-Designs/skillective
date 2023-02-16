@@ -6,7 +6,7 @@ $pageMeta = $currentPage->getAllMeta();
 
 $text_above_filter             = isset($pageMeta['text_above_filter']) ? $pageMeta['text_above_filter'] : '';
 $filter_form_title             = isset($pageMeta['filter_form_title']) ? $pageMeta['filter_form_title'] : '';
-$instructor_filter_form_title             = isset($pageMeta['instructor_filter_form_title']) ? $pageMeta['instructor_filter_form_title'] : '';
+$instructor_filter_form_title  = isset($pageMeta['instructor_filter_form_title']) ? $pageMeta['instructor_filter_form_title'] : '';
 $how_it_works_title            = isset($pageMeta['how_it_works_title']) ? $pageMeta['how_it_works_title'] : '';
 $benefits_title                = isset($pageMeta['benefits_title']) ? $pageMeta['benefits_title'] : '';
 $how_it_works_text             = isset($pageMeta['how_it_works_text']) ? $pageMeta['how_it_works_text'] : '';
@@ -65,7 +65,8 @@ $benefits               = isset($pageMeta['benefits']) ? $pageMeta['benefits'] :
                                             @if ($t->getImageUrl()!='')
                                             <img class="img" src="{{ $t->getImageUrl() }}" />
                                             @endif
-                                            <span>– {{ $t->name }}@if($t->instagram_handle), <a href="https://www.instagram.com/{{ $t->instagram_handle }}" target="_blank">{{ '@' . $t->instagram_handle }}</a>@endif</span>
+                                            <span>– {{ $t->name }}@if($t->instagram_handle),
+                                                <a href="https://www.instagram.com/{{ $t->instagram_handle }}" target="_blank">{{ '@' . $t->instagram_handle }}</a>@endif</span>
                                         </span>
                                     </div>
                                 </div>

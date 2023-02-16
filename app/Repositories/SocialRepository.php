@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Social;
-use InfyOm\Generator\Common\BaseRepository;
+
 use Auth;
 
 class SocialRepository extends BaseRepository

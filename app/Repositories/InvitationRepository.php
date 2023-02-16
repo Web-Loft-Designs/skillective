@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Invitation;
 use Carbon\Carbon;
-use InfyOm\Generator\Common\BaseRepository;
+
 
 class InvitationRepository extends BaseRepository
 {

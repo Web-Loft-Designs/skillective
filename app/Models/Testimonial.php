@@ -3,16 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\HasMedia\HasMedia;
-use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
-use Spatie\MediaLibrary\Models\Media;
+use Illuminate\Support\Facades\Log;
 use Spatie\Image\Manipulations;
-//use Prettus\Repository\Contracts\Transformable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
 
 class Testimonial extends Model implements HasMedia //, Transformable
 {
-	use HasMediaTrait;
-
+    use InteractsWithMedia;
     /**
      * The attributes that are mass assignable.
      *
@@ -30,22 +30,11 @@ class Testimonial extends Model implements HasMedia //, Transformable
 	public static $rules = [
 		'name' => 'required|max:255',
 		'content' => 'required',
-//            'company' => 'required|max:255',
 		'image'=> 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
 	];
 
-//	public function transform()
-//	{
-//		return [
-//			'id' => $this->id,
-//			'name' => $this->name,
-//			'image' => $this->getImageUrl(),
-//			'instagram_handle' => $this->instagram_handle,
-//			'content' => $this->content,
-//		];
-//	}
 
-	public function registerMediaConversions(Media $media = null)
+	public function registerMediaConversions(Media $media = null): void
 	{
 		$this->addMediaConversion('circle_image')
 			 ->fit(Manipulations::FIT_CROP, 40, 40)
@@ -69,12 +58,12 @@ class Testimonial extends Model implements HasMedia //, Transformable
 
 	public function getImageUrl(){
 		$testimonialImage = $this->media()
-								->whereIn('collection_name', ['testimonial'])
-								->orderBy('order_column', 'DESC')
-								->first();
-		if ($testimonialImage)
-			return $testimonialImage->getFullUrl('circle_image');
-
+        ->whereIn('collection_name', ['testimonial'])
+        ->orderBy('order_column', 'DESC')
+        ->first();
+		if ($testimonialImage) {
+            return $testimonialImage->getFullUrl('circle_image');
+        }
 		return null;
 	}
 
@@ -105,8 +94,7 @@ class Testimonial extends Model implements HasMedia //, Transformable
             }
         }
 
-        // since all sport data is encrypted we cant use usual sql  search
-        $conditions = [];
+
         $filterParams = ['name', 'company'];
         foreach ($filterParams as $paramName){
             if (isset($filter[$paramName]) && $filter[$paramName]!=''){

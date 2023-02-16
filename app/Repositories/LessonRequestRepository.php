@@ -6,14 +6,10 @@ use App\Models\LessonRequest;
 use App\Models\User;
 use App\Models\Setting;
 use Illuminate\Http\Request;
-use InfyOm\Generator\Common\BaseRepository;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
 use App\Criteria\LessonRequestSearchCriteria;
-use Cookie;
-use Log;
-use DB;
 use Carbon\Carbon;
 
 class LessonRequestRepository extends BaseRepository

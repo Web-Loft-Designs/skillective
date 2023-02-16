@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use InfyOm\Generator\Common\BaseRepository;
+
 use App\Models\PurchasedLesson;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

@@ -2,17 +2,15 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
-use Illuminate\Support\Facades\Storage;
-use File;
-use Image;
-use Spatie\MediaLibrary\HasMedia\HasMedia;
-use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
+use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Faq extends Model implements HasMedia , Transformable
 {
-    use HasMediaTrait;
+
+    use InteractsWithMedia;
 
     public $table = 'faqs';
     

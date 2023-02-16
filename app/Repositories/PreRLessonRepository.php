@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use InfyOm\Generator\Common\BaseRepository;
+
 use App\Models\PreRecordedLesson;
 use App\Criteria\PreRLessonFilterByContentCriteria;
 use App\Criteria\PreRLessonFilterByGenresListCriteria;

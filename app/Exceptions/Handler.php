@@ -2,12 +2,13 @@
 
 namespace App\Exceptions;
 
-use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Auth;
-use Illuminate\Routing\Route;
-use Response;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use InfyOm\Generator\Utils\ResponseUtil;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -30,25 +31,25 @@ class Handler extends ExceptionHandler
         'password_confirmation',
     ];
 
+
     /**
-     * Report or log an exception.
-     *
-     * @param  \Exception  $exception
+     * @param Throwable $exception
      * @return void
+     * @throws Throwable
      */
-    public function report(Exception $exception)
+    public function report(Throwable $exception)
     {
         parent::report($exception);
     }
 
+
     /**
-     * Render an exception into an HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
+     * @param $request
+     * @param Throwable $exception
+     * @return JsonResponse|RedirectResponse|Response|\Symfony\Component\HttpFoundation\Response
+     * @throws Throwable
      */
-    public function render($request, Exception $exception)
+    public function render($request, Throwable $exception)
     {
 		if($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException){
 			if (preg_match('/backend/', $request->path())) {
