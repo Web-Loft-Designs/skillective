@@ -71,7 +71,10 @@
                 this.apiPost('/login', this.fields);
 			},
 			componentHandlePostResponse(responseData) {
-				window.location = responseData.redirect;
+        if (responseData.redirect) {
+          window.location = responseData.redirect;
+          localStorage.setItem('guest-cart', '[]');
+        }
 			}
 		}
 	}
