@@ -72,13 +72,13 @@ class CartRepository extends BaseRepository
 
             foreach ($carts as $index => $cartItem) {
 
-                if ($cartItem->lesson_id) {
+                if ($cartItem->lesson_id && !$cartItem->pre_r_lesson_id) {
                     if (!$cartItem->lesson || $cartItem->count_booked >= $cartItem->lesson->spots_count) {
                         unset($carts[$index]);
                     }
                 }
 
-                if ($cartItem->lesson_id) {
+                if ($cartItem->lesson_id && !$cartItem->pre_r_lesson_id) {
                     $cartItem->discounts = $cartItem->lesson->instructor->discounts;
                     $handledDiscounts = Discount::validateDiscount($cartItem->discounts, $carts);
                     $cartItem->discounts = $handledDiscounts;
@@ -92,7 +92,6 @@ class CartRepository extends BaseRepository
             return $carts;
 
         } else if ($product_list) {
-
             return $this->addToCart($product_list);
         }
     }
@@ -151,12 +150,12 @@ class CartRepository extends BaseRepository
         }
 
         foreach ($carts as $index => $cartItem) {
-            if ($cartItem->lesson_id) {
+            if ($cartItem->lesson_id && !$cartItem->pre_r_lesson_id) {
                 if (!$cartItem->lesson || $cartItem->count_booked >= $cartItem->lesson->spots_count) {
                     unset($carts[$index]);
                 }
             }
-            if ($cartItem->lesson_id) {
+            if ($cartItem->lesson_id && !$cartItem->pre_r_lesson_id) {
                 $cartItem->discounts = $cartItem->lesson->instructor->discounts;
                 $handledDiscounts = Discount::validateDiscount($cartItem->discounts, $carts);
                 $cartItem->discounts = $handledDiscounts;
@@ -194,7 +193,7 @@ class CartRepository extends BaseRepository
         }
 
         foreach ($cart as $key => $cartItem) {
-            if ($cartItem->lesson_id) {
+            if ($cartItem->lesson_id && !$cartItem->pre_r_lesson_id) {
                 if ($cartItem->lesson->instructor->discounts) {
                     foreach ($cartItem->lesson->instructor->discounts as $discountKey => $discount) {
                         if ($discount->isActivate) {
@@ -216,7 +215,7 @@ class CartRepository extends BaseRepository
         $cartCount = count($cart);
 
         foreach ($cart as $key => $cartItem) {
-            if ($cartItem->lesson_id) {
+            if ($cartItem->lesson_id && !$cartItem->pre_r_lesson_id) {
                 $booking = new Booking();
                 $virtual_fee = round($booking->getBookingVirtualFeeAmount($cartItem->lesson), 2);
                 $finishPrice = $cartItem->lesson->spot_price;
@@ -320,7 +319,7 @@ class CartRepository extends BaseRepository
      * @param Request $request
      * @return false|JsonResponse
      */
-    public function storeGuestCart(Request $request)
+    public function storeGuestCart(Request $request, bool $isCheckout = true)
     {
 
         if ( !\Cookie::has('guest_cart') || !Auth::check() ) return false;
@@ -362,7 +361,7 @@ class CartRepository extends BaseRepository
 
                 $data['instructor_id'] = $lesson->instructor_id;
                 $data['description'] = isset($item->description) ? $item->description : '';
-                $data['is_guest'] = 1;
+                $data['is_guest'] = $isCheckout ? 1 : 0;
 
                 $lessonAlreadyPurchased = null;
                 if($data['pre_r_lesson_id'])

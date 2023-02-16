@@ -22,7 +22,7 @@ class CartListTransformer extends TransformerAbstract
 	 */
 	public function transform(Cart $model)
 	{
-		if ($model->lesson_id) {
+		if ($model->lesson_id && !$model->pre_r_lesson_id) {
 			$lesson = $model->lesson;
 
 			$genre =  $lesson->genre->transform();
