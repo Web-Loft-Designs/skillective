@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\PromoCode;
-use InfyOm\Generator\Common\BaseRepository;
+
 use Auth;
 
 class PromoCodeRepository extends BaseRepository

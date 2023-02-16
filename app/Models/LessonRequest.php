@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Prettus\Repository\Contracts\Transformable;
-use Auth;
-use Log;
-use MaksimM\SubqueryMagic\SubqueryMagic;
+
 use Carbon\Carbon;
 
 class LessonRequest extends Model implements Transformable
 {
-    use SoftDeletes, SubqueryMagic;
+
+    use SoftDeletes;
 
     public $table = 'lesson_requests';
 
@@ -127,9 +127,10 @@ class LessonRequest extends Model implements Transformable
         return $this->belongsTo(\App\Models\User::class, 'student_id');
     }
 
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
+     * @return HasOne
+     */
     public function lesson()
     {
         return $this->hasOne(\App\Models\Lesson::class, 'lesson_id');

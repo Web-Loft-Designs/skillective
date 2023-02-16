@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Genre;
 use App\Models\GenreCategory;
-use InfyOm\Generator\Common\BaseRepository;
 use Illuminate\Http\Request;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use App\Criteria\GenreSearchCriteria;

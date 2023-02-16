@@ -3,30 +3,27 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\Profile;
 use App\Repositories\UserRepository;
-use DB;
-use Log;
-use Braintree_Transaction;
-use Braintree_Gateway;
-use Braintree_MerchantAccount;
-use Braintree_Configuration;
-use Braintree_Exception_NotFound;
+use Braintree;
+use Braintree\Gateway;
+use Illuminate\Support\Facades\Log;
 
 class BraintreeProcessor
 {
 
-    /** @var  UserRepository */
+
+    /**
+     * @var UserRepository
+     */
     private $userRepository;
 
-    /** @var  Braintree_Gateway */
-    private $gateway;
 
-    public function __construct(UserRepository $userRepository)
-    {
-        $this->userRepository = $userRepository;
-        $this->gateway = new Braintree_Gateway(Braintree_Configuration::$global);
-    }
+	private $gateway;
+
+	public function __construct(UserRepository $userRepository){
+		$this->userRepository = $userRepository;
+		$this->gateway = new Gateway(Braintree\Configuration::$global);
+	}
 
     public function generateClientToken(User $user = null)
     {
@@ -355,25 +352,24 @@ class BraintreeProcessor
         }
     }
 
-    public function cancelTransaction($transactionId)
-    {
-        try {
-            $transaction = $this->gateway->transaction()->find($transactionId);
-            $transaction->escrowStatus; // \Braintree_Transaction::ESCROW_HELD
-            if(in_array($transaction->status, [\Braintree_Transaction::SETTLED, \Braintree_Transaction::SETTLING])) {
-                $result = $this->gateway->transaction()->refund($transactionId);
-            } else {
-                $result = $this->gateway->transaction()->void($transactionId);
-            }
+	public function cancelTransaction($transactionId){
+		try{
+			$transaction = $this->gateway->transaction()->find($transactionId);
+			$transaction->escrowStatus; // \Braintree_Transaction::ESCROW_HELD
+			if ( in_array($transaction->status, [Braintree\Transaction::SETTLED, Braintree\Transaction::SETTLING]) ) {
+				$result = $this->gateway->transaction()->refund( $transactionId );
+			}else {
+				$result = $this->gateway->transaction()->void( $transactionId );
+			}
 
-            if(!$result->success) {
-                list($returnError, $codes) = $this->_resultErrorsForResponse($result);
-                throw new \Exception($returnError, $codes[0]);
-            }
-            return true;
-        } catch(\Braintree_Exception_NotFound $e) {
-            throw new \Exception('Can\'t cancel transaction. Transaction ' . $transactionId . ' not found', 404);
-        }
+			if (!$result->success){
+				list($returnError, $codes) = $this->_resultErrorsForResponse($result);
+				throw new \Exception($returnError, $codes[0]);
+			}
+			return true;
+		}catch (Braintree\Exception\NotFound $e){
+			throw new \Exception('Can\'t cancel transaction. Transaction '.$transactionId.' not found', 404);
+		}
 
 
         $result = $this->gateway->transaction()->refund($transactionId);
@@ -385,20 +381,19 @@ class BraintreeProcessor
         }
     }
 
-    public function releaseTransactionFromEscrow($transactionId)
-    {
-        try {
-            $result = $this->gateway->transaction()->releaseFromEscrow($transactionId);
-            if($result->success) {
-                return true;
-            } else {
-                list($returnError, $codes) = $this->_resultErrorsForResponse($result);
-                throw new \Exception($returnError, $codes[0]);
-            }
-        } catch(\Braintree_Exception_NotFound $e) {
-            throw new \Exception('Can\'t release transaction. Transaction ' . $transactionId . ' not found', 404);
-        }
-    }
+	public function releaseTransactionFromEscrow($transactionId){
+		try{
+			$result = $this->gateway->transaction()->releaseFromEscrow($transactionId);
+			if ($result->success){
+				return true;
+			}else{
+				list($returnError, $codes) = $this->_resultErrorsForResponse($result);
+				throw new \Exception($returnError, $codes[0]);
+			}
+		}catch (Braintree\Exception\NotFound $e){
+			throw new \Exception('Can\'t release transaction. Transaction '.$transactionId.' not found', 404);
+		}
+	}
 
     public function createMerchant($user, $inputData)
     {
@@ -562,6 +557,30 @@ class BraintreeProcessor
                 'routingNumber' => isset($inputData['funding_routingNumber']) ? $inputData['funding_routingNumber'] : null // TODO : required with  Braintree_MerchantAccount::FUNDING_DESTINATION_BANK , instructor must provide
             ]
         ];
+	private function _buildMerchantAccountParametersFromInputData($inputData){
+		$merchantAccountParams = [
+			'individual' => [
+				'firstName' => $inputData['individual_firstName'],
+				'lastName' => $inputData['individual_lastName'],
+				'email' => $inputData['individual_email'],
+				'phone' => trim(prepareMobileForTwilio($inputData['individual_phone']), '+'),
+				'dateOfBirth' => $inputData['individual_dateOfBirth'],
+				'address' => [
+					'streetAddress' => $inputData['individual_streetAddress'],
+					'locality' => $inputData['individual_locality'],
+					'region' => $inputData['individual_region'],
+					'postalCode' => $inputData['individual_postalCode']
+				],
+				'ssn' => isset($inputData['individual_ssn']) ? $inputData['individual_ssn'] : null
+			],
+			'funding' => [
+				'destination' => Braintree\MerchantAccount::FUNDING_DESTINATION_BANK, // TODO: Bank or Venmo instructor to decide
+				'email' => isset($inputData['funding_email']) ? $inputData['funding_email'] :null, // optional
+				'mobilePhone' => isset($inputData['funding_mobilePhone']) ? trim(prepareMobileForTwilio($inputData['funding_mobilePhone']), '+') :null, // optional
+				'accountNumber' => isset($inputData['funding_accountNumber']) ? $inputData['funding_accountNumber'] : null, // TODO : required with  Braintree_MerchantAccount::FUNDING_DESTINATION_BANK , instructor must provide
+				'routingNumber' => isset($inputData['funding_routingNumber']) ? $inputData['funding_routingNumber'] : null // TODO : required with  Braintree_MerchantAccount::FUNDING_DESTINATION_BANK , instructor must provide
+			]
+		];
 
         return $merchantAccountParams;
     }

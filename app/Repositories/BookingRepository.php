@@ -5,11 +5,15 @@ namespace App\Repositories;
 use App\Models\Booking;
 use App\Models\Setting;
 use Illuminate\Http\Request;
-use InfyOm\Generator\Common\BaseRepository;
-use Auth;
+
+//use Auth;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
-use Log;
+//use Log;
 use App\Criteria\StudentBookingSearchCriteria;
 use App\Criteria\InstructorBookingSearchCriteria;
 use App\Criteria\InstructorBookingTypeCriteria;
@@ -21,8 +25,8 @@ use App\Criteria\LessonScheduleForMonthCriteria;
 use App\Criteria\LessonInFutureCriteria;
 use App\Criteria\BackendBookingSearchCriteria;
 use App\Criteria\BookingFilterByAmountRangeCriteria;
-use Cookie;
-use DB;
+//use Cookie;
+//use DB;
 use Carbon\Carbon;
 
 /**

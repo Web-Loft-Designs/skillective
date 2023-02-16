@@ -6,18 +6,19 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Log;
+use Spatie\Image\Manipulations;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\MediaLibrary\HasMedia\HasMedia;
-use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
-use Spatie\MediaLibrary\Models\Media;
-use Spatie\Image\Manipulations;
 use Prettus\Repository\Contracts\Transformable;
 
 class User extends Authenticatable implements HasMedia, Transformable
 {
-	use Notifiable, HasRoles, SoftDeletes, HasMediaTrait;
+
+	use Notifiable, HasRoles, SoftDeletes, InteractsWithMedia;
 
 	const STATUS_ON_REVIEW	= 'on_review';
 	const STATUS_APPROVED	= 'approved';
@@ -211,8 +212,6 @@ class User extends Authenticatable implements HasMedia, Transformable
 			'full_name' => $this->getName(),
 			'email' => $this->getEmail(),
 			'profile' => !empty($this->profile) ? $this->profile->transform(): [],
-			//			'isInstructor' => $this->hasRole(self::ROLE_INSTRUCTOR),
-			//			'isStudent' => $this->hasRole(self::ROLE_STUDENT),
 			'genres' => $this->genres->toArray(),
 			'is_featured' => $this->isFeatured(),
 			'discounts' => $this->discounts->toArray()
@@ -228,8 +227,6 @@ class User extends Authenticatable implements HasMedia, Transformable
 			'full_name' => $this->getName(),
 			'email' => $this->getEmail(),
 			'profile' => $this->profile->transform(),
-			//			'isInstructor' => $this->hasRole(self::ROLE_INSTRUCTOR),
-			//			'isStudent' => $this->hasRole(self::ROLE_STUDENT),
 			'genres' => $this->genres->toArray(),
 			'discounts' => $this->discounts->toArray()
 		];
@@ -301,7 +298,7 @@ class User extends Authenticatable implements HasMedia, Transformable
 		$this->save();
 	}
 
-	public function registerMediaConversions(Media $media = null)
+	public function registerMediaConversions(Media $media = null): void
 	{
 		$this->addMediaConversion('thumb')
 			->fit(Manipulations::FIT_CROP, 200, 200)
@@ -333,14 +330,10 @@ class User extends Authenticatable implements HasMedia, Transformable
 			foreach ($requestData as $paramName => $paramValue) {
 				if ($paramName == 'media') {
 					if ($paramValue instanceof \Illuminate\Http\UploadedFile) {
-						//						$mime = $paramValue->getClientMimeType();
-						//						$collectionName = strpos($mime, 'video') === false ? 'images' : 'videos';
 						$this->addMedia($paramValue)->toMediaCollection($collectionName);
 						$countUploadedMedia++;
 					} else { // array of medias
 						for ($i = 0; $i < count($paramValue); $i++) {
-							//							$mime = $paramValue[$i]->getClientMimeType();
-							//							$collectionName = strpos($mime, 'video') === false ? 'images' : 'videos';
 							$this->addMedia($paramValue[$i])->toMediaCollection($collectionName);
 							$countUploadedMedia++;
 						}
@@ -362,15 +355,11 @@ class User extends Authenticatable implements HasMedia, Transformable
 	}
 
 	public function getGalleryMedia($limit = null)
-	{ // \Illuminate\Support\Carbon $uploadedAfter = null,
+	{
 		$media = [];
 		$mediaCollection = $this->media()
 			->whereIn('collection_name', ['website_images', 'instagram'])
 			->orderBy('id', 'DESC');
-
-		//		if ($uploadedAfter!=null){
-		//			$mediaCollection->where('created_at', '>=', $uploadedAfter->format('Y-m-d H:i:s'));
-		//		}
 		if ($limit) {
 			$mediaCollection->limit($limit);
 		}
@@ -381,7 +370,8 @@ class User extends Authenticatable implements HasMedia, Transformable
 					'id'		=> $item->id,
 					'model_id'		=> $item->model_id,
 					'url'		=> $item->getFullUrl(),
-					'thumb_url'	=> $item->getFullUrl('thumb'),
+//					'thumb_url'	=> $item->getFullUrl('thumb'),
+					'thumb_url'	=> $item->getFullUrl(),
 					'collection_name' => $item->collection_name,
 					'count_likes' => $item->hasCustomProperty('count_likes') ? $item->getCustomProperty('count_likes') : 0,
 					'count_comments' => $item->hasCustomProperty('count_comments') ? $item->getCustomProperty('count_comments') : 0

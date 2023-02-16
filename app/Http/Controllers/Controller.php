@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Booking;
 use App\Models\User;
 use App\Models\Profile;
-use App\Repositories\BookingRepository;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Laravel\Socialite\Facades\Socialite;
 use Auth;
 use DB;
 use Illuminate\Http\Request;

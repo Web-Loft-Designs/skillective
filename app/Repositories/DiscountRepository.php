@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Discount;
-use InfyOm\Generator\Common\BaseRepository;
+
 use Auth;
 
 class DiscountRepository extends BaseRepository

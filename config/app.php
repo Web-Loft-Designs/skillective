@@ -188,11 +188,11 @@ return [
 
 		Intervention\Image\ImageServiceProvider::class,
 		NotificationChannels\Twilio\TwilioProvider::class,
-		Tylercd100\Placeholders\ServiceProvider::class,
+//		Tylercd100\Placeholders\ServiceProvider::class,
 
 		SocialiteProviders\Manager\ServiceProvider::class,
 
-		Unisharp\Ckeditor\ServiceProvider::class,
+//		Unisharp\Ckeditor\ServiceProvider::class,
 
 		\Torann\GeoIP\GeoIPServiceProvider::class,
 
@@ -259,7 +259,7 @@ return [
 		'Image' => Intervention\Image\Facades\Image::class,
 
 		'Debugbar' => Barryvdh\Debugbar\Facade::class,
-		"Placeholders" => Tylercd100\Placeholders\Facades\Placeholders::class,
+//		"Placeholders" => Tylercd100\Placeholders\Facades\Placeholders::class,
 
 		'Socialite'    => Laravel\Socialite\Facades\Socialite::class,
 

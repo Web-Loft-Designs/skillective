@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\GenreCategory;
-use InfyOm\Generator\Common\BaseRepository;
+
 use Illuminate\Http\Request;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use App\Criteria\GenreCategorySearchCriteria;

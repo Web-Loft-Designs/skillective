@@ -14,21 +14,12 @@ class HomeController extends AppBaseController
 {
     public function index(GenreRepository $genreRepository, TestimonialRepository $testimonialRepository, LessonRepository $lessonRepository, UserRepository $userRepository)
     {
-
-
-
-//        getLocationDetails('17425 Benson Rd Cottonwood, California(CA), 96022');
 		$userIpLocation = '';
-//		$geoLocation = geoip(request()->ip());
-//		if ($geoLocation instanceof \Torann\GeoIP\Location && $geoLocation->getAttribute('country')=='United States'){
-//			$userIpLocation = $geoLocation->getAttribute('city') . ', ' . $geoLocation->getAttribute('state') . ', USA';
-//		}
-
 		if (!$this->currentPage){
 			$this->currentPage = getCurrentPage('/');
 			view()->share( 'currentPage', $this->currentPage );
 		}
-//        dd(getLocationDetails('1375 Big Orange Road, Cordova, TN, USA'));
+
     	$vars = [
 			'siteGenres' => $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
             'siteInstructorsGenres' => $genreRepository->presentResponse($genreRepository->getSiteInstructorsGenres())['data'],
@@ -39,6 +30,7 @@ class HomeController extends AppBaseController
 			'userIpLocation' => $userIpLocation,
             'userGenres' => Auth::check() ? $userRepository->presentResponse(Auth::user()->genres)['data'] : [],
 		];
+
         return view('home', $vars);
     }
 }

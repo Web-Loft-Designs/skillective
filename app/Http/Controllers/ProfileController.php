@@ -6,17 +6,14 @@ use App\Models\Booking;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Profile;
-use App\Models\Genre;
 use App\Models\Setting;
 use App\Repositories\GenreRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\LessonRepository;
 use App\Models\UserGeoLocation;
-use Session;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use App\Facades\BraintreeProcessor;
-use Log;
 
 class ProfileController extends Controller
 {
@@ -59,10 +56,10 @@ class ProfileController extends Controller
         $userData = $this->userRepository->getUserData($user->id);
         $userData = $this->userRepository->presentResponse($userData)['data'];
 
-        $invitedInstructors = [];
-        $isInstructor = false;
-        if ($user->hasRole(User::ROLE_INSTRUCTOR)) {
-            $isInstructor = true;
+		$invitedInstructors = [];
+		$isInstructor = false;
+		if ($user->hasRole(User::ROLE_INSTRUCTOR)) {
+			$isInstructor = true;
 
             $userData['total_count_lessons'] = $this->lessonRepository->getInstructorsPastBookedLessonsCount($user->id);
             $userData['lessons_rate_min']    = (float)$user->myLessonsBookings()

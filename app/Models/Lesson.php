@@ -2,26 +2,18 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Prettus\Repository\Contracts\Transformable;
-use Illuminate\Support\Str;
-use App\Notifications\StudentBookingConfirmation;
-use App\Notifications\InstructorNewBookingNotification;
-use App\Models\Booking;
-use App\Models\LessonRequest;
-use App\Models\User;
-use Auth;
-use Log;
-use App\Facades\UserRegistrator;
-use App\Http\Requests\API\StudentRegisterRequest;
-use MaksimM\SubqueryMagic\SubqueryMagic;
 use Carbon\Carbon;
 use App\Facades\BraintreeProcessor;
 
 class Lesson extends Model implements Transformable
 {
-	use SoftDeletes, SubqueryMagic;
+//	use SoftDeletes, SubqueryMagic;
+	use SoftDeletes;
 
 	public $table = 'lessons';
 
