@@ -3,18 +3,22 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Request;
-use Auth;
-use File;
+
 
 class UploadPreviewLessonAPIController extends AppBaseController
 {
+    /**
+     * @param Request $request
+     * @return JsonResponse|never|void
+     */
     public function uploadPreview(Request $request)
     {
         if(Request::hasFile('preview')){
-
             $user = Auth::user();
-
             if (!$user)
                 return abort(404);
 

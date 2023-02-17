@@ -2,19 +2,16 @@
 
 namespace App\Http\Controllers\API;
 
+
 use App\Http\Requests\API\CancelBookingsAPIRequest;
 use App\Repositories\BookingRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
-use Response;
-use Auth;
-use Log;
 use App\Models\Booking;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
-/**
- * Class BookingController
- * @package App\Http\Controllers\API
- */
 
 class InstructorBookingsAPIController extends AppBaseController
 {
@@ -23,37 +20,33 @@ class InstructorBookingsAPIController extends AppBaseController
 
     public function __construct(BookingRepository $bookingRepo)
     {
+        parent::__construct();
         $this->bookingRepository = $bookingRepo;
     }
 
+
     /**
-     * Display a listing of the Booking.
-     * GET|HEAD /bookings
-     *
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      */
     public function index(Request $request)
     {
-
 		try{
             $this->bookingRepository->setPresenter("App\\Presenters\\BookingInListPresenter");
 			$bookings = $this->bookingRepository->presentResponse($this->bookingRepository->getInstructorBookings($request, Auth::user()->id));
 		}catch (\Exception $e){
-			\Log::error('getInstructorBookings : ' . $e->getMessage());
+			Log::error('getInstructorBookings : ' . $e->getMessage());
 			$bookings = ['data'=>[]];
 		}
 
         return $this->sendResponse($bookings);
 	}
 
+
     /**
-     * Remove the specified Booking from storage.
-     * DELETE /bookings/{id}
-     *
-     * @param  int $id
-     *
-     * @return Response
+     * @param $id
+     * @return JsonResponse
+     * @throws \Exception
      */
     public function cancel($id)
     {
@@ -69,7 +62,11 @@ class InstructorBookingsAPIController extends AppBaseController
         return $this->sendResponse(1, 'Booking cancelled');
     }
 
-	public function cancelMany(CancelBookingsAPIRequest $request)
+    /**
+     * @param CancelBookingsAPIRequest $request
+     * @return JsonResponse
+     */
+    public function cancelMany(CancelBookingsAPIRequest $request)
 	{
 		$errors = [];
 		$count_cancelled = 0;
@@ -91,7 +88,11 @@ class InstructorBookingsAPIController extends AppBaseController
 		return $this->sendResponse($count_cancelled, $message);
 	}
 
-	public function approve($id)
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function approve($id)
 	{
 		/** @var Booking $booking */
 		$booking = $this->bookingRepository->findWithoutFail($id);

@@ -6,11 +6,11 @@ use App\Http\Requests\API\AddStudentInstructorsAPIRequest;
 use App\Http\Requests\API\RemoveStudentInstructorsAPIRequest;
 use App\Models\User;
 use App\Repositories\UserRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Support\Facades\Auth;
-use Response;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 
 class StudentInstructorsAPIController extends AppBaseController
@@ -21,14 +21,13 @@ class StudentInstructorsAPIController extends AppBaseController
     public function __construct(UserRepository $userRepo)
     {
         $this->userRepository = $userRepo;
+        parent::__construct();
     }
 
+
     /**
-     * Display a listing of the Instructor.
-     * GET|HEAD /instructors
-     *
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      */
     public function index(Request $request)
     {
@@ -43,13 +42,10 @@ class StudentInstructorsAPIController extends AppBaseController
         return $this->sendResponse($instructors);
     }
 
+
     /**
-     * Store a newly created Instructor in storage.
-     * POST /instructors
-     *
-     * @param AddInstructorsAPIRequest $request
-     *
-     * @return Response
+     * @param AddStudentInstructorsAPIRequest $request
+     * @return JsonResponse
      */
     public function add(AddStudentInstructorsAPIRequest $request)
     {
@@ -67,17 +63,13 @@ class StudentInstructorsAPIController extends AppBaseController
         return $this->sendResponse(true, $count_added . ' instructors added');
     }
 
+
     /**
-     * Remove the specified Instructor from storage.
-     * DELETE /instructors/{id}
-     *
-     * @param  int $id
-     *
-     * @return Response
+     * @param $id
+     * @return JsonResponse
      */
     public function remove($id)
     {
-        /** @var Instructor $instructor */
         $instructor = $this->userRepository->findWithoutFail($id);
 
         if (empty($instructor)) {
@@ -89,7 +81,11 @@ class StudentInstructorsAPIController extends AppBaseController
         return $this->sendResponse(true, 'Instructor deleted');
     }
 
-	public function removeMany(RemoveStudentInstructorsAPIRequest $request)
+    /**
+     * @param RemoveStudentInstructorsAPIRequest $request
+     * @return JsonResponse
+     */
+    public function removeMany(RemoveStudentInstructorsAPIRequest $request)
 	{
 		$count_removed = 0;
 		foreach ($request->input('instructors') as $instructorId){
@@ -101,8 +97,12 @@ class StudentInstructorsAPIController extends AppBaseController
 	}
 
 
-
-	public function addAndMarkAsFavorite(User $instructor, $student = [])
+    /**
+     * @param User $instructor
+     * @param $student
+     * @return JsonResponse
+     */
+    public function addAndMarkAsFavorite(User $instructor, $student = [])
 	{
 
         $student = $student ? $student : Auth::user();
@@ -127,7 +127,11 @@ class StudentInstructorsAPIController extends AppBaseController
 	}
 
 
-	public function removeFromFavorites($instructorId)
+    /**
+     * @param $instructorId
+     * @return JsonResponse
+     */
+    public function removeFromFavorites($instructorId)
 	{
 		/** @var User $instructor */
 		$instructor = $this->userRepository->findWithoutFail($instructorId);
@@ -144,44 +148,32 @@ class StudentInstructorsAPIController extends AppBaseController
 		return $this->sendResponse(true, 'Instructor updated');
 	}
 
-	public function enableGeoNotifications(Request $request, User $instructor)
+    /**
+     * @param Request $request
+     * @param User $instructor
+     * @return JsonResponse
+     */
+    public function enableGeoNotifications(Request $request, User $instructor)
 	{
-		//$instructors = (array) $request->instructor;
-
-        //if( $instructors )
-        //{
-
-            //foreach ( $instructors as $item )
-            //{
-
-                /** @var User $instructor */
-                $instructor = $this->userRepository->findWithoutFail($instructor->id);
-
-                if( $instructor )
-                {
-
-                    if ($instructor->hasRole($this->userRepository->model()::ROLE_INSTRUCTOR)) {
-                        if (!Auth::user()->hasOwnInstructor($instructor->id))
-                            Auth::user()->instructors()->attach( $instructor->id, ['geo_notifications_allowed' => true] );
-                        else // enable just geo_notifications_allowed
-                            Auth::user()->instructors()->updateExistingPivot( $instructor->id, ['geo_notifications_allowed' => true], false );
-                    }
-
-                }
-
-            //}
-
-        //}else{
-
-            //return $this->sendError('Instructor not found');
-
-        //}
+        $instructor = $this->userRepository->findWithoutFail($instructor->id);
+        if( $instructor )
+        {
+            if ($instructor->hasRole($this->userRepository->model()::ROLE_INSTRUCTOR)) {
+                if (!Auth::user()->hasOwnInstructor($instructor->id))
+                    Auth::user()->instructors()->attach( $instructor->id, ['geo_notifications_allowed' => true] );
+                else // enable just geo_notifications_allowed
+                    Auth::user()->instructors()->updateExistingPivot( $instructor->id, ['geo_notifications_allowed' => true], false );
+            }
+        }
 
 		return $this->sendResponse(true, 'Geo Notifications enabled for this Instructor');
-
 	}
 
-	public function disableGeoNotifications($instructorId)
+    /**
+     * @param $instructorId
+     * @return JsonResponse
+     */
+    public function disableGeoNotifications($instructorId)
 	{
 		/** @var User $instructor */
 		$instructor = $this->userRepository->findWithoutFail($instructorId);
@@ -198,35 +190,28 @@ class StudentInstructorsAPIController extends AppBaseController
 		return $this->sendResponse(true, 'Geo Notifications disabled for this Instructor');
 	}
 
+    /**
+     * @param User $instructor
+     * @return JsonResponse
+     */
     public function enableVirtualLessonNotifications(User $instructor)
     {
-        //$instructors = (array) $request->instructor;
+        $instructor = $this->userRepository->findWithoutFail($instructor->id);
 
-        //if( $instructors )
-        //{
-
-            //foreach ( $instructors as $item )
-            //{
-
-                /** @var User $instructor */
-                $instructor = $this->userRepository->findWithoutFail($instructor->id);
-
-                if ($instructor->hasRole($this->userRepository->model()::ROLE_INSTRUCTOR)) {
-                    if (!Auth::user()->hasOwnInstructor($instructor->id))
-                        Auth::user()->instructors()->attach( $instructor->id, ['virtual_notifications_allowed' => true] );
-                    else // enable just geo_notifications_allowed
-                        Auth::user()->instructors()->updateExistingPivot( $instructor->id, ['virtual_notifications_allowed' => true], false );
-                }
-
-            //}
-
-        //}else{
-            //return $this->sendError('Instructor not found');
-        //}
+        if ($instructor->hasRole($this->userRepository->model()::ROLE_INSTRUCTOR)) {
+            if (!Auth::user()->hasOwnInstructor($instructor->id))
+                Auth::user()->instructors()->attach( $instructor->id, ['virtual_notifications_allowed' => true] );
+            else // enable just geo_notifications_allowed
+                Auth::user()->instructors()->updateExistingPivot( $instructor->id, ['virtual_notifications_allowed' => true], false );
+        }
 
         return $this->sendResponse(true, 'Virtual Lesson Notifications enabled for this Instructor');
     }
 
+    /**
+     * @param $instructorId
+     * @return JsonResponse
+     */
     public function disableVirtualLessonNotifications($instructorId)
     {
         /** @var User $instructor */

@@ -3,7 +3,13 @@
 /public/hot
 /storage/ssr
 /storage/*.key
-/storage/app/public/*
+/storage/app/public/profiles/*
+/storage/app/public/testimonials/*
+/storage/app/public/genres/*
+/storage/app/public/users/*
+/storage/app/public/videos/*
+/storage/app/public/lessons/*
+/storage/app/public/media/*
 /storage/debugbar/*
 /storage/framework/cache/*
 /storage/framework/sessions/*

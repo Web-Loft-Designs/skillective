@@ -6,15 +6,16 @@ use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\CreatePreRLessonAPIRequest;
 use App\Models\PreRecordedLesson;
 use App\Models\PreRLessonFile;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Repositories\PreRLessonRepository;
+use Illuminate\Support\Facades\Auth;
 use MicrosoftAzure\Storage\Blob\BlobRestProxy;
 use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 use MicrosoftAzure\Storage\Blob\Models\CreateBlockBlobOptions;
-use Log;
-
-use Auth;
 use getID3;
+use Prettus\Repository\Exceptions\RepositoryException;
+use Prettus\Validator\Exceptions\ValidatorException;
 
 class PreRLessonsInstructorAPIController extends AppBaseController
 {
@@ -22,14 +23,18 @@ class PreRLessonsInstructorAPIController extends AppBaseController
 
     public function __construct(PreRLessonRepository $preRLessonRepo)
     {
+        parent::__construct();
         $this->preRLessonRepository = $preRLessonRepo;
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws RepositoryException
+     */
     public function index(Request $request)
     {
-
         $lessons = $this->preRLessonRepository->getInstructorPreRLessons($request);
-
         $this->preRLessonRepository->setPresenter("App\\Presenters\\PreRLessonInListPresenter");
         $instructorLessons = $this->preRLessonRepository->presentResponse($lessons);
         return $this->sendResponse($instructorLessons);
@@ -37,13 +42,10 @@ class PreRLessonsInstructorAPIController extends AppBaseController
 
     public function store(CreatePreRLessonAPIRequest $request)
     {
-
         if (!Auth::user()->canAddNewLesson()) {
             return $this->sendError('To add new lesson you must connect a submerchant account to your profile, upload profile image and have at least one media item in gallery', 400);
         }
-
         $user = Auth::user();
-
         $data = $request->toArray();
         $data['instructor_id'] = $user->id;
         $data['genre_id'] = $data['genre'];
@@ -60,23 +62,6 @@ class PreRLessonsInstructorAPIController extends AppBaseController
             if (strlen($data['duration']) <= 5) {
                 $data['duration'] = '00:' . $data['duration'];
             }
-
-//            $content = fopen($file_path, "r");
-//
-//            $connectionString = "DefaultEndpointsProtocol=https;AccountName=skillective;AccountKey=nrKEkM7ihgQbuybiz/8NzsJJCdpwKQaxmmERc/F5x9kEXl/5RiXMet/5Mzw7QrA3jCdqUUd/9ETamRFatcheIg==;EndpointSuffix=core.windows.net";
-//
-//            $contentType = "video/mp4";
-//            $options = new CreateBlockBlobOptions();
-//            $options->setContentType($contentType);
-//
-//            try {
-//
-//                $blobClient = BlobRestProxy::createBlobService($connectionString);
-//                $blobClient->createBlockBlob("public",  $data['video'], $content, $options);
-//                echo "success";
-//            } catch (ServiceException $e) {
-//                $this->sendError($e);
-//            }
         }
         $preRecordedLesson = PreRecordedLesson::create($data);
 
@@ -93,6 +78,11 @@ class PreRLessonsInstructorAPIController extends AppBaseController
         return $this->sendResponse('Lesson created');
     }
 
+    /**
+     * @param Request $request
+     * @param $lesson
+     * @return JsonResponse
+     */
     public function getInstructorLessonById(Request $request, $lesson)
     {
         $lesson = $this->preRLessonRepository->findWithoutFail((int)$lesson);
@@ -106,6 +96,10 @@ class PreRLessonsInstructorAPIController extends AppBaseController
         return $this->sendResponse($lesson);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getAvailableGenres(Request $request)
     {
 
@@ -119,6 +113,12 @@ class PreRLessonsInstructorAPIController extends AppBaseController
         return $this->sendResponse($instructorGenres);
     }
 
+    /**
+     * @param CreatePreRLessonAPIRequest $request
+     * @param $lesson
+     * @return JsonResponse
+     * @throws ValidatorException
+     */
     public function update(CreatePreRLessonAPIRequest $request, $lesson)
     {
         if (!Auth::user()->canAddNewLesson()) {
@@ -152,7 +152,7 @@ class PreRLessonsInstructorAPIController extends AppBaseController
             $content = fopen($file_path, "r");
 
             $connectionString = "DefaultEndpointsProtocol=https;AccountName=skillective;AccountKey=nrKEkM7ihgQbuybiz/8NzsJJCdpwKQaxmmERc/F5x9kEXl/5RiXMet/5Mzw7QrA3jCdqUUd/9ETamRFatcheIg==;EndpointSuffix=core.windows.net";
-
+// TODO Потрібно перевірити
             $contentType = "video/mp4";
             $options = new CreateBlockBlobOptions();
             $options->setContentType($contentType);
@@ -203,6 +203,10 @@ class PreRLessonsInstructorAPIController extends AppBaseController
         return $this->sendResponse('Lesson updated');
     }
 
+    /**
+     * @param $lesson
+     * @return JsonResponse
+     */
     public function remove($lesson)
     {
 

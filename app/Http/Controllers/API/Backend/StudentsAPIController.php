@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers\API\Backend;
 
-use App\Http\Controllers\API\Backend\UsersAPIController;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Prettus\Repository\Exceptions\RepositoryException;
 use Spatie\Permission\Models\Role;
-use App\Http\Requests\API\CancelUsersAPIRequest;
 use Illuminate\Http\Request;
-use Response;
-use Auth;
+
 
 class StudentsAPIController extends UsersAPIController
 {
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws RepositoryException
+     */
     public function index(Request $request)
     {
 		$this->userRepository->setPresenter("App\\Presenters\\StudentsInListPresenter");

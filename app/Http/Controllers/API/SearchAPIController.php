@@ -6,18 +6,21 @@ use App\Models\Lesson;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Genre;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
+
 
 class SearchAPIController extends AppBaseController
 {
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function autocompleteInstructor(Request $request)
     {
-
         if( !$request->has('instructor') )
         {
             $result = User::whereHas('roles', static function (Builder $query) {
@@ -55,6 +58,10 @@ class SearchAPIController extends AppBaseController
 
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function autocompleteGenres(Request $request)
     {
         $searchString = $request->input('genre');
@@ -68,6 +75,10 @@ class SearchAPIController extends AppBaseController
         return $this->sendResponse($result);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function autocompleteLocations(Request $request)
     {
         $searchString = $request->input('location');

@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Repositories\GenreRepository;
 use App\Repositories\LessonRepository;
 use App\Repositories\UserRepository;
 use App\Models\Lesson;
 use App\Models\User;
-use Auth;
-use Log;
 use App\Facades\BraintreeProcessor;
+use Braintree\MerchantAccount;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class LessonPageController extends Controller
 {
@@ -28,7 +28,7 @@ class LessonPageController extends Controller
 		if (config('app.env')=='prod'
 			&& (
 				$lesson->instructor->bt_submerchant_id==null
-				|| $lesson->instructor->bt_submerchant_status!=\Braintree_MerchantAccount::STATUS_ACTIVE
+				|| $lesson->instructor->bt_submerchant_status!=MerchantAccount::STATUS_ACTIVE
 				|| $lesson->instructor->status != User::STATUS_ACTIVE
 			)
 			&& (!Auth::user() || Auth::user()->id!=$lesson->instructor_id)
@@ -66,19 +66,19 @@ class LessonPageController extends Controller
 
 	public function venmoTest(Lesson $lesson, LessonRepository $lessonRepository, GenreRepository $genreRepository, UserRepository $userRepository)
 	{
-		\Log::debug('venmoTest');
+		Log::debug('venmoTest');
 		if ($lesson->is_cancelled){
-			\Log::debug('Lesson cancelled');
+			Log::debug('Lesson cancelled');
 			abort(404, 'Lesson cancelled');
 		}
 		if ((
 				$lesson->instructor->bt_submerchant_id==null
-				|| $lesson->instructor->bt_submerchant_status!=\Braintree_MerchantAccount::STATUS_ACTIVE
+				|| $lesson->instructor->bt_submerchant_status!=MerchantAccount::STATUS_ACTIVE
 				|| $lesson->instructor->status != User::STATUS_ACTIVE
 			)
 			&& (!Auth::user() || Auth::user()->id!=$lesson->instructor_id)
 		){
-			\Log::debug('Lesson not found');
+			Log::debug('Lesson not found');
 			abort(404, 'Lesson not found');
 		}
 

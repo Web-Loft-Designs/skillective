@@ -7,11 +7,9 @@ use App\Repositories\GenreRepository;
 use App\Repositories\UserRepository;
 use App\Http\Requests\InstructorRegisterRequest;
 use App\Http\Controllers\AppBaseController;
+use Laracasts\Flash\Flash;
 use Laravel\Socialite\Facades\Socialite;
-use App\Facades\UserRegistrator;
 use App\Models\Setting;
-use Flash;
-use Log;
 use App\Repositories\InvitationRepository;
 use App\Models\Invitation;
 
@@ -34,25 +32,25 @@ class InstructorRegisterController extends AppBaseController
 		$this->middleware('guest');
 		$this->userRepository = $userRepo;
 		$this->genreRepository = $genre_repository;
+        parent::__construct();
 	}
 
-	public function remember(InstructorRegisterRequest $request, InvitationRepository $invitationRepository)
+    /**
+     * @param InstructorRegisterRequest $request
+     * @param InvitationRepository $invitationRepository
+     * @return array
+     */
+    public function remember(InstructorRegisterRequest $request, InvitationRepository $invitationRepository)
 	{
 		$free_instructor_registration_enabled = Setting::getValue('free_instructor_registration_enabled', 0);
 		$invitation = null;
 
 		if ($request->input('invitation') === 'Nc2Chuxbf83XXnjfDj') {
-
 			$input = [];
-
-
-
-
 			$input['invited_as_instructor']	= true;
 			$input['invited_by'] = 12;
 			$invitation = new Invitation($input);
 			$invitation->save();
-
 			$request->merge([
 				'invitation' => $invitation->invitation_token
 			]);
@@ -66,7 +64,6 @@ class InstructorRegisterController extends AppBaseController
 			}
 		}
 
-
 		if (!$free_instructor_registration_enabled) {
 			if (
 				!$request->filled('invitation')
@@ -78,15 +75,10 @@ class InstructorRegisterController extends AppBaseController
 			}
 		}
 
-
-
 		session()->forget('submittedInstructor');
 		session()->push('submittedInstructor', $request->all());
 
 		return ['redirect' => Socialite::driver($request->provider)->with(['redirect_uri' => route('social.instructor.registration', ['provider' => $request->provider])])->redirect()->getTargetUrl()];
 	}
 
-	//	public function register(InstructorRegisterRequest $request) {
-	//		return UserRegistrator::registerInstructor($request);
-	//	}
 }

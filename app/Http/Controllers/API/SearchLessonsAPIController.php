@@ -5,17 +5,11 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Lesson;
 use App\Repositories\LessonRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
-use InfyOm\Generator\Criteria\LimitOffsetCriteria;
-use Prettus\Repository\Criteria\RequestCriteria;
-use Response;
-use Log;
+use Illuminate\Support\Facades\Log;
 
-/**
- * Class LessonController
- * @package App\Http\Controllers\API
- */
 
 class SearchLessonsAPIController extends AppBaseController
 {
@@ -24,15 +18,14 @@ class SearchLessonsAPIController extends AppBaseController
 
     public function __construct(LessonRepository $lessonRepo)
     {
+        parent::__construct();
         $this->lessonRepository = $lessonRepo;
     }
 
+
     /**
-     * Display a listing of the Lesson.
-     * GET|HEAD /lessons
-     *
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      */
     public function index(Request $request)
     {
@@ -48,18 +41,20 @@ class SearchLessonsAPIController extends AppBaseController
         return $this->sendResponse($lessons);
     }
 
-	public function getSameDayUpcomingNearbyLessonLocationLessons(Request $request, Lesson $lesson)
+    /**
+     * @param Request $request
+     * @param Lesson $lesson
+     * @return JsonResponse
+     */
+    public function getSameDayUpcomingNearbyLessonLocationLessons(Request $request, Lesson $lesson)
 	{
 		try{
 			$distance = null;
 			if ($request->filled('distance'))
 				$distance = (int)$request->input('distance');
+			$lessons = $this->lessonRepository->resetCriteria()
+                ->sameDayUpcomingNearbyLessonLocationLessons($lesson, $distance);
 
-			$lessons =
-//				$this->lessonRepository
-//				->presentResponse(
-					$this->lessonRepository->resetCriteria()->sameDayUpcomingNearbyLessonLocationLessons($lesson, $distance);
-//	)['data'];
 		}catch (\Exception $e){
 			Log::error('getFilteredAvailableLessons : ' . $e->getMessage());
 			$lessons = ['data'=>[]];

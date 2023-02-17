@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\TwilioVideo;
+use Braintree\MerchantAccount;
 use Illuminate\Http\Request;
 use App\Models\Lesson;
 use App\Models\User;
-use Auth;
-use Log;
-use TwilioVideo;
+use Illuminate\Support\Facades\Auth;
+
 
 class VirtualLessonPageController extends Controller
 {
@@ -45,7 +46,7 @@ class VirtualLessonPageController extends Controller
 		if (config('app.env')=='prod'
 			&& (
 				$lesson->instructor->bt_submerchant_id==null
-				|| $lesson->instructor->bt_submerchant_status!=\Braintree_MerchantAccount::STATUS_ACTIVE
+				|| $lesson->instructor->bt_submerchant_status!=MerchantAccount::STATUS_ACTIVE
 				|| $lesson->instructor->status != User::STATUS_ACTIVE
 			)
 		){

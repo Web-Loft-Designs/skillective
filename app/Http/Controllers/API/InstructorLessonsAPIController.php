@@ -5,23 +5,26 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateLessonAPIRequest;
 use App\Http\Requests\API\UpdateLessonAPIRequest;
 use App\Models\Lesson;
-use App\Models\Booking;
 use App\Models\User;
 use App\Models\LessonRequest;
 use App\Repositories\LessonRepository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
-use Response;
-use App\Exports\InstructorLessonsExport;
+use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
-use Auth;
-use Log;
 use Illuminate\Support\Carbon;
+use Prettus\Repository\Exceptions\RepositoryException;
+use Prettus\Validator\Exceptions\ValidatorException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-/**
- * Class LessonController
- * @package App\Http\Controllers\API
- */
 
 class InstructorLessonsAPIController extends AppBaseController
 {
@@ -30,9 +33,17 @@ class InstructorLessonsAPIController extends AppBaseController
 
     public function __construct(LessonRepository $lessonRepo)
     {
+        parent::__construct();
         $this->lessonRepository = $lessonRepo;
     }
 
+
+    /**
+     * @param Request $request
+     * @param User $instructor
+     * @return Application|ResponseFactory|JsonResponse|Response
+     * @throws RepositoryException
+     */
     public function index(Request $request, User $instructor)
     {
 
@@ -43,9 +54,8 @@ class InstructorLessonsAPIController extends AppBaseController
         ];
         if($request->getMethod() == "OPTIONS") {
             // The client-side application can set only headers allowed in Access-Control-Allow-Headers
-            return Response::make('OK', 200, $headers);
+            return response('ok', 200, $headers);
         }
-
         if ($instructor == null) {
             $instructor = Auth::user();
         }
@@ -55,6 +65,10 @@ class InstructorLessonsAPIController extends AppBaseController
         return $this->sendResponse($lessons);
     }
 
+    /**
+     * @param Request $request
+     * @return BinaryFileResponse
+     */
     public function export(Request $request)
     {
         $this->lessonRepository->setPresenter("App\\Presenters\\LessonInListPresenter");
@@ -62,34 +76,39 @@ class InstructorLessonsAPIController extends AppBaseController
         return Excel::download(new \App\Exports\InstructorLessonsExport($this->lessonRepository, $request, Auth::user()->id, $local_time), 'lessons-list.xlsx');
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function dashboardLessons(Request $request)
     {
-
         $this->lessonRepository->setPresenter("App\\Presenters\\LessonDashboardPresenter");
-
         try {
             $lessons = $this->lessonRepository->presentResponse($this->lessonRepository->getDashboardInstructorLessons($request, Auth::user()->id));
         } catch (\Exception $e) {
-            \Log::error('getDashboardInstructorLessons : ' . $e->getMessage());
+            Log::error('getDashboardInstructorLessons : ' . $e->getMessage());
             $lessons = ['data' => []];
         }
 
         return $this->sendResponse($lessons);
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function pendingLessonsCount()
     {
 
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s');
 
-        $pendingLessons = \DB::table('bookings')
+        $pendingLessons = DB::table('bookings')
             ->where('lessons.instructor_id', '=', Auth::id())
             ->join('lessons', 'bookings.lesson_id', '=', 'lessons.id')
             ->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) < lessons.start")
             ->where('status', '=', 'pending')
             ->count();
 
-        $pendingLessonRequests = \DB::table('lesson_requests')
+        $pendingLessonRequests = DB::table('lesson_requests')
             ->where("lesson_requests.instructor_id", Auth::id())
             ->where(function ($q) {
                 $q->where("lesson_requests.status", LessonRequest::STATUS_APPROVED)
@@ -105,6 +124,11 @@ class InstructorLessonsAPIController extends AppBaseController
         return $this->sendResponse($response);
     }
 
+    /**
+     * @param $input
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws ValidatorException
+     */
     private function createLessonsByInterval($input){
         $_start = $input['start'];
         $_end = $input['end'];
@@ -144,6 +168,11 @@ class InstructorLessonsAPIController extends AppBaseController
         return $lesson;
     }
 
+    /**
+     * @param CreateLessonAPIRequest $request
+     * @return JsonResponse
+     * @throws ValidatorException
+     */
     public function store(CreateLessonAPIRequest $request)
     {
 
@@ -219,13 +248,10 @@ class InstructorLessonsAPIController extends AppBaseController
         return $this->sendResponse($this->lessonRepository->presentResponse($lesson)['data'], 'Lesson saved');
     }
 
+
     /**
-     * Display the specified Lesson.
-     * GET|HEAD /lessons/{id}
-     *
-     * @param  int $id
-     *
-     * @return Response
+     * @param $id
+     * @return JsonResponse
      */
     public function show($id)
     {
@@ -239,14 +265,12 @@ class InstructorLessonsAPIController extends AppBaseController
         return $this->sendResponse($this->lessonRepository->presentResponse($lesson)['data'], 'Lesson retrieved');
     }
 
+
     /**
-     * Update the specified Lesson in storage.
-     * PUT/PATCH /lessons/{id}
-     *
-     * @param  int $id
+     * @param $lesson
      * @param UpdateLessonAPIRequest $request
-     *
-     * @return Response
+     * @return JsonResponse
+     * @throws ValidatorException
      */
     public function update($lesson, UpdateLessonAPIRequest $request)
     {
@@ -289,30 +313,11 @@ class InstructorLessonsAPIController extends AppBaseController
 
         return $this->sendResponse($this->lessonRepository->presentResponse($lesson)['data'], 'Lesson updated');
     }
-    /**
-     * Remove the specified Lesson from storage.
-     * DELETE /lessons/{id}
-     *
-     * @param  int $id
-     *
-     * @return Response
-     */
-    //    public function cancel($id)
-    //    {
-    //        /** @var Lesson $lesson */
-    //        $lesson = $this->lessonRepository->findWithoutFail($id);
-    //
-    //        if (empty($lesson)) {
-    //            return $this->sendError('Lesson not found');
-    //        }
-    //
-    //		$cancelled = $lesson->cancel();
-    //		if ($cancelled)
-    //			return $this->sendResponse(true, 'Lesson cancelled successfully');
-    //		else
-    //			return $this->sendError('Can\'t cancel the lesson', 400);
-    //    }
 
+    /**
+     * @param Request $request
+     * @return array
+     */
     private function _prepareInputData(Request $request)
     {
         // prepare data

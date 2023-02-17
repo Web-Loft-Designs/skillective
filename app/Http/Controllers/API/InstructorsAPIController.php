@@ -4,15 +4,12 @@ namespace App\Http\Controllers\API;
 
 use App\Models\User;
 use App\Repositories\UserRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
-use Response;
-use Auth;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
-/**
- * Class UserController
- * @package App\Http\Controllers\API
- */
 
 class InstructorsAPIController extends AppBaseController
 {
@@ -21,15 +18,14 @@ class InstructorsAPIController extends AppBaseController
 
     public function __construct(UserRepository $userRepo)
     {
+        parent::__construct();
         $this->userRepository = $userRepo;
     }
 
+
     /**
-     * Display a listing of the User.
-     * GET|HEAD /users
-     *
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      */
     public function index(Request $request)
     {
@@ -44,7 +40,9 @@ class InstructorsAPIController extends AppBaseController
         return $this->sendResponse($instructors);
     }
 
-
+    /**
+     * @return JsonResponse
+     */
     public function getFeaturedInstructors()
     {
         $featuredInstructors = $this->userRepository->presentResponse($this->userRepository->getInstructorsForHome());
@@ -52,16 +50,14 @@ class InstructorsAPIController extends AppBaseController
         return $this->sendResponse($featuredInstructors);
     }
 
-    
+
     /**
      * @param User $instructor
-     * @return void
+     * @return JsonResponse
      */
     public function getRelationInstructors(User $instructor)
     {
-
         $related = $this->userRepository->getRelationInstructors($instructor);
-
         return $this->sendResponse($related);
 
     }

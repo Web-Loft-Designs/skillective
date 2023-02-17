@@ -3,59 +3,55 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\BecomeAnInstructorRequest;
-use App\Models\User;
 use App\Http\Requests\API\ContactUsAPIRequest;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Setting;
-use App\Notifications\ContactUsNotification;
-use Notification;
-use Log;
-use Illuminate\Http\Request;
+use App\Models\User;
 use App\Notifications\Admin\GuestBecomeInstructor;
+use App\Notifications\ContactUsNotification;
 use App\Repositories\UserRepository;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
-/**
- * Class LessonController
- * @package App\Http\Controllers\API
- */
 
 class ContactUsAPIController extends AppBaseController
 {
 
-    /** @var  UserRepository */
     private $userRepository;
 
     public function __construct(UserRepository $userRepository)
     {
+        parent::__construct();
         $this->userRepository = $userRepository;
     }
 
+
     /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse|void
+     * @param BecomeAnInstructorRequest $request
+     * @return void
      */
     public function becomeInstructor(BecomeAnInstructorRequest $request)
     {
-
         $email = $request->input('email');
         $name = $request->input('fullName');
-
         $user = User::create([
             'first_name' => $name,
             'email' => $email,
         ]);
-
         $administrators = $this->userRepository->getAdministrators();
         foreach ($administrators as $administrator)
         {
             $administrator->notify(new GuestBecomeInstructor($email));
         }
-
         //$user->notify(new GuestBecomeInstructor($email));
-
         $this->sendResponse('ok');
     }
 
+    /**
+     * @param ContactUsAPIRequest $request
+     * @return JsonResponse
+     */
     public function send(ContactUsAPIRequest $request)
     {
         $recepients = explode(',', Setting::getValue('contact_form_recepients'));
