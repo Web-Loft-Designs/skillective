@@ -232,7 +232,7 @@ class CartAPIController extends AppBaseController
         $cartCount = count($cart);
 
         foreach ($cart as $key => $cartItem) {
-            if ($cartItem->lesson_id) {
+            if ($cartItem->lesson_id && !$cartItem->pre_r_lesson_id) {
                 array_push($appendedGenres, $cartItem->lesson->genre_id);
 
                 $lesson = new Lesson(json_decode(json_encode($cartItem->lesson), true));
