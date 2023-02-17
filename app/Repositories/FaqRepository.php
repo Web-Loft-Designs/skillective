@@ -3,14 +3,14 @@
 namespace App\Repositories;
 
 use App\Models\Faq;
-use App\Models\FaqCategory;
-
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cookie;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use App\Criteria\FaqSearchCriteria;
 use App\Criteria\FaqFilterByCategoryCriteria;
-use Cookie;
-use DB;
+use Prettus\Repository\Exceptions\RepositoryException;
 
 class FaqRepository extends BaseRepository
 {
@@ -22,9 +22,10 @@ class FaqRepository extends BaseRepository
         'content'
     ];
 
+
     /**
-     * Configure the Model
-     **/
+     * @return string
+     */
     public function model()
     {
         return Faq::class;
@@ -35,11 +36,19 @@ class FaqRepository extends BaseRepository
 	 */
 	protected $skipPresenter = true;
 
-	public function presenter() {
+    /**
+     * @return string
+     */
+    public function presenter() {
 		return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
 	}
 
-	public function getFaqs(Request $request){
+    /**
+     * @param Request $request
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
+    public function getFaqs(Request $request){
 		$this->resetCriteria();
 		$this->pushCriteria(new LimitOffsetCriteria($request));
 
@@ -63,13 +72,20 @@ class FaqRepository extends BaseRepository
 	}
 
 	// all faqs for frontend
-	public function getSiteFaqs(){
+
+    /**
+     * @return LengthAwarePaginator|Collection|mixed
+     */
+    public function getSiteFaqs(){
 		return $this->scopeQuery(function($query){
 			return $query->orderBy('position','asc')->orderBy('title','asc');
 		})->with(['category'])->get();
 	}
 
-	public function getCategorizedFaqs(){
+    /**
+     * @return array
+     */
+    public function getCategorizedFaqs(){
 		$this->scopeQuery(function($query){
 			return $query->orderBy('position','asc')->orderBy('title','asc');
 		});
@@ -81,11 +97,14 @@ class FaqRepository extends BaseRepository
 			if (!isset($categorized[$category]))
 				$categorized[$category] = [];
 			$categorized[$category][] = $faq;
-		}
-		ksort($categorized);
+		}ksort($categorized);
 		return $categorized;
 	}
 
+    /**
+     * @param $data
+     * @return mixed
+     */
     public function presentResponse($data){
         return $this->presenter->present($data);
 	}

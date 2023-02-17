@@ -5,45 +5,61 @@ namespace App\Repositories;
 
 use App\Models\PurchasedLesson;
 use Carbon\Carbon;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
-use Auth;
-use DB;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PurchasedLessonRepository extends BaseRepository
 {
 
-	public function model()
+    /**
+     * @return string
+     */
+    public function model()
 	{
 		return PurchasedLesson::class;
 	}
 
-	protected $skipPresenter = true;
+    /**
+     * @var bool
+     */
+    protected $skipPresenter = true;
 
-	public function presenter()
+    /**
+     * @return string
+     */
+    public function presenter()
 	{
 		return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
 	}
 
-	public function presentResponse($data)
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function presentResponse($data)
 	{
 		return $this->presenter->present($data);
 	}
 
 
-	public function getStudentPurchasedLessons(Request $request, $studentUserId = null)
+    /**
+     * @param Request $request
+     * @param $studentUserId
+     * @return LengthAwarePaginator|Collection|mixed
+     */
+    public function getStudentPurchasedLessons(Request $request, $studentUserId = null)
 	{
 		if (!$studentUserId)
 			$studentUserId = Auth::user()->id;
-
 		$this->resetCriteria();
 		$this->resetScope();
 
-
 		$this->scopeQuery(function ($query) use ($studentUserId) {
-
             $userGenres = Auth()->user()->genres()->orderBy('title', 'desc')->get()->pluck('id')->toArray();
             $ids_ordered = implode(',', $userGenres);
-
 			$query->join('users', 'purchased_lessons.student_id', '=', "users.id")
 				->join('profiles', 'users.id', '=', "profiles.user_id")
 				->join('pre_r_lessons', 'purchased_lessons.pre_r_lesson_id', '=', "pre_r_lessons.id")
@@ -63,7 +79,12 @@ class PurchasedLessonRepository extends BaseRepository
 			return $this->paginate(25, ['purchased_lessons.*']);
 	}
 
-	public function getAmountEarnedForPeriod($instructorId, $period = '')
+    /**
+     * @param $instructorId
+     * @param $period
+     * @return array
+     */
+    public function getAmountEarnedForPeriod($instructorId, $period = '')
 	{
 
 		// G TODO
@@ -71,15 +92,12 @@ class PurchasedLessonRepository extends BaseRepository
 
 		$this->resetCriteria();
 		$this->resetScope();
-
 		$this->scopeQuery(function ($query) use ($instructorId, $period) {
-
 			if ($period == '')
 				$query = $query->select(DB::raw('SUM(purchased_lessons.price) as sumEarnedInPeriod'), DB::raw("YEAR(purchased_lessons.created_at) as lessonsPeriod"));
 			else
 				$query = $query->select(DB::raw('SUM(purchased_lessons.price) as sumEarnedInPeriod'), DB::raw("MONTH(purchased_lessons.created_at) as lessonsPeriod"))
 					->whereRaw("YEAR(purchased_lessons.created_at) = $period");
-
 			$query = $query->groupBy(DB::raw('lessonsPeriod'))
 				->join('pre_r_lessons', 'purchased_lessons.pre_r_lesson_id', '=', "pre_r_lessons.id")
 				->where('pre_r_lessons.instructor_id', $instructorId);
@@ -93,9 +111,13 @@ class PurchasedLessonRepository extends BaseRepository
 		return $count;
 	}
 
-	public function getCountPurchasesLessonsForPeriod($instructorId, $period = '')
+    /**
+     * @param $instructorId
+     * @param $period
+     * @return array
+     */
+    public function getCountPurchasesLessonsForPeriod($instructorId, $period = '')
 	{
-
 
 		// G TODO
 		// ADD WHERE WITH STATUSES!
@@ -124,22 +146,22 @@ class PurchasedLessonRepository extends BaseRepository
 		return $count;
 	}
 
-	public function getHappenedLessonsPayedInEscrow($limit = null)
+    /**
+     * @param $limit
+     * @return mixed
+     */
+    public function getHappenedLessonsPayedInEscrow($limit = null)
 	{
-		// TODO
+		// TODO  Тут щось не доробляно амерекосами
 
 		$timePastHappened = 8; // hours
-
 		$nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
-
 		$escrowStatus = PurchasedLesson::STATUS_ESCROW;
 		$escrowErrorStatus = PurchasedLesson::STATUS_UNABLE_ESCROW_RELEASE;
-
 		$this->resetCriteria();
 		$this->resetScope();
 		$this->model = $this->model
 			->select('purchased_lessons.*')
-			// ->whereRaw("purchased_lessons.created_at <= DATE_SUB($nowOnServer), INTERVAL $timePastHappened HOUR)")
 			->whereRaw(" ( purchased_lessons.status='$escrowStatus' OR purchased_lessons.status='$escrowErrorStatus' ) ")
 			->orderBy('purchased_lessons.created_at', 'asc');
 		if ($limit)

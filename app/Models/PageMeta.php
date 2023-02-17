@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Page;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PageMeta extends Model
 {
@@ -22,11 +22,20 @@ class PageMeta extends Model
         'name', 'value'
     ];
 
+    /**
+     * @return BelongsTo
+     */
     public function user()
     {
         return $this->belongsTo(Page::class);
     }
 
+    /**
+     * @param Page $page
+     * @param $meta_name
+     * @param $meta_value
+     * @return void
+     */
     public static function updateMetaValue(Page $page, $meta_name, $meta_value){
         if ($page){
             $attributes = ['name'=>$meta_name, 'value'=>is_array($meta_value)?serialize($meta_value):$meta_value];
@@ -39,6 +48,11 @@ class PageMeta extends Model
         }
     }
 
+    /**
+     * @param $page_id
+     * @param $meta_name
+     * @return mixed
+     */
     public static function findByPageAndName($page_id, $meta_name){
         $meta = self::where([ ['name', '=', $meta_name], ['page_id', '=', $page_id] ])->first();
         return $meta;

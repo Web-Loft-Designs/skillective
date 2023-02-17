@@ -4,9 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Profile;
 
-use File;
-use Image;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * Class ProfileRepository
@@ -38,9 +35,10 @@ class ProfileRepository extends BaseRepository
         'avatar'
     ];
 
+
     /**
-     * Configure the Model
-     **/
+     * @return string
+     */
     public function model()
     {
         return Profile::class;

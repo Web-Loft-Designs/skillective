@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Prettus\Repository\Contracts\Transformable;
-use Auth;
+
 
 class RoomChatMessage extends Model implements Transformable
 {
@@ -19,14 +20,18 @@ class RoomChatMessage extends Model implements Transformable
         'message'
     ];
 
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
+     * @return BelongsTo
+     */
     public function lesson()
     {
-        return $this->belongsTo(\App\Models\Lesson::class, 'lesson_id');
+        return $this->belongsTo(Lesson::class, 'lesson_id');
     }
 
+    /**
+     * @return array
+     */
     public function transform()
     {
         return [
@@ -35,6 +40,9 @@ class RoomChatMessage extends Model implements Transformable
         ];
     }
 
+    /**
+     * @return array
+     */
     public function toArray(){
         return $this->transform();
     }

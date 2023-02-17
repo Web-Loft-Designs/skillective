@@ -4,11 +4,12 @@ namespace App\Repositories;
 
 use App\Models\Cart;
 use App\Models\PurchasedLesson;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
-use InfyOm\Generator\Common\BaseRepository;
 use App\Models\Booking;
 use App\Models\Lesson;
 use App\Models\PreRecordedLesson;
@@ -18,6 +19,9 @@ use App\Models\PromoCode;
 
 class CartRepository extends BaseRepository
 {
+    /**
+     * @return string
+     */
     public function model()
     {
         return Cart::class;
@@ -25,14 +29,21 @@ class CartRepository extends BaseRepository
 
     protected $skipPresenter = true;
 
+    /**
+     * @return string
+     */
     public function presenter()
     {
         return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
     }
 
+    /**
+     * @param $student_id
+     * @param $product_list
+     * @return LengthAwarePaginator|Collection|mixed|void
+     */
     public function getUserCart($student_id, $product_list)
     {
-
         if ($student_id) {
             $this->scopeQuery(function ($query) use ($student_id) {
                 $query
@@ -78,7 +89,6 @@ class CartRepository extends BaseRepository
                         unset($carts[$index]);
                     }
                 }
-
                 if ($cartItem->lesson_id && !$cartItem->pre_r_lesson_id) {
                     $cartItem->discounts = $cartItem->lesson->instructor->discounts;
                     $handledDiscounts = Discount::validateDiscount($cartItem->discounts, $carts);
@@ -89,13 +99,13 @@ class CartRepository extends BaseRepository
                     $cartItem->discounts = $handledDiscounts;
                 }
             }
-
             return $carts;
 
         } else if ($product_list) {
             return $this->addToCart($product_list);
         }
     }
+
 
     /**
      * @param $product_list
@@ -126,7 +136,9 @@ class CartRepository extends BaseRepository
 
        $carts = $lessons->get(["lessons.*"]);
 
-       $preRCart = PreRecordedLesson::whereIn("pre_r_lessons.id", $pre_r_lessons_ids)->with(["genre", "instructor"])->get(["pre_r_lessons.*"]);
+       $preRCart = PreRecordedLesson::whereIn("pre_r_lessons.id", $pre_r_lessons_ids)
+           ->with(["genre", "instructor"])
+           ->get(["pre_r_lessons.*"]);
 
         $carts = $carts->merge($preRCart);
 
@@ -171,6 +183,11 @@ class CartRepository extends BaseRepository
     }
 
 
+    /**
+     * @param $student_id
+     * @param $guest_cart
+     * @return int
+     */
     public function getLessonsCountInCart($student_id, $guest_cart)
     {
         $cart = $this->getUserCart($student_id, $guest_cart);
@@ -178,6 +195,13 @@ class CartRepository extends BaseRepository
     }
 
 
+    /**
+     * @param $student_id
+     * @param $guest_cart
+     * @param $promos
+     * @param $message
+     * @return int[]
+     */
     public function getCartSummary($student_id, $guest_cart, $promos, $message = null)
     {
         $cart = $this->getUserCart($student_id, $guest_cart);
@@ -310,6 +334,10 @@ class CartRepository extends BaseRepository
         return  $response;
     }
 
+    /**
+     * @param $data
+     * @return mixed
+     */
     public function presentResponse($data)
     {
         return $this->presenter->present($data);
@@ -323,9 +351,9 @@ class CartRepository extends BaseRepository
     public function storeGuestCart(Request $request, bool $isCheckout = true)
     {
 
-        if ( !\Cookie::has('guest_cart') || !Auth::check() ) return false;
+        if ( !Cookie::has('guest_cart') || !Auth::check() ) return false;
 
-        $guestCart = json_decode(\Cookie::get('guest_cart'));
+        $guestCart = json_decode(Cookie::get('guest_cart'));
 
         foreach ( $guestCart as $item ){
 

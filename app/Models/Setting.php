@@ -22,6 +22,9 @@ class Setting extends Model
         'name', 'value'
     ];
 
+    /**
+     * @return array
+     */
     public function getAllAssociative(){
         $settings = [];
         $all = $this->all();
@@ -31,6 +34,11 @@ class Setting extends Model
         return $settings;
     }
 
+    /**
+     * @param $settings_name
+     * @param $settings_value
+     * @return void
+     */
     public function updateValue($settings_name, $settings_value){
         $all = $this->all();
         $setting = null;
@@ -49,7 +57,11 @@ class Setting extends Model
         }
     }
 
-	public function incrementValue($settings_name){
+    /**
+     * @param $settings_name
+     * @return void
+     */
+    public function incrementValue($settings_name){
 		$setting = self::where('name', $settings_name)->first();
 		if ($setting && is_numeric($setting->value)){
 			$newValue = $setting->value + 1;
@@ -59,6 +71,12 @@ class Setting extends Model
 		}
 	}
 
+    /**
+     * @param $settings_name
+     * @param $defaultValue
+     * @param $fromCache
+     * @return mixed|string
+     */
     public static function getValue($settings_name, $defaultValue = '', $fromCache = true){
     	if ( $fromCache && ($val = Cache::get("settings.{$settings_name}"))!=null ){
     		return $val;
@@ -72,6 +90,9 @@ class Setting extends Model
         return $defaultValue;
     }
 
+    /**
+     * @return void
+     */
     public function putAllToCache(){
     	$all = $this->getAllAssociative();
     	foreach ($all as $key=>$value){
@@ -79,7 +100,10 @@ class Setting extends Model
 		}
 	}
 
-	public function removeAllFromCache(){
+    /**
+     * @return void
+     */
+    public function removeAllFromCache(){
 		$all = $this->getAllAssociative();
 		foreach ($all as $key=>$value){
 			Cache::forget("settings.{$key}");

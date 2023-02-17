@@ -3,8 +3,7 @@
 namespace App\Models;
 
 use App\Scopes\CartIsGuest;
-use Eloquent as Model;
-
+use Illuminate\Database\Eloquent\Model;
 class Cart extends Model
 {
     const CREATED_AT = 'created_at';
@@ -23,12 +22,12 @@ class Cart extends Model
 
     public function lesson()
 	{
-		return $this->belongsTo(\App\Models\Lesson::class, 'lesson_id');
+		return $this->belongsTo(Lesson::class, 'lesson_id');
 	}
 
     public function preRecordedLesson()
 	{
-		return $this->belongsTo(\App\Models\PreRecordedLesson::class, 'pre_r_lesson_id');
+		return $this->belongsTo(PreRecordedLesson::class, 'pre_r_lesson_id');
 	}
 
     public function checkout($request, $user_repository)

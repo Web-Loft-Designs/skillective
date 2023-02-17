@@ -3,18 +3,20 @@
 namespace App\Repositories;
 
 use App\Models\User;
-use InfyOm\Generator\Common\BaseRepository;
 use App\Models\PreRecordedLesson;
 use App\Criteria\PreRLessonFilterByContentCriteria;
 use App\Criteria\PreRLessonFilterByGenresListCriteria;
 use App\Criteria\PreRLessonFilterByInstructorNameCriteria;
 use App\Criteria\PreRLessonFilterByGenreCriteria;
 use App\Criteria\PreRLessonFilterByTopicCriteria;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
-use Auth;
-use Log;
-use DB;
+use Prettus\Repository\Exceptions\RepositoryException;
+
 
 class PreRLessonRepository extends BaseRepository
 {
@@ -23,6 +25,9 @@ class PreRLessonRepository extends BaseRepository
         'content',
     ];
 
+    /**
+     * @return string
+     */
     public function model()
     {
         return PreRecordedLesson::class;
@@ -30,17 +35,29 @@ class PreRLessonRepository extends BaseRepository
 
     protected $skipPresenter = true;
 
+    /**
+     * @return string
+     */
     public function presenter()
     {
         return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
     }
 
+    /**
+     * @param $data
+     * @return mixed
+     */
     public function presentResponse($data)
     {
         return $this->presenter->present($data);
     }
 
 
+    /**
+     * @param $request
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
     public function getPreRLessons($request)
     {
 
@@ -60,33 +77,21 @@ class PreRLessonRepository extends BaseRepository
         }
 
         $this->scopeQuery(function ($query) use ($request) {
-
             $query = $query->select('pre_r_lessons.*')
                 ->join('users', 'pre_r_lessons.instructor_id', '=', "users.id");
-//                ->join('purchased_lessons', 'pre_r_lessons.id', '=', "purchased_lessons.pre_r_lesson_id");
-
             if( Auth::check() )
             {
                 if (Auth::user()->hasRole(User::ROLE_INSTRUCTOR)){
                     $query->groupBy('pre_r_lessons.id');
-//                        ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'asc');
                 }else if ( Auth::user()->hasRole(User::ROLE_STUDENT) ){
 
                     $userGenres = Auth()->user()->genres()->orderBy('title', 'desc')->get()->pluck('id')->toArray();
                     $ids_ordered = implode(',', $userGenres);
                     $query->groupBy('pre_r_lessons.id');
-//                        ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'desc')
-//                        ->orderBy(DB::raw('FIELD(pre_r_lessons.genre_id, '.$ids_ordered.') + COUNT(`purchased_lessons`.`id`), COUNT(`purchased_lessons`.`id`)'), 'desc');
-
                 }
-
             }else{
-
                 $query->groupBy('pre_r_lessons.id');
-//                    ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'asc');
-
             }
-
             return $query;
         });
 
@@ -95,24 +100,23 @@ class PreRLessonRepository extends BaseRepository
     }
 
 
+    /**
+     * @param $request
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
     public function getInstructorPreRLessons($request)
     {
-
         $user = Auth::user();
         $instructor_id = $user->id;
-
-
         $this->resetCriteria();
         $this->resetScope();
-
         if ($request->filled('content'))
             $this->pushCriteria(new PreRLessonFilterByContentCriteria($request->get('content')));
         if ($request->filled('genres')) {
             $this->pushCriteria(new PreRLessonFilterByGenresListCriteria($request->get('genres')));
         }
-
         $this->scopeQuery(function ($query) use ($request, $instructor_id) {
-
             $query = $query->select('pre_r_lessons.*')
                 ->addSelect(DB::raw('COUNT( DISTINCT purchased_lessons.id) as totalPurchares'))
                 ->addSelect(DB::raw('COUNT( DISTINCT purchased_lessons.id) * purchased_lessons.price  as totalRevenue'))
@@ -120,7 +124,6 @@ class PreRLessonRepository extends BaseRepository
                 ->groupBy('pre_r_lessons.id')
                 ->where('pre_r_lessons.instructor_id', $instructor_id)
                 ->orderBy(DB::raw('COUNT(`purchased_lessons`.`id`)'), 'desc');
-
             return $query;
         })->with(['files']);
 

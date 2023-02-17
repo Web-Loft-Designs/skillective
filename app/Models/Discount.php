@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
-use Log;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Discount extends Model
 {
@@ -27,11 +27,19 @@ class Discount extends Model
 
     protected $table = 'discounts';
 
+    /**
+     * @return BelongsTo
+     */
     public function instructor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'instructor_id');
+        return $this->belongsTo(User::class, 'instructor_id');
     }
 
+    /**
+     * @param $discounts
+     * @param $cart
+     * @return mixed
+     */
     static function validateDiscount($discounts, $cart){
         if($discounts){
             foreach($discounts as $key => $discount){

@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use File;
-use Image;
-use Log;
 use App\Jobs\LoadInstagramMediaJob;
 use Prettus\Repository\Contracts\Transformable;
+use Illuminate\Support\Facades\File;
+use Intervention\Image\Facades\Image;
 
 class Profile extends Model implements Transformable
 {
@@ -41,13 +42,11 @@ class Profile extends Model implements Transformable
         'lng',
         'lesson_block_min_price', // for instructors
         'virtual_min_price',
-//		'instagram_followers_count'
     ];
 
+
     /**
-     * The attributes that should be casted to native types.
-     *
-     * @var array
+     * @var string[]
      */
     protected $casts = [
         'id' => 'integer',
@@ -85,15 +84,19 @@ class Profile extends Model implements Transformable
 		parent::__construct($attributes);
 	}
 
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
+     * @return BelongsTo
+     */
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-	public function transform()
+    /**
+     * @return array
+     */
+    public function transform()
 	{
 		return [
 			'id' => $this->id,
@@ -109,7 +112,6 @@ class Profile extends Model implements Transformable
 			'about_me' => $this->about_me,
 			'image' => $this->getImageUrl(),
 			'notification_methods' => $this->notification_methods,
-//			'instagram_followers_count' => $this->instagram_followers_count,
 			'gender' => $this->gender,
 			'max_allowed_instructor_invites' => $this->max_allowed_instructor_invites,
             'lat' => $this->lat,
@@ -119,15 +121,20 @@ class Profile extends Model implements Transformable
 		];
 	}
 
-	public static function getAvailableNotificationMethods(){
+    /**
+     * @return string[]
+     */
+    public static function getAvailableNotificationMethods(){
 		return [
 			'email'		=> 'Email',
 			'sms'		=> 'Text Message',
-//			'whatsapp'	=> 'WhatsApp'
 		];
 	}
 
-	public function getFullAddress(){
+    /**
+     * @return string
+     */
+    public function getFullAddress(){
 		$fullAddress = trim(
 			str_replace('  ', ' ', implode(' ', [$this->address, $this->city, $this->state, $this->zip])),
 			' '
@@ -135,22 +142,38 @@ class Profile extends Model implements Transformable
 		return $fullAddress;
 	}
 
-	public function getImageUrl(){
-		if ($this->avatar)
-			return config('app.url') . '/storage/' . self::IMAGES_PATH . $this->id . '/' . $this->avatar;
-		else
-			return config('app.url') . Setting::getValue('default_profile_image');
+    /**
+     * @return string
+     */
+    public function getImageUrl(){
+
+      //TODO  test 'https://skillective.com'
+        if(config('app.env') == 'local') {
+            if ($this->avatar) {
+                return 'https://skillective.com' . '/storage/' . self::IMAGES_PATH . $this->id . '/' . $this->avatar;
+            } else {
+                return 'https://skillective.com' . Setting::getValue('default_profile_image');
+            }
+        } else {
+            if ($this->avatar) {
+                return config('app.url') . '/storage/' . self::IMAGES_PATH . $this->id . '/' . $this->avatar;
+            } else {
+                return config('app.url') . Setting::getValue('default_profile_image');
+            }
+        }
 	}
 
-	public function downloadImageFromUrl($url){
+    /**
+     * @param $url
+     * @return mixed
+     */
+    public function downloadImageFromUrl($url){
 		$this->deleteOldImage();
 
 		$destination = storage_path('app/public/' . self::IMAGES_PATH .$this->id.'/');
 		if (! is_file($destination)) {
 			File::makeDirectory($destination, 0775, true, true);
 		}
-//		Log::info('downloadImageFromUrl = ' . $url);
-//		$contents = file_get_contents($url);
 		$path_parts	= pathinfo(strtok($url, '?'));
 		$baseName	= $path_parts['basename'];
 		$ext		= isset($path_parts['extension']) ? $path_parts['extension'] : 'jpg';
@@ -162,7 +185,6 @@ class Profile extends Model implements Transformable
 			$baseName = $fileName . '-'.$index . '.' . $ext;
 			$index++;
 		}
-
 		$img = Image::make($url);
 		$img->resize(200, 200, function ($constraint) {
 			$constraint->aspectRatio();
@@ -171,13 +193,16 @@ class Profile extends Model implements Transformable
 		$img->stream();
 
 		Storage::disk('public')->put(self::IMAGES_PATH.$this->id.'/'.$baseName, $img);
-
 		$this->update(['avatar'=>$baseName]);
 
 		return $fileName;
 	}
 
-	public function updateProfileImage($profile_image){
+    /**
+     * @param $profile_image
+     * @return string
+     */
+    public function updateProfileImage($profile_image){
 		$filename = 'profile-image.'.$profile_image->getClientOriginalExtension();
 		$save_path = storage_path('app/public/' . self::IMAGES_PATH .$this->id.'/');
 		$public_path = self::IMAGES_PATH.$this->id.'/'.$filename;
@@ -205,7 +230,10 @@ class Profile extends Model implements Transformable
 		return $this->getImageUrl();
 	}
 
-	public function deleteOldImage(){
+    /**
+     * @return bool
+     */
+    public function deleteOldImage(){
 		$destination = storage_path('app/public/' . self::IMAGES_PATH .$this->id.'/');
 		// remove the old image
 		if ($this->avatar!= '' && File::exists($destination.$this->avatar)) {
@@ -216,41 +244,65 @@ class Profile extends Model implements Transformable
 		return false;
 	}
 
-	public function updateProfileWithInstagramData($instagramUserObject){
+    /**
+     * @param $instagramUserObject
+     * @return void
+     */
+    public function updateProfileWithInstagramData($instagramUserObject){
 		$this->instagram_handle			= $instagramUserObject->user['username'];
-//		$this->instagram_followers_count	= $instagramUserObject->user['counts']['followed_by'];
 		$this->instagram_token			= $instagramUserObject->token;
 		$this->save();
-
 
 		if ($this->user->hasRole(User::ROLE_INSTRUCTOR)){
 			LoadInstagramMediaJob::dispatch( $this->user_id )->delay(now()->addSecond());
 		}
 
-//		$this->downloadImageFromUrl($instagramUserObject->avatar);
 	}
 
-	public function updateProfileWithFacebookData($facebookUserObject){
+    /**
+     * @param $facebookUserObject
+     * @return void
+     */
+    public function updateProfileWithFacebookData($facebookUserObject){
 		$this->downloadImageFromUrl($facebookUserObject->avatar);
 	}
 
-	public function setMobilePhoneAttribute($val){
+    /**
+     * @param $val
+     * @return void
+     */
+    public function setMobilePhoneAttribute($val){
 		$this->attributes['mobile_phone'] = preg_replace('/[\.\+\s\(\)]/', '', $val);
 	}
 
-	public function getInstagramHandleAttribute($val){
+    /**
+     * @param $val
+     * @return string
+     */
+    public function getInstagramHandleAttribute($val){
 		return trim($val, '@');
 	}
 
-	public function getGoalValueAttribute($val){
+    /**
+     * @param $val
+     * @return int
+     */
+    public function getGoalValueAttribute($val){
 		return $val==null ? 0 : $val;
 	}
 
-	public function getGoalColorAttribute($val){
+    /**
+     * @param $val
+     * @return string
+     */
+    public function getGoalColorAttribute($val){
 		return $val==null ? '#AAAAAA' : $val;
 	}
 
-	public function getGoal(){
+    /**
+     * @return array
+     */
+    public function getGoal(){
 		return [
 			'goal_value' => $this->goal_value,
 			'goal_description' => $this->goal_description,
@@ -258,6 +310,10 @@ class Profile extends Model implements Transformable
 		];
 	}
 
+    /**
+     * @param array $options
+     * @return bool|void
+     */
     public function save(array $options = [])
     {
 		$locationDetails = getLocationDetails( "{$this->city}, {$this->state}" );

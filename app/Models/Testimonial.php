@@ -3,14 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
+use Spatie\Image\Exceptions\InvalidManipulation;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-
-class Testimonial extends Model implements HasMedia //, Transformable
+class Testimonial extends Model implements HasMedia
 {
     use InteractsWithMedia;
     /**
@@ -34,7 +35,12 @@ class Testimonial extends Model implements HasMedia //, Transformable
 	];
 
 
-	public function registerMediaConversions(Media $media = null): void
+    /**
+     * @param Media|null $media
+     * @return void
+     * @throws InvalidManipulation
+     */
+    public function registerMediaConversions(Media $media = null): void
 	{
 		$this->addMediaConversion('circle_image')
 			 ->fit(Manipulations::FIT_CROP, 40, 40)
@@ -42,10 +48,14 @@ class Testimonial extends Model implements HasMedia //, Transformable
 			 ->performOnCollections('testimonial');
 	}
 
-	public function uploadImage($requestImage)
+    /**
+     * @param $requestImage
+     * @return bool
+     */
+    public function uploadImage($requestImage)
 	{
 		try{
-			if ($requestImage instanceof \Illuminate\Http\UploadedFile) {
+			if ($requestImage instanceof UploadedFile) {
 				$this->addMedia( $requestImage )->toMediaCollection( 'testimonial' );
 				return true;
 			}
@@ -56,7 +66,10 @@ class Testimonial extends Model implements HasMedia //, Transformable
 		return false;
 	}
 
-	public function getImageUrl(){
+    /**
+     * @return null
+     */
+    public function getImageUrl(){
 		$testimonialImage = $this->media()
         ->whereIn('collection_name', ['testimonial'])
         ->orderBy('order_column', 'DESC')
@@ -67,6 +80,11 @@ class Testimonial extends Model implements HasMedia //, Transformable
 		return null;
 	}
 
+    /**
+     * @param $filter
+     * @param $per_page
+     * @return mixed
+     */
     public static function getList($filter = array(), $per_page = -1){
         $list = self::orderBy('created_at', 'DESC');
 

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
 
 class FaqCategory extends Model implements Transformable
@@ -55,7 +55,7 @@ class FaqCategory extends Model implements Transformable
 	 **/
 	public function faqs()
 	{
-		return $this->hasMany(\App\Models\Faq::class);
+		return $this->hasMany(Faq::class);
 	}
 
 	public static function boot() {

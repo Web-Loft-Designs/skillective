@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Prettus\Repository\Contracts\Transformable;
 
 class PreRLessonFile extends Model implements Transformable
@@ -18,14 +19,19 @@ class PreRLessonFile extends Model implements Transformable
         'name'
     ];
 
-
     public $table = 'pre_r_lesson_files';
-    
+
+    /**
+     * @return BelongsTo
+     */
     public function preRecordedLesson()
     {
-        return $this->belongsTo('App\Models\PreRecordedLesson');
+        return $this->belongsTo(PreRecordedLesson::class);
     }
 
+    /**
+     * @return array
+     */
     public function transform()
 	{
 		return [
@@ -34,16 +40,17 @@ class PreRLessonFile extends Model implements Transformable
 		];
 	}
 
-    // public function toArray()
-	// {
-	// 	return [
-	// 		'title' => $this->name,
-	// 		'url' => $this->getFileUrl()
-	// 	];
-	// }
-
+    /**
+     * @return string
+     */
     public function getFileUrl()
     {
-        return config('app.url') . '/storage/' . 'videos/' . $this->preRecordedLesson->instructor_id . '/' . $this->name;
+     //TODO   test 'https://skillective.com'
+        if(config('app.env') == 'local') {
+            return 'https://skillective.com' . '/storage/' . 'videos/' . $this->preRecordedLesson->instructor_id . '/' . $this->name;
+        }else {
+            return config('app.url') . '/storage/' . 'videos/' . $this->preRecordedLesson->instructor_id . '/' . $this->name;
+        }
+
     }
 }

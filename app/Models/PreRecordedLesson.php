@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
-use Auth;
+use Illuminate\Database\Eloquent\Model;
 use App\Facades\BraintreeProcessor;
-use Log;
-use App\Models\PurchasedLesson;
-use App\Models\Setting;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 
 class PreRecordedLesson extends Model
 {
@@ -27,32 +28,59 @@ class PreRecordedLesson extends Model
 
     protected $table = 'pre_r_lessons';
 
+    /**
+     * @return BelongsTo
+     */
     public function genre()
     {
-        return $this->belongsTo(\App\Models\Genre::class, 'genre_id');
+        return $this->belongsTo(Genre::class, 'genre_id');
     }
 
+    /**
+     * @return BelongsTo
+     */
     public function instructor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'instructor_id');
+        return $this->belongsTo(User::class, 'instructor_id');
     }
 
+    /**
+     * @return HasMany
+     */
     public function files()
     {
-        return $this->hasMany(\App\Models\PreRLessonFile::class, 'pre_r_lesson_id', 'id');
+        return $this->hasMany(PreRLessonFile::class, 'pre_r_lesson_id', 'id');
     }
 
+    /**
+     * @return string
+     */
     public function getPreviewUrl()
-    {
-        return config('app.url') . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->preview;
+    {// TODO test 'https://skillective.com'
+        if(config('app.env') == 'local') {
+            return 'https://skillective.com' . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->preview;
+        } else {
+            return config('app.url') . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->preview;
+        }
+
     }
 
+    /**
+     * @return string
+     */
     public function getVideoUrl()
-    {
-        //return 'https://skillective.blob.core.windows.net/public/' . $this->video;
-        return config('app.url') . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->video;
+    {// TODO test 'https://skillective.com'
+        if(config('app.env') == 'local') {
+            return 'https://skillective.com' . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->video;
+        } else {
+            return config('app.url') . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->video;
+        }
     }
 
+    /**
+     * @param $price
+     * @return string
+     */
     public function getPreRecordedLessonServiceFeeAmount($price = null)
     {
         if ($price == null)
@@ -68,6 +96,11 @@ class PreRecordedLesson extends Model
         return number_format((float)$serviceFee, 2, '.', '');
     }
 
+    /**
+     * @param $price
+     * @param $serviceFees
+     * @return string
+     */
     public function getPreRecordedLessonPaymentProcessingFeeAmount($price = null, $serviceFees = 0)
     {
         if ($price == null)
@@ -81,9 +114,16 @@ class PreRecordedLesson extends Model
         return number_format((float)$processorFee, 2, '.', '');
     }
 
+    /**
+     * @param $user_repository
+     * @param $request
+     * @param $paymentMethodNonce
+     * @param $student
+     * @return PurchasedLesson
+     * @throws \Exception
+     */
     public function purchareLesson($user_repository, $request, $paymentMethodNonce, $student)
     {
-
 		if(Auth::user() != null){
 			$user_repository->updateUserData(Auth::user()->id, $request);
 		}
@@ -114,7 +154,6 @@ class PreRecordedLesson extends Model
         $purchashedLesson->status            = PurchasedLesson::STATUS_PENDING;
         $purchashedLesson->payment_method_token    = $paymentMethod['token'];
         $purchashedLesson->payment_method_type    = $paymentMethod['type'];
-
         $service_fee = $this->getPreRecordedLessonServiceFeeAmount($this->price);
         $purchashedLesson->service_fee = $service_fee;
         $purchashedLesson->processor_fee = $this->getPreRecordedLessonPaymentProcessingFeeAmount($this->price, $service_fee);

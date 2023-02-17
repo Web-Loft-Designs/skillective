@@ -3,12 +3,14 @@
 namespace App\Repositories;
 
 use App\Models\FaqCategory;
-
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use App\Criteria\FaqCategorySearchCriteria;
-use Cookie;
-use DB;
+use Prettus\Repository\Exceptions\RepositoryException;
 
 class FaqCategoryRepository extends BaseRepository
 {
@@ -19,9 +21,10 @@ class FaqCategoryRepository extends BaseRepository
         'title'
     ];
 
+
     /**
-     * Configure the Model
-     **/
+     * @return string
+     */
     public function model()
     {
         return FaqCategory::class;
@@ -32,15 +35,27 @@ class FaqCategoryRepository extends BaseRepository
 	 */
 	protected $skipPresenter = true;
 
-	public function presenter() {
+    /**
+     * @return string
+     */
+    public function presenter() {
 		return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
 	}
 
-	public function presentResponse($data){
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function presentResponse($data){
 		return $this->presenter->present($data);
 	}
 
-	public function getFaqCategories(Request $request){
+    /**
+     * @param Request $request
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
+    public function getFaqCategories(Request $request){
 		$this->resetCriteria();
 		$this->pushCriteria(new LimitOffsetCriteria($request));
 

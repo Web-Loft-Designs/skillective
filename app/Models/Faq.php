@@ -69,7 +69,7 @@ class Faq extends Model implements HasMedia , Transformable
 
 	public function category()
 	{
-		return $this->belongsTo(\App\Models\FaqCategory::class, 'faq_category_id');
+		return $this->belongsTo(FaqCategory::class, 'faq_category_id');
 	}
 
 	public function getAttachment(){

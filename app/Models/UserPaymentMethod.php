@@ -2,10 +2,8 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
-use App\Models\User;
-use Auth;
-use Log;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserPaymentMethod extends Model
 {
@@ -34,11 +32,12 @@ class UserPaymentMethod extends Model
 		'created_at', 'updated_at'
 	];
 
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
+     * @return BelongsTo
+     */
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
