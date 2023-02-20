@@ -23,11 +23,10 @@ class PageController extends Controller
 
 
     /**
-     * @param Request $request
      * @param FaqRepository $faqRepository
      * @return Application|Factory|View|never
      */
-    public function index(Request $request, FaqRepository $faqRepository)
+    public function index(FaqRepository $faqRepository)
     {
         $page = getCurrentPage();
         if (!$page){

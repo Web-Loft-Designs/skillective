@@ -4,18 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Facades\TwilioVideo;
 use Braintree\MerchantAccount;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use App\Models\Lesson;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class VirtualLessonPageController extends Controller
 {
+
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Lesson $lesson
+     * @param Request $request
+     * @return Application|Factory|View
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function index(Lesson $lesson, Request $request)
     {

@@ -5,20 +5,31 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Repositories\GenreRepository;
 use App\Repositories\InvitationRepository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Cookie;
+use Prettus\Repository\Exceptions\RepositoryException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Session;
-use Log;
-use Cookie;
 use App\Models\Setting;
 
 class InstructorRegisterController extends Controller
 {
-	/**
-	 * Show the application registration form.
-	 *
-	 * @return \Illuminate\Http\Response
-	 */
-	public function showRegistrationForm(Request $request, GenreRepository $genreRepository, InvitationRepository $invitationRepository)
+
+    /**
+     * @param Request $request
+     * @param GenreRepository $genreRepository
+     * @param InvitationRepository $invitationRepository
+     * @return Application|Factory|View|never
+     * @throws RepositoryException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function showRegistrationForm(Request $request, GenreRepository $genreRepository, InvitationRepository $invitationRepository)
 	{
 		session()->forget('invitation');
 		$initialFormData = [];
@@ -75,7 +86,10 @@ class InstructorRegisterController extends Controller
 		return view('auth.instructor-register', $vars);
 	}
 
-	public function showSuccessPage()
+    /**
+     * @return Application|Factory|View|RedirectResponse|Redirector
+     */
+    public function showSuccessPage()
 	{
 		if (Cookie::has('instructorRegistered'))
 			return view('auth.instructor-register-success');

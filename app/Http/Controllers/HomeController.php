@@ -2,16 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cart;
 use App\Repositories\LessonRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\GenreRepository;
 use App\Repositories\TestimonialRepository;
-use Illuminate\Support\Arr;
-use Auth;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
+use Prettus\Repository\Exceptions\RepositoryException;
+
 
 class HomeController extends AppBaseController
 {
+    /**
+     * @param GenreRepository $genreRepository
+     * @param TestimonialRepository $testimonialRepository
+     * @param LessonRepository $lessonRepository
+     * @param UserRepository $userRepository
+     * @return Application|Factory|View
+     * @throws RepositoryException
+     */
     public function index(GenreRepository $genreRepository, TestimonialRepository $testimonialRepository, LessonRepository $lessonRepository, UserRepository $userRepository)
     {
 		$userIpLocation = '';

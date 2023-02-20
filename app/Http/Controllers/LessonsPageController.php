@@ -2,25 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use App\Http\Requests\LessonsFilterRequest;
 use App\Repositories\GenreRepository;
 use App\Repositories\LessonRepository;
-use Log;
-use Cookie;
+use Illuminate\Support\Facades\Log;
+
 
 class LessonsPageController extends Controller
 {
+
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param LessonsFilterRequest $request
+     * @param LessonRepository $lessonRepository
+     * @param GenreRepository $genreRepository
+     * @return Application|Factory|View
      */
     public function index(LessonsFilterRequest $request, LessonRepository $lessonRepository, GenreRepository $genreRepository)
     {
 		try{
 			$lessonRepository->setPresenter("App\\Presenters\\LessonInListPresenter");
-//                	dd($lessonRepository->presentResponse($lessonRepository->getFilteredAvailableLessons($request)));
 			updateSearchReports($request);
 
 			$lessons = $lessonRepository->presentResponse($lessonRepository->getFilteredAvailableLessons($request));
@@ -43,7 +47,7 @@ class LessonsPageController extends Controller
 		$location = $request->get('location', '');
 		if ($location){
 			$locationDetails = getLocationDetails($location);
-			dd($locationDetails);
+			dd($locationDetails); // TODO шо за нах?
 
 //			return (
 //				array_search(null, $locationDetails)==false

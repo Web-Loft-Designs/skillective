@@ -41,12 +41,11 @@ class ProfileController extends Controller
 
 
     /**
-     * @param Request $request
      * @param User $user
      * @return Application|Factory|View|never
      * @throws RepositoryException
      */
-    public function show(Request $request, User $user)
+    public function show(User $user)
     {
         if( !$user->id ) {
             $user = Auth::user();
@@ -123,12 +122,12 @@ class ProfileController extends Controller
         return view("frontend.{$template}.profile", $vars);
     }
 
+
     /**
-     * @param Request $request
      * @param User|null $user
      * @return Application|Factory|View|never
      */
-    public function edit(Request $request, User $user = null)
+    public function edit(User $user = null)
 	{
 		$isAdmin = false;
 		if (!Auth::user()->hasRole(User::ROLE_ADMIN)){

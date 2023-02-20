@@ -3,13 +3,28 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Prettus\Repository\Exceptions\RepositoryException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repositories\GenreRepository;
 use App\Repositories\InvitationRepository;
 
 class StudentRegisterController extends Controller
 {
-	public function showRegistrationForm(Request $request , GenreRepository $genreRepository, InvitationRepository $invitationRepository)
+    /**
+     * @param Request $request
+     * @param GenreRepository $genreRepository
+     * @param InvitationRepository $invitationRepository
+     * @return Application|Factory|View|never
+     * @throws RepositoryException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function showRegistrationForm(Request $request , GenreRepository $genreRepository, InvitationRepository $invitationRepository)
 	{
 		$initialFormData = [];
 		$vars = [];
@@ -39,7 +54,5 @@ class StudentRegisterController extends Controller
 		$vars['featuredGenres'] = $genreRepository->presentResponse($genreRepository->getFeatured())['data'];
 
 		return view('auth.student-register', $vars);
-
-//		return view('auth.student-register', ['registration_via_instagram_url' => Socialite::driver('instagram')->with(['redirect_uri' => route('social.instagram.student.registration')])->redirect()->getTargetUrl()]);
 	}
 }

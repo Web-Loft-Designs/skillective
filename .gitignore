@@ -34,3 +34,10 @@ package.json
 /public/css/app-front.css
 /public/js/app.js
 /public/js/app.js.LICENSE.txt
+/public/storage/genres/*
+/public/storage/lessons/*
+/public/storage/media/*
+/public/storage/profiles/*
+/public/storage/testimonials/*
+/public/storage/users/*
+/public/storage/videos/*

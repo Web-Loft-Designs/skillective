@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
-use Session;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use App\Repositories\GenreRepository;
-use App\Repositories\UserRepository;
+
 
 class InstructorGalleryController extends Controller
 {
+
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param GenreRepository $genreRepository
+     * @return Application|Factory|View
      */
     public function index(GenreRepository $genreRepository)
     {

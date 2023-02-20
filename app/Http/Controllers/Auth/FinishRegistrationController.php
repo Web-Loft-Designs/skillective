@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
 use App\Http\Controllers\Controller;
-use Flash;
+use Laracasts\Flash\Flash;
 
 class FinishRegistrationController extends Controller
 {
+
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param UserRepository $userRepository
+     * @param Request $request
+     * @return Application|Factory|View
      */
     public function index(UserRepository $userRepository, Request $request)
     {

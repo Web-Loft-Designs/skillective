@@ -9,15 +9,19 @@ use App\Models\Lesson;
 use App\Models\User;
 use App\Facades\BraintreeProcessor;
 use Braintree\MerchantAccount;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class LessonPageController extends Controller
 {
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Lesson $lesson
+     * @param GenreRepository $genreRepository
+     * @param UserRepository $userRepository
+     * @return Application|Factory|View
      */
     public function index(Lesson $lesson, GenreRepository $genreRepository, UserRepository $userRepository)
     {
@@ -36,9 +40,7 @@ class LessonPageController extends Controller
 			abort(404, 'Lesson not found');
 		}
 
-
 		$userData = null;
-		$userPaymentMethods = [];
 		$user = Auth::user();
     	if ($user){
 			$userData = $userRepository->getUserData(Auth::user()->id);
@@ -64,7 +66,14 @@ class LessonPageController extends Controller
         return view('frontend.lesson', $vars);
     }
 
-	public function venmoTest(Lesson $lesson, LessonRepository $lessonRepository, GenreRepository $genreRepository, UserRepository $userRepository)
+    /**
+     * @param Lesson $lesson
+     * @param LessonRepository $lessonRepository
+     * @param GenreRepository $genreRepository
+     * @param UserRepository $userRepository
+     * @return Application|Factory|View
+     */
+    public function venmoTest(Lesson $lesson, LessonRepository $lessonRepository, GenreRepository $genreRepository, UserRepository $userRepository)
 	{
 		Log::debug('venmoTest');
 		if ($lesson->is_cancelled){

@@ -5,30 +5,32 @@ namespace App\Http\Controllers;
 use App\Repositories\CartRepository;
 use App\Repositories\GenreRepository;
 use App\Repositories\UserRepository;
-use Auth;
 use App\Facades\BraintreeProcessor;
 use App\Models\User;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 
 
 class StudentCheckoutController extends Controller
 {
+
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param CartRepository $cartRepository
+     * @param GenreRepository $genreRepository
+     * @param UserRepository $userRepository
+     * @return Application|Factory|View
      */
     public function index(CartRepository $cartRepository, GenreRepository $genreRepository, UserRepository $userRepository)
     {
-
         $userData = null;
-        $userPaymentMethods = [];
         $user = Auth::user();
         if ($user) {
             $userData = $userRepository->getUserData(Auth::user()->id);
             $userData = $userRepository->presentResponse($userData)['data'];
             $userData['genres'] = Auth::user()->genres()->pluck('id')->toArray();
         }
-
 
         $total = $cartRepository->getCartSummary();
         $lessonsInACart = $cartRepository->getLessonsCountInCart();
