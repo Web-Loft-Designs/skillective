@@ -41,3 +41,4 @@ package.json
 /public/storage/testimonials/*
 /public/storage/users/*
 /public/storage/videos/*
+/database/seeds/TestSeeder.php

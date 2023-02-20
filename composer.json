@@ -62,7 +62,8 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/"
+            "App\\": "app/",
+            "Tylercd100\\Placeholders\\":"src/packages/laravel-placeholders-master/src"
         },
         "classmap": [
             "database/seeds",

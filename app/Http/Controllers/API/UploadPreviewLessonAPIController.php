@@ -11,26 +11,29 @@ use Illuminate\Support\Facades\Request;
 
 class UploadPreviewLessonAPIController extends AppBaseController
 {
+
     /**
-     * @param Request $request
-     * @return JsonResponse|never|void
+     * @return JsonResponse|int|void
      */
-    public function uploadPreview(Request $request)
+    public function uploadPreview()
     {
         if(Request::hasFile('preview')){
-            $user = Auth::user();
-            if (!$user)
-                return abort(404);
+            if (Auth::check()) {
+                $user = Auth::user();
+                $file = Request::file('preview');
+                $filename = md5(uniqid(rand(), true)) . '.' . $file->getClientOriginalExtension();
+                $save_path = storage_path('app/public/lessons/'.$user->id.'/');
+                File::makeDirectory($save_path, 0775, true, true);
+                $file->move($save_path, $filename);
 
-            $file = Request::file('preview');
+                return $this->sendResponse(config('app.url') . '/storage/' . 'lessons/' . $user->id . '/' . $filename);
+            } else {
+                return back()
+                    ->withInput()
+                    ->withErrors('unauthorized')
+                    ->status(422);
+            }
 
-            $filename = md5(uniqid(rand(), true)) . '.' . $file->getClientOriginalExtension();
-            $save_path = storage_path('app/public/lessons/'.$user->id.'/');
-
-            File::makeDirectory($save_path, 0775, true, true);
-            $file->move($save_path, $filename);
-
-            return $this->sendResponse(config('app.url') . '/storage/' . 'lessons/' . $user->id . '/' . $filename);
         }
     }
 }

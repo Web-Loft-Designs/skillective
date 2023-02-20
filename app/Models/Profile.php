@@ -148,19 +148,19 @@ class Profile extends Model implements Transformable
     public function getImageUrl(){
 
       //TODO  test 'https://skillective.com'
-        if(config('app.env') == 'local') {
-            if ($this->avatar) {
-                return 'https://skillective.com' . '/storage/' . self::IMAGES_PATH . $this->id . '/' . $this->avatar;
-            } else {
-                return 'https://skillective.com' . Setting::getValue('default_profile_image');
-            }
-        } else {
+//        if(config('app.env') == 'local') {
+//            if ($this->avatar) {
+//                return 'https://skillective.com' . '/storage/' . self::IMAGES_PATH . $this->id . '/' . $this->avatar;
+//            } else {
+//                return 'https://skillective.com' . Setting::getValue('default_profile_image');
+//            }
+//        } else {
             if ($this->avatar) {
                 return config('app.url') . '/storage/' . self::IMAGES_PATH . $this->id . '/' . $this->avatar;
             } else {
                 return config('app.url') . Setting::getValue('default_profile_image');
             }
-        }
+//        }
 	}
 
     /**
