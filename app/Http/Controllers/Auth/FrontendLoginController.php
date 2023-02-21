@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\AppBaseController;
+use App\Repositories\CartRepository;
 use Illuminate\Http\Request;
 use Auth;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -24,6 +25,8 @@ class FrontendLoginController extends AppBaseController
 
     use AuthenticatesUsers;
 
+    private $cartRepository;
+
     /**
      * Where to redirect users after login.
      *
@@ -36,9 +39,10 @@ class FrontendLoginController extends AppBaseController
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(cartRepository $cartRepo)
     {
         $this->middleware('guest')->except('logout');
+        $this->cartRepository = $cartRepo;
 
         parent::__construct();
     }
@@ -101,6 +105,7 @@ class FrontendLoginController extends AppBaseController
             }
             if ($this->attemptLogin($request)) {
                 $this->redirectTo = $request->filled('redirect') ? $request->input('redirect') : $this->redirectTo();
+                $this->cartRepository->storeGuestCart($request, false);
                 return response()->json([
                     'redirect'  => $this->redirectTo,
                     'message'   => 'You have successfully logged in'
