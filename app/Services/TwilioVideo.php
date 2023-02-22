@@ -2,13 +2,15 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Twilio\Exceptions\TwilioException;
 use Twilio\Jwt\AccessToken;
 use Twilio\Jwt\Grants\VideoGrant;
 use Twilio\Rest\Client;
-use App\Models\Booking;
 use App\Models\Lesson;
-use Auth;
 use Carbon\Carbon;
+use Twilio\Rest\Video\V1\RoomInstance;
 
 class TwilioVideo
 {
@@ -24,6 +26,9 @@ class TwilioVideo
         $this->client = new Client($this->twilio_account_sid, $this->twilio_account_token);
     }
 
+    /**
+     * @return array|RoomInstance
+     */
     public function getRooms()
     {
         $rooms = [];
@@ -36,6 +41,10 @@ class TwilioVideo
         return $rooms;
     }
 
+    /**
+     * @param $lesson
+     * @return \stdClass|null
+     */
     public function getRoom($lesson)
     {
         $roomName = $this->getRoomNameForLesson($lesson);
@@ -69,6 +78,11 @@ class TwilioVideo
         }
     }
 
+    /**
+     * @param $lesson
+     * @return RoomInstance
+     * @throws TwilioException
+     */
     public function createRoom($lesson)
     {
         $roomName = $this->getRoomNameForLesson($lesson);
@@ -95,6 +109,12 @@ class TwilioVideo
         ]);
     }
 
+    /**
+     * @param $identity
+     * @param $roomName
+     * @param $lifetime
+     * @return string
+     */
     public function getAccessToken($identity, $roomName, $lifetime = 3600){
         // Create an Access Token
         $token = new AccessToken(
@@ -114,17 +134,26 @@ class TwilioVideo
         return $token->toJWT();
     }
 
+    /**
+     * @param $room
+     * @return bool
+     */
     public function completeRoom($room){
         try {
             $this->client->video->v1->rooms($room->sid)
                 ->update("completed");
             return true;
         }catch(\Exception $e){
-            \Log::error('Can\'t complete room : ' . $e->getCode() . " : " . $e->getMessage());
+            Log::error('Can\'t complete room : ' . $e->getCode() . " : " . $e->getMessage());
             return false;
         }
     }
 
+    /**
+     * @param $room
+     * @param $identity
+     * @return bool
+     */
     public function disconnectParticipant($room, $identity){
         try {
             $roomParticipants = $this->client->video->v1->rooms($room->sid)->participants->read(array("status" => "connected"));
@@ -134,23 +163,40 @@ class TwilioVideo
             }
             return true;
         }catch(\Exception $e){
-            \Log::error('Can\'t disconnect participant : ' . $e->getCode() . " : " . $e->getMessage());
+            Log::error('Can\'t disconnect participant : ' . $e->getCode() . " : " . $e->getMessage());
             return false;
         }
     }
 
+    /**
+     * @param $lesson
+     * @return string
+     */
     public function getRoomNameForLesson($lesson){
         return 'Lesson ' . $lesson->id;
     }
 
+    /**
+     * @param $user
+     * @return string
+     */
     public function getInstructorParticipantIdentity($user){
         return 'Instructor: ' . $user->first_name . ' ' . $user->last_name;
     }
 
+    /**
+     * @param $user
+     * @return string
+     */
     public function getStudentParticipantIdentity($user){
         return 'Client #' . $user->id. ':' . $user->first_name . ' ' . $user->last_name;
     }
 
+    /**
+     * @param $token
+     * @param $lesson
+     * @return array
+     */
     public function getRoomSettings($token, $lesson)
     {
         $participantsDetails = [
@@ -168,17 +214,6 @@ class TwilioVideo
                 ];
         });
 
-//        $lesson->bookings()
-//            ->whereNotIn('bookings.status', [Booking::STATUS_CANCELLED, Booking::STATUS_PENDING])
-//            ->with(['student'])->get()->each(function($booking) use (&$participantsDetails){
-//                $participantsDetails[] = [
-//                    'image' => $booking->student->profile->getImageUrl(),
-//                    'disconnected' => $booking->disconnected,
-//                    'identity' => $this->getStudentParticipantIdentity($booking->student)
-//                ];
-//        });
-
-
         return [
             'token'                     => $token,
             'roomName'                  => $this->getRoomNameForLesson($lesson),
@@ -190,9 +225,14 @@ class TwilioVideo
         ];
     }
 
+    /**
+     * @param $start
+     * @param $end
+     * @param $timezone_id
+     * @return bool
+     */
     public function isValidTimeForLessonStart($start, $end, $timezone_id)
     {
-        // Valid when ~: (lesson_start - 5 min) <= $timeAtLessonTimezone < lesson_end + 1 min
 
         $timeAtLessonTimezone = Carbon::now();// UTC
         $timeAtLessonTimezone->setTimezone($timezone_id);
@@ -202,8 +242,6 @@ class TwilioVideo
 
         $withExtraTimeFromLessonEndAtLessonTimezone = Carbon::createFromFormat('Y-m-d H:i:s', $end, $timezone_id);
         $withExtraTimeFromLessonEndAtLessonTimezone->addMinutes(Lesson::VIRTUAL_LESSON_EXTRA_TIME_AFTER_END);
-
-//        dd($timeAtLessonTimezone->format('Y-m-d H:i:s'), $withExtraTimeFromLessonStartAtLessonTimezone->format('Y-m-d H:i:s'), $withExtraTimeFromLessonEndAtLessonTimezone->format('Y-m-d H:i:s'));
 
         return $withExtraTimeFromLessonStartAtLessonTimezone->lessThanOrEqualTo($timeAtLessonTimezone) && $withExtraTimeFromLessonEndAtLessonTimezone->greaterThanOrEqualTo($timeAtLessonTimezone);
 

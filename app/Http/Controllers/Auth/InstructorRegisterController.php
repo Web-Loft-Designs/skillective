@@ -82,7 +82,6 @@ class InstructorRegisterController extends Controller
 		$vars['categorizedGenres'] = $genreRepository->getCategorizedGenres();
 		$vars['featuredGenres'] = $genreRepository->presentResponse($genreRepository->getFeatured())['data'];
 
-
 		return view('auth.instructor-register', $vars);
 	}
 

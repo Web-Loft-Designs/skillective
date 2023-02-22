@@ -1,19 +1,18 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: oleghalin
- * Date: 16/11/2018
- * Time: 10:36
- */
 
 namespace App\Services;
 
-use App\CustomNotification;
-use App\CustomNotificationMethod;
-use Illuminate\Notifications\Notification;
+
+use App\Models\CustomNotification;
+use App\Models\CustomNotificationMethod;
 
 class CustomNotificationService
 {
+    /**
+     * @param CustomNotification $notification
+     * @param array $data
+     * @return void
+     */
     public function update(CustomNotification $notification, array $data)
     {
         if ($data['sms']['checked']) {

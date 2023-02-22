@@ -1,20 +1,21 @@
 <?php
 namespace App\Services;
 
-use DB;
-use Log;
 use App\Repositories\BookingRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\LessonRepository;
 use App\Repositories\InvitationRepository;
 use App\Repositories\GenreRepository;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Prettus\Repository\Exceptions\RepositoryException;
+use Spatie\Analytics\Analytics;
+use Spatie\Analytics\Exceptions\InvalidPeriod;
 use Spatie\Permission\Models\Role;
 use App\Models\Booking;
 use App\Models\Lesson;
 use App\Models\User;
 use App\Models\Setting;
-use Analytics;
 use Spatie\Analytics\Period;
 
 class ReportsBuilder {
@@ -38,10 +39,7 @@ class ReportsBuilder {
 	 */
 	private $invitation_repository = null;
 
-	/*
-	 * @var GenreRepository $genre_repository
-	 */
-	private $genre_repository = null;
+
 
 
 	public function __construct(BookingRepository $booking_repository, UserRepository $user_repository, LessonRepository $lesson_repository, InvitationRepository $invitation_repository, GenreRepository $genre_repository)
@@ -53,7 +51,10 @@ class ReportsBuilder {
 		$this->genre_repository = $genre_repository;
 	}
 
-	public function getDemographicReportData(){
+    /**
+     * @return array
+     */
+    public function getDemographicReportData(){
 		$data = [
 			'< 20' => ['count' => 0 , 'percent' => 0],
 			'21 - 30' => ['count' => 0 , 'percent' => 0],
@@ -105,7 +106,10 @@ class ReportsBuilder {
 		return $return;
 	}
 
-	public function getGeographicReportData(){
+    /**
+     * @return array
+     */
+    public function getGeographicReportData(){
 		$states = getStatesAssociativeArray();
 		$data = [];
 		$countAll = 0;
@@ -141,7 +145,11 @@ class ReportsBuilder {
 		return array_values($data);
 	}
 
-	public function getOtherReportsData(){
+    /**
+     * @return array
+     * @throws RepositoryException
+     */
+    public function getOtherReportsData(){
 		$data = [
 			['paramName' => '% of transactions not completed', 'value' => $this->getNotCompletedTransactionsPercent()],
 			['paramName' => 'Search Queries by Genre', 'value' => $this->getCountSearchQueriesByGenre()],
@@ -149,7 +157,6 @@ class ReportsBuilder {
 			['paramName' => 'Lessons Cancelled %', 'value' => $this->getCountCancelledLessons()],
 			['paramName' => 'Active Instructors', 'value' => $this->getCountActiveInstructors()],
 			['paramName' => 'Active Client', 'value' => $this->getCountActiveClients()],
-//			['paramName' => 'Active Users', 'value' => $this->getCountActiveUsers()],
 			['paramName' => 'Instructors invited / month', 'value' => $this->getAverageInvitedInstructors()],
 			['paramName' => 'Clients added / month', 'value' => $this->getAverageNewStudents()],
 			['paramName' => 'Genre Analysis', 'value' => ''], // Number of lessons for each genre & % of the total lessons
@@ -162,12 +169,14 @@ class ReportsBuilder {
 				'value' => $totalLessons>0 ? number_format($lessonData->count_lessons / $totalLessons * 100, 1) : 0
 			];
 		});
-//		$genres = $this->genre_repository->getSiteGenres()->each(function($genre))
-
 		return $data;
 	}
 
-	public function getOverview($selectedPeriod = null){
+    /**
+     * @param $selectedPeriod
+     * @return array
+     */
+    public function getOverview($selectedPeriod = null){
 		if ($selectedPeriod==null)
 			$selectedPeriod = '-30 days';
 
@@ -243,7 +252,12 @@ class ReportsBuilder {
 		return $widgetData;
 	}
 
-	public function getCountLessonsInPeriod($periodStart, $periodEnd){
+    /**
+     * @param $periodStart
+     * @param $periodEnd
+     * @return int
+     */
+    public function getCountLessonsInPeriod($periodStart, $periodEnd){
 		$nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
 		return DB::table('lessons')
 		  ->whereRaw(" ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) ")
@@ -252,7 +266,13 @@ class ReportsBuilder {
 		  ->count();
 	}
 
-	public function getCountNewUsersInPeriod($periodStart, $periodEnd, $roleId){
+    /**
+     * @param $periodStart
+     * @param $periodEnd
+     * @param $roleId
+     * @return int
+     */
+    public function getCountNewUsersInPeriod($periodStart, $periodEnd, $roleId){
 		return DB::table('users')
 			->leftJoin("model_has_roles", 'users.id', '=', "model_has_roles.model_id")
 			->where('model_has_roles.role_id', '=', $roleId)
@@ -261,7 +281,12 @@ class ReportsBuilder {
 			 ->count();
 	}
 
-	public function getPaymentsAmountInPeriod($periodStart, $periodEnd){
+    /**
+     * @param $periodStart
+     * @param $periodEnd
+     * @return int|mixed
+     */
+    public function getPaymentsAmountInPeriod($periodStart, $periodEnd){
 		return DB::table('bookings')
 				 ->whereNotNull('bookings.transaction_id')
 				 ->whereNotIn('bookings.status', [Booking::STATUS_CANCELLED, Booking::STATUS_PENDING])
@@ -269,8 +294,13 @@ class ReportsBuilder {
 				 ->sum(DB::raw('bookings.spot_price - bookings.service_fee - bookings.processor_fee - bookings.virtual_fee'));
 	}
 
-	public function getCountVisitsInPeriod($periodStart, $periodEnd){
-//		$analyticsData = Analytics::fetchVisitorsAndPageViews(Period::days(7));
+    /**
+     * @param $periodStart
+     * @param $periodEnd
+     * @return int
+     * @throws InvalidPeriod
+     */
+    public function getCountVisitsInPeriod($periodStart, $periodEnd){
 		$periodStart = new \DateTime($periodStart);
 		$periodEnd = new \DateTime($periodEnd);
 
@@ -284,35 +314,51 @@ class ReportsBuilder {
 		return $countUsers;
 	}
 
-	public function getNotCompletedTransactionsPercent(){
+    /**
+     * @return int|string
+     */
+    public function getNotCompletedTransactionsPercent(){
 		$countBookingFormViews = Setting::getValue('report_count_payment_form_views', 0, false);
 		$countBookings = Booking::count();
 
 		return $countBookingFormViews>0 ? number_format((100 - $countBookings / $countBookingFormViews * 100), 2) : 0;
 	}
 
-	public function getCountSearchQueriesByGenre(){
+    /**
+     * @return string
+     */
+    public function getCountSearchQueriesByGenre(){
 		$countSearchesByGenre = Setting::getValue('report_count_searches_by_genre', 0, false);
 		$totalSearches = Setting::getValue('report_total_searches', 0, false);
 
 		return "{$countSearchesByGenre} / " . ($totalSearches>0 ? number_format(($countSearchesByGenre / $totalSearches * 100), 2) : 0) . '%';
 	}
 
-	public function getCountSearchQueriesByLocation(){
+    /**
+     * @return string
+     */
+    public function getCountSearchQueriesByLocation(){
 		$countSearchesByLocation = Setting::getValue('report_count_searches_by_location', 0, false);
 		$totalSearches = Setting::getValue('report_total_searches', 0, false);
 
 		return "{$countSearchesByLocation} / " . ($totalSearches>0 ? number_format(($countSearchesByLocation / $totalSearches * 100), 2) : 0) . '%';
 	}
 
-	public function getCountCancelledLessons(){
+    /**
+     * @return int|string
+     */
+    public function getCountCancelledLessons(){
 		$countAllLessons = Lesson::count();
 		$countCancelledLessons = Lesson::where('is_cancelled', 1)->count();
 
 		return $countAllLessons>0 ? number_format(($countCancelledLessons / $countAllLessons * 100), 2) : 0;
 	}
 
-	public function getCountActiveInstructors(){
+    /**
+     * @return string
+     * @throws RepositoryException
+     */
+    public function getCountActiveInstructors(){
 
 		$instructorRoleId = Role::findByName(User::ROLE_INSTRUCTOR)->id;
 		$countAllInstructors = DB::table('model_has_roles')
@@ -325,7 +371,10 @@ class ReportsBuilder {
 		return $countAllInstructors>0 ? "$countInstructorsHavingNotFinishedLessons / " . number_format(($countInstructorsHavingNotFinishedLessons / $countAllInstructors * 100), 2) . '%' : '0 / 0';
 	}
 
-	public function getCountActiveClients(){
+    /**
+     * @return string
+     */
+    public function getCountActiveClients(){
 		$studentRoleId = Role::findByName(User::ROLE_STUDENT)->id;
 		$countAllStudents = DB::table('model_has_roles')
 								 ->where('model_has_roles.role_id', '=', $studentRoleId)
@@ -337,7 +386,11 @@ class ReportsBuilder {
 		return $countAllStudents>0 ? "$countActiveStudents / " . number_format(($countActiveStudents / $countAllStudents * 100), 2) . '%' : '0 / 0';
 	}
 
-	public function getCountActiveUsers(){
+    /**
+     * @return int|mixed
+     * @throws RepositoryException
+     */
+    public function getCountActiveUsers(){
 
 		$countActiveStudents = $this->booking_repository->getCountActiveStudents();
 		$countActiveInstructors = $this->lesson_repository->countActiveInstructors();//$this->lesson_repository->countInstructorsOfFutureLessons();
@@ -345,11 +398,17 @@ class ReportsBuilder {
 		return $countActiveStudents + $countActiveInstructors;
 	}
 
-	public function getAverageInvitedInstructors(){
+    /**
+     * @return string
+     */
+    public function getAverageInvitedInstructors(){
 		return $this->invitation_repository->getAverageInvitedInstructors();
 	}
 
-	public function getAverageNewStudents(){
+    /**
+     * @return string
+     */
+    public function getAverageNewStudents(){
 		return $this->user_repository->getAverageNewStudents();
 	}
 }

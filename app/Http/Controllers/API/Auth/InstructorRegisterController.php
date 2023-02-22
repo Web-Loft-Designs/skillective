@@ -55,10 +55,8 @@ class InstructorRegisterController extends AppBaseController
 				'invitation' => $invitation->invitation_token
 			]);
 		} else {
-			if (
-				$request->filled('invitation')
-				&& ($invitation = $invitationRepository->findUserInvitation($request->input('invitation'))) == null
-			) {
+			if ($request->filled('invitation') &&
+                ($invitation = $invitationRepository->findUserInvitation($request->input('invitation'))) == null) {
 				Flash::error('Invitation does not exist')->important();
 				return ['redirect' => route('home')];
 			}
@@ -78,7 +76,12 @@ class InstructorRegisterController extends AppBaseController
 		session()->forget('submittedInstructor');
 		session()->push('submittedInstructor', $request->all());
 
-		return ['redirect' => Socialite::driver($request->provider)->with(['redirect_uri' => route('social.instructor.registration', ['provider' => $request->provider])])->redirect()->getTargetUrl()];
+		return [
+            'redirect' => Socialite::driver($request->provider)
+                ->with(['redirect_uri' => route('social.instructor.registration', ['provider' => $request->provider])])
+                ->redirect()
+                ->getTargetUrl()
+        ];
 	}
 
 }

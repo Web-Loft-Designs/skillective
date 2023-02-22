@@ -45,12 +45,6 @@ class PreRLessonFile extends Model implements Transformable
      */
     public function getFileUrl()
     {
-     //TODO   test 'https://skillective.com'
-//        if(config('app.env') == 'local') {
-//            return 'https://skillective.com' . '/storage/' . 'videos/' . $this->preRecordedLesson->instructor_id . '/' . $this->name;
-//        }else {
-            return config('app.url') . '/storage/' . 'videos/' . $this->preRecordedLesson->instructor_id . '/' . $this->name;
-//        }
-
+        return config('app.url') . '/storage/' . 'videos/' . $this->preRecordedLesson->instructor_id . '/' . $this->name;
     }
 }

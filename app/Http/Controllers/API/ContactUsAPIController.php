@@ -33,18 +33,16 @@ class ContactUsAPIController extends AppBaseController
      */
     public function becomeInstructor(BecomeAnInstructorRequest $request)
     {
-        $email = $request->input('email');
-        $name = $request->input('fullName');
+        $data = $request->validated();
         $user = User::create([
-            'first_name' => $name,
-            'email' => $email,
+            'first_name' => $data['fullName'],
+            'email' =>  $data['email'],
         ]);
         $administrators = $this->userRepository->getAdministrators();
         foreach ($administrators as $administrator)
         {
-            $administrator->notify(new GuestBecomeInstructor($email));
+            $administrator->notify(new GuestBecomeInstructor($user->email));
         }
-        //$user->notify(new GuestBecomeInstructor($email));
         $this->sendResponse('ok');
     }
 

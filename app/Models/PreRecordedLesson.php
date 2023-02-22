@@ -57,25 +57,15 @@ class PreRecordedLesson extends Model
      */
     public function getPreviewUrl()
     {
-        // TODO test 'https://skillective.com'
-//        if(config('app.env') == 'local') {
-//            return 'https://skillective.com' . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->preview;
-//        } else {
-            return config('app.url') . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->preview;
-//        }
-
+        return config('app.url') . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->preview;
     }
 
     /**
      * @return string
      */
     public function getVideoUrl()
-    {// TODO test 'https://skillective.com'
-        if(config('app.env') == 'local') {
-            return 'https://skillective.com' . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->video;
-        } else {
-            return config('app.url') . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->video;
-        }
+    {
+        return config('app.url') . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->video;
     }
 
     /**

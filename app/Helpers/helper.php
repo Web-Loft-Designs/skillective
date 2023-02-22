@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
 

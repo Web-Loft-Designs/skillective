@@ -16,14 +16,11 @@ use Laracasts\Flash\Flash;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
 use App\Repositories\SocialRepository;
-use App\Repositories\UserRepository;
-use App\Repositories\ProfileRepository;
 use App\Http\Requests\InstructorRegisterRequest;
 use App\Http\Requests\API\StudentRegisterRequest;
 use App\Facades\UserRegistrator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Symfony\Component\Console\Input\Input;
 use Symfony\Component\HttpFoundation\Request;
 use App\Http\Controllers\AppBaseController;
 use Faker;
@@ -67,7 +64,7 @@ class SocialController extends AppBaseController
      */
     public function getSocialHandle($provider, Request $request)
     {
-        if (Input::get('denied') != '') {
+        if ($request->get('denied') != '') {
 			Flash::error('You did not share your profile data with our social app.')->important();
             return redirect()->route('frontend.login');
         }
@@ -113,7 +110,6 @@ class SocialController extends AppBaseController
 						Flash::error('No such user. Register first to login and attach your '.$this->getProviderDisplayName($provider).' profile to your account on site.')->important();
 						return redirect(route('frontend.login'))->send();
 					}
-//				}
             }
         }catch (InvalidStateException $e){
 			Flash::error('Try again please')->important();
@@ -131,8 +127,8 @@ class SocialController extends AppBaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function getSocialInstructorRegistration($provider, Request $request, InvitationRepository $invitationRepository) {
-
+    public function getSocialInstructorRegistration($provider, Request $request, InvitationRepository $invitationRepository)
+    {
 		$redirectRoute = route('instructor.register');
 		if (session()->has('invitation')){
 			$invitation = session()->get('invitation');
@@ -146,7 +142,7 @@ class SocialController extends AppBaseController
 			return redirect($redirectRoute);
 		}
 
-		if (Input::get('denied') != '') {
+		if ($request->get('denied') != '') {
 			Flash::error('You did not share your profile data with our social app.')->important();
 			return redirect($redirectRoute);
 		}
@@ -229,7 +225,7 @@ class SocialController extends AppBaseController
 
 		$redirectRoute = route('instructor.gallery');
 
-		if (Input::get('denied') != '') {
+		if ($request->get('denied') != '') {
 			Flash::error('You did not share your profile data with our social app.')->important();
 			return redirect($redirectRoute);
 		}
@@ -252,7 +248,7 @@ class SocialController extends AppBaseController
     public function getSocialInstagramStudentRegistration(Request $request) {
 		$provider = $this->defaultProvider;
 		$route = session()->has('current_page') ? session()->get('current_page') : route('home'); // route('student.register')
-		if (Input::get('denied') != '') {
+		if ($request->get('denied') != '') {
 			Flash::error('You did not share your profile data with our social app.')->important();
 			return redirect($route);
 		}

@@ -1,48 +1,26 @@
 <?php
 
-//declare(strict_types=1);
-
 namespace App\Services;
 
-use Http\Client\HttpClient;
-use Http\Discovery\HttpClientDiscovery;
-use Http\Discovery\MessageFactoryDiscovery;
+
 use GuzzleHttp\Client as GuzzleHttpClient;
+use GuzzleHttp\Exception\GuzzleException;
 use Http\Message\RequestFactory;
-use Log;
+use Illuminate\Support\Facades\Log;
+
 
 class InstagramLoader
 {
-    /**
-     * The http client.
-     *
-     * @var \Http\Client\HttpClient
-     */
-    protected $httpClient;
-
-    /**
-     * The http request factory.
-     *
-     * @var \Http\Message\RequestFactory
-     */
     protected $requestFactory;
 
-    /**
-     * Create a new instagram instance.
-     *
-     * @param \Http\Client\HttpClient|null $httpClient
-     * @param \Http\Message\RequestFactory|null $requestFactory
-     *
-     * @return void
-     */
-    public function __construct(HttpClient $httpClient = null, RequestFactory $requestFactory = null)
+    public function __construct( RequestFactory $requestFactory = null)
     {
-        $this->httpClient = $httpClient ?: HttpClientDiscovery::find();
         $this->requestFactory = $requestFactory ?: new GuzzleHttpClient;
     }
 
     /**
-     * Fetch the media items.
+     * @param string $accessToken
+     * @param string $instagramHandle
      * @return array
      */
     public function getOwnRecentMediaUrls(string $accessToken, string $instagramHandle): array
@@ -84,17 +62,17 @@ class InstagramLoader
 		}catch (\Exception $e){
 			Log::error('Can\'t load user media list from IG:' . $e->getMessage());
 		}
-//dd($mediaList, $ownMedia);
         return $ownMedia;
     }
 
-    private function _makeRequest($url){
-
+    /**
+     * @param $url
+     * @return mixed
+     * @throws GuzzleException
+     */
+    private function _makeRequest($url)
+    {
 		$response = $this->requestFactory->request( 'GET', $url);
-
-//		$request = $this->requestFactory->createRequest('GET', $url);
-//
-//		$response = $this->httpClient->sendRequest($request);
 
 		if ($response->getStatusCode() === 400) {
 			$body = json_decode((string) $response->getBody());

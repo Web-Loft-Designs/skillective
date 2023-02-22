@@ -2,8 +2,7 @@
 
 namespace App\Transformers;
 
-use App\Transformers\UsersInListTransformer;
-use League\Fractal\TransformerAbstract;
+
 use App\Models\User;
 
 /**

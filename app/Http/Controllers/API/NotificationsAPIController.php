@@ -29,9 +29,14 @@ class NotificationsAPIController extends AppBaseController
      */
     public function notify(NotifyAPIRequest $request)
     {
+        // TODO Баг коли notif  відправляє інструктор все норм якщо студент то ошибка звязана з невірним
+        //  форматом масива  $request->input('users') потрібно щоб фронт пофіксили.
 		$usersToNotify = $this->userRepository->findWhereIn('id', $request->input('users'));
-		if ($usersToNotify->count()==0)
-			return $this->sendError('No users to notify', 400);
+
+		if ($usersToNotify->count()==0) {
+            return $this->sendError('No users to notify', 400);
+        }
+
     	$message = $request->input('message');
 		$use_methods = array_keys(Profile::getAvailableNotificationMethods());
 		$sender = Auth::user();
