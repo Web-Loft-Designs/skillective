@@ -175,7 +175,6 @@ class UserRegistrator {
 				'zip'				=> isset($data['zip'])?$data['zip']:'',
 				'mobile_phone'		=> isset($data['mobile_phone'])?$data['mobile_phone']:'',
 				'about_me'			=> isset($data['about_me'])?$data['about_me']:'',
-				'gender'			=> isset($data['gender'])?$data['gender']:'',
 				'instagram_handle'	=> isset($data['instagram_handle'])?$data['instagram_handle']:'',
                 'notification_methods' => isset($data['sms_notification'])?$notification:'',
 			] );

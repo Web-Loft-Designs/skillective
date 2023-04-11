@@ -39,7 +39,6 @@ class StudentRegisterRequest extends FormRequest
 			'genres.*'			=> [Rule::in( $availableGenresIds )],
 			'email'				=> ['required', 'string', 'email', 'max:255', 'unique:users'],
 			'mobile_phone'		=> getMobilePhoneValidationRules(),
-			'gender'			=> ['required', Rule::in( getGenders() )],
 			'accept_terms'		=> ['accepted']
 			];
     }
