@@ -25,7 +25,6 @@ class GlobalShopController extends Controller
         $lessons = $preRLessonRepository->getPreRLessons($request);
         $preRLessonRepository->setPresenter("App\\Presenters\\PreRLessonInListPresenter");
         $lessons = $preRLessonRepository->presentResponse($lessons);
-
         $vars = [
             'page_title'    => 'Shop for Lessons and Tutorials',
             'siteGenres' => $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
