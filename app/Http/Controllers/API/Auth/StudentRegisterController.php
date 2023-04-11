@@ -39,11 +39,12 @@ class StudentRegisterController extends AppBaseController
      * @param InvitationRepository $invitationRepository
      * @return JsonResponse
      */
-    public function register(StudentRegisterRequest $request, InvitationRepository $invitationRepository) {
+    public function register(StudentRegisterRequest $request, InvitationRepository $invitationRepository)
+    {
 
 		$invitation = null;
-		if ( $request->filled( 'invitation' )
-			 && ( $invitation = $invitationRepository->findUserInvitation($request->input( 'invitation' )) ) == null
+		if ( $request->filled( 'invitation' ) &&
+            ( $invitation = $invitationRepository->findUserInvitation($request->input( 'invitation' )) ) == null
 		) {
 			return $this->sendError("Invitation not found");
 		}

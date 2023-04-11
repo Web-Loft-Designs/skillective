@@ -13,7 +13,6 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Str;
 
 
-
 class UserRegistrator {
     /**
      * @param InstructorRegisterRequest $request
@@ -169,13 +168,10 @@ class UserRegistrator {
             $notification[] = 'email';
             if( array_key_exists('sms_notification', $data) ) $notification[] = 'sms';
 
-            if( isset($data['dob']) && $data['dob'] === 'Invalid date' ) $data['dob'] = null;
-
 			$profile = new Profile( [
 				'address'			=> isset($data['address'])?$data['address']:'',
 				'city'				=> isset($data['city'])?$data['city']:'',
 				'state'				=> isset($data['state'])?$data['state']:'',
-				'dob'				=> isset($data['dob'])?$data['dob']:null,
 				'zip'				=> isset($data['zip'])?$data['zip']:'',
 				'mobile_phone'		=> isset($data['mobile_phone'])?$data['mobile_phone']:'',
 				'about_me'			=> isset($data['about_me'])?$data['about_me']:'',
