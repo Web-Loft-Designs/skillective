@@ -6,6 +6,7 @@
         instructors & influencers you Love!
       </h1>
     </div>
+    <global-shop-home/>
     <featured-instructors/>
     <become-an-instructor/>
   </div>
@@ -14,12 +15,22 @@
 <script>
 import BecomeAnInstructor from '../BecomeAnInstructor/BecomeAnInstructor.vue'
 import FeaturedInstructors from '../FeaturedInstructors/FeaturedInstructors.vue'
+import GlobalShopHome from '../GlobalShopHome/GlobalShopHome'
 
 export default {
   name: 'Home',
   components: {
     BecomeAnInstructor,
-    FeaturedInstructors
+    FeaturedInstructors,
+    GlobalShopHome
+  },
+  props: {
+    preloadedLessons: {
+      type: Array,
+      default: () => {
+        return []
+      },
+    },
   }
 }
 </script>
