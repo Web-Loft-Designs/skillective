@@ -9,7 +9,7 @@ use App\Repositories\GenreRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Prettus\Repository\Exceptions\RepositoryException;
-use Spatie\Analytics\Analytics;
+use Spatie\Analytics\AnalyticsFacade as Analytics;
 use Spatie\Analytics\Exceptions\InvalidPeriod;
 use Spatie\Permission\Models\Role;
 use App\Models\Booking;
@@ -305,6 +305,7 @@ class ReportsBuilder {
 		$periodEnd = new \DateTime($periodEnd);
 
 		$period = new Period($periodStart, $periodEnd);
+
 		$response = Analytics::performQuery(
 			$period,
 			'ga:users'
