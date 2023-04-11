@@ -229,6 +229,26 @@ function getAboutMeValidationRules()
 	return ['sometimes', 'string', "max_words:300"];
 }
 
+
+function transforInputPhoneNumber($mobilePhone)
+{
+    // Видаляємо всі нецифрові символи з номера телефону
+    $phoneDigits = preg_replace('/\D/', '', $mobilePhone);
+
+    // Перевіряємо, чи містить номер телефону код країни, якщо ні - додаємо +1 на початок
+    if (substr($phoneDigits, 0, 1) !== '1') {
+        $phoneDigits = '1' . $phoneDigits;
+    }
+
+    // Виконуємо перетворення номера телефону на формат зі знаком "+" та 11 цифрами без пробілів та знаків
+    return '+' . $phoneDigits;
+}
+
+function getMobilePhoneWithoutCountryCodeVerificationRules()
+{
+    return ['required', 'regex:/^\(\d{3}\)\s\d{3}\s\d{4}$/'];
+}
+
 function getMobilePhoneValidationRules()
 {
 	return ['required', 'regex:/^((\+1)|(\+37))\s\([0-9]{3}\)\s[0-9]{3}\s[0-9]{4}$/'];
