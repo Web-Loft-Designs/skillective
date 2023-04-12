@@ -161,7 +161,6 @@ export default {
     },
     scrollUp: function () {
       let calendarApi = this.$refs.fullCalendar.getApi();
-
       let currentTimeHour = calendarApi.scrollTime.split(":")[0];
 
       if (currentTimeHour == "00") {
@@ -359,7 +358,6 @@ export default {
       calendarApi.gotoDate(info.start);
     },
     dateClick: function (info) {
-      console.log(info)
       let calendarApi = this.$refs.fullCalendar.getApi()
       if(info.view.type === 'timeGridWeek' || info.view.type === 'timeGridDay') {
         this.selectedEvent = {
