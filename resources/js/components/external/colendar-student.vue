@@ -20,7 +20,7 @@
           right: 'next',
         }"
         :footer="{
-          right: 'timeGridWeek,dayGridMonth',
+          right: 'timeGridWeek,dayGridMonth'
         }"
         :defaultView="'dayGridMonth'"
         :navLinks="true"
