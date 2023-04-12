@@ -63,10 +63,7 @@
         :firstDay='0'
         :fixedWeekCount='false'
         :footer="{
-          right: 'today,timeGridWeek,dayGridMonth',
-        }"
-        :buttonText="{
-          today: 'Day'
+          right: 'timeGridWeek,dayGridMonth',
         }"
         :header="{
           left: 'prev',

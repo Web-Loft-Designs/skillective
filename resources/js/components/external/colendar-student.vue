@@ -19,10 +19,7 @@
           right: 'next',
         }"
         :footer="{
-          right: 'today,timeGridWeek,dayGridMonth'
-        }"
-        :buttonText="{
-          today: 'Day'
+          right: 'timeGridWeek,dayGridMonth'
         }"
         :defaultView="'dayGridMonth'"
         :navLinks="true"
