@@ -165,12 +165,6 @@
             v-if="this.pagination.total>5"
         >View all</a>
     </div>
-    <a
-      :href="'/student/bookings?type=' + showOnly"
-      class='btn btn-block btn-secondary'
-      v-if='this.pagination.total>5'
-    >View all</a>
-  </div>
 </template>
 
 <script>
