@@ -218,6 +218,7 @@ export default {
 
         calendarApi.scrollToTime("08:00:00");
       } else if (info.view.type === "timeGridDay") {
+        this.injectUpDownButtons();
         this.triggerView = "day";
       } else {
         this.removeUpDownButtons()
@@ -237,7 +238,7 @@ export default {
         this.triggerOld = moment(info.view.currentStart).format("YYYY-MM-DD");
       }
 
-      if (this.trigger) {
+      if (this.trigger && info.view.type !== 'timeGridDay') {
         this.trigger = false;
         if (this.loader == null) {
           this.loader = this.$loading.show({
@@ -389,10 +390,13 @@ export default {
           content: info.event.extendedProps,
         }
       } else if (info.view.type === 'dayGridMonth') {
-        // let time = moment(info.event.start).format('HH:mm:ss')
         calendarApi.changeView('timeGridDay',moment(info.event.start).format('YYYY-MM-DD'))
-        // calendarApi.scrollToTime(time)
-        // this.$refs.fullCalendar.changeView('timeGridWeek')
+        calendarApi.scrollTime = moment(this.events[0].start).format(
+          "HH:mm:ss"
+        );
+        calendarApi.scrollToTime(
+          moment(this.events[0].start).format("HH:mm:ss")
+        );
       }
     },
     closeModal: function () {

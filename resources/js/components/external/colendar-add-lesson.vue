@@ -363,6 +363,7 @@ export default {
 
         calendarApi.scrollToTime('08:00:00')
       } else if (info.view.type === 'timeGridDay') {
+        this.injectUpDownButtons()
         this.triggerView = 'day'
       } else {
         this.triggerView = 'month'
@@ -383,7 +384,7 @@ export default {
         this.triggerOld = moment(info.view.currentStart).format('YYYY-MM-DD')
       }
 
-      if (this.trigger) {
+      if (this.trigger && info.view.type !== 'timeGridDay') {
         this.getLessonsByTriggerView(info)
       }
     },
@@ -463,6 +464,7 @@ export default {
           this.events = this.events.filter(function (item) {
             return moment().diff(item.end) <= 0
           })
+
 
           if (this.triggerView == 'week' || this.triggerView == 'day') {
             this.injectUpDownButtons()
@@ -594,6 +596,12 @@ export default {
         })
       }else if (info.view.type === 'dayGridMonth') {
         calendarApi.changeView('timeGridDay',moment(info.event.start).format('YYYY-MM-DD'))
+        calendarApi.scrollTime = moment(this.events[0].start).format(
+          "HH:mm:ss"
+        );
+        calendarApi.scrollToTime(
+          moment(this.events[0].start).format("HH:mm:ss")
+        );
       }
 
     },
