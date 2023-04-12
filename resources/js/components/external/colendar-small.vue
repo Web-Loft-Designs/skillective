@@ -149,6 +149,11 @@ export default {
       })
     }
   },
+  computed: {
+    heightCalendar() {
+      return this.$refs?.fullCalendarSmall.$el.offsetHeight
+    }
+  },
   methods: {
     clearFormAndClosePopup() {
     },
@@ -302,6 +307,11 @@ export default {
     eventRender: function (info) {
       if (moment(info.event.start, 'x') <= moment(new Date(), 'x')) {
         info.el.className = info.el.className + ' last-event'
+      }
+      if (this.heightCalendar > 500) {
+        info.el.className = info.el.className + ' big-event'
+      } else {
+        info.el.className = info.el.className + ' small-event'
       }
       info.el.className = info.el.className + ' test-circle'
       // let count =

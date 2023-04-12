@@ -192,6 +192,7 @@ import siteAPI from '../../mixins/siteAPI.js'
 import moment from 'moment-timezone'
 import countriesAndTimezones from 'countries-and-timezones'
 import { mapMutations } from 'vuex'
+import urlHelper from '../../helpers/urlHelper'
 
 var FileSaver = require('file-saver')
 
@@ -231,6 +232,11 @@ export default {
     this.$root.$on('createdLessons', () => {
       this.getLessonsByTriggerView()
     })
+  },
+  computed: {
+    heightCalendar() {
+      return this.$refs?.fullCalendar.$el.offsetHeight
+    }
   },
   methods: {
     ...mapMutations(['SET_SELECTED_DATES']),
@@ -325,7 +331,7 @@ export default {
     },
     injectUpDownButtons() {
       setTimeout(() => {
-        const cont = document.querySelector('.fc-view-container')
+        const cont = document.querySelector('.fc-body')
 
         const buttonUp = document.createElement('button')
         buttonUp.classList.add('fc-button--arrow')
@@ -468,7 +474,6 @@ export default {
           calendarApi.scrollToTime(
             moment(this.events[1].start).format("HH:mm:ss")
           );
-          console.log(this.events)
           this.loader.hide()
           this.loader = null
         })
@@ -481,6 +486,11 @@ export default {
     eventRender: function (info) {
       if (moment(info.event.start, 'x') <= moment(new Date(), 'x')) {
         info.el.className = info.el.className + ' last-event'
+      }
+      if (this.heightCalendar > 500) {
+        info.el.className = info.el.className + ' big-event'
+      } else {
+        info.el.className = info.el.className + ' small-event'
       }
       info.el.className = info.el.className + ' test-circle'
       var count =
@@ -635,8 +645,15 @@ export default {
   }
 }
 </script>
-<style>
+<style lang='scss'>
 .fc-day-grid-event {
   cursor: pointer;
+}
+.big-event {
+  height: 82px !important;
+}
+
+.small-event {
+  height: 45px !important;
 }
 </style>

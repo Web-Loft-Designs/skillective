@@ -122,6 +122,11 @@ export default {
       selectedEvent: null,
     };
   },
+  computed: {
+    heightCalendar() {
+      return this.$refs?.fullCalendar.$el.offsetHeight
+    }
+  },
   methods: {
     selectAllow: function (selectInfo) {
       return moment().diff(selectInfo.start) <= 0;
@@ -330,6 +335,11 @@ export default {
       if (moment(info.event.start, "x") <= moment(new Date(), "x")) {
         info.el.className = info.el.className + " last-event";
       }
+      if (this.heightCalendar > 500) {
+        info.el.className = info.el.className + ' big-event'
+      } else {
+        info.el.className = info.el.className + ' small-event'
+      }
       info.el.className = info.el.className + ' test-circle';
       var count =
         parseInt(info.event.extendedProps.spots_count) -
@@ -407,6 +417,5 @@ export default {
   background-color: transparent !important;
   border: 1px solid #8ada00 !important;
   width: 70% !important;
-  height: 45px !important;
 }
 </style>
