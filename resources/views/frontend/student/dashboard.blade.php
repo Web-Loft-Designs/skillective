@@ -79,13 +79,14 @@
                     </div>
                 </div>
 
-                <div class="col-12">
+<!--                 <div class="col-12">
                     <div class="dashboard-gallery">
-                        <h2 class="page-title">Gallery</h2>
+                        <h2 class="page-title">Gallery123123</h2>
                         <dashboard-media-gallery v-bind:user-media="{{ json_encode($userMedia) }}" v-bind:instagram-media-queue="{{ isset($loadingInstagramProfileImagesInQueue)?'true':'false' }}"></dashboard-media-gallery>
                         <a href="{{ route('student.gallery') }}" class="btn btn-secondary btn-block">View Gallery</a>
                     </div>
                 </div>
+-->
 
                 <div class="col-12">
                     <div class="table-page">
