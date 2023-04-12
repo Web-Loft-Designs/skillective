@@ -1,30 +1,30 @@
 <template>
-    <div class="bookings-table">
-        <div class="bookings-table-header">
-            <h2>
-                Bookings
-                <span class="filter-table">
+  <div class='bookings-table'>
+    <div class='bookings-table-header'>
+      <h2>
+        Bookings
+        <span class='pl-4 filter-table'>
           <a
-              href="#"
-              @click.prevent="toggleShowOnly('current')"
-              :class="{'active':(showOnly=='current')}"
+            href='#'
+            @click.prevent="toggleShowOnly('current')"
+            :class="{'active':(showOnly=='current')}"
           >Current</a>
           <a
-              href="#"
-              @click.prevent="toggleShowOnly('past')"
-              :class="{'active':(showOnly=='past')}"
+            href='#'
+            @click.prevent="toggleShowOnly('past')"
+            :class="{'active':(showOnly=='past')}"
           >Past</a>
           <a
-              href="#"
-              @click.prevent="toggleShowOnly('cancelled')"
-              :class="{'active':(showOnly=='cancelled')}"
+            href='#'
+            @click.prevent="toggleShowOnly('cancelled')"
+            :class="{'active':(showOnly=='cancelled')}"
           >Cancelled</a>
         </span>
-            </h2>
-        </div>
+      </h2>
+    </div>
 
-        <div v-if="errorText" class="has-error">{{ errorText }}</div>
-        <div v-if="successText" class="has-success">{{ successText }}</div>
+    <div v-if='errorText' class='has-error'>{{ errorText }}</div>
+    <div v-if='successText' class='has-success'>{{ successText }}</div>
 
         <div class="table-responsive">
             <table class="table">
@@ -165,102 +165,108 @@
             v-if="this.pagination.total>5"
         >View all</a>
     </div>
+    <a
+      :href="'/student/bookings?type=' + showOnly"
+      class='btn btn-block btn-secondary'
+      v-if='this.pagination.total>5'
+    >View all</a>
+  </div>
 </template>
 
 <script>
-import siteAPI from "../mixins/siteAPI.js";
-import skillectiveHelper from "../mixins/skillectiveHelper.js";
-import { mapActions, mapMutations } from 'vuex';
+import siteAPI from '../mixins/siteAPI.js'
+import skillectiveHelper from '../mixins/skillectiveHelper.js'
+import { mapActions, mapMutations } from 'vuex'
 
 export default {
-    mixins: [siteAPI, skillectiveHelper],
-    props: {
-        bookings: null,
-        bookingsMeta: {}
-    },
-    data() {
-        return {
-            showOnly: "current",
-            pagination: {
-                total: 0
-            },
-            listLoaded: true
-        };
-    },
-    methods: {
-        ...mapActions(['addItemToCartAtStart']),
-        addToCart: async function(lessonId) {
-            await this.addItemToCartAtStart({
-                lessonId,
-                specialRequest: this.specialRequestText || "",
-            });
-            this.$root.$emit("showMiniCart");
-        },
-        getBookings() {
-            this.listLoaded = false;
-            let queryParams = {};
-
-            queryParams.type = this.showOnly;
-            queryParams.limit = 5;
-
-            let getUrl = "/api/student/bookings"
-
-            this.apiGet(getUrl, {
-                params: queryParams
-            });
-        },
-        notifyInstructor(client) {
-            this.$root.$emit("initNotificationsForm", [client]);
-        },
-        requestCancelBooking(booking) {
-            this.apiDelete("/api/student/booking/" + booking.id);
-        },
-        componentHandleDeleteResponse(responseData) {
-            this.getBookings();
-        },
-        componentHandlePostResponse(responseData) {
-            this.getBookings();
-        },
-        componentHandleGetResponse(responseData) {
-            this.listItems = responseData.data.data;
-            if (
-                responseData.data.meta != undefined &&
-                responseData.data.meta.pagination != undefined
-            ) {
-                this.pagination.total = responseData.data.meta.pagination.total;
-            }
-            this.listLoaded = true;
-        },
-        isPastLesson(lessonStart) {
-            return moment(lessonStart).isBefore();
-        },
-        toggleShowOnly(type) {
-            this.showOnly = type;
-            this.getBookings();
-        },
-        viewLessonRequest(lessonRequest) {
-            this.$root.$emit("lessonRequestUpdateInit", lessonRequest);
-        }
-    },
-    created: function() {
-        this.listItems = this.bookings;
-        if (
-            this.bookingsMeta != undefined &&
-            this.bookingsMeta.pagination != undefined
-        ) {
-            this.pagination.total = this.bookingsMeta.pagination.total;
-        }
-    },
-    mounted() {
-        this.$root.$on("lessonRequestUpdated", id => {
-            for (var i = 0; i < this.listItems.length; i++) {
-                if (this.listItems[i].id == id) {
-                    this.listItems.splice(i, 1);
-                }
-            }
-        });
+  mixins: [siteAPI, skillectiveHelper],
+  props: {
+    bookings: null,
+    bookingsMeta: {}
+  },
+  data() {
+    return {
+      showOnly: 'current',
+      pagination: {
+        total: 0
+      },
+      listLoaded: true
     }
-};
+  },
+  methods: {
+    ...mapActions(['addItemToCartAtStart']),
+    addToCart: async function (lessonId) {
+      await this.addItemToCartAtStart({
+        lessonId,
+        specialRequest: this.specialRequestText || ''
+      })
+      this.$root.$emit('showMiniCart')
+    },
+    getBookings() {
+      this.listLoaded = false
+      let queryParams = {}
+
+      queryParams.type = this.showOnly
+      queryParams.limit = 5
+
+      let getUrl = "/api/student/bookings"
+
+      this.apiGet(getUrl, {
+        params: queryParams
+      })
+    },
+    notifyInstructor(client) {
+      this.$root.$emit('initNotificationsForm', [client])
+    },
+    requestCancelBooking(booking) {
+      this.apiDelete('/api/student/booking/' + booking.id)
+    },
+    componentHandleDeleteResponse(responseData) {
+      this.getBookings()
+    },
+    componentHandlePostResponse(responseData) {
+      this.getBookings()
+    },
+    componentHandleGetResponse(responseData) {
+      this.listItems = responseData.data.data
+      if (
+        responseData.data.meta != undefined &&
+        responseData.data.meta.pagination != undefined
+      ) {
+        this.pagination.total = responseData.data.meta.pagination.total
+      }
+      this.listLoaded = true
+    },
+    isPastLesson(lessonStart) {
+      return moment(lessonStart).isBefore()
+    },
+    toggleShowOnly(type) {
+      this.showOnly = type
+      this.getBookings()
+    },
+    viewLessonRequest(lessonRequest) {
+      this.$root.$emit('lessonRequestUpdateInit', lessonRequest)
+    }
+  },
+  created: function () {
+    this.listItems = this.bookings
+    if (
+      this.bookingsMeta != undefined &&
+      this.bookingsMeta.pagination != undefined
+    ) {
+      this.pagination.total = this.bookingsMeta.pagination.total
+    }
+  },
+  mounted() {
+    this.$root.$on('lessonRequestUpdated', id => {
+      for (var i = 0; i < this.listItems.length; i++) {
+        if (this.listItems[i].id == id) {
+          this.listItems.splice(i, 1)
+        }
+      }
+    })
+  }
+}
 </script>
 
 

@@ -6,8 +6,9 @@
         <button type="button" @click="openShareModal">
           <img src="/images/sare-icon-green.png" alt="" /><span>Share</span>
         </button>
-      </h2>
+        <button type='button' class='fc-dayGridMonth-button fc-button fc-button-primary custom-button' @click='goToCurrentDay'>Day</button>
 
+      </h2>
       <div v-if="errorText" class="has-error">{{ errorText }}</div>
       <div v-if="successText" class="has-success">{{ successText }}</div>
     </div>
@@ -19,7 +20,7 @@
           right: 'next',
         }"
         :footer="{
-          right: 'timeGridWeek,dayGridMonth',
+          right: 'timeGridWeek,dayGridMonth'
         }"
         :defaultView="'dayGridMonth'"
         :navLinks="true"
@@ -94,6 +95,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import MagnificPopupModal from "./MagnificPopupModal";
 import siteAPI from "../../mixins/siteAPI.js";
 import countriesAndTimezones from "countries-and-timezones";
+import moment from 'moment-timezone'
 var FileSaver = require("file-saver");
 
 export default {
@@ -120,6 +122,11 @@ export default {
       scrollTime1: "0:00:00",
       selectedEvent: null,
     };
+  },
+  computed: {
+    heightCalendar() {
+      return this.$refs?.fullCalendar.$el.offsetHeight
+    }
   },
   methods: {
     selectAllow: function (selectInfo) {
@@ -160,7 +167,6 @@ export default {
     },
     scrollUp: function () {
       let calendarApi = this.$refs.fullCalendar.getApi();
-
       let currentTimeHour = calendarApi.scrollTime.split(":")[0];
 
       if (currentTimeHour == "00") {
@@ -178,6 +184,7 @@ export default {
       }
     },
     removeUpDownButtons() {
+      console.log('remove')
       const buttons = document.querySelectorAll(".fc-button--arrow");
       buttons.forEach((item) => {
         item.remove();
@@ -185,15 +192,13 @@ export default {
     },
     injectUpDownButtons() {
       setTimeout(() => {
-        const cont = document.querySelector(".fc-view-container");
-
+        const cont = document.querySelector(".fc-body");
         const buttonUp = document.createElement("button");
         buttonUp.classList.add("fc-button--arrow");
         buttonUp.classList.add("fc-button--up");
 
         buttonUp.innerHTML = "Expand";
         buttonUp.addEventListener("click", this.scrollUp);
-
         cont.prepend(buttonUp);
 
         const buttonDown = document.createElement("button");
@@ -205,23 +210,24 @@ export default {
         cont.appendChild(buttonDown);
       }, 0);
     },
+    goToCurrentDay() {
+      let calendarApi = this.$refs.fullCalendar.getApi()
+      calendarApi.changeView('timeGridDay',new Date())
+    },
     viewRender: function (info) {
       if (info.view.type === "timeGridWeek") {
         this.triggerView = "week";
 
         let calendarApi = this.$refs.fullCalendar.getApi();
-
-       this.injectUpDownButtons();
-
         calendarApi.scrollTime = "08:00:00";
 
         calendarApi.scrollToTime("08:00:00");
       } else if (info.view.type === "timeGridDay") {
+        this.injectUpDownButtons();
         this.triggerView = "day";
       } else {
+        this.removeUpDownButtons()
         this.triggerView = "month";
-
-        this.removeUpDownButtons();
       }
       if (this.triggerOld !== null) {
         if (
@@ -237,7 +243,7 @@ export default {
         this.triggerOld = moment(info.view.currentStart).format("YYYY-MM-DD");
       }
 
-      if (this.trigger) {
+      if (this.trigger && info.view.type !== 'timeGridDay') {
         this.trigger = false;
         if (this.loader == null) {
           this.loader = this.$loading.show({
@@ -310,7 +316,7 @@ export default {
               return moment().diff(item.end) <= 0;
             });
 
-            if (this.triggerView == "week") {
+            if (this.triggerView == "week" || this.triggerView == "day") {
               this.injectUpDownButtons();
             }
 
@@ -335,6 +341,12 @@ export default {
       if (moment(info.event.start, "x") <= moment(new Date(), "x")) {
         info.el.className = info.el.className + " last-event";
       }
+      if (this.heightCalendar > 500) {
+        info.el.className = info.el.className + ' big-event'
+      } else {
+        info.el.className = info.el.className + ' small-event'
+      }
+      info.el.className = info.el.className + ' test-circle';
       var count =
         parseInt(info.event.extendedProps.spots_count) -
         parseInt(info.event.extendedProps.count_booked);
@@ -362,24 +374,35 @@ export default {
       calendarApi.gotoDate(info.start);
     },
     dateClick: function (info) {
-      this.selectedEvent = {
-        id: info.event.id,
-        lat: info.event.extendedProps.lat,
-        lng: info.event.extendedProps.lng,
-        title: info.event.title,
-        fullDate:
-          moment(info.event.start).format("MMM") +
-          " " +
-          moment(info.event.start).format("DD") +
-          ", " +
-          moment(info.event.start).format("hh:mma") +
-          " - " +
-          moment(info.event.end).format("hh:mma"),
-        location: info.event.extendedProps.location,
-        price: info.event.extendedProps.spot_price,
-        students: info.event.extendedProps.students,
-        content: info.event.extendedProps,
-      };
+      let calendarApi = this.$refs.fullCalendar.getApi()
+      if(info.view.type === 'timeGridWeek' || info.view.type === 'timeGridDay') {
+        this.selectedEvent = {
+          id: info.event.id,
+          lat: info.event.extendedProps.lat,
+          lng: info.event.extendedProps.lng,
+          title: info.event.title,
+          fullDate:
+            moment(info.event.start).format("MMM") +
+            " " +
+            moment(info.event.start).format("DD") +
+            ", " +
+            moment(info.event.start).format("hh:mma") +
+            " - " +
+            moment(info.event.end).format("hh:mma"),
+          location: info.event.extendedProps.location,
+          price: info.event.extendedProps.spot_price,
+          students: info.event.extendedProps.students,
+          content: info.event.extendedProps,
+        }
+      } else if (info.view.type === 'dayGridMonth') {
+        calendarApi.changeView('timeGridDay',moment(info.event.start).format('YYYY-MM-DD'))
+        calendarApi.scrollTime = moment(this.events[0].start).format(
+          "HH:mm:ss"
+        );
+        calendarApi.scrollToTime(
+          moment(this.events[0].start).format("HH:mm:ss")
+        );
+      }
     },
     closeModal: function () {
       this.$refs.modal.close();
@@ -392,3 +415,24 @@ export default {
   },
 };
 </script>
+
+<style lang='scss'>
+.test-circle {
+  position: absolute !important;
+  bottom: -15px !important;
+  left: 50% !important;
+  right: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  background-color: transparent !important;
+  border: 1px solid #8ada00 !important;
+  width: 70% !important;
+}
+.custom-button {
+  color: #0a0a0a;
+  background-color: #8ada00 !important;
+
+  &:hover {
+    background-color: #7ac000 !important;
+  }
+}
+</style>
