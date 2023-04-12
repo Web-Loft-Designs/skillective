@@ -9,17 +9,14 @@
       <!-- User profile data -->
       <div v-if="bookingStep != 3">
         <div class="user-info-title">
-          <h3 class="login-box-msg">User Information</h3>
-          <div class="right">
-            <p>Step 1/2</p>
-            <button
-              v-if="bookingStep == 2"
-              class="btn green"
-              @click="editUserInformation"
-            >
-              Edit
-            </button>
-          </div>
+          <h3 class="login-box-msg">Profile</h3>
+          <button
+            v-if="bookingStep == 2"
+            class="prev-step-btn"
+            @click="editUserInformation"
+          >
+            Edit
+          </button>
         </div>
         <form
           method="post"
@@ -35,7 +32,7 @@
 
           <div class="d-flex flex-wrap">
             <div class="label-w-100">
-              <label>Complete name</label>
+              <label>Your name</label>
             </div>
             <div
               class="form-group first-name has-feedback"
@@ -76,7 +73,7 @@
             </div>
 
             <div
-              class="form-group input-zip has-feedback"
+              class="form-group w-50 has-feedback"
               :class="{ 'has-error': errors.zip }"
             >
               <label>ZIP</label>
@@ -94,61 +91,61 @@
               </span>
             </div>
 
-            <div
-              class="form-group w-50 has-feedback"
-              :class="{ 'has-error': errors.dob }"
-            >
-              <label>Date of Birth</label>
+<!--            <div-->
+<!--              class="form-group w-50 has-feedback"-->
+<!--              :class="{ 'has-error': errors.dob }"-->
+<!--            >-->
+<!--              <label>Date of Birth</label>-->
 
-              <dropdown-datepicker
-                :max-year="2021"
-                :min-year="1940"
-                display-format="mdy"
-                v-model="fields.dob"
-                submit-format="yyyy-mm-dd"
-              ></dropdown-datepicker>
+<!--              <dropdown-datepicker-->
+<!--                :max-year="2021"-->
+<!--                :min-year="1940"-->
+<!--                display-format="mdy"-->
+<!--                v-model="fields.dob"-->
+<!--                submit-format="yyyy-mm-dd"-->
+<!--              ></dropdown-datepicker>-->
 
-              <span class="help-block" v-if="errors.dob">
-                <strong>{{ errors.dob[0] }}</strong>
-              </span>
-            </div>
+<!--              <span class="help-block" v-if="errors.dob">-->
+<!--                <strong>{{ errors.dob[0] }}</strong>-->
+<!--              </span>-->
+<!--            </div>-->
 
-            <div
-              class="form-group w-50 has-feedback"
-              :class="{ 'has-error': errors.gender }"
-            >
-              <label>Gender</label>
-              <div class="radio-wrapper">
-                <label class="radio-item" for="male">
-                  <input
-                    v-model="fields.gender"
-                    name="gender"
-                    type="radio"
-                    id="male"
-                    value="male"
-                    :readonly="formReadonly == true"
-                  />
-                  <span class="checkmark"></span>
-                  Male
-                </label>
-                <label class="radio-item" for="female">
-                  <input
-                    v-model="fields.gender"
-                    name="gender"
-                    type="radio"
-                    id="female"
-                    value="female"
-                    :readonly="formReadonly == true"
-                  />
-                  <span class="checkmark"></span>
-                  Female
-                </label>
-              </div>
+<!--            <div-->
+<!--              class="form-group w-50 has-feedback"-->
+<!--              :class="{ 'has-error': errors.gender }"-->
+<!--            >-->
+<!--              <label>Gender</label>-->
+<!--              <div class="radio-wrapper">-->
+<!--                <label class="radio-item" for="male">-->
+<!--                  <input-->
+<!--                    v-model="fields.gender"-->
+<!--                    name="gender"-->
+<!--                    type="radio"-->
+<!--                    id="male"-->
+<!--                    value="male"-->
+<!--                    :readonly="formReadonly == true"-->
+<!--                  />-->
+<!--                  <span class="checkmark"></span>-->
+<!--                  Male-->
+<!--                </label>-->
+<!--                <label class="radio-item" for="female">-->
+<!--                  <input-->
+<!--                    v-model="fields.gender"-->
+<!--                    name="gender"-->
+<!--                    type="radio"-->
+<!--                    id="female"-->
+<!--                    value="female"-->
+<!--                    :readonly="formReadonly == true"-->
+<!--                  />-->
+<!--                  <span class="checkmark"></span>-->
+<!--                  Female-->
+<!--                </label>-->
+<!--              </div>-->
 
-              <span class="help-block" v-if="errors.gender">
-                <strong>{{ errors.gender[0] }}</strong>
-              </span>
-            </div>
+<!--              <span class="help-block" v-if="errors.gender">-->
+<!--                <strong>{{ errors.gender[0] }}</strong>-->
+<!--              </span>-->
+<!--            </div>-->
 
             <div
               class="form-group w-50 has-feedback"
@@ -226,8 +223,7 @@
                   />
                   <span class="checkmark"></span>
                   I agree to the
-                  <a href="/terms" target="_blank">terms of service</a> and that
-                  by booking, I’ll be registered as a user
+                  <a href="/terms" target="_blank">terms of service</a>
                 </label>
               </div>
 
@@ -249,7 +245,7 @@
                 :disabled="!fields.accept_terms"
                 class="btn btn-block"
               >
-                Submit Booking Request
+                Continue to Payment
               </button>
             </div>
           </div>
@@ -259,9 +255,7 @@
       <!-- Payment Method form -->
       <div v-if="bookingStep === 2" class="section-payments">
         <div class="payment-information">
-          <h3 class="custom-padding">
-            Please Submit Payment to Reserve your spot
-          </h3>
+          <h3 class="custom-padding">Please Submit Payment</h3>
           <p>Step 2/2</p>
         </div>
         <div
@@ -286,11 +280,7 @@
             :class="{ active: paymentMethod === 'CreditCard' }"
           >
             <div>
-              <div
-                class="payment-option-header"
-                @click="paymentMethod = 'CreditCard'"
-              >
-                <label>Credit cards</label>
+              <div class="payment-option-header">
                 <img src="/images/card-icon.png" alt />
               </div>
               <div
@@ -325,7 +315,7 @@
                     required
                     name="cardholderName"
                     value
-                    placeholder="Cardholder Name"
+                    placeholder="Name"
                     id="cardholder-name"
                   />
                   <input
@@ -588,9 +578,8 @@ export default {
     async onSubmitStep1() {
       if (moment(this.fields.dob))
         this.fields.dob = moment(this.fields.dob).format('YYYY-MM-DD')
-
-      this.fetchCartTotal()
-      this.fetchCartItems()
+      await this.fetchCartTotal()
+      await this.fetchCartItems()
       this.apiPost('/api/cart/validate-user-info', this.fields)
     },
     book() {
@@ -962,13 +951,25 @@ export default {
 .user-info-title,
 .payment-information {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  align-items: first baseline;
   margin-bottom: 20px;
 
-  .right {
-    display: flex;
-    align-items: center;
+  .prev-step-btn {
+    color: #09C60A;
+    text-decoration: none;
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    outline: none;
+    margin-left: 30px;
+
+    &:hover, &:focus {
+      text-decoration: underline;
+    }
   }
 
   p {
@@ -984,6 +985,13 @@ export default {
     font-size: 14px;
     margin-left: 5px;
     margin-bottom: 0;
+  }
+}
+.payment-information {
+  justify-content: space-between;
+
+  p {
+    padding: 0 10px;
   }
 }
 </style>

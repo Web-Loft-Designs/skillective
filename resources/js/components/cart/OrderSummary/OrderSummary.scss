@@ -91,23 +91,6 @@
     }
   }
 
-  &__continue {
-    color: #09C60A;
-    text-decoration: none;
-    font-family: Hind Vadodara;
-    font-style: normal;
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 21px;
-    cursor: pointer;
-    border-radius: 3px;
-    outline: none;
-
-    &:hover, &:focus {
-      text-decoration: underline;
-    }
-  }
-
   &__apply-promo {
     background: #F4F4F4;
     border-radius: 3px;
