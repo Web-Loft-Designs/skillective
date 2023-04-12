@@ -187,8 +187,7 @@ export default {
     },
     injectUpDownButtons() {
       setTimeout(() => {
-        const cont = document.querySelector(".fc-view-container");
-
+        const cont = document.querySelector(".fc-body");
         const buttonUp = document.createElement("button");
         buttonUp.classList.add("fc-button--arrow");
         buttonUp.classList.add("fc-button--up");
@@ -361,6 +360,7 @@ export default {
     },
     dateClick: function (info) {
       console.log(info)
+      let calendarApi = this.$refs.fullCalendar.getApi()
       if(info.view.type === 'timeGridWeek' || info.view.type === 'timeGridDay') {
         this.selectedEvent = {
           id: info.event.id,
@@ -381,7 +381,9 @@ export default {
           content: info.event.extendedProps,
         }
       } else if (info.view.type === 'dayGridMonth') {
-        this.$refs.fullCalendar.getApi().changeView('timeGridDay',moment(info.event.start).format('YYYY-MM-DD'))
+        // let time = moment(info.event.start).format('HH:mm:ss')
+        calendarApi.changeView('timeGridDay',moment(info.event.start).format('YYYY-MM-DD'))
+        // calendarApi.scrollToTime(time)
         // this.$refs.fullCalendar.changeView('timeGridWeek')
       }
     },
