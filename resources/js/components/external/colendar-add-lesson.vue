@@ -63,7 +63,7 @@
         :firstDay='0'
         :fixedWeekCount='false'
         :footer="{
-          right: 'timeGridWeek,dayGridMonth',
+          right: 'today,timeGridWeek,dayGridMonth',
         }"
         :header="{
           left: 'prev',
@@ -458,10 +458,17 @@ export default {
             return moment().diff(item.end) <= 0
           })
 
-          if (this.triggerView == 'week') {
+          if (this.triggerView == 'week' || this.triggerView == 'day') {
             this.injectUpDownButtons()
           }
-
+          let calendarApi = this.$refs.fullCalendar.getApi();
+          calendarApi.scrollTime = moment(this.events[1].start).format(
+            "HH:mm:ss"
+          );
+          calendarApi.scrollToTime(
+            moment(this.events[1].start).format("HH:mm:ss")
+          );
+          console.log(this.events)
           this.loader.hide()
           this.loader = null
         })
@@ -475,20 +482,20 @@ export default {
       if (moment(info.event.start, 'x') <= moment(new Date(), 'x')) {
         info.el.className = info.el.className + ' last-event'
       }
-
+      info.el.className = info.el.className + ' test-circle'
       var count =
         parseInt(info.event.extendedProps.spots_count) -
         parseInt(info.event.extendedProps.count_booked)
-      if (count === 1) {
-        1
-        info.el.className = info.el.className + ' red-event'
-      } else if (count === 2) {
-        info.el.className = info.el.className + ' yellow-event'
-      } else if (count > 2) {
-        info.el.className = info.el.className + ' green-event'
-      } else {
-        info.el.className = info.el.className + ' grey-event'
-      }
+      // if (count === 1) {
+      //   1
+      //   info.el.className = info.el.className + ' red-event'
+      // } else if (count === 2) {
+      //   info.el.className = info.el.className + ' yellow-event'
+      // } else if (count > 2) {
+      //   info.el.className = info.el.className + ' green-event'
+      // } else {
+      //   info.el.className = info.el.className + ' grey-event'
+      // }
 
       const elementBoundingRect = info.el.getBoundingClientRect()
 
@@ -552,28 +559,33 @@ export default {
       this.SET_SELECTED_DATES(dates)
     },
     dateClick: function (info) {
-      this.selectedEvent = {
-        id: info.event.id,
-        lat: info.event.extendedProps.lat,
-        lng: info.event.extendedProps.lng,
-        title: info.event.title,
-        fullDate:
-          moment(info.event.start).format('MMM') +
-          ' ' +
-          moment(info.event.start).format('DD') +
-          ', ' +
-          moment(info.event.start).format('hh:mma') +
-          ' - ' +
-          moment(info.event.end).format('hh:mma'),
-        location: info.event.extendedProps.location,
-        price: info.event.extendedProps.spot_price,
-        students: info.event.extendedProps.students,
-        content: info.event.extendedProps
+      let calendarApi = this.$refs.fullCalendar.getApi()
+      if(info.view.type === 'timeGridWeek' || info.view.type === 'timeGridDay') {
+        this.selectedEvent = {
+          id: info.event.id,
+          lat: info.event.extendedProps.lat,
+          lng: info.event.extendedProps.lng,
+          title: info.event.title,
+          fullDate:
+            moment(info.event.start).format('MMM') +
+            ' ' +
+            moment(info.event.start).format('DD') +
+            ', ' +
+            moment(info.event.start).format('hh:mma') +
+            ' - ' +
+            moment(info.event.end).format('hh:mma'),
+          location: info.event.extendedProps.location,
+          price: info.event.extendedProps.spot_price,
+          students: info.event.extendedProps.students,
+          content: info.event.extendedProps
+        }
+        axios.get('/api/lesson/' + info.event.id).then(({ data }) => {
+          this.$root.$emit('lessonUpdateInit', data.data.data)
+        })
+      }else if (info.view.type === 'dayGridMonth') {
+        calendarApi.changeView('timeGridDay',moment(info.event.start).format('YYYY-MM-DD'))
       }
 
-      axios.get('/api/lesson/' + info.event.id).then(({ data }) => {
-        this.$root.$emit('lessonUpdateInit', data.data.data)
-      })
     },
     closeModal: function () {
       this.$refs.modal.close()
