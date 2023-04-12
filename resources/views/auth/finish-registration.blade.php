@@ -4,9 +4,10 @@
     <div class="min-h-100">
     <div class="inner login-popup-v2">
         <h1 class="form-title">
-            {{ ( 'Welcome, ' . $user['full_name'] ) }}
-            <br />
-            Please set your Skillective Password:
+            {{ ( 'Welcome, ' . $user['full_name'] . '!' ) }}
+            <br/>
+            <br/>
+            Please set your Skillective password:
         </h1>
         <user-finish-registration-form></user-finish-registration-form>
     </div>
