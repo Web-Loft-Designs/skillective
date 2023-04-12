@@ -47,10 +47,10 @@
                         <td>{{ booking.id }}</td>
 
                         <td v-if="listLoaded==true">
-                            <img :src="booking.lesson.instructor?.profile.image" />
+                            <img :src="booking.lesson.instructor.profile.image" />
                         </td>
                         <td v-else>
-                            <img :src="booking.instructor?.profile.image" />
+                            <img :src="booking.instructor.profile.image" />
                         </td>
 
                         <td v-if="listLoaded==true" class="width-fix">
@@ -75,17 +75,17 @@
                         <td v-if="listLoaded==true" class="width-fix">
                             <div class="width-fix-content">
                                 <a
-                                  :href="'/profile/'+booking.lesson.instructor?.id"
+                                  :href="'/profile/'+booking.lesson.instructor.id"
                                   class="link-to-profile"
-                                >{{ booking.lesson.instructor?.full_name }}</a>
+                                >{{ booking.lesson.instructor.full_name }}</a>
                             </div>
                         </td>
                         <td v-else class="width-fix">
                             <div class="width-fix-content">
                                 <a
-                                  :href="'/profile/'+booking.instructor?.id"
+                                  :href="'/profile/'+booking.instructor.id"
                                   class="link-to-profile"
-                                >{{ booking.instructor?.full_name }}</a>
+                                >{{ booking.instructor.full_name }}</a>
                             </div>
                         </td>
 
