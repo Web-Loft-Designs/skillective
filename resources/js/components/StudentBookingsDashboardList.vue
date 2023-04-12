@@ -19,11 +19,6 @@
               @click.prevent="toggleShowOnly('cancelled')"
               :class="{'active':(showOnly=='cancelled')}"
           >Cancelled</a>
-          <a
-              href="#"
-              @click.prevent="toggleShowOnly('lesson_requests')"
-              :class="{'active':(showOnly=='lesson_requests')}"
-          >Booking Requests</a>
         </span>
             </h2>
         </div>
@@ -47,115 +42,117 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(booking, index) in listItems">
-                    <td>{{ booking.id }}</td>
+                <template v-if='listItems'>
+                    <tr v-for="(booking, index) in listItems">
+                        <td>{{ booking.id }}</td>
 
-                    <td v-if="showOnly!='lesson_requests' && listLoaded==true">
-                        <img :src="booking.lesson.instructor.profile.image" />
-                    </td>
-                    <td v-else>
-                        <img :src="booking.instructor.profile.image" />
-                    </td>
+                        <td v-if="listLoaded==true">
+                            <img :src="booking.lesson.instructor?.profile.image" />
+                        </td>
+                        <td v-else>
+                            <img :src="booking.instructor?.profile.image" />
+                        </td>
 
-                    <td v-if="showOnly!='lesson_requests' && listLoaded==true" class="width-fix">
-                        <div class="width-fix-content">
+                        <td v-if="listLoaded==true" class="width-fix">
+                            <div class="width-fix-content">
+                                <a
+                                  v-if="booking.lesson.instructor && booking.lesson.instructor.profile && booking.lesson.instructor.profile.instagram_handle!=null"
+                                  :href="'https://www.instagram.com/' + booking.lesson.instructor.profile.instagram_handle"
+                                  target="_blank"
+                                >@{{ booking.lesson.instructor.profile.instagram_handle }}</a>
+                            </div>
+                        </td>
+                        <td v-else class="width-fix">
+                            <div class="width-fix-content">
+                                <a
+                                  v-if="booking.instructor && booking.instructor.profile && booking.instructor.profile.instagram_handle!=null"
+                                  :href="'https://www.instagram.com/' + booking.instructor.profile.instagram_handle"
+                                  target="_blank"
+                                >@{{ booking.instructor.profile.instagram_handle }}</a>
+                            </div>
+                        </td>
+
+                        <td v-if="listLoaded==true" class="width-fix">
+                            <div class="width-fix-content">
+                                <a
+                                  :href="'/profile/'+booking.lesson.instructor?.id"
+                                  class="link-to-profile"
+                                >{{ booking.lesson.instructor?.full_name }}</a>
+                            </div>
+                        </td>
+                        <td v-else class="width-fix">
+                            <div class="width-fix-content">
+                                <a
+                                  :href="'/profile/'+booking.instructor?.id"
+                                  class="link-to-profile"
+                                >{{ booking.instructor?.full_name }}</a>
+                            </div>
+                        </td>
+
+                        <td class="width-fix" v-if="listLoaded==true">
+                            <div
+                              class="width-fix-content"
+                              v-if="booking.lesson.lesson_type=='in_person' || booking.lesson.lesson_type=='in_person_client'"
+                              v-html="booking.lesson.location"
+                            ></div>
+                            <div
+                              class="width-fix-content"
+                              v-if="booking.lesson.lesson_type=='virtual'"
+                            >Virtual Lesson</div>
+                        </td>
+                        <td class="width-fix" v-else>
+                            <div
+                              class="width-fix-content"
+                              v-if="booking.lesson_type=='in_person'"
+                              v-html="booking.location"
+                            ></div>
+                            <div class="width-fix-content" v-if="booking.lesson_type=='virtual'">Virtual Lesson</div>
+                        </td>
+
+                        <td
+                          v-if="listLoaded==true"
+                        >{{ booking.lesson.start | moment("MM/D/YYYY") }}</td>
+                        <td v-else>{{ booking.start | moment("MM/D/YYYY") }}</td>
+
+                        <td
+                          v-if="listLoaded==true"
+                        >{{ booking.lesson.start | moment("h:mm a") }} - {{ booking.lesson.end | moment("h:mm a") }} {{ booking.lesson.timezone_id }}</td>
+                        <td
+                          v-else
+                        >{{ booking.start | moment("h:mm a") }} - {{ booking.end | moment("h:mm a") }} {{ booking.timezone_id }}</td>
+
+                        <td v-if="listLoaded==true">${{ booking.spot_price }}</td>
+                        <td v-else>${{ booking.lesson_price }}</td>
+
+                        <td class="no-wrap w-200" v-if="listLoaded==true">
+                            <lesson-participant-room-controls
+                              v-if="showOnly=='current' && listLoaded==true && !booking.lesson.room_completed"
+                              :booking="booking"
+                            ></lesson-participant-room-controls>
+
+                            <span
+                              class="btn btn-notify"
+                              @click="notifyInstructor(booking.lesson.instructor)"
+                              v-if="booking.lesson.instructor.profile.notification_methods.length>0"
+                            >contact</span>
+                            <span
+                              class="btn btn-danger"
+                              @click="requestCancelBooking(booking)"
+                              v-if="(booking.status!='cancelled' && !isPastLesson(booking.lesson.start))"
+                            >Request Cancel</span>
+                        </td>
+
+                        <td v-else-if="booking.lesson_id != null">
                             <a
-                                v-if="booking.lesson.instructor && booking.lesson.instructor.profile && booking.lesson.instructor.profile.instagram_handle!=null"
-                                :href="'https://www.instagram.com/' + booking.lesson.instructor.profile.instagram_handle"
-                                target="_blank"
-                            >@{{ booking.lesson.instructor.profile.instagram_handle }}</a>
-                        </div>
-                    </td>
-                    <td v-else class="width-fix">
-                        <div class="width-fix-content">
-                            <a
-                                v-if="booking.instructor && booking.instructor.profile && booking.instructor.profile.instagram_handle!=null"
-                                :href="'https://www.instagram.com/' + booking.instructor.profile.instagram_handle"
-                                target="_blank"
-                            >@{{ booking.instructor.profile.instagram_handle }}</a>
-                        </div>
-                    </td>
-
-                    <td v-if="showOnly!='lesson_requests' && listLoaded==true" class="width-fix">
-                        <div class="width-fix-content">
-                            <a
-                                :href="'/profile/'+booking.lesson.instructor.id"
-                                class="link-to-profile"
-                            >{{ booking.lesson.instructor.full_name }}</a>
-                        </div>
-                    </td>
-                    <td v-else class="width-fix">
-                        <div class="width-fix-content">
-                            <a
-                                :href="'/profile/'+booking.instructor.id"
-                                class="link-to-profile"
-                            >{{ booking.instructor.full_name }}</a>
-                        </div>
-                    </td>
-
-                    <td class="width-fix" v-if="showOnly!='lesson_requests' && listLoaded==true">
-                        <div
-                            class="width-fix-content"
-                            v-if="booking.lesson.lesson_type=='in_person' || booking.lesson.lesson_type=='in_person_client'"
-                            v-html="booking.lesson.location"
-                        ></div>
-                        <div
-                            class="width-fix-content"
-                            v-if="booking.lesson.lesson_type=='virtual'"
-                        >Virtual Lesson</div>
-                    </td>
-                    <td class="width-fix" v-else>
-                        <div
-                            class="width-fix-content"
-                            v-if="booking.lesson_type=='in_person'"
-                            v-html="booking.location"
-                        ></div>
-                        <div class="width-fix-content" v-if="booking.lesson_type=='virtual'">Virtual Lesson</div>
-                    </td>
-
-                    <td
-                        v-if="showOnly!='lesson_requests' && listLoaded==true"
-                    >{{ booking.lesson.start | moment("MM/D/YYYY") }}</td>
-                    <td v-else>{{ booking.start | moment("MM/D/YYYY") }}</td>
-
-                    <td
-                        v-if="showOnly!='lesson_requests' && listLoaded==true"
-                    >{{ booking.lesson.start | moment("h:mm a") }} - {{ booking.lesson.end | moment("h:mm a") }} {{ booking.lesson.timezone_id }}</td>
-                    <td
-                        v-else
-                    >{{ booking.start | moment("h:mm a") }} - {{ booking.end | moment("h:mm a") }} {{ booking.timezone_id }}</td>
-
-                    <td v-if="showOnly!='lesson_requests' && listLoaded==true">${{ booking.spot_price }}</td>
-                    <td v-else>${{ booking.lesson_price }}</td>
-
-                    <td class="no-wrap w-200" v-if="showOnly!='lesson_requests' && listLoaded==true">
-                        <lesson-participant-room-controls
-                            v-if="showOnly=='current' && listLoaded==true && !booking.lesson.room_completed"
-                            :booking="booking"
-                        ></lesson-participant-room-controls>
-
-                        <span
-                            class="btn btn-notify"
-                            @click="notifyInstructor(booking.lesson.instructor)"
-                            v-if="booking.lesson.instructor.profile.notification_methods.length>0"
-                        >contact</span>
-                        <span
-                            class="btn btn-danger"
-                            @click="requestCancelBooking(booking)"
-                            v-if="(booking.status!='cancelled' && !isPastLesson(booking.lesson.start))"
-                        >Request Cancel</span>
-                    </td>
-
-                    <td v-else-if="booking.lesson_id != null">
-                        <a
-                            @click.prevent="addToCart(booking.lesson_id)"
-                            class="btn-approve"
-                        >Add to cart</a>
-                    </td>
-                    <td v-else>
-                        <a href="#" @click.prevent="viewLessonRequest(booking)" class="btn-approve">View</a>
-                    </td>
-                </tr>
+                              @click.prevent="addToCart(booking.lesson_id)"
+                              class="btn-approve"
+                            >Add to cart</a>
+                        </td>
+                        <td v-else>
+                            <a href="#" @click.prevent="viewLessonRequest(booking)" class="btn-approve">View</a>
+                        </td>
+                    </tr>
+                </template>
                 </tbody>
             </table>
             <div v-if="listItems.length === 0">
@@ -206,10 +203,7 @@ export default {
             queryParams.type = this.showOnly;
             queryParams.limit = 5;
 
-            let getUrl =
-                this.showOnly == "lesson_requests"
-                    ? "/api/lesson-requests"
-                    : "/api/student/bookings";
+            let getUrl = "/api/student/bookings"
 
             this.apiGet(getUrl, {
                 params: queryParams
