@@ -6,8 +6,9 @@
         <button type="button" @click="openShareModal">
           <img src="/images/sare-icon-green.png" alt="" /><span>Share</span>
         </button>
-      </h2>
+        <button type='button' class='fc-dayGridMonth-button fc-button fc-button-primary custom-button' @click='goToCurrentDay'>Day</button>
 
+      </h2>
       <div v-if="errorText" class="has-error">{{ errorText }}</div>
       <div v-if="successText" class="has-success">{{ successText }}</div>
     </div>
@@ -19,7 +20,7 @@
           right: 'next',
         }"
         :footer="{
-          right: 'today,timeGridWeek,dayGridMonth',
+          right: 'timeGridWeek,dayGridMonth',
         }"
         :defaultView="'dayGridMonth'"
         :navLinks="true"
@@ -208,6 +209,10 @@ export default {
         buttonDown.addEventListener("click", this.scrollDown);
         cont.appendChild(buttonDown);
       }, 0);
+    },
+    goToCurrentDay() {
+      let calendarApi = this.$refs.fullCalendar.getApi()
+      calendarApi.changeView('timeGridDay',new Date())
     },
     viewRender: function (info) {
       if (info.view.type === "timeGridWeek") {
@@ -421,5 +426,13 @@ export default {
   background-color: transparent !important;
   border: 1px solid #8ada00 !important;
   width: 70% !important;
+}
+.custom-button {
+  color: #0a0a0a;
+  background-color: #8ada00 !important;
+
+  &:hover {
+    background-color: #7ac000 !important;
+  }
 }
 </style>

@@ -1,7 +1,9 @@
 <template>
   <div class='calendar-component'>
     <div class='calendar-component-top'>
-      <h2>Schedule</h2>
+      <h2>Schedule
+        <button type='button' class='fc-dayGridMonth-button fc-button fc-button-primary custom-button' @click='goToCurrentDay'>Day</button>
+      </h2>
       <div v-if='errorText' class='has-error'>{{ errorText }}</div>
       <div v-if='successText' class='has-success'>{{ successText }}</div>
     </div>
@@ -16,7 +18,7 @@
         :firstDay='0'
         :fixedWeekCount='false'
         :footer="{
-          right: 'today,timeGridWeek,dayGridMonth',
+          right: 'timeGridWeek,dayGridMonth',
         }"
         :header="{
           left: 'prev',
@@ -155,6 +157,10 @@ export default {
     }
   },
   methods: {
+    goToCurrentDay() {
+      let calendarApi = this.$refs.fullCalendarSmall.getApi()
+      calendarApi.changeView('timeGridDay',new Date())
+    },
     clearFormAndClosePopup() {
     },
     removeIt(id) {

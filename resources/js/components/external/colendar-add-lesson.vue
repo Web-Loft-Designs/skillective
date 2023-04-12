@@ -36,6 +36,10 @@
         >
           <span> Embed Calendar </span>
         </button>
+
+        <button type='button' class='fc-dayGridMonth-button fc-button fc-button-primary custom-button' @click='goToCurrentDay'>Day</button>
+
+
       </h2>
 
       <div
@@ -63,7 +67,7 @@
         :firstDay='0'
         :fixedWeekCount='false'
         :footer="{
-          right: 'today,timeGridWeek,dayGridMonth',
+          right: 'timeGridWeek,dayGridMonth',
         }"
         :header="{
           left: 'prev',
@@ -240,6 +244,10 @@ export default {
   },
   methods: {
     ...mapMutations(['SET_SELECTED_DATES']),
+    goToCurrentDay() {
+      let calendarApi = this.$refs.fullCalendar.getApi()
+      calendarApi.changeView('timeGridDay',new Date())
+    },
     copyTextToClipboard(text) {
       var textArea = document.createElement('input')
 
