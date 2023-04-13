@@ -34,7 +34,7 @@
         />
       </svg>
       <div
-        v-if='isDotNeeded'
+        v-if='$store.state.cart.cart.dotNeeded'
         class='cart-icon__indicator'
       ></div>
     </button>
@@ -74,7 +74,7 @@ export default {
     ...mapGetters({
       isDotNeeded: 'isDotNeeded'
     })
-  }
+  },
 }
 </script>
 

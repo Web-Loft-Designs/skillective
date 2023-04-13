@@ -2,6 +2,7 @@ import { initialState } from '../initialState'
 import cartService from '../../services/cartService'
 
 export default {
+  namespased: true,
   state: initialState,
   actions: {
     async fetchCartItems(context) {
@@ -76,6 +77,7 @@ export default {
       return state.cart.total
     },
     isDotNeeded(state) {
+      console.log(state.cart.dotNeeded, 1)
       return state.cart.dotNeeded
     }
   }

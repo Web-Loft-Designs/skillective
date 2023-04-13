@@ -1,10 +1,10 @@
 <template>
   <div id="registration-form-container">
     <form method="post" @submit.prevent="onSubmit" v-if="!formSubmitted">
-      <h3 class="form-title">Profile information</h3>
+      <h3 class="form-title">Profile Information</h3>
       <div class="d-flex flex-wrap">
         <div class="label-w-100">
-          <label>Complete name</label>
+          <label>Full name</label>
         </div>
         <div
           class="form-group first-name has-feedback"
@@ -117,59 +117,59 @@
           </span>
         </div>
 
-        <div
-          class="form-group w-50 has-feedback"
-          :class="{ 'has-error': errors.dob }"
-        >
-          <label>Date of Birth</label>
-          <!--<datepicker :monday-first="false" :typeable="true" :input-class="'mask-input'" :placeholder="'mm/dd/yyyy'" v-model="fields.dob" name="dob" :format="'MM/dd/yyyy'"></datepicker>-->
-          <dropdown-datepicker
-            :max-year="2021"
-            :minYear="1940"
-            display-format="mdy"
-            v-model="fields.dob"
-            submit-format="yyyy-mm-dd"
-          ></dropdown-datepicker>
+<!--        <div-->
+<!--          class="form-group w-50 has-feedback"-->
+<!--          :class="{ 'has-error': errors.dob }"-->
+<!--        >-->
+<!--          <label>Date of Birth</label>-->
+<!--          &lt;!&ndash;<datepicker :monday-first="false" :typeable="true" :input-class="'mask-input'" :placeholder="'mm/dd/yyyy'" v-model="fields.dob" name="dob" :format="'MM/dd/yyyy'"></datepicker>&ndash;&gt;-->
+<!--          <dropdown-datepicker-->
+<!--            :max-year="2021"-->
+<!--            :minYear="1940"-->
+<!--            display-format="mdy"-->
+<!--            v-model="fields.dob"-->
+<!--            submit-format="yyyy-mm-dd"-->
+<!--          ></dropdown-datepicker>-->
 
-          <span class="help-block" v-if="errors.dob">
-            <strong>{{ errors.dob[0] }}</strong>
-          </span>
-        </div>
+<!--          <span class="help-block" v-if="errors.dob">-->
+<!--            <strong>{{ errors.dob[0] }}</strong>-->
+<!--          </span>-->
+<!--        </div>-->
 
-        <div
-          class="form-group w-50 has-feedback"
-          :class="{ 'has-error': errors.gender }"
-        >
-          <label>Gender</label>
-          <div class="radio-wrapper">
-            <label class="radio-item" for="male">
-              <input
-                v-model="fields.gender"
-                name="gender"
-                type="radio"
-                id="male"
-                value="male"
-              />
-              <span class="checkmark"></span>
-              Male
-            </label>
-            <label class="radio-item" for="female">
-              <input
-                v-model="fields.gender"
-                name="gender"
-                type="radio"
-                id="female"
-                value="female"
-              />
-              <span class="checkmark"></span>
-              Female
-            </label>
-          </div>
+<!--        <div-->
+<!--          class="form-group w-50 has-feedback"-->
+<!--          :class="{ 'has-error': errors.gender }"-->
+<!--        >-->
+<!--          <label>Gender</label>-->
+<!--          <div class="radio-wrapper">-->
+<!--            <label class="radio-item" for="male">-->
+<!--              <input-->
+<!--                v-model="fields.gender"-->
+<!--                name="gender"-->
+<!--                type="radio"-->
+<!--                id="male"-->
+<!--                value="male"-->
+<!--              />-->
+<!--              <span class="checkmark"></span>-->
+<!--              Male-->
+<!--            </label>-->
+<!--            <label class="radio-item" for="female">-->
+<!--              <input-->
+<!--                v-model="fields.gender"-->
+<!--                name="gender"-->
+<!--                type="radio"-->
+<!--                id="female"-->
+<!--                value="female"-->
+<!--              />-->
+<!--              <span class="checkmark"></span>-->
+<!--              Female-->
+<!--            </label>-->
+<!--          </div>-->
 
-          <span class="help-block" v-if="errors.gender">
-            <strong>{{ errors.gender[0] }}</strong>
-          </span>
-        </div>
+<!--          <span class="help-block" v-if="errors.gender">-->
+<!--            <strong>{{ errors.gender[0] }}</strong>-->
+<!--          </span>-->
+<!--        </div>-->
 
         <div
           class="form-group w-50 has-feedback"
@@ -198,8 +198,8 @@
           <masked-input
             :class="'form-control'"
             v-model="fields.mobile_phone"
-            :placeholder="'+1 (___) ___ ____'"
-            mask="\+1 (111) 111 1111"
+            :placeholder="'(___) ___ ____'"
+            mask="\(111) 111 1111"
           />
           <span class="help-block" v-if="errors.mobile_phone">
             <strong>{{ errors.mobile_phone[0] }}</strong>
@@ -210,7 +210,7 @@
           class="form-group has-feedback"
           :class="{ 'has-error': errors.genres }"
         >
-          <label>Skills I need to learn …</label>
+          <label>Skills I would like to follow …</label>
           <!--<div class="field" v-for="genre in siteGenres">-->
           <!--<input v-model="fields.genres" type="checkbox" :id="'genre-'+genre.id" :value="genre.id">-->
           <!--<label :for="'genre-'+genre.id">{{ genre.title }}</label>-->
@@ -226,7 +226,7 @@
             :close-on-select="false"
             :clear-on-select="false"
             :multiple="true"
-            placeholder="Select Genre"
+            placeholder="Select Skill"
           >
             <template slot="selection" slot-scope="{ values, isOpen }"
               ><span class="multiselect__single" v-if="values.length && !isOpen"
@@ -300,7 +300,7 @@
                 :value="false"
               />
               <span class="checkmark"></span>
-              By clicking this box, you represent that you have the authority to agree to receive SMS messages on the telephone number that you provided to us. Message frequency depends upon your activity. Standard message and data rates may apply. SMS messaging is not available in all areas. Not all mobile devices or handsets may be supported. Skillective and the mobile carriers are not liable for delayed or undelivered messages
+              By clicking this box, you represent that you have the authority to agree to receive SMS messages on the telephone number that you provided to us. Message frequency depends upon your activity. Standard message and data rates may apply. SMS messaging is not available in all areas. Not all mobile devices or handsets may be supported. Skillective and the mobile carriers are not liable for delayed or undelivered messages.
             </label>
           </div>
         </div>
@@ -342,9 +342,9 @@ export default {
         city: "",
         state: "",
         zip: "",
-        dob: "",
-        genres: [],
-        gender: "",
+        // dob: "",
+        // genres: [],
+        // gender: "",
         mobile_phone: "",
         about_me: "",
         //                    password : '',
@@ -357,8 +357,8 @@ export default {
   },
   methods: {
     onSubmit() {
-      if (moment(this.fields.dob))
-        this.fields.dob = moment(this.fields.dob).format("YYYY-MM-DD");
+      // if (moment(this.fields.dob))
+        // this.fields.dob = moment(this.fields.dob).format("YYYY-MM-DD");
       this.apiPost("/api/student/register", this.fields);
     },
     componentHandlePostResponse(responseData) {
