@@ -8,7 +8,7 @@
                     <div class="sticky-nav"  v-sticky="true" sticky-offset="{top: 100, bottom: 20}">
                         <h2>Settings</h2>
                         <ul >
-                            <li class="active"><a class="scroll-to" href="#data-update-trigger">Personal info</a></li>
+                            <li class="active"><a class="scroll-to" href="#data-update-trigger">Profile Information</a></li>
                             <li><a class="scroll-to" href="#password-change-trigger">Change password</a></li>
                         </ul>
                     </div>
