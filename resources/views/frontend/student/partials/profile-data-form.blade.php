@@ -13,17 +13,17 @@
         @include('frontend.partials.profile.avatar')
     @endif
     <div class="profile-info-text">
-        <h2>
-            @if ($userProfileData['profile']['instagram_handle'])
-                <a href="https://instagram.com/{{ $userProfileData['profile']['instagram_handle'] }}" target="_blank">{{ '@' . $userProfileData['profile']['instagram_handle'] }}</a>
-            @endif
-                @if(Auth::user() && (Auth::user ()->id==$userProfileData['id'] || Auth::user()->hasRole('Admin')))
-                    <a href="{{ $editRoute }}" class="edit">(Edit)</a>
-                @endif
-        </h2>
-        <p><span>{{ $userProfileData['full_name'] }}</span> | <span>
+        <p><span>{{ $userProfileData['full_name'] }}</span> <!-- | <span>
                 {{ $userProfileData['profile']['full_address'] }}
-            </span></p>
+            </span> --></p>
+                    <h2>
+                        @if ($userProfileData['profile']['instagram_handle'])
+                            <a href="https://instagram.com/{{ $userProfileData['profile']['instagram_handle'] }}" target="_blank">{{ '@' . $userProfileData['profile']['instagram_handle'] }}</a>
+                        @endif
+                            @if(Auth::user() && (Auth::user ()->id==$userProfileData['id'] || Auth::user()->hasRole('Admin')))
+                                <a href="{{ $editRoute }}" class="edit">(Edit)</a>
+                            @endif
+                    </h2>
         <div class="d-flex align-items-center">
             <p><strong>{{ $userProfileData['total_booked_lessons'] }}</strong> Lessons</p>
 {{--            <p><strong>{{ number_format($userProfileData['profile']['instagram_followers_count']) }}</strong> Followers</p>--}}
