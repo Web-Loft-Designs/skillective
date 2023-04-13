@@ -6,7 +6,8 @@
         instructors & influencers you Love!
       </h1>
     </div>
-    <global-shop-home/>
+    <global-shop-home :can-book='canBook' :preloaded-lessons='preloadedLessons'/>
+    <upcoming-lessons-near-you :can-book='canBook'/>
     <featured-instructors/>
     <become-an-instructor/>
   </div>
@@ -16,13 +17,15 @@
 import BecomeAnInstructor from '../BecomeAnInstructor/BecomeAnInstructor.vue'
 import FeaturedInstructors from '../FeaturedInstructors/FeaturedInstructors.vue'
 import GlobalShopHome from '../GlobalShopHome/GlobalShopHome'
+import UpcomingLessonsNearYou from '../UpcomingLessonsNearYou/UpcomingLessonsNearYou'
 
 export default {
   name: 'Home',
   components: {
     BecomeAnInstructor,
     FeaturedInstructors,
-    GlobalShopHome
+    GlobalShopHome,
+    UpcomingLessonsNearYou
   },
   props: {
     preloadedLessons: {
@@ -30,6 +33,10 @@ export default {
       default: () => {
         return []
       },
+    },
+    canBook: {
+      type: Boolean,
+      default: false,
     },
   }
 }

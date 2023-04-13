@@ -64,17 +64,17 @@
               platform and ask them to invite you</p>
         </div>
       </div>
-      <div class='become-an-instructor__column'>
-        <div class='become-a-client'>
-          <div class='become-a-client__content'>
-            <h3 class='become-a-client__heading'>Become a Client</h3>
-            <p class='become-a-client__text'>Find, schedule, and purchase in-person, virtual or pre-recorded lessons.
-              Skillective simplifies the whole process of working with talented individuals, coaches and mentors to
-              improve your skills!</p>
-            <a class='become-a-client__link' href='/login'>Join Now</a>
-          </div>
-        </div>
-      </div>
+<!--      <div class='become-an-instructor__column'>-->
+<!--        <div class='become-a-client'>-->
+<!--          <div class='become-a-client__content'>-->
+<!--            <h3 class='become-a-client__heading'>Become a Client123</h3>-->
+<!--            <p class='become-a-client__text'>Find, schedule, and purchase in-person, virtual or pre-recorded lessons.-->
+<!--              Skillective simplifies the whole process of working with talented individuals, coaches and mentors to-->
+<!--              improve your skills!</p>-->
+<!--            <a class='become-a-client__link' href='/login'>Join Now</a>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
     </div>
   </div>
 </template>
