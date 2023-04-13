@@ -7,11 +7,11 @@
         class='cart-item__avatar'
       />
       <div class='cart-item__instructor'>
-        <span class='cart-item__insta'>
-          @{{ item.lesson.instructor.instagram_handle }}
-        </span>
         <span class='cart-item__name'>
           {{ item.lesson.instructor.full_name }}
+        </span>
+        <span class='cart-item__insta'>
+          @{{ item.lesson.instructor.instagram_handle }}
         </span>
       </div>
       <close-button
@@ -21,7 +21,10 @@
       />
     </div>
 
-    <div class='cart-item__discount'>
+    <div
+      v-if='item.discounts.length'
+      class='cart-item__discount'
+    >
       <div
         v-for='(discount, discountIndex) in item.discounts'
         :key='discountIndex'
@@ -83,7 +86,7 @@
         </span>
         <span class='cart-item__price'>
           <span class='cart-item__price--number'>
-            ${{ item.lesson.spot_price || item.lesson.price }}
+            ${{ productPrice(item.lesson.spot_price || item.lesson.price) }}
           </span>
           per lesson
         </span>
@@ -101,7 +104,6 @@
 
 <script>
 import CloseButton from '../../student/CloseButton/CloseButton.vue'
-import { mapActions, mapMutations } from 'vuex'
 import dateHelper from '../../../helpers/dateHelper'
 import ContentViewer from '../../profile/ContentViewer/ContentViewer.vue'
 
@@ -114,8 +116,7 @@ export default {
   props: {
     item: {
       type: Object,
-      default: () => {
-      }
+      default: () => ({})
     },
     note: {
       type: String,
@@ -127,13 +128,9 @@ export default {
     }
   },
   methods: {
-    ...mapActions({
-      removeItemFromCart: 'removeItemFromCart',
-      fetchCartTotal: 'fetchCartTotal'
-    }),
-    ...mapMutations({
-      updateDotNeeded: 'updateDotNeeded'
-    }),
+    productPrice(value) {
+      return typeof value === 'string' && value.endsWith('00') ? parseFloat(value.substring(0, value.length - 2)) : value
+    },
     generateDiscountAmount(discount) {
       if (discount.discount_type === 'percent') {
         return `${ discount.discount }%`
@@ -185,18 +182,13 @@ export default {
     formatTime(hours, minutes) {
       return dateHelper.formatTime(hours, minutes)
     },
-    async removeItem(item) {
-      await this.removeItemFromCart(item.id || item.lesson.id)
-      await this.updateDotNeeded()
-      await this.fetchCartTotal()
+    removeItem(item) {
+      this.$emit('open-confirm', item)
     }
   }
 }
 </script>
 
-<style
-  lang='scss'
-  scoped
->
+<style lang='scss' scoped>
 @import './CartItem.scss';
 </style>
