@@ -66,9 +66,9 @@ export default {
       filters: [
         {
           type: 'select',
-          title: 'Genre',
+          title: 'Skill',
           options: [],
-          placeholder: 'Select genre',
+          placeholder: 'Select skill',
         },
         {
           type: 'search',

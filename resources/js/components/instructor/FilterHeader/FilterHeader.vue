@@ -1,6 +1,26 @@
 <template>
   <div class="filter-header">
+    <div class='d-flex justify-content-between'>
     <h1 class="filter-header__heading">{{ heading }}</h1>
+    <div class="filter-header__col">
+    </div>
+      <a
+        v-if="button.type == 'link'"
+        class="filter-header__button"
+        :href="button.href"
+      >
+        <img v-if="button.image" :src="button.image" :alt="button.image" />
+        <span>{{ button.text }}</span>
+      </a>
+      <button
+        v-else
+        class="filter-header__button"
+        @click.prevent="emitButtonPress()"
+      >
+        <img v-if="button.image" :src="button.image" :alt="button.image" />
+        <span>{{ button.text }}</span>
+      </button>
+    </div>
 
     <div class="filter-header__filters">
       <div
@@ -58,24 +78,6 @@
           />
         </div>
       </div>
-      <div class="filter-header__col">
-        <a
-          v-if="button.type == 'link'"
-          class="filter-header__button"
-          :href="button.href"
-        >
-          <img v-if="button.image" :src="button.image" :alt="button.image" />
-          <span>{{ button.text }}</span>
-        </a>
-        <button
-          v-else
-          class="filter-header__button"
-          @click.prevent="emitButtonPress()"
-        >
-          <img v-if="button.image" :src="button.image" :alt="button.image" />
-          <span>{{ button.text }}</span>
-        </button>
-      </div>
     </div>
   </div>
 </template>
@@ -127,4 +129,12 @@ export default {
 
 <style lang="scss" scoped>
 @import "./FilterHeader.scss";
+
+.filter-header__col{
+  width: 50%;
+}
+.filter-header__button{
+  width: auto;
+  padding: 4px 12px;
+}
 </style>
