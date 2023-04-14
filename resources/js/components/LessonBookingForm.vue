@@ -175,10 +175,10 @@
 
               <masked-input
                 v-if="formReadonly == false"
-                :class="'form-control'"
                 v-model="fields.mobile_phone"
-                :placeholder="'+1 (___) ___ ____'"
-                mask="\+1 (111) 111 1111"
+                :class="'form-control'"
+                :placeholder="'(___) ___ ____'"
+                mask="(111) 111 1111"
               />
               <input
                 v-if="formReadonly == true"
@@ -992,6 +992,18 @@ export default {
 
   p {
     padding: 0 10px;
+  }
+}
+.lesson-success {
+  ul {
+    list-style: disc;
+    li {
+      padding-left: 0;
+      margin-bottom: 30px;
+    }
+  }
+  p {
+    margin-bottom: 40px;
   }
 }
 </style>
