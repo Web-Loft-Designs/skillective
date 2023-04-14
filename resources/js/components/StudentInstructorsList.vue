@@ -9,7 +9,7 @@
                     <span @click="deleteManyInstructors" class="btn btn-danger mr-2">Delete {{ selectedInstructors.length }} instructors</span>
                     <!--<span @click="notifyManyInstructors" class="btn btn-primary mr-2">Notify {{ selectedInstructors.length }} instructors</span>-->
                 </div>
-                <input type="text" v-model="searchString" placeholder="Search instructor"/>
+                <input type="text" v-model="searchString" placeholder="Search for an instructor or influencer"/>
             </div>
 
         </div>

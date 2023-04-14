@@ -246,7 +246,7 @@
     </div>
 
     <span v-else class="video-lessons-list__empty"
-      >No lessons for your request</span
+      >You currently have no lessons in your library.</span
     >
 
     <collapse-transition>
