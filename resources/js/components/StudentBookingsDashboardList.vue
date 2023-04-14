@@ -30,12 +30,10 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th class="w-55">#</th>
                     <th class="w-55"></th>
-                    <th class="w-100px">Instagram</th>
                     <th class="w-140">Name</th>
-                    <th class="w-140">Location</th>
-                    <th class="w-100px">Date</th>
+                    <th class="w-140">Lesson Type</th>
+                    <th class="w-100px">Lesson Date</th>
                     <th class="time-width">Time</th>
                     <th>Price</th>
                     <th class="start-in-fix">Start in:</th>
@@ -44,7 +42,6 @@
                 <tbody>
                 <template v-if='listItems'>
                     <tr v-for="(booking, index) in listItems">
-                        <td>{{ booking.id }}</td>
 
                         <td v-if="listLoaded==true">
                             <img :src="booking.lesson.instructor.profile.image" />
@@ -56,27 +53,8 @@
                         <td v-if="listLoaded==true" class="width-fix">
                             <div class="width-fix-content">
                                 <a
-                                  v-if="booking.lesson.instructor && booking.lesson.instructor.profile && booking.lesson.instructor.profile.instagram_handle!=null"
-                                  :href="'https://www.instagram.com/' + booking.lesson.instructor.profile.instagram_handle"
-                                  target="_blank"
-                                >@{{ booking.lesson.instructor.profile.instagram_handle }}</a>
-                            </div>
-                        </td>
-                        <td v-else class="width-fix">
-                            <div class="width-fix-content">
-                                <a
-                                  v-if="booking.instructor && booking.instructor.profile && booking.instructor.profile.instagram_handle!=null"
-                                  :href="'https://www.instagram.com/' + booking.instructor.profile.instagram_handle"
-                                  target="_blank"
-                                >@{{ booking.instructor.profile.instagram_handle }}</a>
-                            </div>
-                        </td>
-
-                        <td v-if="listLoaded==true" class="width-fix">
-                            <div class="width-fix-content">
-                                <a
                                   :href="'/profile/'+booking.lesson.instructor.id"
-                                  class="link-to-profile"
+                                  class="link-to-profile full-name-link"
                                 >{{ booking.lesson.instructor.full_name }}</a>
                             </div>
                         </td>
@@ -84,7 +62,7 @@
                             <div class="width-fix-content">
                                 <a
                                   :href="'/profile/'+booking.instructor.id"
-                                  class="link-to-profile"
+                                  class="link-to-profile full-name-link"
                                 >{{ booking.instructor.full_name }}</a>
                             </div>
                         </td>
@@ -131,12 +109,12 @@
                             ></lesson-participant-room-controls>
 
                             <span
-                              class="btn btn-notify"
+                              class="btn btn-notify mb-1"
                               @click="notifyInstructor(booking.lesson.instructor)"
                               v-if="booking.lesson.instructor.profile.notification_methods.length>0"
-                            >contact</span>
+                            >Contact</span>
                             <span
-                              class="btn btn-danger"
+                              class="btn btn-danger mb-1"
                               @click="requestCancelBooking(booking)"
                               v-if="(booking.status!='cancelled' && !isPastLesson(booking.lesson.start))"
                             >Request Cancel</span>
@@ -263,4 +241,11 @@ export default {
 }
 </script>
 
-
+<style lang='scss'>
+.full-name-link {
+    color: #444444 !important;
+    font-family: "Hind Vadodara" !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+}
+</style>
