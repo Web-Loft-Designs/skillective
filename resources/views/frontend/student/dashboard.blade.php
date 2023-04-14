@@ -92,7 +92,7 @@
                     <div class="table-page">
                         <div class="table-component">
                             <div class="table-component-top">
-                                <h2>Genre Learning</h2>
+                                <h2>Skills and Learning</h2>
                                 <a href="/lessons">Book More Training</a>
                             </div>
                             <div class="table-component-body">
