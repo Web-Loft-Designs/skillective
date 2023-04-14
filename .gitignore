@@ -42,3 +42,4 @@ package.json
 /public/storage/users/*
 /public/storage/videos/*
 /database/seeds/TestSeeder.php
+composer.lock

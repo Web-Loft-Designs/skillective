@@ -3,7 +3,7 @@
     <form method="post" @submit.prevent="onSubmit" v-if="(maxInvitesEnabled-countSentInvites)>0">
 
       <input type="text" class="form-control" required v-model="fields.invited_contact" placeholder="Instructor's Instagram Handle">
-      <button type="submit">Send invite</button>
+      <button type="submit">Invite</button>
 
       <span class="help-block" v-if="errors.invited_contact">
                 <strong>{{ errors.invited_contact[0] }}</strong>

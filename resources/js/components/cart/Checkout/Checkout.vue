@@ -1,6 +1,9 @@
 <template>
   <div class="checkout">
-    <h1 class="checkout__heading">Checkout</h1>
+    <div class="checkout__head">
+      <h1 class="checkout__heading">Checkout</h1>
+      <a class="checkout__continue-shopping" href="/lessons">Continue shopping</a>
+    </div>
     <div class="checkout__row">
       <div class="checkout__column">
         <div class="user-info">

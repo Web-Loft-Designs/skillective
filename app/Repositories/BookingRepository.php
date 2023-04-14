@@ -98,12 +98,13 @@ class BookingRepository extends BaseRepository
         $this->pushCriteria(new StudentBookingTypeCriteria($type));
 
         $this->pushCriteria(new RequestCriteria($request));
-        if ($request->has('day'))
+        if ($request->has('day')) {
             $this->pushCriteria(new LessonScheduleForDayCriteria($request));
-        elseif ($request->has('week'))
+        } elseif ($request->has('week')) {
             $this->pushCriteria(new LessonScheduleForWeekCriteria($request));
-        elseif ($request->has('month'))
+        } elseif ($request->has('month')) {
             $this->pushCriteria(new LessonScheduleForMonthCriteria($request));
+        }
 
         $this->scopeQuery(function($query) use ($studentUserId){
             $query->join('users', 'bookings.instructor_id', '=', "users.id")
@@ -114,6 +115,8 @@ class BookingRepository extends BaseRepository
                 ->orderBy('bookings.created_at', 'desc');
             return $query;
         });
+
+
         $perPage = Cookie::get('studentBookingsPerPage', 25);
         $this->with(['student', 'lesson', 'lesson.instructor', 'lesson.instructor.profile', 'student.profile', 'lesson.genre']);
         if ($request->filled('limit'))

@@ -3,8 +3,8 @@
 namespace App\Http\Requests\API;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Auth;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+
 
 class FinishStudentRegistrationRequest extends FormRequest
 {

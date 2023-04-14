@@ -10,6 +10,7 @@ use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\FinishStudentRegistrationRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Hash;
 
 class UserFinishRegistrationController extends AppBaseController
 {
@@ -53,10 +54,14 @@ class UserFinishRegistrationController extends AppBaseController
 
 		$user = $this->userRepository->getByFinishRegistrationToken($request->input('token'), $request->input('email'));
 
-		if (!$user)
-			return $this->sendError('Unable to process your request.', 404);
+		if (!$user) {
+            return $this->sendError('Unable to process your request.', 404);
+        }
 
-		$user->update(['password'=>$request->input('password'), 'accepted_invitation_id' => null]);
+		$user->update([
+            'password'=>Hash::make($request->input('password')),
+            'accepted_invitation_id' => null
+        ]);
 		$user->setFinishRegistrationToken('');
 		$user->setStatus(User::STATUS_ACTIVE);
 

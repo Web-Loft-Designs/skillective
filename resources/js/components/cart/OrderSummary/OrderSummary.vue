@@ -52,7 +52,6 @@
         v-if="showCheckoutButton"
         >Checkout</a
       >
-      <a class="order-summary__continue" href="/lessons">Continue shopping</a>
     </div>
   </div>
 </template>

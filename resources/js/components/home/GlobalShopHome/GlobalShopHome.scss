@@ -1,0 +1,81 @@
+.featured-instructors {
+  padding: 56px 30px 116px 30px;
+
+  &__heading {
+    font-family: Poppins;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 28px;
+    line-height: 42px;
+    text-align: center;
+    color: #333333;
+    margin: 0 0 20px 0;
+  }
+
+  ::v-deep .slick-slider {
+    padding: 0 60px;
+    position: relative;
+    max-width: 1340px;
+    margin: 0 auto;
+
+    .slick-arrow {
+      z-index: 1;
+      top: calc(50% - 30px);
+      background: none;
+      border: none;
+      min-width: 60px;
+      min-height: 60px;
+      font-size: 0;
+      border-radius: 50%;
+      transition: background-color .25s, box-shadow .25s;
+      padding: 0;
+      position: absolute;
+      background-position: center;
+      background-repeat: no-repeat;
+      outline: none;
+      box-shadow: 0 0 0 0 rgba(138, 218, 0, 0.5);
+
+      &.slick-disabled {
+        pointer-events: none;
+      }
+
+      &:hover {
+        background-color: #f4f4f4;
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 4px rgba(138, 218, 0, 0.5);
+      }
+    }
+
+    .slick-next {
+      background-image: url("/images/arrow-next-color.svg");
+      right: 0;
+
+      &.slick-disabled {
+        background-image: url("/images/arrow-next.svg");
+      }
+    }
+
+    .slick-prev {
+      background-image: url("/images/arrow-prev-color.svg");
+      left: 0;
+
+      &.slick-disabled {
+        background-image: url("/images/arrow-prev.svg");
+      }
+    }
+
+    .slick-dots {
+      position: absolute;
+      top: calc(100% + 10px);
+      width: 100%;
+      left: 0;
+    }
+  }
+}
+
+
+//@media screen and (max-width: 900px) {
+//
+//}

@@ -15,9 +15,9 @@
                         <h2>Settings</h2>
                         <ul id="top-menu">
                             @if( !$loggedUserIsAdmin )
-                                <li class="active"><a class="scroll-to" href="#social-media-account-trigger">Social media account</a></li>
+                                <li class="active"><a class="scroll-to" href="#social-media-account-trigger">Social media accounts</a></li>
                             @endif
-                            <li><a class="scroll-to" href="#data-update-trigger">Personal info</a></li>
+                            <li><a class="scroll-to" href="#data-update-trigger">Profile Information</a></li>
                             <li><a class="scroll-to" href="#notifications-update-trigger">Notifications</a></li>
                             <li><a class="scroll-to" href="#merchant-account-trigger">Payouts Account</a></li>
                             <li><a class="scroll-to" href="#password-change-trigger">Change password</a></li>

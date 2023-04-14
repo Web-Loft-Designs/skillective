@@ -305,6 +305,7 @@ class ReportsBuilder {
 		$periodEnd = new \DateTime($periodEnd);
 
 		$period = new Period($periodStart, $periodEnd);
+
 		$response = Analytics::performQuery(
 			$period,
 			'ga:users'

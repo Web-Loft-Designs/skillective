@@ -1,4 +1,128 @@
 <template>
+  <div>
+  <div v-if='isSlider'>
+    <slick ref='featuredInstructorsSlick' :options='slickOptions'>
+      <div
+        v-for='(lesson, instructorIndex) in lessons'
+        :key='instructorIndex'
+        class='featured-instructor__outer px-3 py-3'
+      >
+      <img
+        class="video-lesson__image"
+        :src="lesson.preview"
+        :alt="lesson.preview"
+      />
+      <div v-if="showInstructorInfo" class="video-lesson__instructor-info">
+        <img
+          :src="lesson.instructor.profile.image"
+          :alt="lesson.instructor.full_name"
+        />
+        <h6>
+          <a
+            :href="
+                'https://www.instagram.com/' +
+                lesson.instructor.instagram_handle
+              "
+          >
+            @{{ lesson.instructor.instagram_handle }}
+          </a>
+        </h6>
+        <span>
+            <a :href="'/profile/' + lesson.instructor_id">
+              {{ lesson.instructor.full_name }}
+            </a></span
+        >
+      </div>
+      <div
+        :class="{
+            'video-lesson__content': true,
+            'video-lesson__content--wide-row-titles': purchased,
+          }"
+      >
+        <div class="video-lesson__title-container">
+          <span class="video-lesson__title">{{ lesson.title }}</span>
+          <options-menu
+            v-if="optionsMenuItems.length > 0"
+            :options="optionsMenuItems"
+            @menu-item-clicked="optionsMenuItemClicked($event, lesson)"
+          />
+        </div>
+        <div class="video-lesson__genres">
+          <span class="video-lesson__genre">{{ lesson.genre.title }}</span>
+        </div>
+        <div v-if="purchased" class="video-lesson__row">
+          <span class="video-lesson__row-title">Purchase date:</span>
+          <span class="video-lesson__row-value">{{
+              lesson.purchaseDate
+            }}</span>
+        </div>
+        <div class="video-lesson__row">
+          <span class="video-lesson__row-title">Created:</span>
+          <span class="video-lesson__row-value">{{ lesson.start }}</span>
+        </div>
+        <div v-if="lesson.duration" class="video-lesson__row">
+          <span class="video-lesson__row-title">Duration:</span>
+          <span class="video-lesson__row-value">{{ lesson.duration }}</span>
+        </div>
+
+        <div v-if="isInstructorView" class="video-lesson__row">
+          <span class="video-lesson__row-title">Total Revenue:</span>
+          <span class="video-lesson__row-value">
+              ${{ lesson.totalRevenue }}
+            </span>
+        </div>
+
+        <div v-if="isInstructorView" class="video-lesson__row">
+          <span class="video-lesson__row-title">Total Purchares:</span>
+          <span class="video-lesson__row-value">{{
+              lesson.totalPurchares
+            }}</span>
+        </div>
+
+        <div v-if="!purchased" class="video-lesson__row">
+            <span class="video-lesson__row-title video-lesson__row-title--price"
+            >Price:</span
+            >
+          <span class="video-lesson__row-value video-lesson__row-value--price"
+          >${{ lesson.price }}</span
+          >
+        </div>
+        <div class="video-lesson__button">
+          <a
+            v-if="cardButton == 'watch-student'"
+            class="video-lesson__more-info"
+            :href="'/student/library/video/' + lesson.id"
+          >Watch the Video</a
+          >
+          <a
+            v-if="cardButton == 'watch-instructor'"
+            class="video-lesson__more-info"
+            :href="'/instructor/my-shop/video/' + lesson.id"
+          >Watch the Video</a
+          >
+          <button
+            v-if="cardButton == 'more-info'"
+            class="video-lesson__more-info"
+            @click.prevent="showMoreInfoPopup(lesson)"
+          >
+            More info
+          </button>
+          <button
+            v-if="
+                cardButton == 'watch-instructor' ||
+                cardButton == 'watch-student'
+              "
+            class="video-lesson__more-info-link"
+            @click.prevent="showMoreInfoPopup(lesson)"
+          >
+            Show all info
+          </button>
+        </div>
+      </div>
+      </div>
+    </slick>
+  </div>
+  <template v-else>
   <div class="video-lessons-list">
     <div class="video-lessons-list__list" v-if="lessons.length">
       <div
@@ -122,7 +246,7 @@
     </div>
 
     <span v-else class="video-lessons-list__empty"
-      >No lessons for your request</span
+      >You currently have no lessons in your library.</span
     >
 
     <collapse-transition>
@@ -241,6 +365,8 @@
     >
       Show less
     </button>
+  </div>
+  </template>
     <video-lesson-info-popup
       :can-book="canBook"
       ref="videoLessonInfoPopup"
@@ -262,6 +388,37 @@ export default {
     VideoLessonInfoPopup,
     OptionsMenu,
   },
+  data() {
+    return{
+      collapsed: true,
+      slickOptions: {
+        autoplay: true,
+        infinite: true,
+        rows: 1,
+        dots: true,
+        slidesToShow: 3,
+        speed: 500,
+        slidesToScroll: 3,
+        responsive: [
+          {
+            breakpoint: 1300,
+            settings: {
+              slidesToShow: 2,
+              slidesToScroll: 2
+            }
+          },
+          {
+            breakpoint: 700,
+            settings: {
+              slidesToShow: 1,
+              slidesToScroll: 1,
+              dots: false,
+            }
+          }
+        ]
+      }
+    }
+  },
   methods: {
     showMoreInfoPopup(lesson) {
       this.$refs.videoLessonInfoPopup.showPopup(lesson);
@@ -274,10 +431,20 @@ export default {
     },
   },
   props: {
+    isSlider: {
+      type: Boolean,
+      default: false,
+    },
     lessons: {
       type: Array,
       default: () => {
         return [];
+      },
+    },
+    lesson: {
+      type: Object,
+      default: () => {
+        return {};
       },
     },
     collapsedLessons: {
@@ -296,7 +463,7 @@ export default {
     },
     isInstructorView: {
       type: Boolean,
-      deafult: false,
+      default: false,
     },
     optionsMenuItems: {
       type: Array,
@@ -319,11 +486,6 @@ export default {
       default: false,
     },
   },
-  data() {
-    return {
-      collapsed: true
-    };
-  }
 };
 </script>
 

@@ -12458,7 +12458,7 @@ a.text-dark:focus {
 }
 
 body {
-  margin-top: 80px;
+  margin-top: 70px;
 }
 
 @media (max-width: 767px) {
@@ -16614,7 +16614,7 @@ body {
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  padding: 25px 30px;
+  padding: 25px 40px;
   min-height: 80px;
   cursor: pointer;
 }
@@ -21779,11 +21779,6 @@ body {
 }
 
 .student-profile .password-form-container p {
-  color: #aaaaaa;
-  font-family: "Hind Vadodara";
-  font-size: 16px;
-  font-weight: 400;
-  margin-top: 22px;
   padding-right: 20px;
 }
 

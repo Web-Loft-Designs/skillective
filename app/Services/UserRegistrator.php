@@ -13,7 +13,6 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Str;
 
 
-
 class UserRegistrator {
     /**
      * @param InstructorRegisterRequest $request
@@ -133,7 +132,7 @@ class UserRegistrator {
      */
     protected function createStudent(array $data, $status = null)
 	{
-		if (!$status)
+        if (!$status)
 			$status = User::STATUS_ACTIVE;
 
 		DB::beginTransaction();
@@ -169,17 +168,17 @@ class UserRegistrator {
             $notification[] = 'email';
             if( array_key_exists('sms_notification', $data) ) $notification[] = 'sms';
 
-            if( isset($data['dob']) && $data['dob'] === 'Invalid date' ) $data['dob'] = null;
+            if(isset($data['mobile_phone'])) {
+                $data['mobile_phone'] = transforInputPhoneNumber($data['mobile_phone']); //to format +122222222222
+            }
 
 			$profile = new Profile( [
 				'address'			=> isset($data['address'])?$data['address']:'',
 				'city'				=> isset($data['city'])?$data['city']:'',
 				'state'				=> isset($data['state'])?$data['state']:'',
-				'dob'				=> isset($data['dob'])?$data['dob']:null,
 				'zip'				=> isset($data['zip'])?$data['zip']:'',
 				'mobile_phone'		=> isset($data['mobile_phone'])?$data['mobile_phone']:'',
 				'about_me'			=> isset($data['about_me'])?$data['about_me']:'',
-				'gender'			=> isset($data['gender'])?$data['gender']:'',
 				'instagram_handle'	=> isset($data['instagram_handle'])?$data['instagram_handle']:'',
                 'notification_methods' => isset($data['sms_notification'])?$notification:'',
 			] );

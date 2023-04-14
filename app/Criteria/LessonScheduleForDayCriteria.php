@@ -22,18 +22,18 @@ class LessonScheduleForDayCriteria implements CriteriaInterface
 		$this->request = $request;
 	}
 
+
     /**
-     * Apply criteria in query repository
-     *
-     * @param string              $model
+     * @param $model
      * @param RepositoryInterface $repository
-     *
      * @return mixed
      */
     public function apply($model, RepositoryInterface $repository)
     {
-		if ($this->request->has('day') && ($carbon = \Carbon\Carbon::createFromFormat('Y-m-d', $this->request->get('day'))) )
+		if ($this->request->has('day') && (Carbon::createFromFormat('Y-m-d', $this->request->get('day'))) ) {
 			$model = $model->whereRaw("( DATE(lessons.start) = '" . $this->request->get('day') . "' OR DATE(lessons.end) = '" . $this->request->get('day') . "' OR '" . $this->request->get('day') . "' BETWEEN DATE(lessons.start) AND DATE(lessons.end) )");
+        }
+
 		return $model;
     }
 }

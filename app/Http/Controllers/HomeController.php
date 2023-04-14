@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\LessonRepository;
+use App\Repositories\PreRLessonRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\GenreRepository;
 use App\Repositories\TestimonialRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Prettus\Repository\Exceptions\RepositoryException;
 
@@ -23,13 +25,17 @@ class HomeController extends AppBaseController
      * @return Application|Factory|View
      * @throws RepositoryException
      */
-    public function index(GenreRepository $genreRepository, TestimonialRepository $testimonialRepository, LessonRepository $lessonRepository, UserRepository $userRepository)
+    public function index(Request $request,GenreRepository $genreRepository, TestimonialRepository $testimonialRepository, LessonRepository $lessonRepository, UserRepository $userRepository, PreRLessonRepository $preRLessonRepository)
     {
 		$userIpLocation = '';
 		if (!$this->currentPage){
 			$this->currentPage = getCurrentPage('/');
 			view()->share( 'currentPage', $this->currentPage );
 		}
+        $request->query->set('lesson_type', 'pre_recorded');
+        $lessons = $preRLessonRepository->getPreRLessons($request);
+        $preRLessonRepository->setPresenter("App\\Presenters\\PreRLessonInListPresenter");
+        $lessons = $preRLessonRepository->presentResponse($lessons);
 
     	$vars = [
 			'siteGenres' => $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
@@ -40,6 +46,7 @@ class HomeController extends AppBaseController
 			'upcomingNearbyLessons' => $lessonRepository->upcomingNearbyLessons(request()->ip()),
 			'userIpLocation' => $userIpLocation,
             'userGenres' => Auth::check() ? $userRepository->presentResponse(Auth::user()->genres)['data'] : [],
+            'lessons' => $lessons
 		];
 
         return view('home', $vars);
