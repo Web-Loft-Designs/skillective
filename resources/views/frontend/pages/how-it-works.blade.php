@@ -32,7 +32,7 @@
 
 
 <section class="contact-us-section how--it">
-    <h1 class="title">{{ $currentPage->title }}</h1>
+    <h1 class="title" style="padding-bottom: 50px;">{{ $currentPage->title }}</h1>
 
 
     @foreach ($categorizedFaqs as $categoryTitle=>$faqs)
@@ -40,7 +40,7 @@
     {{ logger(json_encode($categoryTitle)) }}
 
     @if($categoryTitle == 'Instructions')
-    <div class="instruction--outer">
+  <!-- <div class="instruction--outer">
         <span class="title"> Instructions: </span>
         <div class="instruction-inner">
 
@@ -57,7 +57,7 @@
             </div>
             @endforeach
         </div>
-    </div>
+    </div> -->
     @endif
 
 

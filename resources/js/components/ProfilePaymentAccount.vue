@@ -2,7 +2,7 @@
     <div id="password-payment-account">
         <form method="post" id="payment-method-form" @submit.prevent="onSubmit">
 
-            <p class="login-box-msg">Payment account</p>
+            <p class="login-box-msg">Payment Methods</p>
             <div class="form-group has-feedback mb-5" >
                 <div class="radio-wrapper">
                     <label class="radio-item" for="isCard">

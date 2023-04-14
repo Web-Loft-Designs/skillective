@@ -58,7 +58,7 @@
 @if (is_array($featuredGenres) && count($featuredGenres)>0)
         <section class="slider-genres">
             <div class="container">
-                <h2 class="section-title">Popular Genres</h2>
+                <h2 class="section-title">Popular Skills</h2>
                 <slick class="slider" :options="{
               slidesToShow: 7,
               slidesToScroll: 1,
@@ -132,5 +132,4 @@
         </section>
     @endif
 
-        @include('include/benefit', ['title_block' => 'More benefits', 'benefits'=>$benefits])
 @endsection

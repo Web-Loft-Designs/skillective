@@ -132,7 +132,7 @@ class UserRegistrator {
      */
     protected function createStudent(array $data, $status = null)
 	{
-		if (!$status)
+        if (!$status)
 			$status = User::STATUS_ACTIVE;
 
 		DB::beginTransaction();
@@ -167,6 +167,10 @@ class UserRegistrator {
 
             $notification[] = 'email';
             if( array_key_exists('sms_notification', $data) ) $notification[] = 'sms';
+
+            if(isset($data['mobile_phone'])) {
+                $data['mobile_phone'] = transforInputPhoneNumber($data['mobile_phone']); //to format +122222222222
+            }
 
 			$profile = new Profile( [
 				'address'			=> isset($data['address'])?$data['address']:'',

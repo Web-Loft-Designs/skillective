@@ -2,6 +2,7 @@
 
 namespace App\Criteria;
 
+use Carbon\Carbon;
 use Prettus\Repository\Contracts\CriteriaInterface;
 use Prettus\Repository\Contracts\RepositoryInterface;
 use Illuminate\Http\Request;
@@ -20,17 +21,15 @@ class LessonScheduleForWeekCriteria implements CriteriaInterface
 		$this->request = $request;
 	}
 
+
     /**
-     * Apply criteria in query repository
-     *
-     * @param string              $model
+     * @param $model
      * @param RepositoryInterface $repository
-     *
      * @return mixed
      */
     public function apply($model, RepositoryInterface $repository)
     {
-		if ($this->request->has('week') && ($carbon = \Carbon\Carbon::createFromFormat('Y-m-d', $this->request->get('week'))) ){
+		if ($this->request->has('week') && (Carbon::createFromFormat('Y-m-d', $this->request->get('week'))) ) {
 			$weekStartDay = date("Y-m-d", strtotime('monday this week', strtotime($this->request->get('week'))));
             $weekEndDay = date("Y-m-d", strtotime('sunday next week', strtotime($this->request->get('week'))));
             
