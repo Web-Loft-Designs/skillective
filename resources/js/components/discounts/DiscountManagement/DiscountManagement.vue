@@ -58,7 +58,7 @@ export default {
         },
         {
           code: 'promo',
-          title: 'Promo code'
+          title: 'Promo Code'
         }
       ]
     }

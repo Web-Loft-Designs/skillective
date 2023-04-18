@@ -37,7 +37,7 @@
                 >
                 </radial-progress-bar>
                 <span>
-                  {{ count_booked }} of {{ spots_count }} Clients Bookings
+                  {{ count_booked }} of {{ spots_count }} clients booked
                 </span>
               </div>
 

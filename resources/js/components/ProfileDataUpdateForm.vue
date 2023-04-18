@@ -228,8 +228,7 @@
           :class="{ 'has-error': errors.genres }"
           v-if="fields.genres != undefined"
         >
-          <label v-if="userProfileData.isInstructor">Genres</label>
-          <label v-if="!userProfileData.isInstructor">Genres</label>
+          <label>Skills</label>
           <div class="scroll">
             <div class="genres-wrapper">
               <div class="item" v-for="(genres, catTitle) in categorizedGenres">
