@@ -11,19 +11,14 @@ use Braintree\Exception\NotFound;
 use Braintree\Gateway;
 use Braintree\MerchantAccount;
 use Braintree\PayPalAccount;
-use Braintree\Result;
 use Braintree\Result\Error;
 use Braintree\Result\Successful;
-use Braintree\Webhook;
+//use Braintree\Webhook;
 use Illuminate\Support\Facades\Log;
 
 class BraintreeProcessor
 {
 
-
-    /**
-     * @var UserRepository
-     */
     private $userRepository;
 
 
@@ -426,6 +421,8 @@ class BraintreeProcessor
             'lineItems' => $lineItems
         ]);
 
+
+
         if($result->success) {
             return $result->transaction;
         } else {
@@ -582,6 +579,7 @@ class BraintreeProcessor
         }
         return null;
     }
+
 
     /**
      * @param $type

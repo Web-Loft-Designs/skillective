@@ -240,7 +240,6 @@ class CartAPIController extends AppBaseController
         $cartCount = count($cart);
 
         $nonce = $request->input('payment_method_nonce');
-
         $appendedGenres = array();
 
         $discounts = [];
