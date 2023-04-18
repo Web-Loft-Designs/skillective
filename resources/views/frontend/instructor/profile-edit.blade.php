@@ -15,12 +15,12 @@
                         <h2>Settings</h2>
                         <ul id="top-menu">
                             @if( !$loggedUserIsAdmin )
-                                <li class="active"><a class="scroll-to" href="#social-media-account-trigger">Social media accounts</a></li>
+                                <li class="active"><a class="scroll-to" href="#social-media-account-trigger">Social Media</a></li>
                             @endif
-                            <li><a class="scroll-to" href="#data-update-trigger">Profile Information</a></li>
+                            <li><a class="scroll-to" href="#data-update-trigger">Profile</a></li>
                             <li><a class="scroll-to" href="#notifications-update-trigger">Notifications</a></li>
                             <li><a class="scroll-to" href="#merchant-account-trigger">Payouts Account</a></li>
-                            <li><a class="scroll-to" href="#password-change-trigger">Change password</a></li>
+                            <li><a class="scroll-to" href="#password-change-trigger">Change Password</a></li>
                             @if( $loggedUserIsAdmin )
                                 <li><a class="scroll-to" href="#invitations-limit">Invitations limit</a></li>
                             @endif

@@ -24,7 +24,7 @@
                             @if( Auth::user()->hasRole('Student') )
                                 <li><a class="scroll-to" href="#payment-account-trigger">Payment Methods</a></li>
                             @endif
-                            <li><a class="scroll-to" href="#password-change-trigger">Change password</a></li>
+                            <li><a class="scroll-to" href="#password-change-trigger">Change Password</a></li>
                             @if( $loggedUserIsAdmin )
                                 <li><a class="scroll-to" href="#invitations-limit">Invitations limit</a></li>
                             @endif

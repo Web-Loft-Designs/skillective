@@ -27,13 +27,15 @@
             v-if='showPastLesson'
             @click.prevent="toggleShowOnly('past')"
             :class="{ active: showOnly == 'past' }"
-          >Past
+          >
+            Past
           </a>
           <a
             href='#'
             @click.prevent="toggleShowOnly('lesson_requests')"
             :class="{ active: showOnly == 'lesson_requests' }"
-          >Client Booking Requests ({{ pendingRequestCount }})
+          >
+            Client Booking Requests ({{ pendingRequestCount }})
           </a>
         </span>
         <div class='sort-select'>
@@ -131,7 +133,7 @@
         </div>
       </div>
       <div v-if='listItems.length === 0'>
-        <p class='text-center'>No {{ showOnly.replace("_", " ") }} bookings</p>
+        <p class='text-center'>No bookings</p>
       </div>
     </div>
     <a
