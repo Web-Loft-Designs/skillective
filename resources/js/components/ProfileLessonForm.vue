@@ -29,7 +29,7 @@
               v-if='!fields.id'
               class='login-box-msg col-12'
             >
-              Add Lesson Time
+              Add Event
             </h2>
             <h2
               v-else
@@ -53,7 +53,7 @@
               :class="{ 'has-error': errors.genre }"
               class='col-12 form-group has-feedback'
             >
-              <label>Genre</label>
+              <label>Skill</label>
               <select
                 v-model='fields.genre'
                 class='form-control'
@@ -76,7 +76,7 @@
               </span>
             </div>
             <div class='form-group col-4 has-feedback'>
-              <label>Lesson preview</label>
+              <label>Event Hero Image</label>
               <div
                 :class="{
                 'add-lesson-popup__upload': true,
@@ -100,7 +100,7 @@
                   />
                 </div>
                 <span class='add-lesson-popup__upload-title'>
-                  Lesson preview
+                  Upload Image
                 </span>
                 <span class='add-lesson-popup__upload-formats'>PNG, JPG up to 10MB</span>
                 <div
@@ -136,7 +136,7 @@
               :class="{ 'has-error': errors.lesson_type }"
               class='form-group col-4 has-feedback'
             >
-              <label>Type of Lesson</label>
+              <label>Event Type</label>
               <select
                 v-model='fields.lesson_type'
                 class='form-control'
@@ -290,42 +290,22 @@
               v-if='!fields.id'
               class='col-lg-6 col-sm-6 col-12 form-group has-feedback'
             >
-              <toggle-button
-                v-model='isTimeIntervals'
-                :color="{
-                  checked: '#a94442',
-                  unchecked: '#01bd00',
-                }"
-                :font-size='14'
-                :height='38'
-                :labels="{
-                  checked: 'Disable time intervals',
-                  unchecked: 'Enable time intervals',
-                }"
-                :sync='true'
-                :width='186'
-              />
+              <label for='enableIntervals'>
+                Enable time intervals
+                <input v-model='isTimeIntervals' type='checkbox' name='enableIntervals' id='enableIntervals'>
+                <span class='checkmark'></span>
+              </label>
             </div>
 
             <div
               v-if='!fields.id'
-              class='col-lg-6 col-sm-6 col-12 form-group has-feedback'
+              class='col-lg-6 col-sm-6 col-12 form-group has-feedback field'
             >
-              <toggle-button
-                v-model='isRecurring'
-                :color="{
-                  checked: '#a94442',
-                  unchecked: '#01bd00',
-                }"
-                :font-size='14'
-                :height='38'
-                :labels="{
-                  checked: 'Disable recurring',
-                  unchecked: 'Enable recurring',
-                }"
-                :sync='true'
-                :width='166'
-              />
+              <label for='enableRecurring'>
+                  Enable recurring
+                <input v-model='isRecurring' type='checkbox' name='enableRecurring' id='enableRecurring'>
+                <span class='checkmark'></span>
+              </label>
             </div>
 
             <div
@@ -473,7 +453,7 @@
                     type='number'
                   />
                 </span>
-                <span class='per-lesson'>Per lesson</span>
+                <span class='per-lesson'>per person</span>
               </div>
 
               <span
@@ -502,7 +482,7 @@
                   />
                 </span>
               </span>
-              <label>Max students</label>
+              <label>Attendance Limit</label>
               <input
                 v-model.number='fields.spots_count'
                 class='form-control'
@@ -523,7 +503,7 @@
               :class="{ 'has-error': errors.description }"
               class='form-group col-12 has-feedback'
             >
-              <label>What I am teaching, offering or sharing:</label>
+              <label>Event Description:</label>
               <text-editor
                 v-model='fields.description'
                 name='description'
@@ -1028,7 +1008,7 @@ export default {
       this.uploadPreviewProgress = 101
     },
     getShareLink() {
-      console.log(this.fields,'zxc')
+      console.log(this.fields, 'zxc')
       return shareHelper.buildShareLink(this.instructorId, this.fields.id, this.fields.date)
     },
     initDateFrom() {
@@ -1174,5 +1154,65 @@ export default {
 @import './student/VideoLessonsList/VideoLessonsList.scss';
 .pac-container {
   z-index: 10000 !important;
+}
+label {
+  color: #444;
+  font-family: 'Hind Vadodara';
+  font-size: 16px;
+  font-weight: 400;
+  position: relative;
+  padding-left: 35px;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-top: 10px;
+  input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #fff;
+    border: 1px solid #cccccc;
+  }
+
+  &:hover input ~ .checkmark {
+    background-color: #fff;
+    border: 1px solid #eee;
+  }
+
+  input:checked ~ .checkmark {
+    background-color: #8ada00;
+    border: 1px solid #8ada00;
+  }
+
+
+  input:checked ~ .checkmark:after {
+    display: block;
+    -webkit-transform: rotate(45deg) scale(1);
+    -ms-transform: rotate(45deg) scale(1);
+    transform: rotate(45deg) scale(1);
+  }
+
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: 3px;
+    width: 9px;
+    height: 16px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg) scale(0);
+    -ms-transform: rotate(45deg) scale(0);
+    transform: rotate(45deg) scale(0);
+    transition: all 0.25s ease;
+  }
 }
 </style>
