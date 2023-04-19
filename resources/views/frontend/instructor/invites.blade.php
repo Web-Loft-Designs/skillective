@@ -50,7 +50,6 @@
                         @foreach ($how_this_works_blocks as $index=>$b)
                         <div class="item col-md-4 col-sm-6 col-12">
                             <div>
-                                <img src="{{ $b['_image_block'] }}" alt="">
                                 <h3>{{ $b['title'] }}</h3>
                                 <p>{{ $b['text'] }}</p>
                             </div>
