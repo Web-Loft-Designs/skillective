@@ -160,7 +160,6 @@ class PreRecordedLesson extends Model
             $purchashedLesson->service_fee,
             $purchashedLesson->processor_fee
         );
-        dd($transaction);
 
         $purchashedLesson->transaction_id        = $transaction->id;
         $purchashedLesson->transaction_status    = $transaction->status;

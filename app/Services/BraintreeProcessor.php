@@ -13,7 +13,7 @@ use Braintree\MerchantAccount;
 use Braintree\PayPalAccount;
 use Braintree\Result\Error;
 use Braintree\Result\Successful;
-//use Braintree\Webhook;
+use Braintree\Webhook;
 use Illuminate\Support\Facades\Log;
 
 class BraintreeProcessor
