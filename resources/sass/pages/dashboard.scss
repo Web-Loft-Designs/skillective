@@ -443,7 +443,7 @@
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            color: #aaaaaa;
+            color: #db4437;
             font-family: "Hind Vadodara";
             font-size: 14px;
             font-weight: 600;
@@ -895,7 +895,7 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        color: #aaaaaa;
+        color: #db4437;
         font-family: "Hind Vadodara";
         font-size: 14px;
         font-weight: 600;
@@ -2170,7 +2170,7 @@
 
     .time-intervals-dropdowns {
         display: flex;
-      
+
         .col-sm-6 {
             flex: 1;
         }
@@ -4427,26 +4427,29 @@
 
             span {
                 color: #fff;
-                font-family: "Poppins";
+                font-family: 'Poppins';
                 font-size: 22px;
                 font-weight: 600;
                 position: relative;
                 display: inline-block;
                 z-index: 1;
-                margin: 0 17px;
+                margin: 0 8px;
+                background-color: #8ada00;
+                border-radius: 15px;
+                padding: 0 10px;
 
-                &::before {
-                    content: "";
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    height: 40px;
-                    width: 40px;
-                    border-radius: 100%;
-                    background-color: #8ada00;
-                    z-index: -1;
-                }
+                //&::before {
+                //    content: "";
+                //    position: absolute;
+                //    top: 50%;
+                //    left: 50%;
+                //    transform: translate(-50%, -50%);
+                //    height: 40px;
+                //    width: 40px;
+                //    border-radius: 100%;
+                //    background-color: #8ada00;
+                //    z-index: -1;
+                //}
             }
         }
     }
@@ -5375,30 +5378,30 @@ h4 {
         border-radius: 5px;
         border: 1px solid #e9e9e9;
         background-color: #ffffff;
-    
+
         .page-title {
             color: #444444;
             font-family: "Hind Vadodara";
             font-size: 19px;
             font-weight: 600;
         }
-    
+
         .table-top {
             padding: 20px;
             margin: 0;
         }
-    
+
         .table {
             margin: 0;
-    
+
             td:first-child, th:first-child {
                 padding-left: 30px;
             }
-    
+
             td:last-child, th:last-child {
                 padding-right: 30px;
             }
-    
+
             td {
                 border-top: none;
                 border-bottom: 1px solid #ddd;
@@ -5575,7 +5578,7 @@ h4 {
             }
         }
 
-        &.green {
+        &.success {
             .checkmark:before {
                 background-color: #7ed321;
             }

@@ -129,7 +129,7 @@ export default {
           type: "image",
         },
         {
-          title: "Student",
+          title: "Client",
           type: "text",
         },
         {

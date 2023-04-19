@@ -33,8 +33,8 @@
       class='promos-editor__item'
     >
       <div class='promos-editor__item-header'>
-        <h3 v-if="viewMode === 'create'">Create Promo code</h3>
-        <h3 v-else-if="viewMode === 'edit'">Edit Promo code</h3>
+        <h3 v-if="viewMode === 'create'">Create Promo Code</h3>
+        <h3 v-else-if="viewMode === 'edit'">Edit Promo Code</h3>
         <h3 v-else-if='promo.title'>{{ promo.title }}</h3>
         <h3 v-else>Promo code {{ promoIndex + 1 }}</h3>
         <options-menu
@@ -46,7 +46,7 @@
       </div>
       <div class='promos-editor__item-row'>
         <div class='promos-editor__item-col discounts-editor__item-col--full'>
-          <span class='promos-editor__item-col-title'>Promo code</span>
+          <span class='promos-editor__item-col-title'>Promo Code</span>
           <copy-input
             :readonly="viewMode === 'list'"
             :value='promo.name'
@@ -161,7 +161,7 @@
         </div>
         <div class='promos-editor__item-row'>
           <div class='promos-editor__item-col'>
-            <span class='promos-editor__item-col-title'>Method of notification</span>
+            <span class='promos-editor__item-col-title'>Notification Type</span>
             <select-with-search
               :options='promoOptions.notifMethods'
               :value='notice.notifMethod'
