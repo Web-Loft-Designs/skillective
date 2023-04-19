@@ -18,7 +18,7 @@
                 <li><a href="{{ route('instructor.invites') }}">Invite instructor <span class="count-sent-instructor-invitations circle-badge">{{ Auth::user()->getMaxAllowedInstructorInvites() - $countInstructorInvitationsSent }}</span></a></li>
                 <li><a href="{{ route('instructor.discount-management') }}">Discount Management</a></li>
                 <li><a href="{{ route('instructor.my-shop') }}">My Shop</a></li>
-                <li><a href="{{ route('instructor.incomes') }}">Incomes</a></li>
+                <li><a href="{{ route('instructor.incomes') }}">Income</a></li>
                 <li><a href="{{ route('instructor.payouts') }}">Payouts</a></li>
             @endif
             <li><a href="{{ route('profile.edit') }}">Settings</a></li>
