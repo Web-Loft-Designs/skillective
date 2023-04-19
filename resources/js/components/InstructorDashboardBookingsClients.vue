@@ -1,5 +1,5 @@
 <template>
-  <div class="tabs">
+  <div class='tabs'>
     <ul>
       <li
         @click="selectTab('bookings')"
@@ -15,26 +15,27 @@
       </li>
     </ul>
 
-    <div class="tab" v-if="active === 'bookings'">
+    <div class='tab' v-if="active === 'bookings'">
       <instructor-bookings-dashboard-list
-        :bookings="bookings"
-        :bookings-meta="bookingsMeta"
+        :bookings='bookings'
+        :bookings-meta='bookingsMeta'
       >
       </instructor-bookings-dashboard-list>
     </div>
 
-    <div class="tab" v-if="active === 'clients'">
-      <div class="clients-table">
-        <div class="clients-table-header">
+    <div class='tab' v-if="active === 'clients'">
+      <div class='clients-table'>
+        <div class='clients-table-header'>
 
           <instructor-clients-add-form></instructor-clients-add-form>
         </div>
 
-        <instructor-clients-dashboard-list :clients="clients">
+        <instructor-clients-dashboard-list :clients='clients'>
         </instructor-clients-dashboard-list>
 
-        <a href="/instructor/clients" class="btn btn-block btn-secondary"
-          >View all</a
+        <a
+          href='/instructor/clients' class='btn btn-block btn-secondary'
+        >View all</a
         >
       </div>
     </div>
@@ -46,17 +47,17 @@ export default {
   props: {
     bookings: null,
     bookingsMeta: {},
-    clients: null,
+    clients: null
   },
   data() {
-    return { active: "bookings" };
+    return { active: 'bookings' }
   },
   methods: {
     selectTab(selectedTab) {
-      this.active = selectedTab;
-    },
-  },
-};
+      this.active = selectedTab
+    }
+  }
+}
 </script>
 
 
