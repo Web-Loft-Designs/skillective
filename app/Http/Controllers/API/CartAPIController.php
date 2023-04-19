@@ -19,6 +19,7 @@ use App\Models\PurchasedLesson;
 use App\Repositories\UserRepository;
 use App\Repositories\CartRepository;
 use App\Facades\UserRegistrator;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
@@ -240,7 +241,6 @@ class CartAPIController extends AppBaseController
         $cartCount = count($cart);
 
         $nonce = $request->input('payment_method_nonce');
-
         $appendedGenres = array();
 
         $discounts = [];

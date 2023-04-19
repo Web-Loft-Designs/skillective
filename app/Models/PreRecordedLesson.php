@@ -121,6 +121,7 @@ class PreRecordedLesson extends Model
 
         if ($paymentMethodNonce) {
             $device_data = $request->input('device_data', null);
+
             $paymentMethod = BraintreeProcessor::createPaymentMethod($student, $paymentMethodNonce, $device_data);
         } else {
             $paymentMethodToken = $request->input('payment_method_token', null);
@@ -159,6 +160,7 @@ class PreRecordedLesson extends Model
             $purchashedLesson->service_fee,
             $purchashedLesson->processor_fee
         );
+        dd($transaction);
 
         $purchashedLesson->transaction_id        = $transaction->id;
         $purchashedLesson->transaction_status    = $transaction->status;
