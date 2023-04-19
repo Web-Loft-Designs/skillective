@@ -19,6 +19,7 @@ use App\Models\PurchasedLesson;
 use App\Repositories\UserRepository;
 use App\Repositories\CartRepository;
 use App\Facades\UserRegistrator;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
