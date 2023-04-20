@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Request;
 
 class UploadVideoAPIController extends AppBaseController
 {
+
     /**
      * @param Request $request
      * @return JsonResponse|never|void
@@ -19,9 +20,6 @@ class UploadVideoAPIController extends AppBaseController
         if(Request::hasFile('uploaded_video')){
 
             $user = Auth::user();
-
-            if (!$user)
-                return abort(404);
 
             $file = Request::file('uploaded_video');
             $filename = md5(uniqid(rand(), true)) . '.' . $file->getClientOriginalExtension();
