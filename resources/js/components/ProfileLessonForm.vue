@@ -507,7 +507,7 @@
               <text-editor
                 v-model='fields.description'
                 name='description'
-                placeholder='provide a description'
+                placeholder='Describe what you are teaching, offering, or sharing...'
               />
               <span
                 v-if='errors.description'
