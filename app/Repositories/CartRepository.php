@@ -44,7 +44,9 @@ class CartRepository extends BaseRepository
      */
     public function getUserCart($student_id, $product_list)
     {
+
         if ($student_id) {
+
             $this->scopeQuery(function ($query) use ($student_id) {
                 $query
                     ->select('cart.*')
@@ -89,6 +91,7 @@ class CartRepository extends BaseRepository
                         unset($carts[$index]);
                     }
                 }
+
                 if ($cartItem->lesson_id && !$cartItem->pre_r_lesson_id) {
                     $cartItem->discounts = $cartItem->lesson->instructor->discounts;
                     $handledDiscounts = Discount::validateDiscount($cartItem->discounts, $carts);
