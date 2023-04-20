@@ -12,7 +12,7 @@
           <th class='w-140'>Name</th>
           <th class='w-140'>Email</th>
           <th class='w-140'>Phone</th>
-          <th>Genre</th>
+          <th>Skills</th>
           <th></th>
         </tr>
         </thead>

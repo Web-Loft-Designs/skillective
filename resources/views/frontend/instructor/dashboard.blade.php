@@ -76,7 +76,7 @@
                     </div>
                 </div>
 -->
-
+<!--
                 <div class="col-12">
                     <div class="invite-block" style="background-image: url('{{asset('images/invide-bg.jpg')}}')">
                         <div>
@@ -90,6 +90,7 @@
                         </div>
                     </div>
                 </div>
+-->
             </div>
         </div>
     </div>
