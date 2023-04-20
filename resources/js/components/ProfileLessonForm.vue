@@ -307,29 +307,6 @@
                 <span class='checkmark'></span>
               </label>
             </div>
-
-            <div
-              v-if='isRecurring && !fields.id'
-              class='col-lg-6 col-sm-6 col-12 form-group has-feedback'
-            >
-              <label> Recurrence frequencies: </label>
-              <select
-                v-model='fields.recurrence_frequencies'
-                class='form-control'
-              >
-                <option value='0'>Disable recurring</option>
-                <option value='day'>Daily</option>
-                <option value='week'>Weekly</option>
-                <option value='week2'>Every 2 Weeks</option>
-                <option value='month'>Monthly</option>
-              </select>
-              <span
-                v-if='errors.recurrence_frequencies'
-                class='help-block'
-              >
-                <strong>{{ errors.recurrence_frequencies[0] }}</strong>
-              </span>
-            </div>
             <div
               v-if='isRecurring && !fields.id'
               class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
@@ -518,10 +495,9 @@
             </div>
 
             <div class='col-12'>
-              <span>
-                Instructor is responsible for collecting any and all applicable
-                taxes for the location in which the lesson takes place.
-              </span>
+              <i>
+                * Instructor is responsible for collecting any and all applicable taxes for the location in which the lesson takes place.
+              </i>
             </div>
             <div class='col-12'>
               <div
@@ -553,7 +529,7 @@
                 type='submit'
                 @keypress.enter.prevent
               >
-                Add lesson
+                Add Event
               </button>
 
               <button
@@ -704,6 +680,8 @@ export default {
       if (!this.isRecurring) {
         this.fields.recurrence_until = null
         this.fields.recurrence_frequencies = 0
+      } else {
+        this.fields.recurrence_frequencies = 'week'
       }
     },
     isTimeIntervals() {
