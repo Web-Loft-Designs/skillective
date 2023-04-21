@@ -35,7 +35,7 @@
               v-else
               class='login-box-msg col-12'
             >
-              Edit Lesson
+              Edit Event
             </h2>
 
             <div
@@ -48,7 +48,23 @@
                 readonly
               />
             </div>
-
+            <div
+              :class="{ 'has-error': errors.genre }"
+              class='col-12 form-group has-feedback'
+            >
+              <label>Title</label>
+              <input
+                v-model='fields.title'
+                class='form-control'
+                name='title'
+              />
+              <span
+                v-if='errors.genre'
+                class='help-block'
+              >
+                <strong>{{ errors.genre[0] }}</strong>
+              </span>
+            </div>
             <div
               :class="{ 'has-error': errors.genre }"
               class='col-12 form-group has-feedback'
@@ -288,7 +304,7 @@
 
             <div
               v-if='!fields.id'
-              class='col-lg-6 col-sm-6 col-12 form-group has-feedback'
+              class='col-lg-6 col-sm-6 col-12 form-group check-box has-feedback'
             >
               <label for='enableIntervals'>
                 Enable time intervals
@@ -299,7 +315,7 @@
 
             <div
               v-if='!fields.id'
-              class='col-lg-6 col-sm-6 col-12 form-group has-feedback field'
+              class='col-lg-6 col-sm-6 col-12 form-group check-box has-feedback field'
             >
               <label for='enableRecurring'>
                   Enable recurring
@@ -589,6 +605,7 @@ export default {
       shareLink: '',
       fields: {
         recurrence_until: null,
+        title: '',
         recurrence_frequencies: 0,
         preview: '',
         genre: null,
@@ -894,6 +911,7 @@ export default {
 
     this.$root.$on('lessonUpdateInit', (lesson) => {
       this.fields = {
+        title: lesson.title,
         id: lesson.id,
         genre: lesson.genre_id,
         date: moment(lesson.start)
@@ -986,7 +1004,6 @@ export default {
       this.uploadPreviewProgress = 101
     },
     getShareLink() {
-      console.log(this.fields, 'zxc')
       return shareHelper.buildShareLink(this.instructorId, this.fields.id, this.fields.date)
     },
     initDateFrom() {
@@ -1133,64 +1150,66 @@ export default {
 .pac-container {
   z-index: 10000 !important;
 }
-label {
-  color: #444;
-  font-family: 'Hind Vadodara';
-  font-size: 16px;
-  font-weight: 400;
-  position: relative;
-  padding-left: 35px;
-  cursor: pointer;
-  margin-right: 10px;
-  margin-top: 10px;
-  input {
-    position: absolute;
-    opacity: 0;
+.check-box {
+  label {
+    color: #444;
+    font-family: 'Hind Vadodara';
+    font-size: 16px;
+    font-weight: 400;
+    position: relative;
+    padding-left: 35px;
     cursor: pointer;
-    height: 0;
-    width: 0;
-  }
-  .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 25px;
-    width: 25px;
-    background-color: #fff;
-    border: 1px solid #cccccc;
-  }
+    margin-right: 10px;
+    margin-top: 10px;
+    input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+    .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 25px;
+      width: 25px;
+      background-color: #fff;
+      border: 1px solid #cccccc;
+    }
 
-  &:hover input ~ .checkmark {
-    background-color: #fff;
-    border: 1px solid #eee;
-  }
+    &:hover input ~ .checkmark {
+      background-color: #fff;
+      border: 1px solid #eee;
+    }
 
-  input:checked ~ .checkmark {
-    background-color: #8ada00;
-    border: 1px solid #8ada00;
-  }
+    input:checked ~ .checkmark {
+      background-color: #8ada00;
+      border: 1px solid #8ada00;
+    }
 
 
-  input:checked ~ .checkmark:after {
-    display: block;
-    -webkit-transform: rotate(45deg) scale(1);
-    -ms-transform: rotate(45deg) scale(1);
-    transform: rotate(45deg) scale(1);
-  }
+    input:checked ~ .checkmark:after {
+      display: block;
+      -webkit-transform: rotate(45deg) scale(1);
+      -ms-transform: rotate(45deg) scale(1);
+      transform: rotate(45deg) scale(1);
+    }
 
-  .checkmark:after {
-    content: "";
-    position: absolute;
-    left: 8px;
-    top: 3px;
-    width: 9px;
-    height: 16px;
-    border: solid white;
-    border-width: 0 3px 3px 0;
-    -webkit-transform: rotate(45deg) scale(0);
-    -ms-transform: rotate(45deg) scale(0);
-    transform: rotate(45deg) scale(0);
-    transition: all 0.25s ease;
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 3px;
+      width: 9px;
+      height: 16px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      -webkit-transform: rotate(45deg) scale(0);
+      -ms-transform: rotate(45deg) scale(0);
+      transform: rotate(45deg) scale(0);
+      transition: all 0.25s ease;
+    }
   }
 }
 </style>
