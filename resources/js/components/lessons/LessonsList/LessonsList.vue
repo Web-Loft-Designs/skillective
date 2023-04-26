@@ -51,6 +51,9 @@
                     >
                 </div>
                 <div class="lesson__footer">
+                    <div v-if="lesson.title" class="lesson__genre">
+                        {{ lesson.title }}
+                    </div>
                     <div class="lesson__footer-head">
                         <div class="lesson__genre">
                             {{ lesson.genre.title }}
@@ -59,9 +62,6 @@
                             ${{ lesson.spot_price }}
                             <span>lesson</span>
                         </span>
-                    </div>
-                    <div v-if="lesson.title" class="lesson__date">
-                        {{ lesson.title }}
                     </div>
                     <div v-if="lesson.start && lesson.end" class="lesson__date">
                         {{ formatDate(lesson.start, lesson.end) }}

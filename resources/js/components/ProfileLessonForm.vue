@@ -225,24 +225,6 @@
               </span>
             </div>
 
-              <div :class="{ 'has-error': errors.title }" class='form-group col-12 has-feedback'>
-                  <label>Title</label>
-                  <input
-                          ref='lessonLocation'
-                          v-model='fields.title'
-                          class='form-control'
-                          name='title'
-                          type='text'
-                          value
-                  />
-                  <span
-                          v-if='errors.title'
-                          class='help-block'
-                  >
-                <strong>{{ errors.location[0] }}</strong>
-              </span>
-              </div>
-
             <div
               :class="{ 'has-error': errors.date }"
               class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
@@ -627,7 +609,6 @@ export default {
         recurrence_frequencies: 0,
         preview: '',
         genre: null,
-        title: '',
         date: '',
         date_to: null,
         time_from: '',
@@ -947,7 +928,6 @@ export default {
         lesson_type: lesson.lesson_type,
         timezone_id: lesson.timezone_id,
         description: lesson.description,
-        title: lesson.title,
         count_booked: lesson.count_booked,
         preview: lesson.preview
       }
