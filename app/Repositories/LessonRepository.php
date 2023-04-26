@@ -390,7 +390,7 @@ class LessonRepository extends BaseRepository
             $instructor_id = Auth::user()->id;
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
         $upcomingLessonsLocations = $this
-            ->select(DB::raw('DATE(start) as date_day_start'), 'city', 'state')
+            ->select(DB::raw('DATE(start) as date_day_start'), 'city', 'state', 'title')
             ->groupBy('date_day_start', 'city', 'state')
             ->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) <= lessons.start")
             ->whereRaw(" ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) ")
@@ -437,7 +437,7 @@ class LessonRepository extends BaseRepository
             $instructor_id = Auth::user()->id;
         $this->pushCriteria(new LessonInFutureCriteria());
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s');
-        $upcomingLessonsLocations = $this->select(DB::raw('DATE(start) as date_day_start'), 'genre_id')
+        $upcomingLessonsLocations = $this->select(DB::raw('DATE(start) as date_day_start'), 'genre_id', 'title')
             ->whereRaw("CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) <= lessons.start")
             ->whereRaw(" ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) ")
             ->where('lessons.lesson_type', 'virtual')

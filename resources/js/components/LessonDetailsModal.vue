@@ -11,6 +11,7 @@
         <h2 class='d-flex align-items-center'>
           {{ selectedLesson.title }}
         </h2>
+        <p class='instructor-full_name'>{{ selectedLesson.genre.title }}</p>
         <p class='instructor-full_name'>{{ selectedLesson.instructor.full_name }}</p>
         <p class='instructor-instagram'>@{{ selectedLesson.instructor.profile.instagram_handle }}</p>
         <span class='lesson-type'>
@@ -183,7 +184,6 @@ export default {
     componentHandleGetResponse(responseData) {
       this.selectedLesson = responseData.data.data
       this.selectedLesson.content = responseData.data.data
-      this.selectedLesson.title = this.selectedLesson.genre.title
       this.selectedLesson.fullDate =
         moment(this.selectedLesson.start).format('MMM') +
         ' ' +

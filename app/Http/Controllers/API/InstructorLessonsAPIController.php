@@ -337,7 +337,8 @@ class InstructorLessonsAPIController extends AppBaseController
             'recurrence_until',
             'recurrence_frequencies',
             'interval_break',
-            'preview'
+            'preview',
+            'title'
         ]);
 
         $input['start'] = $input['date'] . ' ' . $input['time_from'];
