@@ -75,6 +75,7 @@ class LessonDashboardTransformer extends TransformerAbstract
 			'extra_time_after_end' => Lesson::VIRTUAL_LESSON_EXTRA_TIME_AFTER_END,
 			'bookings_count' => $model->bookings_count,
             'preview' => $model->getPreviewUrl(),
+            'title' => $model->title,
         ];
     }
 }

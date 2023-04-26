@@ -75,6 +75,7 @@ class LessonSingleTransformer extends TransformerAbstract
             'room_sid' => $model->room_sid,
             'room_completed' => $model->room_completed,
             'preview' => $model->getPreviewUrl(),
+            'title' => $model->title,
 		];
     }
 }

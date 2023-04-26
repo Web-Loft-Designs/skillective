@@ -55,7 +55,8 @@ class Lesson extends Model implements Transformable
 		'room_completed',
 		'private_for_student_id',
 		'count_places_in_spot',
-        'preview'
+        'preview',
+        'title'
 	];
 
 	/**
@@ -81,7 +82,8 @@ class Lesson extends Model implements Transformable
 		'lng' => 'float',
 		'description' => 'string',
 		'timezone_id' => 'string',
-        'preview' => 'string'
+        'preview' => 'string',
+        'title' => 'string'
 	];
 
 	/**
@@ -201,6 +203,7 @@ class Lesson extends Model implements Transformable
 			'lesson_type' => $this->lesson_type,
 			'room_sid' => $this->room_sid,
 			'room_completed' => $this->room_completed,
+            'title' => $this->title,
 		];
 	}
 
