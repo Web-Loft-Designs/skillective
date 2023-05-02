@@ -478,3 +478,10 @@ export default {
   },
 }
 </script>
+<style lang='scss' scoped>
+
+.full-name-link {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+</style>

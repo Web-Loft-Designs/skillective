@@ -995,6 +995,9 @@ export default {
   }
 }
 .lesson-success {
+  h3 {
+    font-weight: 700;
+  }
   ul {
     list-style: disc;
     li {
