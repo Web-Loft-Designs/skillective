@@ -325,6 +325,27 @@
             </div>
             <div
               v-if='isRecurring && !fields.id'
+              class='col-lg-6 col-sm-6 col-12 form-group has-feedback'
+            >
+              <label> Recurrence frequencies: </label>
+              <select
+                v-model='fields.recurrence_frequencies'
+                class='form-control'
+              >
+                <option value='day'>Daily</option>
+                <option value='week'>Weekly</option>
+                <option value='week2'>Every 2 Weeks</option>
+                <option value='month'>Monthly</option>
+              </select>
+              <span
+                v-if='errors.recurrence_frequencies'
+                class='help-block'
+              >
+                <strong>{{ errors.recurrence_frequencies[0] }}</strong>
+              </span>
+            </div>
+            <div
+              v-if='isRecurring && !fields.id'
               class='col-lg-12 col-sm-12 col-12 form-group has-feedback'
             >
               <label> Recurrence until </label>
