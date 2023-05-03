@@ -78,15 +78,15 @@
         :nowIndicator='true'
         :plugins='calendarPlugins'
         :selectAllow='selectAllow'
-        :selectConstraint="{
-          startTime: '00:00',
-          endTime: '24:00',
-        }"
         :selectOverlap='selectOverlap'
         :selectable='true'
         :showNonCurrentDates='false'
         slotDuration='00:15:00'
         slotLabelInterval='01:00'
+        :selectConstraint="{
+          startTime: '00:00',
+          endTime: '24:00',
+        }"
         @eventClick='dateClick'
         @eventMouseEnter='eventMouseEnter'
         @select='selected'
@@ -294,9 +294,7 @@ export default {
     },
     scrollDown: function () {
       let calendarApi = this.$refs.fullCalendar.getApi()
-
       let currentTimeHour = calendarApi.scrollTime.split(':')[0]
-
       if (currentTimeHour == '14') {
         return
       } else {
@@ -314,7 +312,6 @@ export default {
     },
     scrollUp: function () {
       let calendarApi = this.$refs.fullCalendar.getApi()
-
       let currentTimeHour = calendarApi.scrollTime.split(':')[0]
 
       if (currentTimeHour == '00') {
@@ -347,6 +344,7 @@ export default {
 
         buttonUp.innerHTML = 'Expand'
         buttonUp.addEventListener('click', this.scrollUp)
+        let calendarApi = this.$refs.fullCalendar.getApi()
 
         cont.prepend(buttonUp)
 
@@ -360,16 +358,14 @@ export default {
       }, 0)
     },
     viewRender: function (info) {
+      let calendarApi = this.$refs.fullCalendar.getApi()
+      calendarApi.scrollTime = '08:00:00'
       if (info.view.type === 'timeGridWeek') {
         this.triggerView = 'week'
-
-        let calendarApi = this.$refs.fullCalendar.getApi()
+        calendarApi.scrollToTime('08:00:00')
 
         this.injectUpDownButtons()
 
-        calendarApi.scrollTime = '08:00:00'
-
-        calendarApi.scrollToTime('08:00:00')
       } else if (info.view.type === 'timeGridDay') {
         this.injectUpDownButtons()
         this.triggerView = 'day'
