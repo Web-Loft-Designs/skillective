@@ -45,6 +45,7 @@ class LessonsAPIController extends AppBaseController
 
         }
 		$lesson = $this->lessonRepository->findWithoutFail((int)$lesson);
+
 		if (empty($lesson)) {
 			return $this->sendError('Lesson not found');
 		}
