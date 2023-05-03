@@ -2,6 +2,7 @@
 
 namespace App\Transformers;
 
+use Illuminate\Support\Facades\Auth;
 use League\Fractal\TransformerAbstract;
 use App\Models\Lesson;
 use App\Models\Booking;
@@ -22,11 +23,34 @@ class LessonSingleTransformer extends TransformerAbstract
      */
     public function transform(Lesson $model)
     {
-    	$students = $model->students//()
-//				->whereIn('bookings.status', [Booking::STATUS_ESCROW, Booking::STATUS_APPROVED])
-//				->get()
-		->toArray();
+
+        $studentBooked = null;
+        if(Auth::check() && Auth::user()->hasRole('Student')) {
+            $authUserId = Auth::user()->id;
+            $studentsIds = [];
+            foreach($model->students as $student) {
+                $studentsIds[] = $student->id;
+            }
+
+            $bookingId = null;
+            foreach($model->bookings as $booking) {
+                if($booking->student_id == $authUserId) {
+                    $bookingId = $booking->id;
+                }
+            }
+
+            $studentBooked = [
+                'student_id' => Auth::user()->id,
+                'booking_id' => $bookingId,
+                'authStudentBooked' => in_array($authUserId, $studentsIds)
+            ];
+
+        }
+
+    	$students = $model->students->toArray();
+
 		return [
+            'authStudent' => $studentBooked,
 			'id' => (int)$model->id,
 			'instructor_id' => $model->instructor_id,
 			'genre_id'=> $model->genre_id,
