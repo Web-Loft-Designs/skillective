@@ -79,7 +79,6 @@
                 !isPastLesson(end) &&
                 bookings.length > 0
               ">
-            <div class="cd--control-btn-disabled">Until event</div>
             <dashboard-booking-item-countdown
               :lesson='lesson'
             >

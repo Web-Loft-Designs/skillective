@@ -41,6 +41,7 @@
       class="b-dashboar-join"
       v-if="showJoinButton"
       >Until event</a>
+    <div v-else class="cd--control-btn-disabled">Until event</div>
   </div>
 </template>
 
@@ -153,6 +154,9 @@ export default {
 };
 </script>
 <style>
+.bookings-table .dashboard-bookings-item--content .cd--control-inner{
+  flex-direction: column-reverse;
+}
 .bookings-table .dashboard-bookings-item--content .cd--control-inner .b-dashboard-cd{
   border: 0;
   cursor: auto;
