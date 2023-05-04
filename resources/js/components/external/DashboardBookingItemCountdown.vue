@@ -40,8 +40,8 @@
       "
       class="b-dashboar-join"
       v-if="showJoinButton"
-      >Join Lesson</a
-    >
+      >Until event</a>
+    <div v-else class="cd--control-btn-disabled">Until event</div>
   </div>
 </template>
 
@@ -153,3 +153,52 @@ export default {
   },
 };
 </script>
+<style>
+.bookings-table .dashboard-bookings-item--content .cd--control-inner{
+  flex-direction: column-reverse;
+}
+.bookings-table .dashboard-bookings-item--content .cd--control-inner .b-dashboard-cd{
+  border: 0;
+  cursor: auto;
+}
+.bookings-table .dashboard-bookings-item--content .cd--control-btn{
+  background-color: #fff;
+  border: 1px solid rgba(10, 171, 21, 0.4);
+  border-radius: 3px;
+  width: 100%;
+  padding: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: #0aab14;
+  font-family: Hind Vadodara;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+}
+.bookings-table .dashboard-bookings-item--content .cd--control-btn-disabled{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+  border-radius: 3px;
+  width: 100%;
+  padding: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: not-allowed;
+  text-decoration: none;
+  font-family: Hind Vadodara;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+}
+.bookings-table .dashboard-bookings-item--content .right-side .more-wrap {
+  margin-left: 20px;
+}
+.bookings-table .dashboard-bookings-item--content .cd--control-inner {
+  margin-right: 0 !important;
+}
+</style>

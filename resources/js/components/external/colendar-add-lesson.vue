@@ -11,7 +11,7 @@
             alt
             src='/images/plus-icon.svg'
           />
-          <span>Add Time</span>
+          <span>Add Event</span>
 
           <div class='tolltip bottom'>
             click here to add additional time slots in increments that you wish
