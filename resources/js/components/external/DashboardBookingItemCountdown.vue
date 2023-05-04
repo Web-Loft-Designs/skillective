@@ -40,8 +40,7 @@
       "
       class="b-dashboar-join"
       v-if="showJoinButton"
-      >Join Lesson</a
-    >
+      >Until event</a>
   </div>
 </template>
 

@@ -76,15 +76,6 @@
                v-if="listLoaded == true &&
                 !lesson.room_completed &&
                 lesson_type == 'virtual' &&
-                isPastLesson(end) &&
-                bookings.length > 0
-              ">
-            <div class="cd--control-btn">Until event</div>
-          </div>
-          <div class='cd--control-outer'
-               v-if="listLoaded == true &&
-                !lesson.room_completed &&
-                lesson_type == 'virtual' &&
                 !isPastLesson(end) &&
                 bookings.length > 0
               ">
