@@ -72,15 +72,24 @@
         </div>
         <div class='right-side'>
           <span class='price price--mobile'> ${{ bookings_summ }} </span>
-          <div class='cd--control-outer'>
-            <dashboard-booking-item-countdown
-              v-if="
-                listLoaded == true &&
+          <div class='cd--control-outer'
+               v-if="listLoaded == true &&
+                !lesson.room_completed &&
+                lesson_type == 'virtual' &&
+                isPastLesson(end) &&
+                bookings.length > 0
+              ">
+            <div class="cd--control-btn">Until event</div>
+          </div>
+          <div class='cd--control-outer'
+               v-if="listLoaded == true &&
                 !lesson.room_completed &&
                 lesson_type == 'virtual' &&
                 !isPastLesson(end) &&
                 bookings.length > 0
-              "
+              ">
+            <div class="cd--control-btn-disabled">Until event</div>
+            <dashboard-booking-item-countdown
               :lesson='lesson'
             >
             </dashboard-booking-item-countdown>

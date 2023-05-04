@@ -84,7 +84,7 @@ class InstructorLessonsAPIController extends AppBaseController
     {
         $this->lessonRepository->setPresenter("App\\Presenters\\LessonDashboardPresenter");
         try {
-            $lessons = $this->lessonRepository->presentResponse($this->lessonRepository->getDashboardInstructorLessons($request, Auth::user()->id));
+            $lessons = $this->lessonRepository->presentResponse($this->lessonRepository->getInstructorLessons($request, Auth::user()->id));
         } catch (\Exception $e) {
             Log::error('getDashboardInstructorLessons : ' . $e->getMessage());
             $lessons = ['data' => []];
