@@ -21,12 +21,12 @@
         >
           Cancelled
         </button>
-        <button
-          @click.prevent="toggleShowOnly('lesson_requests')"
-          :class="{ active: showOnly == 'lesson_requests' }"
-        >
-          Booking Requests
-        </button>
+<!--        <button-->
+<!--          @click.prevent="toggleShowOnly('lesson_requests')"-->
+<!--          :class="{ active: showOnly == 'lesson_requests' }"-->
+<!--        >-->
+<!--          Booking Requests-->
+<!--        </button>-->
       </div>
     </div>
     <div class="d-flex justify-content-between align-items-center">
