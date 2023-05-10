@@ -123,8 +123,9 @@ class LessonRequestRepository extends BaseRepository
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
         $this->resetCriteria();
         $this->resetScope();
+
         $this->model = $this->model->select('lesson_requests.*')
-            ->whereRaw("( ( created_at <= DATE_SUB('$nowOnServer', INTERVAL $timeToApprove HOUR) ) OR lessons.start <= CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) )")
+            ->whereRaw("( ( created_at <= DATE_SUB('$nowOnServer', INTERVAL $timeToApprove HOUR) ) OR lesson_requests.start <= CONVERT_TZ('$nowOnServer', 'GMT', lesson_requests.timezone_id) )")
             ->where('status', LessonRequest::STATUS_PENDING)
             ->orWhere('status', LessonRequest::STATUS_APPROVED)
             ->orderBy('created_at', 'asc');
