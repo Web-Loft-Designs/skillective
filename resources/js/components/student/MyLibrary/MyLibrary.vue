@@ -73,7 +73,7 @@ export default {
         {
           type: 'search',
           title: '',
-          placeholder: 'Enter the question',
+          placeholder: 'Search my library',
           length: 'wide',
         },
       ],
