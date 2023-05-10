@@ -23,21 +23,42 @@ class Kernel extends ConsoleKernel
      * @return void
      */
     protected function schedule(Schedule $schedule)
-    {
-		$schedule->command('queue:flush')->hourly()->withoutOverlapping();
-		$schedule->command('bookings:cancel_past_pending')->everyFiveMinutes();// auto cancel bookings when lesson happened and booking still pending
-		$schedule->command('bookings:auto_cancel_pending')->everyFiveMinutes();// auto cancel bookings not approved during 2 hours
-		$schedule->command('bookings:release_payments_from_escrow')->everyFiveMinutes();// auto cancel bookings not approved during 2 hours
-
-        $schedule->command('past_lessons_rooms:complete')->everyMinute()->withoutOverlapping();
-
-        $schedule->command('lesson_requests:auto_cancel_pending')->everyFiveMinutes();
-        
-        $schedule->command('bookings:send_regular_notifications')->everyMinute();// send notifications to users, if less than 24 hours, and 1 hour before lesson
-
-        $schedule->command('lesson_private:auto_cancel_not_booked')->everyFiveMinutes();// auto cancel not booked private lessons after 24 hours after creation
-
-//		$schedule->command('queue:work --once')->everyMinute()->withoutOverlapping();
+    {// Flush all of the failed queue jobs
+        $schedule->command('queue:flush')
+            ->hourly()
+            ->withoutOverlapping();
+        // auto cancel bookings when lesson happened and booking still pending
+        $schedule->command('bookings:cancel_past_pending')
+            ->everyMinute()
+            ->withoutOverlapping();
+        // auto cancel bookings not approved during 2 hours
+        $schedule->command('bookings:auto_cancel_pending')
+            ->everyFiveMinutes()
+            ->withoutOverlapping();
+        //release payments for happened lessons from braintree merketplace escrow after 2 hours after lesson started
+        $schedule->command('bookings:release_payments_from_escrow')
+            ->hourly()
+            ->withoutOverlapping();
+        //release payments for happened lessons from braintree merketplace escrow after 2 hours after lesson started
+        $schedule->command('purchased_lessons:release_payments_from_escrow')
+            ->everyFourHours()
+            ->withoutOverlapping();
+        // close rooms for past lessons
+        $schedule->command('past_lessons_rooms:complete')
+            ->everyMinute()
+            ->withoutOverlapping();
+        // cancel lesson requests if not approved in \$settings['time_to_approve_lesson_request']
+        $schedule->command('lesson_requests:auto_cancel_pending')
+            ->everyTenMinutes()
+            ->withoutOverlapping();
+        // send notifications to users, if less than 24 hours, and 1 hour before lesson
+        $schedule->command('bookings:send_regular_notifications')
+            ->everyMinute()
+            ->withoutOverlapping();
+        // auto cancel not booked private lessons after 24 hours after creation
+        $schedule->command('lesson_private:auto_cancel_not_booked')
+            ->everyFiveMinutes()
+            ->withoutOverlapping();
     }
 
     /**
