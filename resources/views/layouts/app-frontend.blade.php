@@ -82,7 +82,7 @@
     </script>
 </head>
 
-<body class="skin-blue sidebar-mini @if (isset($currentPage)){{ 'page-' . $currentPage->id }}@endif " @if ($currentPage?->id == 8 || $currentPage?->id == 15 || $currentPage?->id == 6 || $currentPage?->id == 14) style="margin-top: 70px;" @endif  >
+<body class="skin-blue sidebar-mini @if (isset($currentPage)){{ 'page-' . $currentPage->id }}@endif " @if ($currentPage?->id == 8 || $currentPage?->id == 15 || $currentPage?->id == 6 || $currentPage?->id == 14 || $currentPage?->id == 9) style="margin-top: 70px;" @endif  >
 
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TV7TNV2" height="0" width="0"

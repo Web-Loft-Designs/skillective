@@ -75,5 +75,8 @@ export default {
   lang='scss'
   scoped
 >
+.discount-management{
+  margin-top: -10px!important;
+}
 @import './DiscountManagement.scss';
 </style>
