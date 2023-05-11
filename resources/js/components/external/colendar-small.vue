@@ -1,9 +1,7 @@
 <template>
   <div class='calendar-component'>
     <div class='calendar-component-top'>
-      <h2>Schedule
-        <button type='button' class='fc-dayGridMonth-button fc-button fc-button-primary custom-button' @click='goToCurrentDay'>Day</button>
-      </h2>
+      <h2>Schedule</h2>
       <div v-if='errorText' class='has-error'>{{ errorText }}</div>
       <div v-if='successText' class='has-success'>{{ successText }}</div>
     </div>
@@ -18,7 +16,13 @@
         :firstDay='0'
         :fixedWeekCount='false'
         :footer="{
-          right: 'timeGridWeek,dayGridMonth',
+          right: 'custom1,timeGridWeek,dayGridMonth',
+        }"
+        :custom-buttons="{
+          custom1: {
+          text: 'Day',
+            click: goToCurrentDay
+          }
         }"
         :header="{
           left: 'prev',
@@ -37,7 +41,7 @@
         }"
         @eventClick='dateClick'
         @select='selected'
-        timeZone="UTC"
+        timeZone='UTC'
       ></FullCalendar>
       <a
         v-if='isAdmin'
@@ -159,7 +163,10 @@ export default {
   methods: {
     goToCurrentDay() {
       let calendarApi = this.$refs.fullCalendarSmall.getApi()
-      calendarApi.changeView('timeGridDay',new Date())
+      calendarApi.changeView('timeGridDay', new Date())
+      this.injectUpDownButtons()
+      calendarApi.scrollTime = "08:00:00";
+      calendarApi.scrollToTime("08:00:00");
     },
     clearFormAndClosePopup() {
     },
@@ -201,29 +208,29 @@ export default {
     },
     injectUpDownButtons() {
       setTimeout(() => {
-        const cont = document.querySelector(".fc-body");
-        const buttonUp = document.createElement("button");
-        buttonUp.classList.add("fc-button--arrow");
-        buttonUp.classList.add("fc-button--up");
+        const cont = document.querySelector('.fc-body')
+        const buttonUp = document.createElement('button')
+        buttonUp.classList.add('fc-button--arrow')
+        buttonUp.classList.add('fc-button--up')
 
-        buttonUp.innerHTML = "Expand";
-        buttonUp.addEventListener("click", this.scrollUp);
-        cont.prepend(buttonUp);
+        buttonUp.innerHTML = 'Expand'
+        buttonUp.addEventListener('click', this.scrollUp)
+        cont.prepend(buttonUp)
 
-        const buttonDown = document.createElement("button");
-        buttonDown.classList.add("fc-button--arrow");
-        buttonDown.classList.add("fc-button--down");
+        const buttonDown = document.createElement('button')
+        buttonDown.classList.add('fc-button--arrow')
+        buttonDown.classList.add('fc-button--down')
 
-        buttonDown.innerHTML = "Expand";
-        buttonDown.addEventListener("click", this.scrollDown);
-        cont.appendChild(buttonDown);
-      }, 0);
+        buttonDown.innerHTML = 'Expand'
+        buttonDown.addEventListener('click', this.scrollDown)
+        cont.appendChild(buttonDown)
+      }, 0)
     },
     viewRender: function (info) {
       let calendarApi = this.$refs.fullCalendarSmall.getApi()
       if (info.view.type === 'timeGridWeek' || info.view.type === 'timeGridDay') {
         this.triggerView = 'week'
-        calendarApi.scrollTime = "08:00:00"
+        calendarApi.scrollTime = '08:00:00'
         this.injectUpDownButtons()
       } else if (info.view.type === 'dayGridMonth') {
         this.triggerView = 'month'
@@ -231,9 +238,9 @@ export default {
         buttons.forEach((item) => {
           item.remove()
         }, [])
-      } else if(info.view.type === "timeGridDay") {
+      } else if (info.view.type === 'timeGridDay') {
         this.injectUpDownButtons()
-        this.triggerView = "day"
+        this.triggerView = 'day'
       }
       if (this.triggerOld !== null) {
         if (
@@ -293,12 +300,12 @@ export default {
               return moment().diff(item.end) <= 0
             })
 
-            if (this.triggerView == "week" || this.triggerView == "day") {
-              this.injectUpDownButtons();
+            if (this.triggerView == 'week' || this.triggerView == 'day') {
+              this.injectUpDownButtons()
             }
 
             calendarApi.scrollToTime(
-              moment(this.events[0].start).format("HH:mm:ss")
+              moment(this.events[0].start).format('HH:mm:ss')
             )
             this.loader.hide()
             this.loader = null
@@ -357,7 +364,7 @@ export default {
     },
     dateClick: function (info) {
       let calendarApi = this.$refs.fullCalendarSmall.getApi()
-      if(info.view.type === 'timeGridWeek' || info.view.type === 'timeGridDay') {
+      if (info.view.type === 'timeGridWeek' || info.view.type === 'timeGridDay') {
         this.selectedEvent = {
           id: info.event.id,
           lat: info.event.extendedProps.lat,
@@ -369,8 +376,8 @@ export default {
           students: info.event.extendedProps.students,
           content: info.event.extendedProps
         }
-      } else if(info.view.type === 'dayGridMonth') {
-        calendarApi.changeView('timeGridDay',moment(info.event.start).format('YYYY-MM-DD'))
+      } else if (info.view.type === 'dayGridMonth') {
+        calendarApi.changeView('timeGridDay', moment(info.event.start).format('YYYY-MM-DD'))
       }
     },
     closeModal: function () {
