@@ -37,8 +37,6 @@
           <span> Embed Calendar </span>
         </button>
 
-        <button type='button' class='fc-dayGridMonth-button fc-button fc-button-primary custom-button' @click='goToCurrentDay'>Day</button>
-
 
       </h2>
 
@@ -67,7 +65,13 @@
         :firstDay='0'
         :fixedWeekCount='false'
         :footer="{
-          right: 'timeGridWeek,dayGridMonth',
+          right: 'custom1,timeGridWeek,dayGridMonth',
+        }"
+        :custom-buttons="{
+          custom1: {
+          text: 'Day',
+            click: goToCurrentDay
+          }
         }"
         :header="{
           left: 'prev',
@@ -247,6 +251,9 @@ export default {
     goToCurrentDay() {
       let calendarApi = this.$refs.fullCalendar.getApi()
       calendarApi.changeView('timeGridDay',new Date())
+      this.injectUpDownButtons()
+      calendarApi.scrollTime = "08:00:00";
+      calendarApi.scrollToTime("08:00:00");
     },
     copyTextToClipboard(text) {
       var textArea = document.createElement('input')
@@ -474,16 +481,17 @@ export default {
             this.injectUpDownButtons()
           }
           let calendarApi = this.$refs.fullCalendar.getApi();
-          calendarApi.scrollTime = moment(this.events[1].start).format(
-            "HH:mm:ss"
-          );
-          calendarApi.scrollToTime(
-            moment(this.events[1].start).format("HH:mm:ss")
-          );
+          // calendarApi.scrollTime = moment(this.events[1].start).format(
+          //   "HH:mm:ss"
+          // );
+          // calendarApi.scrollToTime(
+          //   moment(this.events[0].start).format("HH:mm:ss")
+          // );
           this.loader.hide()
           this.loader = null
         })
         .catch((error) => {
+          console.log(error)
           this.events = []
           this.loader.hide()
           this.loader = null
