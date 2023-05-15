@@ -52,7 +52,7 @@ class LessonDashboardTransformer extends TransformerAbstract
 //					'gender' => $model->instructor->profile->gender,
 				]
             ],
-            'bookings' => $model->bookings,
+            'bookings' => $model->bookings()->with(['student'])->get(),
 			'start'=> $model->start->format('Y-m-d H:i:s'),
 			'end'=> $model->end->format('Y-m-d H:i:s'),
 			'timezone_id' => $model->timezone_id,
