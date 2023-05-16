@@ -2110,7 +2110,7 @@
 
     .fc-time-grid-container {
         width: 100%;
-        padding-right: 17px;
+        overflow: hidden !important;
         pointer-events: none;
 
         .fc-time-grid {

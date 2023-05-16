@@ -573,10 +573,11 @@
   border: 0;
   border-top: 1px solid #ddd;
   //border-bottom: 1px solid #ddd;
-  padding: 4px 5px;
+  padding: 2px 9px;
   margin: 0;
   border-radius: 0;
   cursor: pointer;
+  width: 70% !important;
   &:hover {
     z-index: 22;
     .calendar-tooltip {
@@ -664,6 +665,7 @@
 }
 .fc-timeGridDay-view.fc-timeGrid-view .fc-event {
   padding: 8px;
+  width: 96.6% !important;
   position: relative;
   .fc-title {
     color: #444444;
