@@ -41,7 +41,6 @@
         }"
         @eventClick='dateClick'
         @select='selected'
-        timeZone='UTC'
       ></FullCalendar>
       <a
         v-if='isAdmin'

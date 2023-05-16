@@ -48,7 +48,6 @@
         @select="selected"
         @eventClick="dateClick"
         ref="fullCalendar"
-        timeZone="UTC"
       ></FullCalendar>
       <magnific-popup-modal
         @close="clearFormAndClosePopup"
