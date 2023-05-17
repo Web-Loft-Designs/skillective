@@ -160,6 +160,7 @@ export default {
       return this.isCartLoading()
     },
     canCancel() {
+      if (this?.authStudent || this.authStudent === null) return false
       return this.authStudent.authStudentBooked
     },
   },
