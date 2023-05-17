@@ -187,7 +187,6 @@ export default {
       }
     },
     removeUpDownButtons() {
-      console.log('remove')
       const buttons = document.querySelectorAll(".fc-button--arrow");
       buttons.forEach((item) => {
         item.remove();
@@ -423,15 +422,53 @@ export default {
 </script>
 
 <style lang='scss'>
+.fc-week {
+  .test-circle {
+    &::after {
+      position: absolute;
+      content: '';
+      top: -7px;
+      left: 3px;
+      width: 55px;
+      height: 55px;
+      border: 1px solid #8ada00 !important;
+      border-radius: 140px;
+
+      @media (max-width: 1200px) {
+        left: -2px;
+        top: -10px;
+      }
+
+      @media (max-width: 991px) {
+        left: 10px;
+        top: -8px;
+      }
+
+      @media (max-width: 767px) {
+        left: -3px;
+      }
+
+      @media (max-width: 585px) {
+        top: 10px;
+        left: 4px;
+        width: 45px;
+        height: 45px;
+      }
+
+
+      @media (max-width: 447px) {
+        left: -6px;
+      }
+
+      @media (max-width: 399px) {
+        left: -10px;
+      }
+    }
+  }
+}
 .test-circle {
-  position: absolute !important;
-  bottom: -15px !important;
-  left: 50% !important;
-  right: 50% !important;
-  transform: translate(-50%, -50%) !important;
   background-color: transparent !important;
-  border: 1px solid #8ada00 !important;
-  width: 70% !important;
+
 }
 .custom-button {
   color: #0a0a0a;
@@ -440,5 +477,12 @@ export default {
   &:hover {
     background-color: #7ac000 !important;
   }
+}
+
+.fc-time-grid-event.fc-short .fc-time:before {
+  content: attr(data-full);
+}
+.fc-time-grid-event.fc-short .fc-time:after {
+  content: '';
 }
 </style>
