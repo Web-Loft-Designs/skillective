@@ -90,13 +90,26 @@ export default {
   },
   methods: {
     ...mapActions(['getStudentGenres']),
-    async filterChanged(e) {
+    async filterChanged(filterValue) {
       this.isLoading = true
-      const selectedGenre = this.genres.find(el => e.value.toLowerCase() === el.title.toLowerCase())
-      e.value === 'All'
+      if (filterValue.type === 'search') {
+        await this.searchData(filterValue.value.target.value)
+      }
+      if (filterValue.type === 'select') {
+        await this.filterByGenre(filterValue.value)
+      }
+      this.isLoading = false
+    },
+    async searchData(searchVal) {
+      searchVal === ''
+        ? this.lessons = await lessonService.myLibraryLessons()
+        : this.lessons = await lessonService.myLibraryLessons({search: searchVal})
+    },
+    async filterByGenre(filterVal) {
+      const selectedGenre = this.genres.find(el => filterVal.toLowerCase() === el.title.toLowerCase())
+      filterVal === 'All'
         ? this.lessons = await lessonService.myLibraryLessons()
         : this.lessons = await lessonService.myLibraryLessons({genre: selectedGenre.id})
-      this.isLoading = false
     },
     async setGenres() {
       this.genres = await this.getStudentGenres()

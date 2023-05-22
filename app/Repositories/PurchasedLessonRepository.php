@@ -57,7 +57,9 @@ class PurchasedLessonRepository extends BaseRepository
 		$this->resetCriteria();
 		$this->resetScope();
 
-		$this->scopeQuery(function ($query) use ($studentUserId) {
+        $genre = $request->input('genre');
+        $search = $request->input('search');
+		$this->scopeQuery(function ($query) use ($studentUserId, $genre, $search) {
             $userGenres = Auth()->user()->genres()->orderBy('title', 'desc')->get()->pluck('id')->toArray();
             $ids_ordered = implode(',', $userGenres);
 			$query->join('users', 'purchased_lessons.student_id', '=', "users.id")
@@ -65,6 +67,12 @@ class PurchasedLessonRepository extends BaseRepository
 				->join('pre_r_lessons', 'purchased_lessons.pre_r_lesson_id', '=', "pre_r_lessons.id")
 				->join('genres', 'pre_r_lessons.genre_id', '=', "genres.id")
 				->where('purchased_lessons.student_id', $studentUserId)
+                ->when($genre, function ($query) use ($genre) {
+                    $query->where('pre_r_lessons.genre_id', $genre);
+                })
+                ->when($search, function ($query) use ($search) {
+                    $query->where('pre_r_lessons.title', 'like','%'.$search.'%');
+                })
                 ->orderBy('purchased_lessons.pre_r_lesson_id', 'desc')
                 ->groupBy('purchased_lessons.id');
 

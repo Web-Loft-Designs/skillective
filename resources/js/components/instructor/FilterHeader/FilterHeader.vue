@@ -35,14 +35,15 @@
         <span class="filter-header__col-title">{{ filter.title }}</span>
         <div v-if="filter.type == 'select'" class="filter-header__select">
           <select-with-search
+            ref='selectRef'
             :options="filter.options"
-            @value-changed="valueChanged($event, index)"
+            @value-changed="valueChanged($event, index,'select')"
             :placeholder="filter.placeholder"
           />
         </div>
         <div v-else-if="filter.type == 'multiselect'" class="filter-header__multiselect">
           <multiselect
-            @input="valueChanged($event, index)"
+            @input="valueChanged($event, index, 'multiselect')"
             v-model="filter.value"
             :options="filter.options"
             label="label"
@@ -71,10 +72,11 @@
         </div>
         <div v-else-if="filter.type == 'search'" class="filter-header__search">
           <input
+            ref='searchRef'
             class="filter-header__search-input"
             type="text"
             :placeholder="filter.placeholder"
-            @change="valueChanged($event, index)"
+            @change="valueChanged($event, index, 'search')"
           />
         </div>
       </div>
@@ -117,10 +119,16 @@ export default {
     emitButtonPress() {
       this.$emit("button-clicked");
     },
-    valueChanged(event, filterIndex) {
+    valueChanged(event, filterIndex, type) {
+      if (type === 'select') {
+        this.$refs.searchRef[0].value = ''
+      } else if (type === 'search') {
+        this.$refs.selectRef[0].selectedValue = ''
+      }
       this.$emit("filter-changed", {
         value: event,
         filterIndex,
+        type
       });
     },
   },
