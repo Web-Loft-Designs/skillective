@@ -35,7 +35,6 @@
         <span class="filter-header__col-title">{{ filter.title }}</span>
         <div v-if="filter.type == 'select'" class="filter-header__select">
           <select-with-search
-            ref='selectRef'
             :options="filter.options"
             @value-changed="valueChanged($event, index,'select')"
             :placeholder="filter.placeholder"
@@ -72,7 +71,6 @@
         </div>
         <div v-else-if="filter.type == 'search'" class="filter-header__search">
           <input
-            ref='searchRef'
             class="filter-header__search-input"
             type="text"
             :placeholder="filter.placeholder"
@@ -120,11 +118,6 @@ export default {
       this.$emit("button-clicked");
     },
     valueChanged(event, filterIndex, type) {
-      if (type === 'select') {
-        this.$refs.searchRef[0].value = ''
-      } else if (type === 'search') {
-        this.$refs.selectRef[0].selectedValue = ''
-      }
       this.$emit("filter-changed", {
         value: event,
         filterIndex,

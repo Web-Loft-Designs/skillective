@@ -80,6 +80,7 @@ export default {
       selectedGenre: 'All',
       lessons: [],
       genres: [],
+      params: {}
     }
   },
   async created() {
@@ -101,15 +102,13 @@ export default {
       this.isLoading = false
     },
     async searchData(searchVal) {
-      searchVal === ''
-        ? this.lessons = await lessonService.myLibraryLessons()
-        : this.lessons = await lessonService.myLibraryLessons({search: searchVal})
+      this.params.search = searchVal
+      this.lessons = await lessonService.myLibraryLessons(this.params)
     },
     async filterByGenre(filterVal) {
       const selectedGenre = this.genres.find(el => filterVal.toLowerCase() === el.title.toLowerCase())
-      filterVal === 'All'
-        ? this.lessons = await lessonService.myLibraryLessons()
-        : this.lessons = await lessonService.myLibraryLessons({genre: selectedGenre.id})
+      this.params.genre = filterVal === 'All' ? '' : selectedGenre.id
+      this.lessons = await lessonService.myLibraryLessons(this.params)
     },
     async setGenres() {
       this.genres = await this.getStudentGenres()
