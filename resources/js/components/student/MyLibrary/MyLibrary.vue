@@ -101,7 +101,9 @@ export default {
       this.isLoading = false
     },
     async searchData(searchVal) {
-      console.log(searchVal,'searchVal')
+      searchVal === ''
+        ? this.lessons = await lessonService.myLibraryLessons()
+        : this.lessons = await lessonService.myLibraryLessons({search: searchVal})
     },
     async filterByGenre(filterVal) {
       const selectedGenre = this.genres.find(el => filterVal.toLowerCase() === el.title.toLowerCase())
