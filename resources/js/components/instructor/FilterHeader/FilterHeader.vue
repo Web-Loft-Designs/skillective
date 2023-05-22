@@ -36,13 +36,13 @@
         <div v-if="filter.type == 'select'" class="filter-header__select">
           <select-with-search
             :options="filter.options"
-            @value-changed="valueChanged($event, index)"
+            @value-changed="valueChanged($event, index,'select')"
             :placeholder="filter.placeholder"
           />
         </div>
         <div v-else-if="filter.type == 'multiselect'" class="filter-header__multiselect">
           <multiselect
-            @input="valueChanged($event, index)"
+            @input="valueChanged($event, index, 'multiselect')"
             v-model="filter.value"
             :options="filter.options"
             label="label"
@@ -74,7 +74,7 @@
             class="filter-header__search-input"
             type="text"
             :placeholder="filter.placeholder"
-            @change="valueChanged($event, index)"
+            @change="valueChanged($event, index, 'search')"
           />
         </div>
       </div>
@@ -117,10 +117,11 @@ export default {
     emitButtonPress() {
       this.$emit("button-clicked");
     },
-    valueChanged(event, filterIndex) {
+    valueChanged(event, filterIndex, type) {
       this.$emit("filter-changed", {
         value: event,
         filterIndex,
+        type
       });
     },
   },
