@@ -172,16 +172,20 @@ class BookingRepository extends BaseRepository
      * @return LengthAwarePaginator|Collection|mixed
      * @throws RepositoryException
      */
-    public function getBookings(Request $request){
+    public function getBookings(Request $request) {
         $this->resetCriteria();
         $this->resetScope();
 
         $this->pushCriteria(new LimitOffsetCriteria($request));
 
-        if ($request->filled('s'))
+        if ($request->filled('s')) {
             $this->pushCriteria(new BackendBookingSearchCriteria($request->get('s')));
-        if ($request->filled('price_from') || $request->filled('price_to'))
+        }
+
+        if ($request->filled('price_from') || $request->filled('price_to')) {
             $this->pushCriteria(new BookingFilterByAmountRangeCriteria($request->get('price_from', 0), $request->get('price_to', 9999999)));
+        }
+
 
         $this->scopeQuery(function($query) use ($request){
             $query->join('users as instructors', 'bookings.instructor_id', '=', "instructors.id")
@@ -193,7 +197,7 @@ class BookingRepository extends BaseRepository
                 if (!in_array($sort, ['asc', 'desc']))
                     $sort = 'asc';
 
-                switch ( $request->input('order') ){
+                switch ($request->input('order')) {
                     case 'recepient':
                         $query->orderByRaw(DB::raw("CONCAT(instructors.first_name, ' ', instructors.last_name) $sort"));
                         break;
@@ -221,23 +225,18 @@ class BookingRepository extends BaseRepository
             return $query;
         });
 
-
-
-
         $perPage = Cookie::get('adminBookingsPerPage', 25);
 
         Log::info($this->get(['bookings.*']));
 
         $this->with(['instructor', 'student']);
-        if ($request->filled('limit') && $request->input('limit')>0)
+        if ($request->filled('limit') && $request->input('limit')>0) {
             return $this->paginate($request->input('limit'), ['bookings.*']);
-        elseif($request->filled('limit') && $request->input('limit')==-1)
+        } elseif ($request->filled('limit') && $request->input('limit') == -1) {
             return $this->get(['bookings.*']);
-        else
+        } else {
             return $this->paginate($perPage, ['bookings.*']);
-
-
-
+        }
 
     }
 
