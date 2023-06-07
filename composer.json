@@ -28,7 +28,7 @@
         "php-ffmpeg/php-ffmpeg": "^1.1",
         "php-http/message": "^1.7",
         "predis/predis": "^1.1",
-        "prettus/l5-repository": "*",
+        "prettus/l5-repository": "2.9.0",
         "socialiteproviders/instagram": "^5.0.0",
         "spatie/icalendar-generator": "^2.5.4",
         "spatie/laravel-analytics": "4.1.1",

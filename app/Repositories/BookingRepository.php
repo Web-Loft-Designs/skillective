@@ -172,7 +172,8 @@ class BookingRepository extends BaseRepository
      * @return LengthAwarePaginator|Collection|mixed
      * @throws RepositoryException
      */
-    public function getBookings(Request $request) {
+    public function getBookings(Request $request)
+    {
         $this->resetCriteria();
         $this->resetScope();
 
@@ -186,58 +187,62 @@ class BookingRepository extends BaseRepository
             $this->pushCriteria(new BookingFilterByAmountRangeCriteria($request->get('price_from', 0), $request->get('price_to', 9999999)));
         }
 
-
-        $this->scopeQuery(function($query) use ($request){
-            $query->join('users as instructors', 'bookings.instructor_id', '=', "instructors.id")
-                ->join('users as students', 'bookings.student_id', '=', "students.id")
-                ->whereNotNull('transaction_id');
-
-            if ($request->filled('order')){
-                $sort = $request->input('sort', 'asc');
-                if (!in_array($sort, ['asc', 'desc']))
-                    $sort = 'asc';
-
-                switch ($request->input('order')) {
-                    case 'recepient':
-                        $query->orderByRaw(DB::raw("CONCAT(instructors.first_name, ' ', instructors.last_name) $sort"));
-                        break;
-                    case 'payer':
-                        $query->orderByRaw(DB::raw("CONCAT(students.first_name, ' ', students.last_name) $sort"));
-                        break;
-                    case 'updated_at':
-                        $query->orderBy('updated_at', $sort);
-                        break;
-                    case 'date':
-                        $query->orderBy('transaction_created_at', $sort);
-                        break;
-                    case 'status':
-                        $statuses_ordered = [Booking::STATUS_CANCELLED, Booking::STATUS_COMPLETE, Booking::STATUS_ESCROW, Booking::STATUS_ESCROW_RELEASED, Booking::STATUS_UNABLE_ESCROW_RELEASE];
-                        if ($sort=='desc')
-                            $statuses_ordered = array_reverse($statuses_ordered);
-                        $statuses_ordered = "'" . implode("','" , $statuses_ordered) . "'";
-                        $query->orderByRaw(DB::raw("FIELD(bookings.status, $statuses_ordered)"));
-                        break;
-                    default:
-                        $query->orderBy('bookings.transaction_created_at', 'desc');
-                }
+        if ($request->filled('order')) {
+            $sort = $request->input('sort', 'asc');
+            if (!in_array($sort, ['asc', 'desc'])) {
+                $sort = 'asc';
             }
 
-            return $query;
-        });
+            $this->scopeQuery(function($query) {
+                return $query->join('users as instructors', 'bookings.instructor_id', '=', "instructors.id")
+                    ->join('users as students', 'bookings.student_id', '=', "students.id")
+                    ->whereNotNull('transaction_id');
+            });
 
+            switch ($request->input('order')) {
+                case 'payer':
+                    $this->orderBy('students.first_name', $sort)
+                        ->orderBy('students.last_name', $sort);
+                    break;
+                case 'recepient':
+                    $this->orderBy('instructors.first_name', $sort)
+                        ->orderBy('instructors.last_name', $sort);
+                    break;
+                case 'updated_at':
+                    $this->orderBy('updated_at', $sort);
+                    break;
+                case 'date':
+                    $this->orderBy('transaction_created_at', $sort);
+                    break;
+                case 'status':
+                    $statuses_ordered = [
+                        Booking::STATUS_CANCELLED,
+                        Booking::STATUS_COMPLETE,
+                        Booking::STATUS_ESCROW,
+                        Booking::STATUS_ESCROW_RELEASED,
+                        Booking::STATUS_UNABLE_ESCROW_RELEASE];
+                    if ($sort == 'desc') {
+                        $statuses_ordered = array_reverse($statuses_ordered);
+                    }
+                    $statuses_ordered = "'" . implode("','", $statuses_ordered) . "'";
+                    $this->orderBy(DB::raw("FIELD(bookings.status, $statuses_ordered)"));
+
+                    break;
+                default:
+                    $this->orderBy('transaction_created_at', 'desc');
+            }
+        } else {
+            $this->orderBy('transaction_created_at', 'desc');
+        }
         $perPage = Cookie::get('adminBookingsPerPage', 25);
 
-        Log::info($this->get(['bookings.*']));
-
-        $this->with(['instructor', 'student']);
-        if ($request->filled('limit') && $request->input('limit')>0) {
+        if ($request->filled('limit') && $request->input('limit') > 0) {
             return $this->paginate($request->input('limit'), ['bookings.*']);
         } elseif ($request->filled('limit') && $request->input('limit') == -1) {
             return $this->get(['bookings.*']);
         } else {
             return $this->paginate($perPage, ['bookings.*']);
         }
-
     }
 
     /**
