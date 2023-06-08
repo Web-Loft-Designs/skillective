@@ -2,21 +2,16 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Requests\API\FinishUserAPIRequest;
 use App\Models\User;
 use App\Repositories\UserRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\UpdateProfilePasswordRequest;
-use App\Http\Requests\API\FinishUserRegistrationRequest;
 use App\Http\Requests\API\UpdateProfileRequest;
 use App\Http\Requests\API\UpdateProfileNotificationMethodsRequest;
-use Response;
-use Auth;
-/**
- * Class UserController
- * @package App\Http\Controllers\API
- */
+use Illuminate\Support\Facades\Auth;
+
 
 class UserAPIController extends AppBaseController
 {
@@ -26,9 +21,14 @@ class UserAPIController extends AppBaseController
     public function __construct(UserRepository $userRepo)
     {
         $this->userRepository = $userRepo;
+        parent::__construct();
     }
 
-	public function getUserData(Request $request){
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getUserData(Request $request){
 		$user = Auth::user();
 		$userData = $this->userRepository->getUserData(Auth::user()->id);
 		$isInstructor = false;
@@ -43,37 +43,13 @@ class UserAPIController extends AppBaseController
 		return response()->json($userData);
 	}
 
-//	public function finishUserRegistration(FinishUserRegistrationRequest $request)
-//	{
-//		if (!$request->filled('email') || !$request->filled('token')) {
-//			return $this->sendError('Unable to process your request.', 400);
-//		}
-//
-//		$user = $this->userRepository->getByFinishRegistrationToken($request->input('token'), $request->input('email'));
-//
-//		if (!$user)
-//			return $this->sendError('Unable to process your request.', 404);
-//
-//		$user->update(['password'=>$request->input('password')]);
-//		$user->setFinishRegistrationToken('');
-//		$user->setStatus(User::STATUS_ACTIVE);
-//
-//		Auth::login($user);
-//
-//		return $this->sendResponse(['redirect'=>route('student.dashboard')]);
-//
-////		$user = User::query()
-////					->where('email', $request->get('email'))
-////					->where('token', $request->get('token'))
-////					->firstOrFail();
-////
-////		$user->fill(['password' => $request->get('password')]);
-////		$user->save();
-////
-////		return response()->json($user);
-//	}
 
-	public function updatePassword(UpdateProfilePasswordRequest $request, User $user = null)
+    /**
+     * @param UpdateProfilePasswordRequest $request
+     * @param User|null $user
+     * @return JsonResponse|never
+     */
+    public function updatePassword(UpdateProfilePasswordRequest $request, User $user = null)
 	{
 		if (!Auth::user()->hasRole(User::ROLE_ADMIN) || $user==null){
 			$user = Auth::user();
@@ -85,7 +61,13 @@ class UserAPIController extends AppBaseController
 		return $this->sendResponse(true, 'Password updated');
 	}
 
-	public function updateProfile(UpdateProfileRequest $request, User $user = null, UserRepository $user_repository)
+    /**
+     * @param UpdateProfileRequest $request
+     * @param User|null $user
+     * @param UserRepository $user_repository
+     * @return JsonResponse
+     */
+    public function updateProfile(UpdateProfileRequest $request, User $user = null, UserRepository $user_repository)
 	{
 		if (!Auth::user()->hasRole(User::ROLE_ADMIN) || $user==null){
 			$user = Auth::user();
@@ -96,7 +78,12 @@ class UserAPIController extends AppBaseController
 		return $this->sendResponse(true, 'Personal Info updated');
 	}
 
-	public function updateNotificationMethods(UpdateProfileNotificationMethodsRequest $request, User $user = null)
+    /**
+     * @param UpdateProfileNotificationMethodsRequest $request
+     * @param User|null $user
+     * @return JsonResponse|never
+     */
+    public function updateNotificationMethods(UpdateProfileNotificationMethodsRequest $request, User $user = null)
 	{
 		if (!Auth::user()->hasRole(User::ROLE_ADMIN) || $user==null){
 			$user = Auth::user();

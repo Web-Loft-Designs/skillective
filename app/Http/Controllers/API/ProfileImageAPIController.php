@@ -2,32 +2,40 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Repositories\UserRepository;
+
 use App\Http\Controllers\AppBaseController;
-use Response;
-use Auth;
 use App\Http\Requests\API\UpdateProfileImageRequest;
-use Illuminate\Support\Facades\Input;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class ProfileImageAPIController extends AppBaseController
 {
-    public function __construct() { }
 
-	public function update(UpdateProfileImageRequest $request, User $user = null) {
+    /**
+     * @param UpdateProfileImageRequest $request
+     * @param User|null $user
+     * @return JsonResponse|never
+     */
+    public function update(UpdateProfileImageRequest $request, User $user = null) {
 		if (!Auth::user()->hasRole(User::ROLE_ADMIN) || $user==null){
 			$user = Auth::user();
 		}
 		if (!$user)
 			return abort(404);
 
-		$profile_image = Input::file('profile_image');
+//		$profile_image = Input::file('profile_image');
+		$profile_image = $request->file('profile_image');
 		$profile_image_path = $user->profile->updateProfileImage($profile_image);
 
 		return $this->sendResponse($profile_image_path, 'You have successfully uploaded profile image.');
 	}
 
-	public function delete(User $user = null)
+    /**
+     * @param User|null $user
+     * @return JsonResponse|never
+     */
+    public function delete(User $user = null)
 	{
 		if (!Auth::user()->hasRole(User::ROLE_ADMIN) || $user==null){
 			$user = Auth::user();

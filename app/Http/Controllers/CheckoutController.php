@@ -5,26 +5,27 @@ namespace App\Http\Controllers;
 use App\Repositories\CartRepository;
 use App\Repositories\GenreRepository;
 use App\Repositories\UserRepository;
-use Auth;
 use App\Facades\BraintreeProcessor;
 use App\Models\User;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends Controller
 {
+
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param CartRepository $cartRepository
+     * @param GenreRepository $genreRepository
+     * @param UserRepository $userRepository
+     * @return Application|Factory|View
      */
     public function index(Request $request, CartRepository $cartRepository, GenreRepository $genreRepository, UserRepository $userRepository)
     {
-
-        $guestCart = $cartRepository->storeGuestCart($request);
-
         $userData = null;
-        $userPaymentMethods = [];
         $user = Auth::user();
         $total = 0;
         $lessonsInACart = [];
@@ -44,7 +45,6 @@ class CheckoutController extends Controller
             'siteGenres'        => $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
             'categorizedGenres' => $genreRepository->getCategorizedGenres(),
         ];
-
 
         $isStudent = ($user && $user->hasRole(User::ROLE_STUDENT));
         if (!$user || $isStudent) {

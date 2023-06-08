@@ -58,7 +58,7 @@ export default {
         },
         {
           code: 'promo',
-          title: 'Promo code'
+          title: 'Promo Code'
         }
       ]
     }
@@ -75,5 +75,8 @@ export default {
   lang='scss'
   scoped
 >
+.discount-management{
+  margin-top: -10px!important;
+}
 @import './DiscountManagement.scss';
 </style>

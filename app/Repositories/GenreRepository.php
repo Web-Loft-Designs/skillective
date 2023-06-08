@@ -3,16 +3,17 @@
 namespace App\Repositories;
 
 use App\Models\Genre;
-use App\Models\GenreCategory;
-use InfyOm\Generator\Common\BaseRepository;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use App\Criteria\GenreSearchCriteria;
 use App\Criteria\GenreStatusCriteria;
 use App\Criteria\GenreFilterByCategoryCriteria;
-use Cookie;
-use DB;
 use App\Models\User;
+use Prettus\Repository\Exceptions\RepositoryException;
 use Spatie\Permission\Models\Role;
 
 /**
@@ -34,9 +35,10 @@ class GenreRepository extends BaseRepository
         'is_featured'
     ];
 
+
     /**
-     * Configure the Model
-     **/
+     * @return string
+     */
     public function model()
     {
         return Genre::class;
@@ -47,11 +49,19 @@ class GenreRepository extends BaseRepository
 	 */
 	protected $skipPresenter = true;
 
-	public function presenter() {
+    /**
+     * @return string
+     */
+    public function presenter() {
 		return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
 	}
 
-	public function getGenres(Request $request){
+    /**
+     * @param Request $request
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
+    public function getGenres(Request $request){
 		$this->resetCriteria();
 		$this->pushCriteria(new LimitOffsetCriteria($request));
 
@@ -77,13 +87,20 @@ class GenreRepository extends BaseRepository
 	}
 
 	// all genres for frontend
-	public function getSiteGenres(){
+
+    /**
+     * @return LengthAwarePaginator|Collection|mixed
+     */
+    public function getSiteGenres(){
 		return $this->scopeQuery(function($query){
 			return $query->orderBy('title','asc')->where('is_disabled', 0);
 		})->with(['category'])->get();
 	}
 
-	public function getSiteLessonsGenres(){
+    /**
+     * @return LengthAwarePaginator|Collection|mixed
+     */
+    public function getSiteLessonsGenres(){
 		return $this->scopeQuery(function($query){
 			$nowOnServer = \Carbon\Carbon::now()->format('Y-m-d H:i:s');
 			$in = DB::table('lessons')
@@ -102,6 +119,9 @@ class GenreRepository extends BaseRepository
 		})->with(['category'])->get();
 	}
 
+    /**
+     * @return LengthAwarePaginator|Collection|mixed
+     */
     public function getSiteInstructorsGenres(){
 
         return $this->scopeQuery(function($query){
@@ -123,6 +143,11 @@ class GenreRepository extends BaseRepository
         })->with(['category'])->get();
     }
 
+    /**
+     * @param $limit
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
     public function getFeatured($limit = null){
 
 		$this->resetCriteria();
@@ -136,7 +161,10 @@ class GenreRepository extends BaseRepository
     	return $this->with(['category'])->orderBy('genres.title', 'asc')->findByField('is_featured', 1)->where('is_disabled', 0);
 	}
 
-	public function getCategorizedGenres(){
+    /**
+     * @return array
+     */
+    public function getCategorizedGenres(){
 		$this->scopeQuery(function($query){
 			return $query->orderBy('title','asc')->where('is_disabled', 0);
 		});
@@ -153,7 +181,11 @@ class GenreRepository extends BaseRepository
 		return $categorized;
 	}
 
-	public function presentResponse($data){
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function presentResponse($data){
 		return $this->presenter->present($data);
 	}
 }

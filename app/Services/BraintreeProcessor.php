@@ -3,31 +3,36 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\Profile;
 use App\Repositories\UserRepository;
-use DB;
-use Log;
-use Braintree_Transaction;
-use Braintree_Gateway;
-use Braintree_MerchantAccount;
-use Braintree_Configuration;
-use Braintree_Exception_NotFound;
+use Braintree;
+use Braintree\CreditCard;
+use Braintree\Customer;
+use Braintree\Exception\NotFound;
+use Braintree\Gateway;
+use Braintree\MerchantAccount;
+use Braintree\PayPalAccount;
+use Braintree\Result\Error;
+use Braintree\Result\Successful;
+use Braintree\Webhook;
+use Illuminate\Support\Facades\Log;
 
 class BraintreeProcessor
 {
 
-    /** @var  UserRepository */
     private $userRepository;
 
-    /** @var  Braintree_Gateway */
-    private $gateway;
 
-    public function __construct(UserRepository $userRepository)
-    {
-        $this->userRepository = $userRepository;
-        $this->gateway = new Braintree_Gateway(Braintree_Configuration::$global);
-    }
+	private $gateway;
 
+	public function __construct(UserRepository $userRepository){
+		$this->userRepository = $userRepository;
+		$this->gateway = new Gateway(Braintree\Configuration::$global);
+	}
+
+    /**
+     * @param User|null $user
+     * @return string
+     */
     public function generateClientToken(User $user = null)
     {
         $options = [];
@@ -45,13 +50,18 @@ class BraintreeProcessor
         }
     }
 
+    /**
+     * @param User $user
+     * @return bool|Customer|null
+     * @throws NotFound
+     */
     public function findCustomer(User $user)
     {
         if(!$user->braintree_customer_id)
             return null;
         try {
             return $this->gateway->customer()->find($user->braintree_customer_id);
-        } catch(\Braintree_Exception_NotFound $e) {
+        } catch(NotFound $e) {
             Log::channel('braintree')->info($e->getMessage());
             $user->braintree_customer_id = null;
             $user->save();
@@ -59,6 +69,12 @@ class BraintreeProcessor
         }
     }
 
+
+    /**
+     * @param User $user
+     * @return array
+     * @throws NotFound
+     */
     public function getSavedCustomerPaymentMethods(User $user)
     {
         $methods = [];
@@ -100,7 +116,7 @@ class BraintreeProcessor
                 }
             }
             return $methods;
-        } catch(\Braintree_Exception_NotFound $e) {
+        } catch(NotFound$e) {
             Log::channel('braintree')->info($e->getMessage());
             $user->braintree_customer_id = null;
             $user->save();
@@ -109,6 +125,12 @@ class BraintreeProcessor
     }
 
     // used nowhere , just for development
+
+    /**
+     * @param User $user
+     * @return int
+     * @throws NotFound
+     */
     public function deleteAllCustomerPaymentMethods(User $user)
     {
         $countDeleted = 0;
@@ -130,6 +152,11 @@ class BraintreeProcessor
         return $countDeleted;
     }
 
+    /**
+     * @param User $user
+     * @return array
+     * @throws NotFound
+     */
     public function getAllCustomerPaymentMethods(User $user)
     {
         $methods = [];
@@ -168,13 +195,17 @@ class BraintreeProcessor
         return $methods;
     }
 
+    /**
+     * @param User $user
+     * @return User
+     * @throws \Exception
+     */
     public function createCustomer(User $user)
     {
         if(!$user->braintree_customer_id) {
             $result = $this->gateway->customer()->create([
                 'firstName' => $user->first_name,
                 'lastName' => $user->last_name,
-//			'company' => '',
                 'email' => $user->email,
                 'phone' => presentMobilePhone($user->profile->mobile_phone)
             ]);
@@ -190,6 +221,11 @@ class BraintreeProcessor
         return $user;
     }
 
+    /**
+     * @param User $user
+     * @return void
+     * @throws \Exception
+     */
     public function updateCustomer(User $user)
     {
         $result = $this->gateway->customer()->update($user->braintree_customer_id,
@@ -207,12 +243,18 @@ class BraintreeProcessor
         }
     }
 
+    /**
+     * @param User $user
+     * @param $paymentMethodNonce
+     * @param $deviceData
+     * @return array
+     * @throws \Exception
+     */
     public function createPaymentMethod(User $user, $paymentMethodNonce, $deviceData = null)
     {
         if(!$user->braintree_customer_id) {
             $user = self::createCustomer($user);
         }
-//		$oldListMethods = BraintreeProcessor::getAllCustomerPaymentMethods($user);
         $options = [
             'customerId' => $user->braintree_customer_id,
             'paymentMethodNonce' => $paymentMethodNonce
@@ -230,16 +272,30 @@ class BraintreeProcessor
         return null;
     }
 
+
+    /**
+     * @param $token
+     * @return Result|Successful
+     */
     public function deletePaymentMethod($token)
     {
         return $this->gateway->paymentMethod()->delete($token); // Braintree_Exception_NotFound
     }
 
+    /**
+     * @param $token
+     * @return CreditCard|PayPalAccount
+     * @throws NotFound
+     */
     public function findPaymentMethod($token)
     {
         return $this->gateway->paymentMethod()->find($token); // Braintree_Exception_NotFound
     }
 
+    /**
+     * @param $token
+     * @return Error|Successful
+     */
     public function setAsDefaultMethod($token)
     {
         return $this->gateway->paymentMethod()->update(
@@ -252,6 +308,15 @@ class BraintreeProcessor
         );
     }
 
+    /**
+     * @param $subMerchantId
+     * @param $paymentMethodVaultToken
+     * @param $booking
+     * @param $serviceFee
+     * @param $expectedBrainTreeFee
+     * @return mixed|null
+     * @throws \Exception
+     */
     public function createSellBookingTransactionAndHoldInEscrow($subMerchantId, $paymentMethodVaultToken, $booking, $serviceFee, $expectedBrainTreeFee)
     {
         $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
@@ -303,6 +368,15 @@ class BraintreeProcessor
         }
     }
 
+    /**
+     * @param $subMerchantId
+     * @param $paymentMethodVaultToken
+     * @param $purchasedLesson
+     * @param $serviceFee
+     * @param $expectedBrainTreeFee
+     * @return mixed|null
+     * @throws \Exception
+     */
     public function createPurchasereLessonTransactionAndHoldInEscrow($subMerchantId, $paymentMethodVaultToken, $purchasedLesson, $serviceFee = 0, $expectedBrainTreeFee = 0)
     {
 
@@ -347,6 +421,8 @@ class BraintreeProcessor
             'lineItems' => $lineItems
         ]);
 
+
+
         if($result->success) {
             return $result->transaction;
         } else {
@@ -355,25 +431,29 @@ class BraintreeProcessor
         }
     }
 
-    public function cancelTransaction($transactionId)
-    {
-        try {
-            $transaction = $this->gateway->transaction()->find($transactionId);
-            $transaction->escrowStatus; // \Braintree_Transaction::ESCROW_HELD
-            if(in_array($transaction->status, [\Braintree_Transaction::SETTLED, \Braintree_Transaction::SETTLING])) {
-                $result = $this->gateway->transaction()->refund($transactionId);
-            } else {
-                $result = $this->gateway->transaction()->void($transactionId);
-            }
+    /**
+     * @param $transactionId
+     * @return true
+     * @throws \Exception
+     */
+    public function cancelTransaction($transactionId){
+		try{
+			$transaction = $this->gateway->transaction()->find($transactionId);
+			$transaction->escrowStatus; // \Braintree_Transaction::ESCROW_HELD
+			if ( in_array($transaction->status, [Braintree\Transaction::SETTLED, Braintree\Transaction::SETTLING]) ) {
+				$result = $this->gateway->transaction()->refund( $transactionId );
+			}else {
+				$result = $this->gateway->transaction()->void( $transactionId );
+			}
 
-            if(!$result->success) {
-                list($returnError, $codes) = $this->_resultErrorsForResponse($result);
-                throw new \Exception($returnError, $codes[0]);
-            }
-            return true;
-        } catch(\Braintree_Exception_NotFound $e) {
-            throw new \Exception('Can\'t cancel transaction. Transaction ' . $transactionId . ' not found', 404);
-        }
+			if (!$result->success){
+				list($returnError, $codes) = $this->_resultErrorsForResponse($result);
+				throw new \Exception($returnError, $codes[0]);
+			}
+			return true;
+		}catch (Braintree\Exception\NotFound $e){
+			throw new \Exception('Can\'t cancel transaction. Transaction '.$transactionId.' not found', 404);
+		}
 
 
         $result = $this->gateway->transaction()->refund($transactionId);
@@ -385,21 +465,31 @@ class BraintreeProcessor
         }
     }
 
-    public function releaseTransactionFromEscrow($transactionId)
-    {
-        try {
-            $result = $this->gateway->transaction()->releaseFromEscrow($transactionId);
-            if($result->success) {
-                return true;
-            } else {
-                list($returnError, $codes) = $this->_resultErrorsForResponse($result);
-                throw new \Exception($returnError, $codes[0]);
-            }
-        } catch(\Braintree_Exception_NotFound $e) {
-            throw new \Exception('Can\'t release transaction. Transaction ' . $transactionId . ' not found', 404);
-        }
-    }
+    /**
+     * @param $transactionId
+     * @return true
+     * @throws \Exception
+     */
+    public function releaseTransactionFromEscrow($transactionId){
+		try{
+			$result = $this->gateway->transaction()->releaseFromEscrow($transactionId);
+			if ($result->success){
+				return true;
+			}else{
+				list($returnError, $codes) = $this->_resultErrorsForResponse($result);
+				throw new \Exception($returnError, $codes[0]);
+			}
+		}catch (Braintree\Exception\NotFound $e){
+			throw new \Exception('Can\'t release transaction. Transaction '.$transactionId.' not found', 404);
+		}
+	}
 
+    /**
+     * @param $user
+     * @param $inputData
+     * @return mixed|null
+     * @throws \Exception
+     */
     public function createMerchant($user, $inputData)
     {
         if(!$user->hasRole(User::ROLE_INSTRUCTOR)) {
@@ -426,6 +516,12 @@ class BraintreeProcessor
         }
     }
 
+    /**
+     * @param $user
+     * @param $inputData
+     * @return mixed|null
+     * @throws \Exception
+     */
     public function updateMerchant($user, $inputData)
     {
         if($inputData->taxId) {
@@ -466,6 +562,10 @@ class BraintreeProcessor
         }
     }
 
+    /**
+     * @param $user
+     * @return array|null
+     */
     public function getMerchantAccountDetails($user)
     {
         if($user->bt_submerchant_id) {
@@ -480,6 +580,12 @@ class BraintreeProcessor
         return null;
     }
 
+
+    /**
+     * @param $type
+     * @param $subMerchantId
+     * @return Webhook|string[]
+     */
     public function createSampleWebhookNotification($type, $subMerchantId)
     {
         $sampleNotification = $this->gateway->webhookTesting()->sampleNotification(
@@ -491,6 +597,10 @@ class BraintreeProcessor
         return $sampleNotification;
     }
 
+    /**
+     * @param $merchantAccount
+     * @return array
+     */
     public function _prepareMerchantAccountOutput($merchantAccount)
     {
         return [
@@ -522,11 +632,19 @@ class BraintreeProcessor
         ];
     }
 
+    /**
+     * @param $paymentMethod
+     * @return array|string|string[]
+     */
     public function _getPaymentMethodType($paymentMethod)
     {
         return str_replace('Braintree\\', '', get_class($paymentMethod));
     }
 
+    /**
+     * @param $inputData
+     * @return array[]
+     */
     private function _buildMerchantAccountParametersFromInputData($inputData)
     {
         $merchantAccountParams = [
@@ -555,17 +673,20 @@ class BraintreeProcessor
                 ]
             ],
             'funding' => [
-                'destination' => Braintree_MerchantAccount::FUNDING_DESTINATION_BANK, // TODO: Bank or Venmo instructor to decide
-                'email' => isset($inputData['funding_email']) ? $inputData['funding_email'] : null, // optional
+                'destination' => MerchantAccount::FUNDING_DESTINATION_BANK, // TODO: Bank or Venmo instructor to decide
+                'email' => $inputData['funding_email'] ?? null, // optional
                 'mobilePhone' => isset($inputData['funding_mobilePhone']) ? trim(prepareMobileForTwilio($inputData['funding_mobilePhone']), '+') : null, // optional
                 'accountNumber' => isset($inputData['funding_accountNumber']) ? $inputData['funding_accountNumber'] : null, // TODO : required with  Braintree_MerchantAccount::FUNDING_DESTINATION_BANK , instructor must provide
                 'routingNumber' => isset($inputData['funding_routingNumber']) ? $inputData['funding_routingNumber'] : null // TODO : required with  Braintree_MerchantAccount::FUNDING_DESTINATION_BANK , instructor must provide
             ]
         ];
-
         return $merchantAccountParams;
     }
 
+    /**
+     * @param $result
+     * @return array
+     */
     private function _resultErrorsForResponse($result)
     {
         $returnError = '';

@@ -82,6 +82,7 @@ class BookingsExport implements FromCollection, WithHeadings, ShouldAutoSize, Wi
 		$map[] = $lesson->spot_price;
 		$map[] = $lesson->location;
 		$map[] = $lesson->description;
+		$map[] = $lesson->title;
 
 		return $map;
 	}

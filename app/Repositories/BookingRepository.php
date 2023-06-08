@@ -4,12 +4,16 @@ namespace App\Repositories;
 
 use App\Models\Booking;
 use App\Models\Setting;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use InfyOm\Generator\Common\BaseRepository;
-use Auth;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
-use Log;
 use App\Criteria\StudentBookingSearchCriteria;
 use App\Criteria\InstructorBookingSearchCriteria;
 use App\Criteria\InstructorBookingTypeCriteria;
@@ -21,9 +25,8 @@ use App\Criteria\LessonScheduleForMonthCriteria;
 use App\Criteria\LessonInFutureCriteria;
 use App\Criteria\BackendBookingSearchCriteria;
 use App\Criteria\BookingFilterByAmountRangeCriteria;
-use Cookie;
-use DB;
 use Carbon\Carbon;
+use Prettus\Repository\Exceptions\RepositoryException;
 
 /**
  * Class BookingRepository
@@ -36,33 +39,49 @@ use Carbon\Carbon;
  */
 class BookingRepository extends BaseRepository
 {
+
     /**
      * @var array
      */
     protected $fieldSearchable = [
     ];
 
+
     /**
-     * Configure the Model
-     **/
+     * @return string
+     */
     public function model()
     {
         return Booking::class;
     }
+
 
     /**
      * @var bool
      */
     protected $skipPresenter = true;
 
+    /**
+     * @return string
+     */
     public function presenter() {
         return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
     }
 
+    /**
+     * @param $data
+     * @return mixed
+     */
     public function presentResponse($data){
         return $this->presenter->present($data);
     }
 
+    /**
+     * @param Request $request
+     * @param $studentUserId
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
     public function getStudentBookings(Request $request, $studentUserId = null){
         if (!$studentUserId)
             $studentUserId = Auth::user()->id;
@@ -79,12 +98,13 @@ class BookingRepository extends BaseRepository
         $this->pushCriteria(new StudentBookingTypeCriteria($type));
 
         $this->pushCriteria(new RequestCriteria($request));
-        if ($request->has('day'))
+        if ($request->has('day')) {
             $this->pushCriteria(new LessonScheduleForDayCriteria($request));
-        elseif ($request->has('week'))
+        } elseif ($request->has('week')) {
             $this->pushCriteria(new LessonScheduleForWeekCriteria($request));
-        elseif ($request->has('month'))
+        } elseif ($request->has('month')) {
             $this->pushCriteria(new LessonScheduleForMonthCriteria($request));
+        }
 
         $this->scopeQuery(function($query) use ($studentUserId){
             $query->join('users', 'bookings.instructor_id', '=', "users.id")
@@ -95,6 +115,8 @@ class BookingRepository extends BaseRepository
                 ->orderBy('bookings.created_at', 'desc');
             return $query;
         });
+
+
         $perPage = Cookie::get('studentBookingsPerPage', 25);
         $this->with(['student', 'lesson', 'lesson.instructor', 'lesson.instructor.profile', 'student.profile', 'lesson.genre']);
         if ($request->filled('limit'))
@@ -103,6 +125,12 @@ class BookingRepository extends BaseRepository
             return $this->paginate($perPage, ['bookings.*']);
     }
 
+    /**
+     * @param Request $request
+     * @param $instructorUserId
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
     public function getInstructorBookings(Request $request, $instructorUserId = null){
         $this->resetCriteria();
         $this->resetScope();
@@ -138,16 +166,26 @@ class BookingRepository extends BaseRepository
     }
 
     // for backend payments list
-    public function getBookings(Request $request){
+
+    /**
+     * @param Request $request
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
+    public function getBookings(Request $request) {
         $this->resetCriteria();
         $this->resetScope();
 
         $this->pushCriteria(new LimitOffsetCriteria($request));
 
-        if ($request->filled('s'))
+        if ($request->filled('s')) {
             $this->pushCriteria(new BackendBookingSearchCriteria($request->get('s')));
-        if ($request->filled('price_from') || $request->filled('price_to'))
+        }
+
+        if ($request->filled('price_from') || $request->filled('price_to')) {
             $this->pushCriteria(new BookingFilterByAmountRangeCriteria($request->get('price_from', 0), $request->get('price_to', 9999999)));
+        }
+
 
         $this->scopeQuery(function($query) use ($request){
             $query->join('users as instructors', 'bookings.instructor_id', '=', "instructors.id")
@@ -159,7 +197,7 @@ class BookingRepository extends BaseRepository
                 if (!in_array($sort, ['asc', 'desc']))
                     $sort = 'asc';
 
-                switch ( $request->input('order') ){
+                switch ($request->input('order')) {
                     case 'recepient':
                         $query->orderByRaw(DB::raw("CONCAT(instructors.first_name, ' ', instructors.last_name) $sort"));
                         break;
@@ -187,26 +225,25 @@ class BookingRepository extends BaseRepository
             return $query;
         });
 
-
-
-
         $perPage = Cookie::get('adminBookingsPerPage', 25);
 
         Log::info($this->get(['bookings.*']));
 
         $this->with(['instructor', 'student']);
-        if ($request->filled('limit') && $request->input('limit')>0)
+        if ($request->filled('limit') && $request->input('limit')>0) {
             return $this->paginate($request->input('limit'), ['bookings.*']);
-        elseif($request->filled('limit') && $request->input('limit')==-1)
+        } elseif ($request->filled('limit') && $request->input('limit') == -1) {
             return $this->get(['bookings.*']);
-        else
+        } else {
             return $this->paginate($perPage, ['bookings.*']);
-
-
-
+        }
 
     }
 
+    /**
+     * @param $instructorUserId
+     * @return mixed
+     */
     public function getCountInstructorPendingBookings($instructorUserId = null){
         $this->resetCriteria();
         $this->resetScope();
@@ -224,10 +261,13 @@ class BookingRepository extends BaseRepository
             ->count();
     }
 
+    /**
+     * @param $limit
+     * @return Builder|\Illuminate\Database\Eloquent\Collection
+     */
     public function getPastLessonsPendingBookings($limit = null){
         $this->resetCriteria();
         $this->resetScope();
-//		$this->pushCriteria(new LessonInFutureCriteria());
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
         $this->model = $this->model
             ->select('bookings.*')
@@ -239,6 +279,11 @@ class BookingRepository extends BaseRepository
         return $this->model->with(['lesson'])->get();
     }
 
+    /**
+     * @param $student_id
+     * @return mixed
+     * @throws RepositoryException
+     */
     public function getStudentUpcomingBooking($student_id = null){
         $this->resetCriteria();
         $this->resetScope();
@@ -261,6 +306,10 @@ class BookingRepository extends BaseRepository
         return $upcomingBooking;
     }
 
+    /**
+     * @param $student_id
+     * @return array
+     */
     public function getStudentBookedGenresStatistics($student_id){
         $statistics = [];
 
@@ -274,8 +323,8 @@ class BookingRepository extends BaseRepository
                 if (!isset($statistics[$row->genre_id]))
                     $statistics[$row->genre_id] = ['minutes' => 0, 'lessons' =>0, 'genre_id' => $row->genre_id];
 
-                $to = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $row->end);
-                $from = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $row->start);
+                $to = Carbon::createFromFormat('Y-m-d H:i:s', $row->end);
+                $from = Carbon::createFromFormat('Y-m-d H:i:s', $row->start);
                 $diff_in_minutes = $to->diffInMinutes($from);
 
                 $statistics[$row->genre_id]['lessons'] += 1;
@@ -292,6 +341,9 @@ class BookingRepository extends BaseRepository
         return $statistics;
     }
 
+    /**
+     * @return mixed
+     */
     public function getBookingsWhereUserShouldReceiveRegularNotifications(){
 
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
@@ -305,6 +357,10 @@ class BookingRepository extends BaseRepository
         return $this->model->get();
     }
 
+    /**
+     * @param $limit
+     * @return Builder|\Illuminate\Database\Eloquent\Collection
+     */
     public function getTooLongTimePendingBookings($limit = null){
 
         $timeToApprove = Setting::getValue('time_to_approve_booking', 48);
@@ -324,15 +380,16 @@ class BookingRepository extends BaseRepository
         return $this->model->with(['lesson'])->get();
     }
 
+    /**
+     * @param $limit
+     * @return Builder|\Illuminate\Database\Eloquent\Collection
+     */
     public function getHappenedLessonsPayedInEscrowBookings($limit = null){
 
         $timePastHappened = 8; // hours
-
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
-
         $escrowStatus = Booking::STATUS_ESCROW;
         $escrowErrorStatus = Booking::STATUS_UNABLE_ESCROW_RELEASE;
-
         $this->resetCriteria();
         $this->resetScope();
         $this->model = $this->model
@@ -347,6 +404,11 @@ class BookingRepository extends BaseRepository
         return $this->model->with(['lesson'])->get();
     }
 
+    /**
+     * @param $instructorId
+     * @param Request $request
+     * @return LengthAwarePaginator|Collection|mixed
+     */
     public function getInstructorPayouts($instructorId, Request $request){
         $this->resetCriteria();
         $this->resetScope();
@@ -368,6 +430,11 @@ class BookingRepository extends BaseRepository
             return $this->paginate($perPage, ['totalPayoutsAmount', 'payoutsPeriod']);
     }
 
+    /**
+     * @param $instructorId
+     * @param $period
+     * @return array
+     */
     public function getAmountEarnedForPeriod($instructorId, $period = ''){
         $this->resetCriteria();
         $this->resetScope();
@@ -397,33 +464,14 @@ class BookingRepository extends BaseRepository
         return $count;
     }
 
-    // public function totalAmountInEscrow($instructorId){
-    // 	$this->resetCriteria();
-    // 	$this->resetScope();
 
-    // 	$this->scopeQuery(function($query) use ($instructorId){
-    // 		$query = $query->select(DB::raw('SUM(bookings.spot_price) as amountInEscrow'))
-    // 					   ->groupBy('bookings.instructor_id')
-    // 					   ->where('bookings.instructor_id', $instructorId)
-    // 					   ->where(DB::raw('YEAR(created_at)'), '=', now()->year)
-    // 					   ->whereIn('bookings.status', [Booking::STATUS_ESCROW, Booking::STATUS_ESCROW_RELEASED, Booking::STATUS_UNABLE_ESCROW_RELEASE]);
-    // 		return $query;
-    // 	});
-
-
-    // 	$total = 0;
-    // 	$this->get(['totalPayoutYTD'])->each(function($item) use (&$count){
-    // 		$count += $item->totalPayoutYTD;
-    // 	});
-
-    // 	return ($total) ? $total : 0;
-    // }
-
+    /**
+     * @param $instructorId
+     * @return int|mixed
+     */
     public function totalAmountInEscrow ($instructorId){
         $this->resetCriteria();
         $this->resetScope();
-
-
         $this->scopeQuery(function($query) use ($instructorId){
             $query = $query->select(DB::raw('SUM(bookings.spot_price) as totalPayoutYTD'), DB::raw("DATE(bookings.updated_at) as payoutsPeriod"))
                 ->groupBy(DB::raw('DATE(bookings.updated_at)'))
@@ -434,9 +482,7 @@ class BookingRepository extends BaseRepository
             return $query;
         });
 
-
         $total = $this->get(['totalPayoutYTD'])->sum('totalPayoutYTD');
-
         Log::info($total);
 
         return ($total) ? $total : 0;
@@ -444,6 +490,11 @@ class BookingRepository extends BaseRepository
 
     /*
      * total amount of payments in escrow(moved to marketplace account but not yet disbursed to merchant account)
+     */
+    /**
+     * @param $instructorId
+     * @param $period
+     * @return array
      */
     public function getAmountBookedForPeriod($instructorId, $period = ''){
         $this->resetCriteria();
@@ -474,6 +525,10 @@ class BookingRepository extends BaseRepository
         return $count;
     }
 
+    /**
+     * @param $transactionId
+     * @return bool
+     */
     public function markBookingTransactionAsComplete($transactionId){
         $booking = $this->findWhere([
             'transaction_id' => $transactionId,
@@ -488,6 +543,12 @@ class BookingRepository extends BaseRepository
         return false;
     }
 
+    /**
+     * @param $transactionId
+     * @param $exceptionMessage
+     * @param $followUpAction
+     * @return bool
+     */
     public function markBookingTransactionAsFailedDisbursement($transactionId, $exceptionMessage, $followUpAction){
         $booking = $this->findWhere([
             'transaction_id' => $transactionId,
@@ -504,6 +565,9 @@ class BookingRepository extends BaseRepository
         return false;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCountActiveStudents(){
         $this->resetCriteria();
         $this->resetScope();

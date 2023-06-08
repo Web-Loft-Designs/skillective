@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class RegularNotification extends Model
 {
@@ -22,19 +23,28 @@ class RegularNotification extends Model
 
     protected $table = 'regular_notification';
 
+    /**
+     * @return BelongsToMany
+     */
     public function user()
     {
-        return $this->belongsToMany(\App\Models\User::class);
+        return $this->belongsToMany(User::class);
     }
 
 
+    /**
+     * @return BelongsToMany
+     */
     public function booking()
     {
-        return $this->belongsToMany(\App\Models\Booking::class);
+        return $this->belongsToMany(Booking::class);
     }
 
+    /**
+     * @return BelongsToMany
+     */
     public function lesson()
     {
-        return $this->belongsToMany(\App\Models\Lesson::class);
+        return $this->belongsToMany(Lesson::class);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Criteria;
 
+use Braintree\MerchantAccount;
 use Prettus\Repository\Contracts\CriteriaInterface;
 use Prettus\Repository\Contracts\RepositoryInterface;
 
@@ -12,7 +13,7 @@ class OnlyOnboardedActiveMerchantInstructorsCriteria implements CriteriaInterfac
     public function apply($model, RepositoryInterface $repository)
     {
 		$model = $model->whereNotNull('users.bt_submerchant_id')
-					   ->where('users.bt_submerchant_status', \Braintree_MerchantAccount::STATUS_ACTIVE);
+					   ->where('users.bt_submerchant_status', MerchantAccount::STATUS_ACTIVE);
         return $model;
     }
 }

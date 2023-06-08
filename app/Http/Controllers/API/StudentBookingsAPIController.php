@@ -4,24 +4,20 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CancelBookingsAPIRequest;
 use App\Http\Requests\API\ShareBookingsScheduleAPIRequest;
-use App\Models\User;
 use App\Models\Booking;
 use App\Repositories\BookingRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
-use Response;
-use Auth;
-use Log;
 use App\Notifications\Share\ShareBookingsSchedule;
 use App\Notifications\Bookings\BookingCancellationRequestInstructorNotification;
-use Notification;
 use App\Exports\BookingsExport;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-/**
- * Class BookingController
- * @package App\Http\Controllers\API
- */
 
 class StudentBookingsAPIController extends AppBaseController
 {
@@ -31,14 +27,13 @@ class StudentBookingsAPIController extends AppBaseController
     public function __construct(BookingRepository $bookingRepo)
     {
         $this->bookingRepository = $bookingRepo;
+        parent::__construct();
     }
 
+
     /**
-     * Display a listing of the Booking.
-     * GET|HEAD /bookings
-     *
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      */
     public function index(Request $request)
     {
@@ -53,28 +48,32 @@ class StudentBookingsAPIController extends AppBaseController
         return $this->sendResponse($bookings);
     }
 
-	public function export(Request $request)
+    /**
+     * @param Request $request
+     * @return BinaryFileResponse
+     */
+    public function export(Request $request)
 	{
 		$this->bookingRepository->setPresenter("App\\Presenters\\BookingInListPresenter");
 		$local_time = strtotime($request->get('local_time', 'now'));
 		return Excel::download(new BookingsExport($this->bookingRepository, $request, Auth::user()->id, $local_time), 'bookings-list.xlsx');
 	}
+
     /**
-     * Remove the specified Booking from storage.
-     * DELETE /bookings/{id}
-     *
-     * @param  int $id
-     *
-     * @return Response
+     * @param Booking $booking
+     * @return JsonResponse
      */
     public function cancel(Booking $booking)
     {
 		$this->_requestCancellation($booking);
-
         return $this->sendResponse(true, 'Booking cancellation request sent to instructor');
     }
 
-	public function cancelMany(CancelBookingsAPIRequest $request)
+    /**
+     * @param CancelBookingsAPIRequest $request
+     * @return JsonResponse
+     */
+    public function cancelMany(CancelBookingsAPIRequest $request)
 	{
 		$count_cancelled = 0;
 		foreach ($request->input('bookings') as $bookingId){
@@ -88,7 +87,11 @@ class StudentBookingsAPIController extends AppBaseController
 		return $this->sendResponse(true, $count_cancelled . ' cancellation requests sent');
 	}
 
-	public function share(ShareBookingsScheduleAPIRequest $request){
+    /**
+     * @param ShareBookingsScheduleAPIRequest $request
+     * @return JsonResponse
+     */
+    public function share(ShareBookingsScheduleAPIRequest $request){
     	$currentUser = Auth::user();
 		try{
 			Notification::route('mail', $request->email)->notify(new ShareBookingsSchedule($currentUser, $this->bookingRepository)); // $currentUser->notify(new ShareBookingsSchedule($currentUser, $this->bookingRepository));
@@ -99,7 +102,11 @@ class StudentBookingsAPIController extends AppBaseController
 		return $this->sendResponse(true, 'iCalendar file sent to provided email');
 	}
 
-	private function _requestCancellation(Booking $booking){
+    /**
+     * @param Booking $booking
+     * @return true
+     */
+    private function _requestCancellation(Booking $booking){
 		$booking->has_cancellation_request = 1;
 		$booking->cancellation_request_created_at = now();
 		$booking->save();
@@ -109,7 +116,6 @@ class StudentBookingsAPIController extends AppBaseController
 		}catch (\Exception $e){
 			Log::error("BookingCancellationRequestInstructorNotification Error: " . $e->getCode() . ': ' . $e->getMessage());
 		}
-
 		return true;
 	}
 }

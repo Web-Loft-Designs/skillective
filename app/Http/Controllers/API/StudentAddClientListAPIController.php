@@ -4,34 +4,38 @@ namespace App\Http\Controllers\API;
 
 use App\Facades\UserRegistrator;
 use App\Http\Controllers\AppBaseController;
-use App\Http\Requests\API\StudentRegisterRequest;
 use App\Http\Requests\StudentAddClientListRequest;
-use App\Http\Requests\StudentCreateClientListRequest;
 use App\Http\Requests\StudentSmallRegisterRequest;
-use App\Models\User;
-use App\Repositories\StudentAddClientListRepository;
 use App\Repositories\UserRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
+
 
 class StudentAddClientListAPIController extends AppBaseController
 {
-    private $addClientListRepository;
+
     private $userRepository;
 
-    public function __construct(StudentAddClientListRepository $addClientListRepository, UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->addClientListRepository = $addClientListRepository;
         $this->userRepository = $userRepository;
         parent::__construct();
     }
 
+    /**
+     * @param StudentAddClientListRequest $request
+     * @return JsonResponse
+     */
     public function addToClientList(StudentAddClientListRequest $request)
     {
         $student = $this->userRepository->find($request->required);
         return $this->toClientList($request, $student);
     }
 
+    /**
+     * @param StudentSmallRegisterRequest $request
+     * @return mixed
+     */
     public function createToClientList(StudentSmallRegisterRequest $request)
     {
         $student = UserRegistrator::registerInactiveStudent($request);
@@ -39,6 +43,11 @@ class StudentAddClientListAPIController extends AppBaseController
         return $student;
     }
 
+    /**
+     * @param $request
+     * @param $student
+     * @return JsonResponse
+     */
     private function toClientList($request, $student)
     {
         if(empty($student)) {

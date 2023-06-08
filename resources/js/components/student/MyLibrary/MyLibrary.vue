@@ -66,20 +66,21 @@ export default {
       filters: [
         {
           type: 'select',
-          title: 'Genre',
+          title: 'Skill',
           options: [],
-          placeholder: 'Select genre',
+          placeholder: 'Select skill',
         },
         {
           type: 'search',
           title: '',
-          placeholder: 'Enter the question',
+          placeholder: 'Search my library',
           length: 'wide',
         },
       ],
       selectedGenre: 'All',
       lessons: [],
       genres: [],
+      params: {}
     }
   },
   async created() {
@@ -90,13 +91,24 @@ export default {
   },
   methods: {
     ...mapActions(['getStudentGenres']),
-    async filterChanged(e) {
+    async filterChanged(filterValue) {
       this.isLoading = true
-      const selectedGenre = this.genres.find(el => e.value.toLowerCase() === el.title.toLowerCase())
-      e.value === 'All'
-        ? this.lessons = await lessonService.myLibraryLessons()
-        : this.lessons = await lessonService.myLibraryLessons({genre: selectedGenre.id})
+      if (filterValue.type === 'search') {
+        await this.searchData(filterValue.value.target.value)
+      }
+      if (filterValue.type === 'select') {
+        await this.filterByGenre(filterValue.value)
+      }
       this.isLoading = false
+    },
+    async searchData(searchVal) {
+      this.params.search = searchVal
+      this.lessons = await lessonService.myLibraryLessons(this.params)
+    },
+    async filterByGenre(filterVal) {
+      const selectedGenre = this.genres.find(el => filterVal.toLowerCase() === el.title.toLowerCase())
+      this.params.genre = filterVal === 'All' ? '' : selectedGenre.id
+      this.lessons = await lessonService.myLibraryLessons(this.params)
     },
     async setGenres() {
       this.genres = await this.getStudentGenres()

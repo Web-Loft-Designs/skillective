@@ -3,7 +3,6 @@
 namespace App\Repositories;
 
 use App\Models\Testimonial;
-use InfyOm\Generator\Common\BaseRepository;
 
 /**
  * Class TestimonialRepository
@@ -23,9 +22,10 @@ class TestimonialRepository extends BaseRepository
 		'name', 'instagram_handle', 'content'
     ];
 
+
     /**
-     * Configure the Model
-     **/
+     * @return string
+     */
     public function model()
     {
         return Testimonial::class;
@@ -36,11 +36,18 @@ class TestimonialRepository extends BaseRepository
 	 */
 	protected $skipPresenter = true;
 
-	public function presenter() {
+    /**
+     * @return string
+     */
+    public function presenter() {
 		return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
 	}
 
-	public function presentResponse($data){
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function presentResponse($data){
 		return $this->presenter->present($data);
 	}
 }

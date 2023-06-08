@@ -2,10 +2,8 @@
 
 namespace App\Spatie\MediaLibrary\PathGenerator;
 
-use App\Models\User;
-use Spatie\MediaLibrary\Models\Media;
-use Spatie\MediaLibrary\PathGenerator\PathGenerator;
-use Log;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\MediaLibrary\Support\PathGenerator\PathGenerator;
 
 class SkillectivePathGenerator implements PathGenerator
 {

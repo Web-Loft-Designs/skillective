@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Log;
 
 class UserGeoLocation extends Model
 {
@@ -52,8 +52,6 @@ class UserGeoLocation extends Model
      * @var array
      */
     public static $rules = [
-//		'city' => ['required', 'string', 'max:255'],
-//		'state' => ['required', 'valid_us_state'],
 		'location' => ['required'],
 		'limit' => ['required', 'integer'],
 		'date_from' => ['required'],
@@ -65,15 +63,19 @@ class UserGeoLocation extends Model
 		parent::__construct($attributes);
 	}
 
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
+     * @return BelongsTo
+     */
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-	public static function getAvailableLimits(){
+    /**
+     * @return string[]
+     */
+    public static function getAvailableLimits(){
 		return [
 			'10'						=> '+10 Miles',
 			'50'						=> '+50 Miles',
@@ -81,11 +83,18 @@ class UserGeoLocation extends Model
 		];
 	}
 
-	public static function getDefaultLimit(){
+    /**
+     * @return int
+     */
+    public static function getDefaultLimit(){
 		return 50;
 	}
 
-	public function save(array $options = [])
+    /**
+     * @param array $options
+     * @return bool|void
+     */
+    public function save(array $options = [])
 	{
 		$locationDetails = getLocationDetails($this->location);
 

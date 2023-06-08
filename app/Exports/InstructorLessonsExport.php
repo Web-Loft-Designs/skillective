@@ -82,6 +82,7 @@ class InstructorLessonsExport implements FromCollection, WithHeadings, ShouldAut
 		$map[] = $lesson->spot_price;
 		$map[] = $lesson->location;
 		$map[] = $lesson->description;
+        $map[] = $lesson->title;
 
 		return $map;
 	}

@@ -3,16 +3,12 @@
 namespace App\Services;
 
 use App\Repositories\LessonRepository;
-use DB;
-use Log;
 use App\Repositories\BookingRepository;
 use App\Repositories\PurchasedLessonRepository;
 
 class IncomesCalculator
 {
-	/*
-	 * @var BookingRepository $booking_repository
-	 */
+
 	private $booking_repository = null;
 	private $purchasedLessons = null;
 
@@ -22,7 +18,11 @@ class IncomesCalculator
 		$this->purchasedLessons = $purshPreRLessonRepo;
 	}
 
-	public function totalAmountInEscrow($instructorId)
+    /**
+     * @param $instructorId
+     * @return int|mixed
+     */
+    public function totalAmountInEscrow($instructorId)
 	{
 		$preREarned = $this->purchasedLessons->getAmountEarnedForPeriod($instructorId);
 		
@@ -31,11 +31,16 @@ class IncomesCalculator
 		return ($this->booking_repository->totalAmountInEscrow($instructorId) + $earnedVal);
 	}
 
-	// public function totalPayoutYTD($instructorId){
-	// 	return $this->booking_repository->totalPayoutYTD($instructorId);
-	// }
 
-	public function getInstructorIncomes($instructor, $period = '', BookingRepository $bookingsRepository, LessonRepository $lessonRepository, PurchasedLessonRepository $purshPreRLessonRepo)
+    /**
+     * @param $instructor
+     * @param $period
+     * @param BookingRepository $bookingsRepository
+     * @param LessonRepository $lessonRepository
+     * @param PurchasedLessonRepository $purshPreRLessonRepo
+     * @return array
+     */
+    public function getInstructorIncomes($instructor, $period = '', BookingRepository $bookingsRepository, LessonRepository $lessonRepository, PurchasedLessonRepository $purshPreRLessonRepo)
 	{
 		$countBookedLessons = $lessonRepository->getCountBookedLessonsForPeriod($instructor->id, $period);
 		$countHeldLessons = $lessonRepository->getCountCompleteLessonsForPeriod($instructor->id, $period);

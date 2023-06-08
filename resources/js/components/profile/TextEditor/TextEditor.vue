@@ -21,7 +21,6 @@
         <chrome v-model="colors" />
       </div>
     </transition>
-
     <VueTrix
       :name="name"
       :placeholder="placeholder"
@@ -34,7 +33,6 @@
 
 <script>
 import VueTrix from "vue-trix";
-// import Trix from "trix";
 import { VEmojiPicker } from "v-emoji-picker";
 import { Chrome } from "vue-color";
 
@@ -112,7 +110,13 @@ export default {
     // };
   },
   methods: {
+    handleKeyDown(e) {
+      if (e.keyCode === 13) {
+        document.execCommand('insertHTML', false, '<br><br>');
+      }
+    },
     trixInit() {
+      this.$el.addEventListener('keydown', this.handleKeyDown);
       const buttonHTML = `
               <button title="Underline" type="button" class="trix-button trix-button--icon trix-button--icon-underline" data-trix-key="u" data-trix-attribute="underline" tabindex="-1">Underline</button>
               <button title="Choose color" type="button" class="trix-button trix-button--icon trix-button--icon-palette" tabindex="-1">Choose color</button>

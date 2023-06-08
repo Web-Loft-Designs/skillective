@@ -5,16 +5,16 @@ namespace App\Repositories;
 use App\Models\LessonRequest;
 use App\Models\User;
 use App\Models\Setting;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
-use InfyOm\Generator\Common\BaseRepository;
-use Auth;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
 use App\Criteria\LessonRequestSearchCriteria;
-use Cookie;
-use Log;
-use DB;
 use Carbon\Carbon;
+use Prettus\Repository\Exceptions\RepositoryException;
 
 class LessonRequestRepository extends BaseRepository
 {
@@ -32,9 +32,10 @@ class LessonRequestRepository extends BaseRepository
         'location'
     ];
 
+
     /**
-     * Configure the Model
-     **/
+     * @return string
+     */
     public function model()
     {
         return LessonRequest::class;
@@ -45,16 +46,28 @@ class LessonRequestRepository extends BaseRepository
      */
     protected $skipPresenter = true;
 
+    /**
+     * @return string
+     */
     public function presenter()
     {
         return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
     }
 
+    /**
+     * @param $data
+     * @return mixed
+     */
     public function presentResponse($data)
     {
         return $this->presenter->present($data);
     }
 
+    /**
+     * @param Request $request
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
     public function getUserLessonRequests(Request $request)
     {
         $this->resetCriteria();
@@ -99,16 +112,20 @@ class LessonRequestRepository extends BaseRepository
             return $this->paginate($perPage);
     }
 
+    /**
+     * @param $limit
+     * @return mixed
+     */
     public function getTooLongTimePendingLessonRequests($limit = null)
     {
-
         $timeToApprove = Setting::getValue('time_to_approve_lesson_request', 24);
 
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
         $this->resetCriteria();
         $this->resetScope();
+
         $this->model = $this->model->select('lesson_requests.*')
-            ->whereRaw("( ( created_at <= DATE_SUB('$nowOnServer', INTERVAL $timeToApprove HOUR) ) OR lessons.start <= CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id) )")
+            ->whereRaw("( ( created_at <= DATE_SUB('$nowOnServer', INTERVAL $timeToApprove HOUR) ) OR lesson_requests.start <= CONVERT_TZ('$nowOnServer', 'GMT', lesson_requests.timezone_id) )")
             ->where('status', LessonRequest::STATUS_PENDING)
             ->orWhere('status', LessonRequest::STATUS_APPROVED)
             ->orderBy('created_at', 'asc');

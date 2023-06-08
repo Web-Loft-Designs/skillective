@@ -12,7 +12,7 @@
       :disabled='disabled'
       :options='options'
       :placeholder='placeholder'
-      @input="$emit('value-changed', selectedValue.value)"
+      @input="$emit('value-changed', selectedValue)"
     />
   </div>
 </template>

@@ -11,6 +11,7 @@
         <h2 class='d-flex align-items-center'>
           {{ selectedLesson.title }}
         </h2>
+        <p class='instructor-full_name'>{{ selectedLesson.genre.title }}</p>
         <p class='instructor-full_name'>{{ selectedLesson.instructor.full_name }}</p>
         <p class='instructor-instagram'>@{{ selectedLesson.instructor.profile.instagram_handle }}</p>
         <span class='lesson-type'>
@@ -80,7 +81,7 @@
           Cancel lesson
         </a>
         <a
-          v-if='studentCancel === true'
+          v-if='studentCancel && !canCancel'
           @click.prevent='cancelRequestLesson(selectedLesson)'
           :class="{
             'cancel-lesson':
@@ -97,11 +98,22 @@
           v-model='specialRequestText'
         ></textarea>
         <loader-button
-          v-if="currentUserCanBook && studentList === 'booking-button'"
+          v-if="currentUserCanBook && studentList === 'booking-button' && !canCancel"
           :isLoading='isLoading'
           text='Add to cart'
           @click='addToCart(selectedLesson)'
         />
+        <a
+          v-if='canCancel'
+          @click.prevent='cancelRequestLesson(selectedLesson)'
+          :class="{
+            'cancel-lesson':
+              selectedLesson.students.length === 0 || studentList === false,
+          }"
+          href='#'
+        >
+          Request Cancel
+        </a>
         <div v-if='errorText' class='has-error'>{{ errorText }}</div>
         <div v-if='successText' class='has-success'>{{ successText }}</div>
       </div>
@@ -140,11 +152,16 @@ export default {
       countAvatarsToShow: 7,
       countLessonStudents: 0,
       specialRequestText: '',
+      authStudent: {}
     }
   },
   computed: {
     isLoading() {
       return this.isCartLoading()
+    },
+    canCancel() {
+      if (this?.authStudent || this.authStudent === null) return false
+      return this.authStudent.authStudentBooked
     },
   },
   methods: {
@@ -182,8 +199,8 @@ export default {
     },
     componentHandleGetResponse(responseData) {
       this.selectedLesson = responseData.data.data
+      this.authStudent = responseData.data.data.authStudent
       this.selectedLesson.content = responseData.data.data
-      this.selectedLesson.title = this.selectedLesson.genre.title
       this.selectedLesson.fullDate =
         moment(this.selectedLesson.start).format('MMM') +
         ' ' +
@@ -202,7 +219,7 @@ export default {
       this.apiDelete('/api/lesson/' + lesson.id)
     },
     cancelRequestLesson(lesson) {
-      this.apiDelete('/api/student/booking/' + lesson.id)
+      this.apiDelete('/api/student/booking/' + this.authStudent.booking_id)
     },
     componentHandleDeleteResponse() {
       this.$emit('lessons-cancelled', this.selectedLesson.id)

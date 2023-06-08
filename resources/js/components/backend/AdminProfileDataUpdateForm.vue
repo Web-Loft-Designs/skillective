@@ -2,7 +2,7 @@
     <div id="profile-form-container">
         <form method="post" @submit.prevent="onSubmit">
 
-            <p class="login-box-msg">Personal info</p>
+            <p class="login-box-msg">Profile Information</p>
             <div class="d-flex flex-wrap" >
                 <div class="form-group f-name  w-50 has-feedback" :class="{ 'has-error' : errors.first_name,'color': !isStudent}">
                     <label>Complete name</label>

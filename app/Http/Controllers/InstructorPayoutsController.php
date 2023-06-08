@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
-use Session;
-use Log;
 use App\Facades\BraintreeProcessor;
-use Prettus\Repository\Presenter\ModelFractalPresenter;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use App\Repositories\BookingRepository;
 use App\Repositories\GenreRepository;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class InstructorPayoutsController extends Controller
 {
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param BookingRepository $booking_repository
+     * @param GenreRepository $genreRepository
+     * @return Application|Factory|View
      */
     public function index(Request $request, BookingRepository $booking_repository, GenreRepository $genreRepository)
     {

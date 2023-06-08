@@ -2,8 +2,9 @@
 
 namespace App\Providers;
 
+use Braintree\Configuration;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Socialite\Two\FacebookProvider;
 use Illuminate\Support\Facades\Validator;
@@ -19,10 +20,8 @@ use App\Observers\LessonRequestObserver;
 use App\Repositories\UserRepository;
 use App;
 use Illuminate\Support\Facades\Auth;
-use Log;
 use DateTime;
 use DateTimeZone;
-use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 
 class AppServiceProvider extends ServiceProvider
@@ -44,10 +43,10 @@ class AppServiceProvider extends ServiceProvider
 	 */
 	public function boot(UserRepository $userRepository)
 	{
-		\Braintree_Configuration::environment(config('services.braintree.environment'));
-		\Braintree_Configuration::merchantId(config('services.braintree.merchant_id'));
-		\Braintree_Configuration::publicKey(config('services.braintree.public_key'));
-		\Braintree_Configuration::privateKey(config('services.braintree.private_key'));
+		Configuration::environment(config('services.braintree.environment'));
+		Configuration::merchantId(config('services.braintree.merchant_id'));
+		Configuration::publicKey(config('services.braintree.public_key'));
+		Configuration::privateKey(config('services.braintree.private_key'));
 
 		$this->bootIgSocialite();
 
@@ -72,7 +71,6 @@ class AppServiceProvider extends ServiceProvider
 
 		Validator::extend('is_real_city_in_us', function ($attribute, $value, $parameters) {
 			$state = $parameters[0];
-			//            \Log::info("$value $state, USA");
 			$locationDetails = getLocationDetails("$value $state, USA");
 			return ($locationDetails['city'] != null && $state == $locationDetails['state']); // require the city is defined
 		});
@@ -82,9 +80,9 @@ class AppServiceProvider extends ServiceProvider
 			$instructorId = $parameters[0];
 			$start = \Carbon\Carbon::parse($parameters[1]);
 			$end = \Carbon\Carbon::parse($parameters[2]);
-			\Log::info($instructorId);
-			\Log::info($start);
-			\Log::info($end);
+			Log::info($instructorId);
+			Log::info($start);
+			Log::info($end);
 
 			$instructor = User::find($instructorId);
 			if ($instructor == null) {
@@ -99,8 +97,8 @@ class AppServiceProvider extends ServiceProvider
 
 			$countSpots = ceil($end->diffInMinutes($start) / 30);
 
-			\Log::info($countSpots);
-			\Log::info($minPrice);
+			Log::info($countSpots);
+			Log::info($minPrice);
 
 			return (strtotime($parameters[1]) !== false && strtotime($parameters[2]) !== false && $minPrice > 0) ? ($minPrice * $countSpots <= $value) : true;
 		});

@@ -10,7 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Facades\InstagramLoader;
 use App\Repositories\UserRepository;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class LoadInstagramMediaJob implements ShouldQueue
 {
@@ -50,12 +50,10 @@ class LoadInstagramMediaJob implements ShouldQueue
 					Log::channel('instagram')->info("USER {$this->user_id}: {$m->media_url}");
 
 					if (isset($m->media_url)) {
-
 						// do not load already loaded images
 						$mediaBasename = basename($m->media_url);
 						$filename = substr($mediaBasename, 0, strpos($mediaBasename, '?'));
 						$mediaExists = $user->media()->where('collection_name', 'instagram')->where('file_name', $filename)->count();
-						
 
                         if ($mediaExists == 0) {
                             try {

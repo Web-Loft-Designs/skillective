@@ -11,14 +11,14 @@
 |
 */
 
+
+use Illuminate\Support\Facades\Route;
+
 Route::get('/', 'HomeController@index')->name('home');
-//Route::get('/genres', 'GenresPageController@index')->name('genres');
 Route::get('/lessons', 'LessonsPageController@index')->name('lessons');
 Route::get('/instructors', 'InstructorsPageController@index')->name('instructors');
 Route::get('/lesson/{lesson}', 'LessonPageController@index')->name('lesson');
-//Route::get('/lesson/venmo-test/{lesson}', 'LessonPageController@venmoTest')->name('venmotest');
 
-//Route::get('/location-details', 'LessonsPageController@locationDetails'); // for testing
 
 Route::get('/braintree/webhook', 'BraintreeWebhookController@index'); // TODO: remove this route
 Route::post('/braintree/webhook', 'BraintreeWebhookController@index')->middleware(['guest']);
@@ -67,9 +67,6 @@ Route::post('/social/detach/{provider}', 'Auth\SocialController@detachSocial')->
 Route::get('/globalshop', 'GlobalShopController@index')->name('globalshop');
 Route::get('/checkout', 'CheckoutController@index')->name('checkout');
 Route::get('/cart', 'CartController@index')->name('cart');
-
-//Route::post('avatar', 'AvatarController@avatarUpload')->name('avatar.upload');
-//Route::delete('avatar', 'AvatarController@avatarDelete')->name('avatar.delete');
 
 Route::group(['prefix' => 'instructor', 'middleware'=>['role:Instructor']], function () {
 	Route::get('/dashboard', 'InstructorDashboardController@index')->name('instructor.dashboard');
@@ -124,10 +121,6 @@ Route::group(['prefix' => 'backend', 'middleware'=>['rememberHttpReferer', 'role
 	Route::get('lessons', 'Backend\LessonController@index')->name('backend.lessons.index'); //	Route::resource('lessons', 'Backend\LessonController', ['as' => 'backend']);
 
 	Route::resource('/testimonials', 'Backend\TestimonialController', ['as' => 'backend']);
-
-//	Route::patch('/instructors/approve/{instructor}', 'Backend\InstructorController@approve')->name('backend.instructors.approve');
-//	Route::patch('/instructors/deny/{instructor}', 'Backend\InstructorController@deny')->name('backend.instructors.deny');
-//	Route::resource('instructors', 'Backend\InstructorController', ['as' => 'backend']);
 
 	Route::get('/instructors', 'Backend\InstructorController@index')->name('backend.instructors.index');
 	Route::get('/students', 'Backend\StudentController@index')->name('backend.students.index');

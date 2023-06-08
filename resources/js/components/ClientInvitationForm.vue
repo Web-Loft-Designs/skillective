@@ -2,7 +2,7 @@
     <div>
         <form class="d-flex send-invate-wrapper" method="post" @submit.prevent="onSubmit" v-if="(maxInvitesEnabled-countSentInvites)>0">
             <input type="text" class="form-control" required v-model="fields.invited_contact" :placeholder="inputPlaceholder">
-            <button class="send-invate" type="submit">Send invite</button>
+            <button class="send-invate" type="submit">Invite</button>
         </form>
         <span class="help-block mt-2 has-success" v-if="errors.invited_contact">
                 <strong>{{ errors.invited_contact[0] }}</strong>

@@ -13,8 +13,9 @@ use App\Notifications\MerchantAccount\SubMerchantAccountApproved;
 use App\Notifications\MerchantAccount\SubMerchantAccountDeclined;
 use App\Notifications\InstructorRegistrationRequestSentToReview;
 use App\Notifications\UserAccountSuspended;
-use Log;
 use App\Repositories\UserRepository;
+use Braintree\MerchantAccount;
+use Illuminate\Support\Facades\Log;
 
 class UserObserver
 {
@@ -27,14 +28,14 @@ class UserObserver
 
 	public function submerchantStatusChanged(User $user){
 		switch ($user->bt_submerchant_status) {
-			case \Braintree_MerchantAccount::STATUS_ACTIVE:
+			case MerchantAccount::STATUS_ACTIVE:
 				try{
 					$user->notify(new SubMerchantAccountApproved($user));
 				}catch (\Exception $e){
 					Log::error("SubMerchantAccountApproved Error for #{$user->id} : " . $e->getCode() . ': ' . $e->getMessage());
 				}
 				break;
-			case \Braintree_MerchantAccount::STATUS_SUSPENDED:
+			case MerchantAccount::STATUS_SUSPENDED:
 				try{
 					$user->notify(new SubMerchantAccountDeclined($user));
 				}catch (\Exception $e){

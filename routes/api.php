@@ -21,46 +21,28 @@ Route::post('/become-instructor', 'ContactUsAPIController@becomeInstructor');
 Route::group(['middleware' => ['guest']], function () {
 
 	Route::post('login', '\App\Http\Controllers\Auth\FrontendLoginController@login')->name('frontend.login');
-
-	//	Route::get('user/password/reset', 'Auth\ApiUserForgotPasswordController@showLinkRequestForm');
-	//	Route::post('user/password/email', 'Auth\ApiUserForgotPasswordController@sendResetLinkEmail');
-	//	Route::get('user/password/reset/{token}', 'Auth\ApiUserResetPasswordController@showResetForm');
-	//	Route::post('user/password/reset', 'Auth\ApiUserResetPasswordController@reset');
-
-
-
 	Route::post('instructor/remember', 'Auth\InstructorRegisterController@remember'); // registration in social controller after redirect
-
-	//	Route::post('student/remember', 'Auth\StudentRegisterController@remember'); // Flow for form with input data, registration in social controller after redirect
 	Route::post('student/register', 'Auth\StudentRegisterController@register'); // Flow for form with input data
-
 	Route::get('/user/exists', 'Auth\UserFinishRegistrationController@exists'); // accepts email/token get params(required)
 	Route::post('/user/finish-registration', 'Auth\UserFinishRegistrationController@finishRegistration');
 });
 
 Route::get('/us-states', 'USStatesAPIController@index');
-
 Route::get('/cetegorized-genres', 'GenreAPIController@categorizedGenres');
 Route::get('/genres', 'GenreAPIController@index');
 Route::get('/genres/featured', 'GenreAPIController@featured');
-
 Route::get('/search/instructors', 'SearchAPIController@autocompleteInstructor');
 Route::get('/search/genre', 'SearchAPIController@autocompleteGenres');
 Route::get('/search/location', 'SearchAPIController@autocompleteLocations');
-
 Route::get('user/{user}/media', 'MediaAPIController@index');
 
 Route::group(['middleware' => ['role:Instructor|Student']], function () {
-
 	Route::get('lesson-requests', 'LessonRequestAPIController@index');
 	Route::post('lesson-request/{lessonRequest}/cancel', 'LessonRequestAPIController@cancel');
-
 	Route::post('/invite-instructor', 'InvitationAPIController@inviteInstructor');
 	Route::post('/invite-student', 'InvitationAPIController@inviteStudent');
-
 	Route::get('virtual-lessons/{lesson}/room', 'VirtualLessonRoomsController@getRoomConnectSettings');
 	Route::post('virtual-lessons/{lesson}/room/join', 'VirtualLessonRoomsController@getLessonAccessToken'); // to prevent open the virtual lesson url manually
-	// FOR Testing
 	Route::get('virtual-lessons/rooms', 'VirtualLessonRoomsController@getList');
 });
 
@@ -107,10 +89,6 @@ Route::get('instructors/search', 'SearchInstructorsAPIController@index'); // sea
 Route::get('lesson/{lesson}', 'LessonsAPIController@details');
 Route::get('upcoming-lessons', 'LessonsAPIController@upcomingLessons');
 
-//	/api/lessons all lessons
-//	/api/lessons?day=2019-08-29 day lessons for 2019-08-29
-//	/api/lessons?week=2019-08-23 week lessons (any day of week accepted)
-//	/api/lessons?month=2019-08-29 month lessons for 08 month (any day of month accepted)
 
 Route::get('instructor/{instructor}/lessons', 'InstructorLessonsAPIController@index'); // current instructor lessons
 
@@ -123,9 +101,6 @@ Route::group(['middleware' => ['role:Instructor']], function () {
 
 	Route::group(['prefix' => 'instructor/virtual-lessons'], function () {
 		Route::get('/', 'InstructorVirtualLessonRoomsController@index'); // current instructor lessons
-		//        Route::get('/{lesson}/room', 'InstructorVirtualLessonRoomsController@connect');
-		//        Route::post('{lesson}/room/create', 'InstructorVirtualLessonRoomsController@createRoom');
-		//        Route::post('{lesson}/room/join', 'InstructorVirtualLessonRoomsController@joinRoom');
 		Route::delete('{lesson}/room/complete', 'InstructorVirtualLessonRoomsController@completeRoom');
 		Route::delete('{lesson}/room/participant/{participantId}', 'InstructorVirtualLessonRoomsController@disconnectParticipantFromRoom');
 	});
@@ -195,21 +170,10 @@ Route::get('cart/promo/{promo}', 'CartAPIController@checkIsPromoIsValid');
 Route::post('student/instructors', 'StudentInstructorsAPIController@add'); // add many
 Route::post('cart/validate-user-info', 'CartAPIController@validateUserData');
 Route::group(['middleware' => ['role:Student']], function () {
-
-
 	Route::post('cart', 'CartAPIController@store');
-
 	Route::delete('cart/{cart}', 'CartAPIController@delete');
 
-
-
-	// Lesson Request
 	Route::post('lesson-request', 'LessonRequestAPIController@store');
-
-	//	/api/bookings all lessons
-	//	/api/bookings?day=2019-08-29 day lessons for 2019-08-29
-	//	/api/bookings?week=2019-08-23 week lessons (any day of week accepted)
-	//	/api/bookings?month=2019-08-29 month lessons for 08 month (any day of month accepted)
 	Route::get('student/bookings', 'StudentBookingsAPIController@index'); // current student bookings
 	Route::get('student/bookings/export', 'StudentBookingsAPIController@export'); // current instructor lessons EXPORT
 	Route::delete('student/booking/{booking}', 'StudentBookingsAPIController@cancel'); // request cancellation booking
@@ -235,7 +199,6 @@ Route::group(['middleware' => ['role:Student']], function () {
 	Route::delete('student/instructor/virtual-lesson-notifications/{instructor}', 'StudentInstructorsAPIController@disableVirtualLessonNotifications');
 
 	Route::get('instructors', 'InstructorsAPIController@index'); // get instructors list to add as student instructors
-
 
 	Route::get('student/payment-methods', 'StudentPaymentMethodsAPIController@index'); // get student payment methods
 	Route::post('student/payment-method', 'StudentPaymentMethodsAPIController@store'); // add student payment method
@@ -283,8 +246,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['role:Admin']], function () 
 
 	Route::get('genre-categories', 'Backend\GenreCategoriesAPIController@index');
 	Route::delete('genre-categories/{category}', 'Backend\GenreCategoriesAPIController@delete');
-
-	//Route::get('/cetegorized-faqs', 'FaqAPIController@categorizedFaqs');
 
 	Route::get('faqs', 'Backend\FaqAPIController@index');
 	Route::delete('faq/{genre}', 'Backend\FaqAPIController@delete');

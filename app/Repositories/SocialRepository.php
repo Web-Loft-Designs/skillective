@@ -3,8 +3,8 @@
 namespace App\Repositories;
 
 use App\Models\Social;
-use InfyOm\Generator\Common\BaseRepository;
-use Auth;
+use Illuminate\Support\Facades\Auth;
+
 
 class SocialRepository extends BaseRepository
 {
@@ -17,19 +17,31 @@ class SocialRepository extends BaseRepository
         'social_id'
     ];
 
+
     /**
-     * Configure the Model
-     **/
+     * @return string
+     */
     public function model()
     {
         return Social::class;
     }
 
+    /**
+     * @param $socialId
+     * @param $provider
+     * @return mixed
+     */
     public function getBySocialIdAndProvider($socialId, $provider){
 		return $this->model->where('social_id', $socialId)->where('provider', $provider)->first();
 	}
 
-	public function createAndAttachToUser($socialUserObject, $provider, $user = null){
+    /**
+     * @param $socialUserObject
+     * @param $provider
+     * @param $user
+     * @return bool
+     */
+    public function createAndAttachToUser($socialUserObject, $provider, $user = null){
 		$socialAlreadyLinked = false;
 		$user = !$user ? Auth::user() : $user;
 
@@ -45,14 +57,11 @@ class SocialRepository extends BaseRepository
 				$socialData->social_id = $socialUserObject->id;
 				$socialData->provider = $provider;
 				$user->social()->save($socialData);
-
 				if ($provider=='ig' || $provider=='instagram'){
 					$user->profile->instagram_handle			= $socialUserObject->user['username'];
-//				$user->profile->instagram_followers_count	= $socialUserObject->user['counts']['followed_by'];
 					$user->profile->instagram_token			= $socialUserObject->token;
 					$user->profile->save();
 				}
-
 				$socialAlreadyLinked = true;
 			}
 		}

@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers\API\Backend;
 
-use App\Http\Controllers\API\Backend\UsersAPIController;
 use App\Notifications\InstructorRegistrationRequestApproved; // must finish registration
 use App\Models\User;
 use App\Models\Invitation;
 use App\Notifications\InstructorRegistrationRequestDenied;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Prettus\Repository\Exceptions\RepositoryException;
 use Spatie\Permission\Models\Role;
-use App\Http\Requests\API\CancelUsersAPIRequest;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use App\Jobs\LoadInstagramMediaJob;
 use Illuminate\Support\Str;
 use App\Repositories\InvitationRepository;
 use Illuminate\Support\Facades\Log;
@@ -20,17 +18,25 @@ use Illuminate\Support\Facades\Log;
 class InstructorsAPIController extends UsersAPIController
 {
 
-	public function index(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws RepositoryException
+     */
+    public function index(Request $request)
 	{
 		$this->userRepository->setPresenter("App\\Presenters\\InstructorsInListPresenter");
 		$roleID = Role::findByName(User::ROLE_INSTRUCTOR)->id;
 		$users = $this->userRepository->presentResponse($this->userRepository->getUsers($request, $roleID));
-
-
 		return $this->sendResponse($users);
 	}
 
-	public function approve(User $user, InvitationRepository $invitationRepository)
+    /**
+     * @param User $user
+     * @param InvitationRepository $invitationRepository
+     * @return JsonResponse
+     */
+    public function approve(User $user, InvitationRepository $invitationRepository)
 	{
 		if ($user->status != User::STATUS_ON_REVIEW || !$user->hasRole(User::ROLE_INSTRUCTOR))
 			return $this->sendError('User not on review', 400);
@@ -44,31 +50,36 @@ class InstructorsAPIController extends UsersAPIController
 		return $this->sendResponse(true, 'User approved.');
 	}
 
-	public function toggleFeatured(User $user)
+    /**
+     * @param User $user
+     * @return JsonResponse
+     */
+    public function toggleFeatured(User $user)
 	{
-
 		if (!$user->isFeatured && User::ROLE_INSTRUCTOR) {
-			\DB::table('featured_instructors')->insert([
+			DB::table('featured_instructors')->insert([
 				'instructor_id' => $user->id
 			]);
 		} else {
-			\DB::table('featured_instructors')->where(
+			DB::table('featured_instructors')->where(
 				'instructor_id',
 				"=",
 				$user->id
 			)->delete();
 		}
 
-
-
 		return $this->sendResponse(true);
 	}
 
-	public function setPriority(User $user, Request $request)
+    /**
+     * @param User $user
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function setPriority(User $user, Request $request)
 	{
-
 		if (User::ROLE_INSTRUCTOR) {
-			\DB::table('featured_instructors')
+			DB::table('featured_instructors')
 				->where('instructor_id', $user->id)
 				->update(['priority' => $request->priority]);
 		}
@@ -76,7 +87,11 @@ class InstructorsAPIController extends UsersAPIController
 		return $this->sendResponse(true);
 	}
 
-	public function deny(User $user)
+    /**
+     * @param User $user
+     * @return JsonResponse
+     */
+    public function deny(User $user)
 	{
 		if ($user->status != User::STATUS_ON_REVIEW || !$user->hasRole(User::ROLE_INSTRUCTOR))
 			return $this->sendError('User not on review', 400);
@@ -90,7 +105,11 @@ class InstructorsAPIController extends UsersAPIController
 		return $this->sendResponse(true, 'User application denied.');
 	}
 
-	public function resendFinishRegistrationReminder(User $user)
+    /**
+     * @param User $user
+     * @return JsonResponse
+     */
+    public function resendFinishRegistrationReminder(User $user)
 	{
 		if ($user->status != User::STATUS_APPROVED || !$user->hasRole(User::ROLE_INSTRUCTOR))
 			return $this->sendError('Can\'t send reminder', 400);
@@ -104,16 +123,17 @@ class InstructorsAPIController extends UsersAPIController
 		}
 	}
 
-	private function _addFavoriteClientsAndInstructorsFromInvitations(User $user, $invitationId, InvitationRepository $invitationRepository)
+    /**
+     * @param User $user
+     * @param $invitationId
+     * @param InvitationRepository $invitationRepository
+     * @return void
+     */
+    private function _addFavoriteClientsAndInstructorsFromInvitations(User $user, $invitationId, InvitationRepository $invitationRepository)
 	{
 		$userIsInstructor = $user->hasRole(User::ROLE_INSTRUCTOR);
 
 		if ($invitationId) {
-			//			$tokenMatchingInvitation = Invitation::select('invitations.*')
-			//												 ->whereNull('invited_user_id')
-			//												 ->where('invitation_token', $invitationToken)
-			//												 ->with(['sender'])
-			//												 ->first();
 			$invitationUsedForRegistration = $invitationRepository->findWithoutFail($invitationId);
 
 			$matchingInvitations = Invitation::select('invitations.*')
@@ -127,10 +147,8 @@ class InstructorsAPIController extends UsersAPIController
 					$conditions .= " OR invited_email='{$invitationUsedForRegistration->invited_email}' ";
 				if ($invitationUsedForRegistration->invited_instagram_handle)
 					$conditions .= " OR invited_instagram_handle='{$invitationUsedForRegistration->invited_instagram_handle}' ";
-
 				$matchingInvitations = $matchingInvitations
 					->where('id', '<>', $invitationId)
-					//					->where('invitation_token', '<>', $invitationToken)
 					->whereRaw("(  $conditions  )");
 			} else {
 				$matchingInvitations = $matchingInvitations->whereRaw("( invited_instagram_handle={$user->profile->instagram_handle} OR invited_mobile_phone={$user->profile->mobile_phone} OR invited_email='{$user->email}' )");

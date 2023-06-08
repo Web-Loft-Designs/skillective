@@ -5,13 +5,17 @@ namespace App\Repositories;
 use App\Models\Booking;
 use App\Models\Invitation;
 use App\Models\User;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
-use InfyOm\Generator\Common\BaseRepository;
-use DB;
-use Auth;
+use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
-use Cookie;
 use App\Criteria\InstructorClientSearchCriteria;
 use App\Criteria\StudentInstructorSearchCriteria;
 use App\Criteria\UserSearchCriteria;
@@ -23,7 +27,9 @@ use App\Criteria\UserFilterByInstagranHandleCriteria;
 use App\Criteria\InstructorFilterByLocationCriteria;
 use App\Criteria\UserFilterByGenreCriteria;
 use Carbon\Carbon;
+use Prettus\Repository\Exceptions\RepositoryException;
 use Spatie\Permission\Models\Role;
+
 
 /**
  * Class UserRepository
@@ -41,7 +47,10 @@ class UserRepository extends BaseRepository
 	 */
 	protected $skipPresenter = true;
 
-	public function presenter()
+    /**
+     * @return string
+     */
+    public function presenter()
 	{
 		return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
 	}
@@ -61,9 +70,12 @@ class UserRepository extends BaseRepository
 	protected $appends = ['full_name'];
 
 
-	public function presentResponse($data)
+    /**
+     * @param $data
+     * @return array|mixed
+     */
+    public function presentResponse($data)
 	{
-
         $data = $this->presenter->present($data);
 
         if (request()->routeIs('instructors'))
@@ -77,20 +89,29 @@ class UserRepository extends BaseRepository
 		return $data;
 	}
 
-	public function forceDelete($id)
+    /**
+     * @param $id
+     * @return void
+     */
+    public function forceDelete($id)
 	{
 		$this->find($id)->forceDelete();
 	}
 
-	/**
-	 * Configure the Model
-	 **/
-	public function model()
+
+    /**
+     * @return string
+     */
+    public function model()
 	{
 		return User::class;
 	}
 
-	public function getByToken(Request $request)
+    /**
+     * @param Request $request
+     * @return Application|ResponseFactory|Response
+     */
+    public function getByToken(Request $request)
 	{
 		if (!$request->has('email') || !$request->has('token')) {
 			return response([
@@ -98,15 +119,16 @@ class UserRepository extends BaseRepository
 				'message' => 'Email and Token required',
 			], 400);
 		}
-
 		$user = $this->model()->where('email', '=', $request->email)->where('token', '=', $request->token)->first();
 
 		return $user;
 	}
 
-	public function getAdministrators()
+    /**
+     * @return mixed
+     */
+    public function getAdministrators()
 	{
-
 		return $this->model
 			->leftJoin("model_has_roles", 'users.id', '=', "model_has_roles.model_id")
 			->where('model_has_roles.role_id', '=', 1)
@@ -115,7 +137,10 @@ class UserRepository extends BaseRepository
 	}
 
 
-	public function getInstructorsForHome()
+    /**
+     * @return LengthAwarePaginator|Collection|mixed
+     */
+    public function getInstructorsForHome()
 	{
 		$this->scopeQuery(function ($query) {
 			$instructorRoleId = Role::findByName(User::ROLE_INSTRUCTOR)->id;
@@ -130,22 +155,22 @@ class UserRepository extends BaseRepository
 
 			return $query;
 		});
-
-
-
 		$this->orderBy('featured_instructors.priority', 'desc');
-
 
 		return $this->with(['profile'])->get(['users.*']);
 	}
 
-	public function getUsers(Request $request, $roleID)
+    /**
+     * @param Request $request
+     * @param $roleID
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
+    public function getUsers(Request $request, $roleID)
 	{
 		$this->resetCriteria();
 		$this->pushCriteria(new LimitOffsetCriteria($request));
-
 		$invitedBy = null;
-
 		if ($request->filled('user_id')) {
 			$this->pushCriteria(new UserIdCriteria($request->get('user_id')));
 		} else {
@@ -159,7 +184,6 @@ class UserRepository extends BaseRepository
 				$this->pushCriteria(new UserInvitedByCriteria($invitedBy));
 			}
 		}
-
 		$this->scopeQuery(function ($query) use ($roleID, $invitedBy) {
 			$query
 				->leftJoin("model_has_roles", 'users.id', '=', "model_has_roles.model_id")
@@ -167,15 +191,12 @@ class UserRepository extends BaseRepository
 				->where('model_type', '=', 'App\Models\User')
 				->join('profiles', 'users.id', '=', "profiles.user_id")
 				->orderBy('users.created_at', 'desc');
-
 			if ($invitedBy > 0) {
 				$query->leftJoin("invitations", 'users.id', '=', "invitations.invited_user_id");
 				$query->distinct('users.id');
 			}
-
 			return $query;
 		});
-
 		$defaultPerPage = 25;
 		$perPage = $defaultPerPage;
 		if ($roleID == 2)
@@ -191,14 +212,17 @@ class UserRepository extends BaseRepository
 			return $this->paginate($perPage, ['users.*']);
 	}
 
-	public function getFilteredActiveInstructors(Request $request)
+    /**
+     * @param Request $request
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
+    public function getFilteredActiveInstructors(Request $request)
 	{ // for frontend search
 		$this->resetCriteria();
 		$this->resetScope();
-
 		$this->pushCriteria(new RequestCriteria($request));
 		$this->pushCriteria(new LimitOffsetCriteria($request));
-
 		if ($request->filled('instructor_name'))
 			$this->pushCriteria(new UserFilterByNameCriteria($request->get('instructor_name')));
 		if ($request->filled('instagram_handle'))
@@ -207,16 +231,7 @@ class UserRepository extends BaseRepository
 			$this->pushCriteria(new UserFilterByGenreCriteria($request->get('genre')));
 		if ($request->filled('location'))
 			$this->pushCriteria(new InstructorFilterByLocationCriteria($request->get('location')));
-
-		//        if ($request->filled('rate_from') || $request->filled('rate_to'))
-		//            $this->pushCriteria(new InstructorFilterByLessonPriceRangeCriteria($request->get('rate_from', 0), $request->get('rate_to', 9999999)));
-
-		// if (config('app.env')=='prod'){
-		//     $this->pushCriteria(new OnlyOnboardedActiveMerchantInstructorsCriteria());
-		// }
-
 		$this->pushCriteria(new UserStatusCriteria(User::STATUS_ACTIVE));
-
 		$this->scopeQuery(function ($query) use ($request) {
 			$instructorRoleId = Role::findByName(User::ROLE_INSTRUCTOR)->id;
 			$query = $query->selectRaw('users.*, MIN(bookings.spot_price) as min_rate, MAX(bookings.spot_price) as max_rate')
@@ -232,11 +247,10 @@ class UserRepository extends BaseRepository
 				->orderBy('users.created_at', 'desc')
 				->groupBy('users.id');
 
-
-
 			if ($request->filled('rate_from') || $request->filled('rate_to')) {
 				// use $query as subquery
-				$filterQuery = User::selectRaw('*, case when ( min_rate IS NULL ) then 0 else min_rate end as min_rate, case when ( max_rate IS NULL ) then 0 else max_rate end as max_rate ')->fromSub($query, 'users');
+				$filterQuery = User::selectRaw('*, case when ( min_rate IS NULL ) then 0 else min_rate end as min_rate, case when ( max_rate IS NULL ) then 0 else max_rate end as max_rate ')
+                    ->fromSub($query, 'users');
 				$rate_from = is_numeric($request->rate_from) ? (float)$request->rate_from : 0;
 				$rate_to = is_numeric($request->rate_to) ? (float)$request->rate_to : 9999999;
 				if ($rate_from != 0 && $rate_to != 0) {
@@ -263,14 +277,18 @@ class UserRepository extends BaseRepository
 		return $this->with(['profile', 'genres'])->paginate(20, ['users.*']);
 	}
 
-	public function getInstructors(Request $request, $excludeInstructorsOfStudentUserId = null)
+    /**
+     * @param Request $request
+     * @param $excludeInstructorsOfStudentUserId
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
+    public function getInstructors(Request $request, $excludeInstructorsOfStudentUserId = null)
 	{
 		$this->resetCriteria();
 		$this->pushCriteria(new LimitOffsetCriteria($request));
-
 		if ($request->filled('s'))
 			$this->pushCriteria(new InstructorClientSearchCriteria($request->get('s')));
-
 		$this->scopeQuery(function ($query) use ($excludeInstructorsOfStudentUserId) {
 			$instructorsIds = DB::table('instructor_client')
 				->where('instructor_id', $excludeInstructorsOfStudentUserId)
@@ -286,15 +304,18 @@ class UserRepository extends BaseRepository
 				->where('model_has_roles.role_id', '=', 2)
 				->where('model_type', '=', 'App\Models\User')
 				->orderBy('users.created_at', 'desc');
-
-			//			$query->join('profiles', 'users.id', '=', "profiles.user_id");
 			return $query;
 		});
-
 		return $this->with(['profile', 'genres', 'genres.category', 'roles'])->get(['users.*']);
 	}
 
-	public function getStudents(Request $request, $excludeClientsOfInstructorUserId = null)
+    /**
+     * @param Request $request
+     * @param $excludeClientsOfInstructorUserId
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
+    public function getStudents(Request $request, $excludeClientsOfInstructorUserId = null)
 	{
 		$this->resetCriteria();
 		$this->pushCriteria(new LimitOffsetCriteria($request));
@@ -325,10 +346,15 @@ class UserRepository extends BaseRepository
 		return $this->with(['profile', 'genres', 'genres.category', 'roles'])->get(['users.*']);
 	}
 
-	public function getInstructorClients($instructorUserId = null, Request $request)
+    /**
+     * @param $instructorUserId
+     * @param Request $request
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
+    public function getInstructorClients($instructorUserId = null, Request $request)
 	{
 		$this->resetCriteria();
-
 		$this->pushCriteria(new LimitOffsetCriteria($request));
 
 		if ($request->filled('s'))
@@ -361,18 +387,20 @@ class UserRepository extends BaseRepository
 			return $this->paginate($perPage, ['users.*']);
 	}
 
-	public function getStudentInstructors($studentUserId = null, Request $request)
+    /**
+     * @param $studentUserId
+     * @param Request $request
+     * @return LengthAwarePaginator|Collection|mixed
+     * @throws RepositoryException
+     */
+    public function getStudentInstructors($studentUserId = null, Request $request)
 	{
 		$this->resetCriteria();
-
 		$this->pushCriteria(new LimitOffsetCriteria($request));
-
 		if ($request->filled('s'))
 			$this->pushCriteria(new StudentInstructorSearchCriteria($request->get('s')));
-
 		if (!$studentUserId)
 			$studentUserId = Auth::user()->id;
-
 		$this->scopeQuery(function ($query) use ($studentUserId) {
 			$query->join('student_instructor', 'users.id', '=', "student_instructor.instructor_id")
 				->where('student_instructor.student_id', $studentUserId)
@@ -380,7 +408,6 @@ class UserRepository extends BaseRepository
 				->join('profiles', 'student_instructor.instructor_id', '=', "profiles.user_id");
 			return $query;
 		});
-
 		$perPage = Cookie::get('studentInstructorsPerPage', 25);
 		$this->with(['profile', 'genres', 'genres.category', 'roles']);
 		$columnsArray = ['users.*', 'student_instructor.is_favorite', 'student_instructor.geo_notifications_allowed', 'student_instructor.virtual_notifications_allowed'];
@@ -390,14 +417,23 @@ class UserRepository extends BaseRepository
 			return $this->paginate($perPage, $columnsArray);
 	}
 
-	public function getUserData($userId)
+    /**
+     * @param $userId
+     * @return User
+     */
+    public function getUserData($userId)
 	{
 		if (!$userId)
 			$userId = Auth::user()->id;
 		return $this->with(['profile', 'genres', 'genres.category', 'roles'])->find($userId);
 	}
 
-	public function getByFinishRegistrationToken($token, $email)
+    /**
+     * @param $token
+     * @param $email
+     * @return User
+     */
+    public function getByFinishRegistrationToken($token, $email)
 	{
 		$this->scopeQuery(function ($query) use ($token, $email) {
 			$query = $query->where('finish_registration_token', $token)
@@ -409,14 +445,25 @@ class UserRepository extends BaseRepository
 		return $this->first();
 	}
 
-	public function setUserSubMerchantId($user, $merchantAccountId)
+    /**
+     * @param $user
+     * @param $merchantAccountId
+     * @return false
+     */
+    public function setUserSubMerchantId($user, $merchantAccountId)
 	{
 		$user->bt_submerchant_id = $merchantAccountId;
 		$user->save();
 		return false;
 	}
 
-	public function updateUserSubMerchantStatus($merchantAccountId, $status, $message = '')
+    /**
+     * @param $merchantAccountId
+     * @param $status
+     * @param $message
+     * @return false
+     */
+    public function updateUserSubMerchantStatus($merchantAccountId, $status, $message = '')
 	{
 		$user = $this->findByField('bt_submerchant_id', $merchantAccountId)->first();
 		if ($user) {
@@ -425,9 +472,12 @@ class UserRepository extends BaseRepository
 		return false;
 	}
 
-	public function getStudentsWhoMayBeInterestedInRegularLesson($lesson)
+    /**
+     * @param $lesson
+     * @return LengthAwarePaginator|Collection|mixed
+     */
+    public function getStudentsWhoMayBeInterestedInRegularLesson($lesson)
 	{
-
 		$studentsWithFavoriteLessonInstructor = DB::table('student_instructor')
 			->select('student_id')
 			->where('geo_notifications_allowed', 1)
@@ -447,16 +497,6 @@ class UserRepository extends BaseRepository
 				    AND user_geo_locations.date_to >='{$lesson->start->format('Y-m-d')}'
 				  ) AND ";
 			}
-
-			//"(
-			//    (
-			//        get_distance_in_miles_between_geo_locations({$lesson->lat},{$lesson->lng}, user_geo_locations.lat, user_geo_locations.lng) <= user_geo_locations.limit
-			//    )
-			//    AND user_geo_locations.date_from <='{$lesson->start->format('Y-m-d')}'
-			//    AND user_geo_locations.date_to >='{$lesson->start->format('Y-m-d')}'
-			//) AND
-			//users.id IN (".implode(',', $studentsWithFavoriteLessonInstructor).")"
-
 			$query = $query->join('user_geo_locations', 'users.id', '=', "user_geo_locations.user_id")
 				->leftJoin('user_genre', 'users.id', '=', "user_genre.user_id")
 				->whereIn('users.id', $studentsWithFavoriteLessonInstructor)
@@ -469,9 +509,12 @@ class UserRepository extends BaseRepository
 		return $this->all(['users.*']);
 	}
 
-	public function getStudentsWhoMayBeInterestedInVirtualLesson($lesson)
+    /**
+     * @param $lesson
+     * @return LengthAwarePaginator|Collection|mixed
+     */
+    public function getStudentsWhoMayBeInterestedInVirtualLesson($lesson)
 	{
-
 		$studentsWhoWantToBeNotifiedInstructor = DB::table('student_instructor')
 			->select('student_id')
 			->where('virtual_notifications_allowed', 1)
@@ -494,7 +537,10 @@ class UserRepository extends BaseRepository
 		return $this->all(['users.*']);
 	}
 
-	public function getAverageNewStudents()
+    /**
+     * @return string
+     */
+    public function getAverageNewStudents()
 	{
 		$firstStudent = $this->model->orderBy('created_at', 'asc')->first();
 		$countMonths = Carbon::now()->diffInMonths($firstStudent->created_at);
@@ -507,7 +553,12 @@ class UserRepository extends BaseRepository
 		return $countMonths > 0 ? number_format($totalStudents / $countMonths, 1) : $totalStudents;
 	}
 
-	public function appendGenres($userId, $genres)
+    /**
+     * @param $userId
+     * @param $genres
+     * @return void
+     */
+    public function appendGenres($userId, $genres)
 	{
 		$user = $this->find($userId);
 
@@ -516,7 +567,12 @@ class UserRepository extends BaseRepository
 		return;
 	}
 
-	public function updateUserData($userId, Request $request)
+    /**
+     * @param $userId
+     * @param Request $request
+     * @return void
+     */
+    public function updateUserData($userId, Request $request)
 	{
 		$user = $this->find($userId);
 
@@ -553,6 +609,10 @@ class UserRepository extends BaseRepository
 		return;
 	}
 
+    /**
+     * @param $email
+     * @return string|null
+     */
     public function checkInvitationFromEmail($email)
     {
         if($this->where('email', $email)->exists()) {
@@ -570,6 +630,10 @@ class UserRepository extends BaseRepository
         return null;
     }
 
+    /**
+     * @param $phone
+     * @return string|null
+     */
     public function checkInvitationFromPhone($phone)
     {
         if($this->where('mobile_phone', $phone)->exists()) {
@@ -587,6 +651,10 @@ class UserRepository extends BaseRepository
         return null;
     }
 
+    /**
+     * @param $handle
+     * @return string|null
+     */
     public function checkInvitationFromInstagram($handle)
     {
         if($this->where('instagram_handle', $handle)->exists()) {
@@ -604,6 +672,10 @@ class UserRepository extends BaseRepository
         return null;
     }
 
+    /**
+     * @param $email
+     * @return string|null
+     */
     public function checkResendInvitationFromEmail($email)
     {
         if($this->where('email', $email)->exists()) {
@@ -622,6 +694,10 @@ class UserRepository extends BaseRepository
         return null;
     }
 
+    /**
+     * @param $phone
+     * @return string|null
+     */
     public function checkResendInvitationFromPhone($phone)
     {
         if($this->where('mobile_phone', $phone)->exists()) {
@@ -640,6 +716,10 @@ class UserRepository extends BaseRepository
         return null;
     }
 
+    /**
+     * @param object $genres
+     * @return LengthAwarePaginator|Collection|mixed
+     */
     public function getInstructorFromGenres(object $genres)
     {
         return $this->with(['profile', 'genres', 'genres.category', 'roles'])
@@ -648,6 +728,7 @@ class UserRepository extends BaseRepository
             })
             ->get();
     }
+
 
     /**
      * @param $instructor

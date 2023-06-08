@@ -3,23 +3,16 @@
 namespace App\Http\Controllers\API\Backend;
 
 use App\Models\User;
-use App\Repositories\UserRepository;
-use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\UpdateProfilePasswordRequest;
 use App\Http\Requests\API\UpdateAdminProfileRequest;
-use Response;
-use Auth;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+
 
 class AdminProfileAPIController extends AppBaseController
 {
-    /** @var  UserRepository */
-    private $userRepository;
 
-    public function __construct(UserRepository $userRepo)
-    {
-        $this->userRepository = $userRepo;
-    }
 
 	public function updatePassword(UpdateProfilePasswordRequest $request, User $user = null)
 	{
@@ -33,16 +26,18 @@ class AdminProfileAPIController extends AppBaseController
 		return $this->sendResponse(true, 'Password updated');
 	}
 
-	public function updateProfile(UpdateAdminProfileRequest $request)
+    /**
+     * @param UpdateAdminProfileRequest $request
+     * @return JsonResponse
+     */
+    public function updateProfile(UpdateAdminProfileRequest $request)
 	{
 		$user = Auth::user();
-
 		$user->update($request->only([
 			'first_name',
 			'last_name',
 			'email',
 		]));
-
 		$user->profile->update($request->only([
 			'mobile_phone'
 		]));

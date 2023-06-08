@@ -9,7 +9,7 @@ use App\Repositories\InvitationRepository;
 use App\Http\Requests\API\StudentRegisterRequest;
 use App\Http\Controllers\AppBaseController;
 use App\Facades\UserRegistrator;
-use Auth;
+use Illuminate\Http\JsonResponse;
 
 class StudentRegisterController extends AppBaseController
 {
@@ -30,27 +30,26 @@ class StudentRegisterController extends AppBaseController
 		$this->middleware('guest');
 		$this->userRepository = $userRepo;
 		$this->genreRepository = $genre_repository;
+        parent::__construct();
 	}
 
-//	public function remember(StudentRegisterRequest $request){
-//		session()->forget('submittedStudent');
-//		session()->push('submittedStudent', $request->all());
-//		return ['redirect' => Socialite::driver('instagram')->with(['redirect_uri' => route('social.instagram.student.registration')])->redirect()->getTargetUrl()];
-//	}
 
-	public function register(StudentRegisterRequest $request, InvitationRepository $invitationRepository) {
+    /**
+     * @param StudentRegisterRequest $request
+     * @param InvitationRepository $invitationRepository
+     * @return JsonResponse
+     */
+    public function register(StudentRegisterRequest $request, InvitationRepository $invitationRepository)
+    {
 
 		$invitation = null;
-		if ( $request->filled( 'invitation' )
-			 && ( $invitation = $invitationRepository->findUserInvitation($request->input( 'invitation' )) ) == null
+		if ( $request->filled( 'invitation' ) &&
+            ( $invitation = $invitationRepository->findUserInvitation($request->input( 'invitation' )) ) == null
 		) {
 			return $this->sendError("Invitation not found");
 		}
-
 		$student = UserRegistrator::registerInactiveStudent($request);
 		return $this->sendResponse(true, 'Check you email to finish registration and activate your account');
 
-//		Auth::login($student);
-//		return $this->sendResponse(['redirect' => route('student.dashboard')]);
 	}
 }

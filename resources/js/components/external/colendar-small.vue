@@ -16,7 +16,13 @@
         :firstDay='0'
         :fixedWeekCount='false'
         :footer="{
-          right: 'timeGridWeek,dayGridMonth',
+          right: 'custom1,timeGridWeek,dayGridMonth',
+        }"
+        :custom-buttons="{
+          custom1: {
+          text: 'Day',
+            click: goToCurrentDay
+          }
         }"
         :header="{
           left: 'prev',
@@ -29,6 +35,10 @@
         :showNonCurrentDates='false'
         slotDuration='00:15:00'
         slotLabelInterval='01:00'
+        :selectConstraint="{
+          startTime: '00:00',
+          endTime: '24:00',
+        }"
         @eventClick='dateClick'
         @select='selected'
       ></FullCalendar>
@@ -89,6 +99,7 @@ import interactionPlugin from '@fullcalendar/interaction'
 import MagnificPopupModal from './MagnificPopupModal'
 import siteAPI from '../../mixins/siteAPI.js'
 import countriesAndTimezones from 'countries-and-timezones'
+import moment from 'moment-timezone'
 
 export default {
   components: {
@@ -143,7 +154,19 @@ export default {
       })
     }
   },
+  computed: {
+    heightCalendar() {
+      return this.$refs?.fullCalendarSmall.$el.offsetHeight
+    }
+  },
   methods: {
+    goToCurrentDay() {
+      let calendarApi = this.$refs.fullCalendarSmall.getApi()
+      calendarApi.changeView('timeGridDay', new Date())
+      this.injectUpDownButtons()
+      calendarApi.scrollTime = "08:00:00";
+      calendarApi.scrollToTime("08:00:00");
+    },
     clearFormAndClosePopup() {
     },
     removeIt(id) {
@@ -182,31 +205,41 @@ export default {
         calendarApi.scrollToTime(`${ newTime }:00:00`)
       }
     },
-    viewRender: function (info) {
-      if (info.view.type === 'timeGridWeek') {
-        this.triggerView = 'week'
-        let calendarApi = this.$refs.fullCalendarSmall.getApi()
-        const cont = document.querySelector('.fc-view-container')
+    injectUpDownButtons() {
+      setTimeout(() => {
+        const cont = document.querySelector('.fc-body')
         const buttonUp = document.createElement('button')
         buttonUp.classList.add('fc-button--arrow')
         buttonUp.classList.add('fc-button--up')
+
         buttonUp.innerHTML = 'Expand'
         buttonUp.addEventListener('click', this.scrollUp)
         cont.prepend(buttonUp)
+
         const buttonDown = document.createElement('button')
         buttonDown.classList.add('fc-button--arrow')
         buttonDown.classList.add('fc-button--down')
+
         buttonDown.innerHTML = 'Expand'
         buttonDown.addEventListener('click', this.scrollDown)
         cont.appendChild(buttonDown)
+      }, 0)
+    },
+    viewRender: function (info) {
+      let calendarApi = this.$refs.fullCalendarSmall.getApi()
+      if (info.view.type === 'timeGridWeek' || info.view.type === 'timeGridDay') {
+        this.triggerView = 'week'
         calendarApi.scrollTime = '08:00:00'
-        calendarApi.scrollToTime('08:00:00')
+        this.injectUpDownButtons()
       } else if (info.view.type === 'dayGridMonth') {
         this.triggerView = 'month'
         const buttons = document.querySelectorAll('.fc-button--arrow')
         buttons.forEach((item) => {
           item.remove()
         }, [])
+      } else if (info.view.type === 'timeGridDay') {
+        this.injectUpDownButtons()
+        this.triggerView = 'day'
       }
       if (this.triggerOld !== null) {
         if (
@@ -265,6 +298,14 @@ export default {
             this.events = this.events.filter(function (item) {
               return moment().diff(item.end) <= 0
             })
+
+            if (this.triggerView == 'week' || this.triggerView == 'day') {
+              this.injectUpDownButtons()
+            }
+
+            calendarApi.scrollToTime(
+              moment(this.events[0].start).format('HH:mm:ss')
+            )
             this.loader.hide()
             this.loader = null
           })
@@ -279,23 +320,29 @@ export default {
       if (moment(info.event.start, 'x') <= moment(new Date(), 'x')) {
         info.el.className = info.el.className + ' last-event'
       }
-      let count =
-        parseInt(info.event.extendedProps.spots_count) -
-        parseInt(info.event.extendedProps.count_booked)
-      if (count === 1) {
-        info.el.className = info.el.className + ' red-event'
-      } else if (count === 2) {
-        info.el.className = info.el.className + ' yellow-event'
-      } else if (count > 2) {
-        info.el.className = info.el.className + ' green-event'
+      if (this.heightCalendar > 500) {
+        info.el.className = info.el.className + ' big-event'
       } else {
-        info.el.className = info.el.className + ' grey-event'
+        info.el.className = info.el.className + ' small-event'
       }
-      info.el.innerHTML =
-        info.el.innerHTML +
-        '<span class="spot-left">Spots left: ' +
-        count +
-        '</span>'
+      info.el.className = info.el.className + ' test-circle'
+      // let count =
+      //   parseInt(info.event.extendedProps.spots_count) -
+      //   parseInt(info.event.extendedProps.count_booked)
+      // if (count === 1) {
+      //   info.el.className = info.el.className + ' red-event'
+      // } else if (count === 2) {
+      //   info.el.className = info.el.className + ' yellow-event'
+      // } else if (count > 2) {
+      //   info.el.className = info.el.className + ' green-event'
+      // } else {
+      //   info.el.className = info.el.className + ' grey-event'
+      // }
+      // info.el.innerHTML =
+      //   info.el.innerHTML +
+      //   '<span class="spot-left">Spots left: ' +
+      //   count +
+      //   '</span>'
       if (!this.lessonIdParsed) {
         const params = urlHelper.parseQueryParams()
         if (params.lessonId) {
@@ -310,21 +357,26 @@ export default {
       return true
     },
     selected: function (info) {
-      let calendarApi = this.$refs.fullCalendar.getApi()
+      let calendarApi = this.$refs.fullCalendarSmall.getApi()
       calendarApi.changeView('timeGridWeek')
       calendarApi.gotoDate(info.start)
     },
     dateClick: function (info) {
-      this.selectedEvent = {
-        id: info.event.id,
-        lat: info.event.extendedProps.lat,
-        lng: info.event.extendedProps.lng,
-        title: info.event.title,
-        fullDate: `${ moment(info.event.start).format('MMM') } ${ moment(info.event.start).format('DD') }, ${ moment(info.event.start).format('hh:mma') } - ${ moment(info.event.end).format('hh:mma') }`,
-        location: info.event.extendedProps.location,
-        price: info.event.extendedProps.spot_price,
-        students: info.event.extendedProps.students,
-        content: info.event.extendedProps
+      let calendarApi = this.$refs.fullCalendarSmall.getApi()
+      if (info.view.type === 'timeGridWeek' || info.view.type === 'timeGridDay') {
+        this.selectedEvent = {
+          id: info.event.id,
+          lat: info.event.extendedProps.lat,
+          lng: info.event.extendedProps.lng,
+          title: info.event.title,
+          fullDate: `${ moment(info.event.start).format('MMM') } ${ moment(info.event.start).format('DD') }, ${ moment(info.event.start).format('hh:mma') } - ${ moment(info.event.end).format('hh:mma') }`,
+          location: info.event.extendedProps.location,
+          price: info.event.extendedProps.spot_price,
+          students: info.event.extendedProps.students,
+          content: info.event.extendedProps
+        }
+      } else if (info.view.type === 'dayGridMonth') {
+        calendarApi.changeView('timeGridDay', moment(info.event.start).format('YYYY-MM-DD'))
       }
     },
     closeModal: function () {

@@ -1,6 +1,6 @@
 @extends('layouts.app-frontend')
 @section('content')
-    <div class="dashboard-gallery-page">
+   <!-- <div class="dashboard-gallery-page">
         <div class="container dashboard-gallery">
             <div class="row">
                 <div class="col-12">
@@ -8,5 +8,5 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 @endsection

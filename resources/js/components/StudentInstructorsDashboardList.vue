@@ -1,7 +1,9 @@
 <template>
   <div id="profile-instructors-container">
     <div class="table-top d-flex align-items-center">
-      <h2 class="page-title">Instructors</h2>
+      <a href='/instructors'>
+        <h2 class="page-title">Instructors</h2>
+      </a>
     </div>
 
     <div class="table-responsive">
@@ -223,5 +225,15 @@ export default {
   },
 };
 </script>
+
+<style scoped lang='scss'>
+  #profile-instructors-container {
+    .table-top {
+      a {
+        text-decoration: none;
+      }
+    }
+  }
+</style>
 
 

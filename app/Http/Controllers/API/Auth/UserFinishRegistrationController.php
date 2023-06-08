@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\API\Auth;
 
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\FinishStudentRegistrationRequest;
-use Auth;
-use Log;
-use Cookie;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Hash;
 
 class UserFinishRegistrationController extends AppBaseController
 {
@@ -21,10 +22,11 @@ class UserFinishRegistrationController extends AppBaseController
 		parent::__construct();
 	}
 
+
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param UserRepository $userRepository
+     * @param Request $request
+     * @return JsonResponse
      */
     public function exists(UserRepository $userRepository, Request $request)
     {
@@ -40,7 +42,11 @@ class UserFinishRegistrationController extends AppBaseController
 		return $this->sendResponse(true);
     }
 
-	public function finishRegistration(FinishStudentRegistrationRequest $request)
+    /**
+     * @param FinishStudentRegistrationRequest $request
+     * @return JsonResponse
+     */
+    public function finishRegistration(FinishStudentRegistrationRequest $request)
 	{
 		if (!$request->filled('email') || !$request->filled('token')) {
 			return $this->sendError('Unable to process your request.', 400);
@@ -48,10 +54,14 @@ class UserFinishRegistrationController extends AppBaseController
 
 		$user = $this->userRepository->getByFinishRegistrationToken($request->input('token'), $request->input('email'));
 
-		if (!$user)
-			return $this->sendError('Unable to process your request.', 404);
+		if (!$user) {
+            return $this->sendError('Unable to process your request.', 404);
+        }
 
-		$user->update(['password'=>$request->input('password'), 'accepted_invitation_id' => null]);
+		$user->update([
+            'password'=>Hash::make($request->input('password')),
+            'accepted_invitation_id' => null
+        ]);
 		$user->setFinishRegistrationToken('');
 		$user->setStatus(User::STATUS_ACTIVE);
 

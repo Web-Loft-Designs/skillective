@@ -28,7 +28,7 @@ const cartService = {
           description: data.specialRequest,
           isPreRecorded: data.isPreRecorded
         }).catch(({ response }) => {
-          return { message: response.data.message, isError: true }
+          return { message: response.data, isError: true }
         })
     }
   },

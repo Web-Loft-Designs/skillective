@@ -4,10 +4,10 @@ namespace App\Http\Controllers\API\Backend;
 
 use App\Models\Genre;
 use App\Repositories\GenreRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
-use Response;
-use Auth;
+use Prettus\Repository\Exceptions\RepositoryException;
 
 
 class GenresAPIController extends AppBaseController
@@ -18,22 +18,35 @@ class GenresAPIController extends AppBaseController
     public function __construct(GenreRepository $genreRepo)
     {
         $this->genreRepository = $genreRepo;
+        parent::__construct();
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws RepositoryException
+     */
     public function index(Request $request)
     {
 		$genres = $this->genreRepository->presentResponse( $this->genreRepository->getGenres($request) );
-
         return $this->sendResponse($genres);
     }
 
-	public function disable(Genre $genre)
+    /**
+     * @param Genre $genre
+     * @return JsonResponse
+     */
+    public function disable(Genre $genre)
 	{
 		$genre->is_disabled = true;
 		$genre->save();
 		return $this->sendResponse(true, 'Genre disabled and won\'t be available when creating new lessons');
 	}
 
+    /**
+     * @param Genre $genre
+     * @return JsonResponse
+     */
     public function enable(Genre $genre)
 	{
 		$genre->is_disabled = false;

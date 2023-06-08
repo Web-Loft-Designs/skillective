@@ -13,6 +13,7 @@
                             <div class="form-wrap">
                                 @include('frontend.student.partials.profile-data-form')
                                 {{--  --}}
+                                <!--
                                 @if(Auth::user() && (Auth::user()->id==$userProfileData['id'] || $authUserIsAdmin) )
                                     <student-media-gallery
                                             class="dashboard-gallery-page"
@@ -23,7 +24,9 @@
                                     ></student-media-gallery>
                                 @else
                                     <profile-simple-gallery class="dashboard-gallery-page" v-bind:user-media="{{ json_encode($userMedia) }}" v-bind:instagram-media-queue="{{ (Auth::user() && Auth::user()->id==$userProfileData['id'] && isset($loadingInstagramProfileImagesInQueue))?'true':'false' }}"></profile-simple-gallery>
+
                                 @endif
+                                 -->
                             </div>
                         </div>
                     </div>

@@ -17,17 +17,14 @@
                         <h2>Settings</h2>
                         <ul id="top-menu">
                             @if( !$loggedUserIsAdmin )
-                                <li class="active"><a class="scroll-to" href="#social-media-account-trigger">Social media account</a></li>
+                                <li class="active"><a class="scroll-to" href="#social-media-account-trigger">Social media accounts</a></li>
                             @endif
-                            <li class="@if( $loggedUserIsAdmin ){{'active'}}@endif"><a class="scroll-to" href="#data-update-trigger">Personal info</a></li>
-                            @if( Auth::user()->hasRole('Student') )
-                                <li><a class="scroll-to" href="#geo-limitations-trigger">Geo limitations</a></li>
-                            @endif
+                            <li class="@if( $loggedUserIsAdmin ){{'active'}}@endif"><a class="scroll-to" href="#data-update-trigger">Profile Information</a></li>
                             <li><a class="scroll-to" href="#notifications-update-trigger">Notifications</a></li>
                             @if( Auth::user()->hasRole('Student') )
-                                <li><a class="scroll-to" href="#payment-account-trigger">Payment method</a></li>
+                                <li><a class="scroll-to" href="#payment-account-trigger">Payment Methods</a></li>
                             @endif
-                            <li><a class="scroll-to" href="#password-change-trigger">Change password</a></li>
+                            <li><a class="scroll-to" href="#password-change-trigger">Change Password</a></li>
                             @if( $loggedUserIsAdmin )
                                 <li><a class="scroll-to" href="#invitations-limit">Invitations limit</a></li>
                             @endif
@@ -51,7 +48,13 @@
                                     @if( $loggedUserIsAdmin )v-bind:is-admin-form="true" @endif
                          ></profile-data-update-form>
                         </div>
-                        <div class="form-wrap" id="geo-limitations-trigger">
+                        <div class="form-wrap" id="notifications-update-trigger">
+                            <profile-notifications-update-form
+                                    v-bind:available-notification-methods="{{  json_encode($availableNotificationMethods) }}"
+                                    v-bind:user-notification-methods="{{  json_encode($userProfileData['profile']['notification_methods']) }}"
+                                    v-bind:description="'{{ addslashes(preg_replace( "/\r|\n/", "", $student_notifications_block_description)) }}'"
+                                    @if( $loggedUserIsAdmin )v-bind:user-id="{{ $userProfileData['id'] }}" @endif
+                            ></profile-notifications-update-form>
                             <profile-geo-locations-form
                                     v-bind:us-states="{{  json_encode($usStates) }}"
                                     v-bind:available-limits="{{  json_encode($availableLimits) }}"
@@ -60,14 +63,6 @@
                                     v-bind:description="'{{ preg_replace( "/\r|\n/", "", $student_geolocation_block_description) }}'"
                                     @if( $loggedUserIsAdmin )v-bind:user-id="{{ $userProfileData['id'] }}" @endif
                             ></profile-geo-locations-form>
-                        </div>
-                        <div class="form-wrap" id="notifications-update-trigger">
-                            <profile-notifications-update-form
-                                    v-bind:available-notification-methods="{{  json_encode($availableNotificationMethods) }}"
-                                    v-bind:user-notification-methods="{{  json_encode($userProfileData['profile']['notification_methods']) }}"
-                                    v-bind:description="'{{ addslashes(preg_replace( "/\r|\n/", "", $student_notifications_block_description)) }}'"
-                                    @if( $loggedUserIsAdmin )v-bind:user-id="{{ $userProfileData['id'] }}" @endif
-                            ></profile-notifications-update-form>
                         </div>
                         @if( !$loggedUserIsAdmin )
                             <div class="form-wrap" id="payment-account-trigger">

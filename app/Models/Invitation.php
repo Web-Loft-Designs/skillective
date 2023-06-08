@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -45,27 +47,38 @@ class Invitation extends Model implements Transformable
 		'invited_user_id' => 'integer'
     ];
 
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
+     * @return BelongsTo
+     */
     public function sender()
     {
-        return $this->belongsTo(\App\Models\User::class, 'invited_by');
+        return $this->belongsTo(User::class, 'invited_by');
     }
 
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-	 **/
-	public function invitedUser()
+
+    /**
+     * @return BelongsTo
+     */
+    public function invitedUser()
 	{
-		return $this->belongsTo(\App\Models\User::class, 'invited_user_id');
+		return $this->belongsTo(User::class, 'invited_user_id');
 	}
 
-	public function setInvitedMobilePhoneAttribute($val){
+    /**
+     * @param $val
+     * @return void
+     */
+    public function setInvitedMobilePhoneAttribute($val){
 		$this->attributes['invited_mobile_phone'] = preg_replace('/[\.\+\s\(\)]/', '', $val);
 	}
 
-	public function routeNotificationFor($driver, $notification = null)
+    /**
+     * @param $driver
+     * @param $notification
+     * @return MorphMany|mixed|string|void
+     */
+    public function routeNotificationFor($driver, $notification = null)
 	{
 		if (method_exists($this, $method = 'routeNotificationFor'.Str::studly($driver))) {
 			return $this->{$method}($notification);
@@ -83,12 +96,19 @@ class Invitation extends Model implements Transformable
 		}
 	}
 
-	public function routeNotificationForTwilio()
+    /**
+     * @return string
+     */
+    public function routeNotificationForTwilio()
 	{
 		return prepareMobileForTwilio($this->invited_mobile_phone);
 	}
 
-	public function save(array $options = [])
+    /**
+     * @param array $options
+     * @return bool|void
+     */
+    public function save(array $options = [])
 	{
 		if (!$this->invitation_token && !$this->id){
 			$this->invitation_token = Str::random(40);
@@ -97,6 +117,9 @@ class Invitation extends Model implements Transformable
 		parent::save($options);
 	}
 
+    /**
+     * @return array
+     */
     public function transform()
     {
         return [
