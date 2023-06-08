@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Prettus\Repository\Contracts\Transformable;
 
@@ -40,15 +41,19 @@ class GenreCategory extends Model implements Transformable
 		'title' => 'required|unique:genre_categories',
 	];
 
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\hasMany
-	 **/
-	public function genres()
+
+    /**
+     * @return HasMany
+     */
+    public function genres()
 	{
-		return $this->hasMany(\App\Models\Genre::class);
+		return $this->hasMany(Genre::class);
 	}
 
-	public function transform()
+    /**
+     * @return array
+     */
+    public function transform()
 	{
 		return [
 			'id' => $this->id,
@@ -57,7 +62,10 @@ class GenreCategory extends Model implements Transformable
 		];
 	}
 
-	public  static function boot() {
+    /**
+     * @return void
+     */
+    public  static function boot() {
 		parent::boot();
 
 		static::deleting(function($category) {

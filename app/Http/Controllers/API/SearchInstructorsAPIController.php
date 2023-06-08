@@ -5,11 +5,17 @@ namespace App\Http\Controllers\API;
 use App\Repositories\UserRepository;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\InstructorsFilterRequest;
-use Response;
-use Log;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+
 
 class SearchInstructorsAPIController extends AppBaseController
 {
+    /**
+     * @param InstructorsFilterRequest $request
+     * @param UserRepository $userRepository
+     * @return JsonResponse
+     */
     public function index(InstructorsFilterRequest $request, UserRepository $userRepository)
     {
         try{

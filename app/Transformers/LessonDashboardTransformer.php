@@ -52,7 +52,7 @@ class LessonDashboardTransformer extends TransformerAbstract
 //					'gender' => $model->instructor->profile->gender,
 				]
             ],
-            'bookings' => $model->bookings,
+            'bookings' => $model->bookings()->with(['student'])->get(),
 			'start'=> $model->start->format('Y-m-d H:i:s'),
 			'end'=> $model->end->format('Y-m-d H:i:s'),
 			'timezone_id' => $model->timezone_id,
@@ -75,6 +75,7 @@ class LessonDashboardTransformer extends TransformerAbstract
 			'extra_time_after_end' => Lesson::VIRTUAL_LESSON_EXTRA_TIME_AFTER_END,
 			'bookings_count' => $model->bookings_count,
             'preview' => $model->getPreviewUrl(),
+            'title' => $model->title,
         ];
     }
 }

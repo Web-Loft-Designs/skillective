@@ -45,8 +45,8 @@
                             </span>
                     </div>
                     <div class="form-group w-50 has-feedback" :class="{ 'has-error' : errors.reason }">
-                        <label>Reason</label>
-                        <textarea class="form-control" name="reason"  v-model="fields.reason" placeholder="Reason"></textarea>
+                        <label>Message</label>
+                        <textarea class="form-control" name="reason"  v-model="fields.reason" placeholder="Your message"></textarea>
                         <span class="help-block" v-if="errors.reason">
                         <strong>{{ errors.reason[0] }}</strong>
                         </span>
@@ -55,7 +55,7 @@
 
                 <div class="row bottom-row">
                     <div class="submit form-group">
-                        <input type="submit" class="btn" value="Submit" id="contact-submit">
+                        <input type="submit" class="btn" value="Send" id="contact-submit">
                     </div>
                 </div>
             </div>

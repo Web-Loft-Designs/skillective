@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PurchasedLesson extends Model
 {
@@ -25,24 +26,34 @@ class PurchasedLesson extends Model
 
     protected $table = 'purchased_lessons';
 
+    /**
+     * @return BelongsTo
+     */
     public function preRecordedLesson()
     {
-        return $this->belongsTo(\App\Models\PreRecordedLesson::class, 'pre_r_lesson_id');
+        return $this->belongsTo(PreRecordedLesson::class, 'pre_r_lesson_id');
 	}
 
+    /**
+     * @return BelongsTo
+     */
     public function instructor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'instructor_id');
+        return $this->belongsTo(User::class, 'instructor_id');
     }
 
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-	 **/
-	public function student()
+
+    /**
+     * @return BelongsTo
+     */
+    public function student()
 	{
-		return $this->belongsTo(\App\Models\User::class, 'student_id');
+		return $this->belongsTo(User::class, 'student_id');
 	}
 
+    /**
+     * @return string[]
+     */
     public static function getStatuses()
 	{
 		return [
@@ -55,7 +66,11 @@ class PurchasedLesson extends Model
 		];
 	}
 
-	public static function getStatusTitle($status)
+    /**
+     * @param $status
+     * @return string
+     */
+    public static function getStatusTitle($status)
 	{
 		switch ($status){
 			case self::STATUS_ESCROW:
@@ -78,6 +93,10 @@ class PurchasedLesson extends Model
 		}
 	}
 
+    /**
+     * @param $status
+     * @return void
+     */
     public function setStatusAttribute($status)
 	{
 		if (in_array($status, self::getStatuses()) && $this->status!==$status){

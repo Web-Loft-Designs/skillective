@@ -4,7 +4,7 @@
       <filter-header
         :button='button'
         :filters='filters'
-        heading='My Shop'
+        heading='Pre-Recorded Events & Lessons'
         @filter-changed='filterChanged($event)'
         @button-clicked='addLesson'
       />
@@ -98,10 +98,10 @@ export default {
         },
         {
           type: 'multiselect',
-          title: 'Genres',
+          title: 'Skills',
           value: [],
           options: [],
-          placeholder: 'Select genres',
+          placeholder: 'Select Skills',
         },
         {
           type: 'select',

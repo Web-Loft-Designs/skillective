@@ -37,7 +37,7 @@
                 >
                 </radial-progress-bar>
                 <span>
-                  {{ count_booked }} of {{ spots_count }} Clients Bookings
+                  {{ count_booked }} of {{ spots_count }} clients booked
                 </span>
               </div>
 
@@ -72,16 +72,15 @@
         </div>
         <div class='right-side'>
           <span class='price price--mobile'> ${{ bookings_summ }} </span>
-          <div class='cd--control-outer'>
-            <dashboard-booking-item-countdown
-              v-if="
-                listLoaded == true &&
+          <div class='cd--control-outer'
+               v-if="listLoaded == true &&
                 !lesson.room_completed &&
-                lesson_type == 'virtual' &&
                 !isPastLesson(end) &&
                 bookings.length > 0
-              "
+              ">
+            <dashboard-booking-item-countdown
               :lesson='lesson'
+              :lesson-type='lesson_type'
             >
             </dashboard-booking-item-countdown>
           </div>

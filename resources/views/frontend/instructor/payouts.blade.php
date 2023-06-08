@@ -20,7 +20,7 @@
                                     <span>Routing Number: {{ $savedMerchantAccountDetails['funding_routingNumber'] }}</span>
                                 </div>
                                 @endif
-                                <div class="link-container"><a href="{{ route('profile.edit') }}#merchant-account-trigger"><img src="{{ asset('images/img.png') }}" alt="">Set Account</a></div>
+                                <div class="link-container"><a href="{{ route('profile.edit') }}#merchant-account-trigger">Update</a></div>
                             </div>
                     </div>
                 </div>

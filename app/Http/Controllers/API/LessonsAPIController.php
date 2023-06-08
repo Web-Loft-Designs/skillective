@@ -5,13 +5,15 @@ namespace App\Http\Controllers\API;
 use App\Models\Booking;
 use App\Models\Lesson;
 use App\Http\Requests\API\CancelLessonsAPIRequest;
-use App\Models\User;
 use App\Repositories\LessonRepository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
-use Response;
-use Auth;
-use Log;
+use Illuminate\Http\Response;
+use Prettus\Repository\Exceptions\RepositoryException;
+
 
 class LessonsAPIController extends AppBaseController
 {
@@ -20,12 +22,18 @@ class LessonsAPIController extends AppBaseController
 
     public function __construct(LessonRepository $lessonRepo)
     {
+        parent::__construct();
         $this->lessonRepository = $lessonRepo;
     }
 
-	public function details(Request $request, $lesson)
-	{
 
+    /**
+     * @param Request $request
+     * @param $lesson
+     * @return Application|ResponseFactory|JsonResponse|Response
+     */
+    public function details(Request $request, $lesson)
+	{
         // ALLOW OPTIONS METHOD
         $headers = [
             'Access-Control-Allow-Methods'=> 'POST, GET, OPTIONS, PUT, DELETE',
@@ -33,29 +41,36 @@ class LessonsAPIController extends AppBaseController
         ];
         if($request->getMethod() == "OPTIONS") {
             // The client-side application can set only headers allowed in Access-Control-Allow-Headers
-            return Response::make('OK', 200, $headers);
-        }
+            return response('OK', 200, $headers);
 
+        }
 		$lesson = $this->lessonRepository->findWithoutFail((int)$lesson);
+
 		if (empty($lesson)) {
 			return $this->sendError('Lesson not found');
 		}
-
 		$this->lessonRepository->setPresenter("App\\Presenters\\LessonSinglePresenter");
 		$lesson = $this->lessonRepository->presentResponse( $lesson );
 		return $this->sendResponse($lesson);
 	}
 
 
-	public function upcomingLessons(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws RepositoryException
+     */
+    public function upcomingLessons(Request $request)
 	{
-
 		$lessons = $this->lessonRepository->upcomingNearbyLessons($request->ip());
-
 		return $this->sendResponse($lessons);
 	}
 
-	public function cancel($id)
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function cancel($id)
 	{
 		/** @var Lesson $lesson */
 		$lesson = $this->lessonRepository->findWithoutFail($id);
@@ -73,7 +88,11 @@ class LessonsAPIController extends AppBaseController
 		return $this->sendError( 'Can\'t cancel the lesson', 400 );
 	}
 
-	public function cancelMany(CancelLessonsAPIRequest $request)
+    /**
+     * @param CancelLessonsAPIRequest $request
+     * @return JsonResponse
+     */
+    public function cancelMany(CancelLessonsAPIRequest $request)
 	{
 		$count_cancelled = 0;
 		$count_not_cancelled = 0;

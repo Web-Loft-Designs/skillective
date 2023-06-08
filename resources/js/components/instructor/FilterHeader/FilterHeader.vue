@@ -1,6 +1,26 @@
 <template>
   <div class="filter-header">
+    <div class='d-flex justify-content-between'>
     <h1 class="filter-header__heading">{{ heading }}</h1>
+    <div class="filter-header__col">
+    </div>
+      <a
+        v-if="button.type == 'link'"
+        class="filter-header__button"
+        :href="button.href"
+      >
+        <img v-if="button.image" :src="button.image" :alt="button.image" />
+        <span>{{ button.text }}</span>
+      </a>
+      <button
+        v-else
+        class="filter-header__button"
+        @click.prevent="emitButtonPress()"
+      >
+        <img v-if="button.image" :src="button.image" :alt="button.image" />
+        <span>{{ button.text }}</span>
+      </button>
+    </div>
 
     <div class="filter-header__filters">
       <div
@@ -16,13 +36,13 @@
         <div v-if="filter.type == 'select'" class="filter-header__select">
           <select-with-search
             :options="filter.options"
-            @value-changed="valueChanged($event, index)"
+            @value-changed="valueChanged($event, index,'select')"
             :placeholder="filter.placeholder"
           />
         </div>
         <div v-else-if="filter.type == 'multiselect'" class="filter-header__multiselect">
           <multiselect
-            @input="valueChanged($event, index)"
+            @input="valueChanged($event, index, 'multiselect')"
             v-model="filter.value"
             :options="filter.options"
             label="label"
@@ -54,27 +74,9 @@
             class="filter-header__search-input"
             type="text"
             :placeholder="filter.placeholder"
-            @change="valueChanged($event, index)"
+            @change="valueChanged($event, index, 'search')"
           />
         </div>
-      </div>
-      <div class="filter-header__col">
-        <a
-          v-if="button.type == 'link'"
-          class="filter-header__button"
-          :href="button.href"
-        >
-          <img v-if="button.image" :src="button.image" :alt="button.image" />
-          <span>{{ button.text }}</span>
-        </a>
-        <button
-          v-else
-          class="filter-header__button"
-          @click.prevent="emitButtonPress()"
-        >
-          <img v-if="button.image" :src="button.image" :alt="button.image" />
-          <span>{{ button.text }}</span>
-        </button>
       </div>
     </div>
   </div>
@@ -115,10 +117,11 @@ export default {
     emitButtonPress() {
       this.$emit("button-clicked");
     },
-    valueChanged(event, filterIndex) {
+    valueChanged(event, filterIndex, type) {
       this.$emit("filter-changed", {
         value: event,
         filterIndex,
+        type
       });
     },
   },
@@ -127,4 +130,12 @@ export default {
 
 <style lang="scss" scoped>
 @import "./FilterHeader.scss";
+
+.filter-header__col{
+  width: 50%;
+}
+.filter-header__button{
+  width: auto;
+  padding: 4px 12px;
+}
 </style>

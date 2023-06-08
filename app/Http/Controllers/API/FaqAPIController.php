@@ -3,33 +3,30 @@
 namespace App\Http\Controllers\API;
 
 use App\Repositories\FaqRepository;
-use App\Repositories\FaqCategoryRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
-use Response;
+use Prettus\Repository\Exceptions\RepositoryException;
+
 
 class FaqAPIController extends AppBaseController
 {
     /** @var  FaqRepository */
     private $faqRepository;
 
-	/** @var  FaqCategoryRepository */
-	private $faqCategoryRepository;
 
-    public function __construct(FaqRepository $faqRepo, FaqCategoryRepository $faqCategoryRepo)
+    public function __construct(FaqRepository $faqRepo)
     {
+        parent::__construct();
         $this->faqRepository = $faqRepo;
-        $this->faqCategoryRepository = $faqCategoryRepo;
     }
 
+
     /**
-     * Display a listing of the Faq.
-     * GET|HEAD /faqs
-     *
      * @param Request $request
-     * @return Response
+     * @return mixed
+     * @throws RepositoryException
      */
     public function index(Request $request)
     {
@@ -40,7 +37,11 @@ class FaqAPIController extends AppBaseController
         return $this->faqRepository->presentResponse($faqs)['data'];
     }
 
-	public function categorizedFaqs(Request $request)
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    public function categorizedFaqs(Request $request)
 	{
 		return $this->faqRepository->presentResponse($this->faqRepository->getCategorizedFaqs())['data'];
 	}

@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Backend;
 use App\Repositories\BookingRepository;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
-use Log;
+use Illuminate\Support\Facades\Log;
+
 
 class PaymentsController extends AppBaseController
 {
@@ -18,7 +19,7 @@ class PaymentsController extends AppBaseController
 			Log::error('getBookings : ' . $e->getMessage());
 			$bookings = ['data'=>[]];
 		}
-		
+
 		$vars = [
 			'page_title' => 'Payments',
 			'bookings' => $bookings

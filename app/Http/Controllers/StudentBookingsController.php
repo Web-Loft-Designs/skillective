@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Auth;
-use Session;
 use App\Repositories\BookingRepository;
 use App\Repositories\LessonRequestRepository;
 use App\Repositories\GenreRepository;
-use Log;
-use App\Models\Profile;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 
 class StudentBookingsController extends Controller
 {
@@ -21,10 +23,12 @@ class StudentBookingsController extends Controller
         $this->lessonRequestRepository = $lessonRequestRepository;
         parent::__construct();
     }
+
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param BookingRepository $bookingRepository
+     * @param GenreRepository $genreRepository
+     * @param Request $request
+     * @return Application|Factory|View
      */
     public function index(BookingRepository $bookingRepository, GenreRepository $genreRepository, Request $request)
     {

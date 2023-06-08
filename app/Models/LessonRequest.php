@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Prettus\Repository\Contracts\Transformable;
-use Auth;
-use Log;
-use MaksimM\SubqueryMagic\SubqueryMagic;
+
 use Carbon\Carbon;
 
 class LessonRequest extends Model implements Transformable
 {
-    use SoftDeletes, SubqueryMagic;
+
+    use SoftDeletes;
 
     public $table = 'lesson_requests';
 
@@ -90,52 +91,59 @@ class LessonRequest extends Model implements Transformable
         'lesson_price' => 'required',
         'location' => 'required',
         'lesson_type' => 'required'
-//        'address' => 'required',
-//        'city' => 'required',
-//        'state' => 'required',
     ];
 
 	protected $hidden = [
 		'created_at', 'updated_at', 'deleted_at'
 	];
 
-	public static function getLessonTypes(){
+    /**
+     * @return string[]
+     */
+    public static function getLessonTypes(){
 	    return Lesson::getLessonTypes();
     }
 
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
+     * @return BelongsTo
+     */
     public function genre()
     {
-        return $this->belongsTo(\App\Models\Genre::class, 'genre_id');
+        return $this->belongsTo(Genre::class, 'genre_id');
     }
 
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
+     * @return BelongsTo
+     */
     public function instructor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'instructor_id');
+        return $this->belongsTo(User::class, 'instructor_id');
     }
 
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
+     * @return BelongsTo
+     */
     public function student()
     {
-        return $this->belongsTo(\App\Models\User::class, 'student_id');
+        return $this->belongsTo(User::class, 'student_id');
+    }
+
+
+    /**
+     * @return HasOne
+     */
+    public function lesson()
+    {
+        return $this->hasOne(Lesson::class, 'lesson_id');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
-    public function lesson()
-    {
-        return $this->hasOne(\App\Models\Lesson::class, 'lesson_id');
-    }
-
-	public function transform()
+     * @return array
+     */
+    public function transform()
 	{
 		return [
 			'id' => (int)$this->id,
@@ -164,6 +172,9 @@ class LessonRequest extends Model implements Transformable
 		];
 	}
 
+    /**
+     * @return string[]
+     */
     public static function getStatuses()
     {
         return [
@@ -173,11 +184,19 @@ class LessonRequest extends Model implements Transformable
         ];
     }
 
+    /**
+     * @param $status
+     * @return string
+     */
     public static function getStatusTitle($status)
     {
         return ucfirst(str_replace('_', ' ', $status));
     }
 
+    /**
+     * @param array $options
+     * @return bool|mixed
+     */
     public function saveQuietly(array $options = [])
     {
         return static::withoutEvents(function () use ($options) {
@@ -185,7 +204,12 @@ class LessonRequest extends Model implements Transformable
         });
     }
 
-	public function save(array $options = [])
+    /**
+     * @param array $options
+     * @return bool|void
+     * @throws \Exception
+     */
+    public function save(array $options = [])
 	{
 	    if ($this->lesson_type=='in_person'){
             $locationDetails = getLocationDetails($this->location);
@@ -205,14 +229,11 @@ class LessonRequest extends Model implements Transformable
 		parent::save($options);
 	}
 
-	// public function getLocationAttribute($value){
-	// 	if ($this->address!=null && $this->state!=null)
-	// 		return str_replace(', ,', ', ', "{$this->address} <br/>$this->city, $this->state, $this->zip");
-	// 	else
-	// 		return $value;
-	// }
-
-    // can cancel not past and not already cancelled
+    /**
+     * @param $reason
+     * @return true
+     * @throws \Exception
+     */
     public function cancel($reason = null){
         $this->status = self::STATUS_CANCELLED;
         $this->instructor_note = $reason;
@@ -220,6 +241,10 @@ class LessonRequest extends Model implements Transformable
         return true;
     }
 
+    /**
+     * @return true
+     * @throws \Exception
+     */
     public function autoCancel(){
         $this->cancel(null);
         return true;

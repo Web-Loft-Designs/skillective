@@ -3,7 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\PageMeta;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Page extends Model
 {
@@ -26,22 +27,36 @@ class Page extends Model
     ];
 
     // parent Page
+
+    /**
+     * @return BelongsTo
+     */
     public function parent()
     {
-        return $this->belongsTo('App\Models\Page' , 'parent_id');
+        return $this->belongsTo(Page::class , 'parent_id');
     }
 
     // loads only direct children - 1 level
+
+    /**
+     * @return HasMany
+     */
     public function children()
     {
-        return $this->hasMany('App\Models\Page', 'parent_id', 'id');
+        return $this->hasMany(Page::class, 'parent_id', 'id');
     }
 
+    /**
+     * @return HasMany
+     */
     public function meta()
     {
         return $this->hasMany(PageMeta::class);
     }
 
+    /**
+     * @return array
+     */
     public function getAllMeta()
     {
         $return = [];
@@ -52,6 +67,10 @@ class Page extends Model
         return $return;
     }
 
+    /**
+     * @param $metaname
+     * @return mixed|null
+     */
     public function getMetaValue($metaname)
     {
         $allMeta = $this->meta;
@@ -62,6 +81,10 @@ class Page extends Model
         return null;
     }
 
+    /**
+     * @param $metaValue
+     * @return mixed
+     */
     private function prepareOutputMeta($metaValue){
 		if ((strpos($metaValue, 'a:')===0)){
 			try{
@@ -74,6 +97,10 @@ class Page extends Model
 		}
 	}
 
+    /**
+     * @param $metaname
+     * @return false|string
+     */
     public function getMetaValueYoutubeVideoId($metaname){
         $metavalue = $this->getMetaValue($metaname);
         if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $metavalue, $match)) {
@@ -84,34 +111,17 @@ class Page extends Model
         }
     }
 
+    /**
+     * @return mixed
+     */
     public static function getTree(){
         $tree = self::whereNull('parent_id')->with('children')->get();
-
         return $tree;
-//        $tree = array();
-//
-//        foreach ( $all as &$s ) {
-//            if ( is_null($s->parent_id) ) {
-//                // no parent_id so we put it in the root of the array
-//                $tree[] = &$s;
-//            }
-//            else {
-//                $pid = $s['parent_id'];
-//                if ( isset($source[$pid]) ) {
-//                    // If the parent ID exists in the source array
-//                    // we add it to the 'children' array of the parent after initializing it.
-//
-//                    if ( !isset($source[$pid]['children']) ) {
-//                        $source[$pid]['children'] = array();
-//                    }
-//
-//                    $source[$pid]['children'][] = &$s;
-//                }
-//            }
-//        }
-//        return $tree;
     }
 
+    /**
+     * @return int[]
+     */
     public static function getSpecialPages(){
         return array(
             'HOME_PAGE_ID'      		=>self::HOME_PAGE_ID,
@@ -125,6 +135,11 @@ class Page extends Model
         );
     }
 
+    /**
+     * @param $filter
+     * @param $per_page
+     * @return mixed
+     */
     public static function getList($filter = array(), $per_page = -1){
         $list = self::orderBy('title', 'ASC');
 

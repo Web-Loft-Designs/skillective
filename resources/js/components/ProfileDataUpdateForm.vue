@@ -1,7 +1,7 @@
 <template>
   <div id="profile-form-container">
     <form method="post" @submit.prevent="onSubmit">
-      <p class="login-box-msg">Personal info</p>
+      <p class="login-box-msg">Profile Information</p>
       <div class="d-flex flex-wrap">
         <div
           class="form-group f-name w-50 has-feedback"
@@ -228,8 +228,7 @@
           :class="{ 'has-error': errors.genres }"
           v-if="fields.genres != undefined"
         >
-          <label v-if="userProfileData.isInstructor">Genres</label>
-          <label v-if="!userProfileData.isInstructor">Genres</label>
+          <label>Skills</label>
           <div class="scroll">
             <div class="genres-wrapper">
               <div class="item" v-for="(genres, catTitle) in categorizedGenres">

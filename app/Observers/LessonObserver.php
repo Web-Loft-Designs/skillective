@@ -4,10 +4,10 @@ namespace App\Observers;
 
 use App\Models\Lesson;
 use App\Notifications\InstructorChangeTimeLessonNotification;
-use Log;
 use App\Repositories\UserRepository;
 use App\Notifications\YouMayBeInterestedInLessonNotification;
 use App\Notifications\YouMayBeInterestedInVirtualLessonNotification;
+use Illuminate\Support\Facades\Log;
 
 class LessonObserver
 {

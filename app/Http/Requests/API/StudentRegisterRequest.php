@@ -3,8 +3,8 @@
 namespace App\Http\Requests\API;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Auth;
 use App\Models\Genre;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 
@@ -35,12 +35,10 @@ class StudentRegisterRequest extends FormRequest
 			'city'				=> getCityValidationRules($request),
 			'state'				=> ['required', 'string', 'max:255', 'valid_us_state'],
 			'zip'				=> getPostCodeValidationRules(),
-			'dob'				=> getDOBValidationRules(),
 			'genres'			=> ['required', 'array'],
 			'genres.*'			=> [Rule::in( $availableGenresIds )],
 			'email'				=> ['required', 'string', 'email', 'max:255', 'unique:users'],
-			'mobile_phone'		=> getMobilePhoneValidationRules(),
-			'gender'			=> ['required', Rule::in( getGenders() )],
+			'mobile_phone'		=> getMobilePhoneWithoutCountryCodeVerificationRules(),
 			'accept_terms'		=> ['accepted']
 			];
     }

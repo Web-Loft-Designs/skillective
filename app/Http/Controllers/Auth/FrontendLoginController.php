@@ -4,11 +4,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\AppBaseController;
 use App\Repositories\CartRepository;
 use Illuminate\Http\Request;
-use Auth;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use App\Models\User;
-use Cookie;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 
 class FrontendLoginController extends AppBaseController
 {
@@ -47,7 +46,10 @@ class FrontendLoginController extends AppBaseController
         parent::__construct();
     }
 
-	public function redirectTo()
+    /**
+     * @return string|void
+     */
+    public function redirectTo()
 	{
 
 		if ( Auth::user()->hasRole(User::ROLE_INSTRUCTOR) )

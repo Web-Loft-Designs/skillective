@@ -55,6 +55,7 @@ class CartListTransformer extends TransformerAbstract
 					'zip' => $lesson->zip,
 					'description' => $lesson->description,
 					'lesson_type' => $lesson->lesson_type,
+					'title' => $lesson->title,
 
 				]
 			];

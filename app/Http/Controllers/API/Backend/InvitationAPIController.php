@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\Backend;
 
 use App\Models\User;
 use App\Repositories\InvitationRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
 use App\Repositories\ProfileRepository;
@@ -14,8 +15,8 @@ use Illuminate\Support\Facades\Log;
 use App\Notifications\InstructorRegistrationInvitation;
 use App\Notifications\StudentRegistrationInvitation;
 use Illuminate\Support\Facades\Notification;
+use Prettus\Repository\Exceptions\RepositoryException;
 use Spatie\Permission\Models\Role;
-
 
 class InvitationAPIController extends AppBaseController
 {
@@ -37,8 +38,13 @@ class InvitationAPIController extends AppBaseController
 		$this->emailRegexp = getInviteEmailValidationRegexp();
 		$this->phoneRegexp = getInviteMobilePhoneValidationRegexp();
         $this->invitationRepository = $invitationRepository;
+        parent::__construct();
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function inviteInstructors(Request $request)
     {
     	$resultMessage = '';
@@ -102,7 +108,11 @@ class InvitationAPIController extends AppBaseController
 		return $this->sendResponse(true, $resultMessage);
     }
 
-	public function inviteStudents(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function inviteStudents(Request $request)
 	{
 		$resultMessage = '';
 		$countInvited = 0;
@@ -161,7 +171,11 @@ class InvitationAPIController extends AppBaseController
 		return $this->sendResponse(true, $resultMessage);
 	}
 
-	private function _prepareInputData($contact){
+    /**
+     * @param $contact
+     * @return array
+     */
+    private function _prepareInputData($contact){
 		$input = [
 			'invited_by'			=> auth()->id(),
 			'invited_name'			=> ''
@@ -176,6 +190,10 @@ class InvitationAPIController extends AppBaseController
 		return $input;
 	}
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function inviteResendInstructors(Request $request)
     {
         $resultMessage = '';
@@ -241,6 +259,11 @@ class InvitationAPIController extends AppBaseController
         return $this->sendResponse(true, $resultMessage);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws RepositoryException
+     */
     public  function getInvitations(Request $request)
     {
         $roleID = Role::findByName(User::ROLE_INSTRUCTOR)->id;

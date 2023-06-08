@@ -21,12 +21,12 @@
         >
           Cancelled
         </button>
-        <button
-          @click.prevent="toggleShowOnly('lesson_requests')"
-          :class="{ active: showOnly == 'lesson_requests' }"
-        >
-          Booking Requests
-        </button>
+<!--        <button-->
+<!--          @click.prevent="toggleShowOnly('lesson_requests')"-->
+<!--          :class="{ active: showOnly == 'lesson_requests' }"-->
+<!--        >-->
+<!--          Booking Requests-->
+<!--        </button>-->
       </div>
     </div>
     <div class="d-flex justify-content-between align-items-center">
@@ -40,7 +40,7 @@
         <input
           type="text"
           v-model="searchString"
-          placeholder="Search booking"
+          placeholder="Search bookings"
         />
       </div>
       <div class="row" v-if="pagination.total_pages > 1">
@@ -96,13 +96,11 @@
                 </label>
               </span>
             </th>
-            <th class="w-55" scope="col">#</th>
             <th class="w-55" scope="col"></th>
-            <th class="w-100px" scope="col">Instagram</th>
             <th class="w-140" scope="col">Name</th>
-            <th scope="col">Genre</th>
-            <th class="w-140" scope="col">Location</th>
-            <th scope="col">Date</th>
+            <th scope="col">Skill</th>
+            <th class="w-140" scope="col">Lesson Type</th>
+            <th scope="col">Lesson Date</th>
             <th scope="col" class="time-width">Time</th>
             <th scope="col">Price</th>
             <th class="w-200" scope="col"></th>
@@ -121,8 +119,6 @@
               ></span>
             </td>
 
-            <td>{{ firstListItemNumber + index }}</td>
-
             <td v-if="showOnly != 'lesson_requests' && listLoaded == true">
               <img :src="booking.lesson.instructor.profile.image" />
             </td>
@@ -134,40 +130,8 @@
             >
               <div class="width-fix-content">
                 <a
-                  v-if="
-                    booking.lesson.instructor.profile.instagram_handle != null
-                  "
-                  :href="
-                    'https://www.instagram.com/' +
-                    booking.lesson.instructor.profile.instagram_handle
-                  "
-                  target="_blank"
-                  >@{{ booking.lesson.instructor.profile.instagram_handle }}</a
-                >
-              </div>
-            </td>
-            <td v-else class="width-fix">
-              <div class="width-fix-content">
-                <a
-                  v-if="booking.instructor.profile.instagram_handle != null"
-                  :href="
-                    'https://www.instagram.com/' +
-                    booking.instructor.profile.instagram_handle
-                  "
-                  target="_blank"
-                  >@{{ booking.instructor.profile.instagram_handle }}</a
-                >
-              </div>
-            </td>
-
-            <td
-              v-if="showOnly != 'lesson_requests' && listLoaded == true"
-              class="width-fix"
-            >
-              <div class="width-fix-content">
-                <a
                   :href="'/profile/' + booking.lesson.instructor.id"
-                  class="link-to-profile"
+                  class="link-to-profile full-name-link"
                   >{{ booking.lesson.instructor.full_name }}</a
                 >
               </div>
@@ -176,7 +140,7 @@
               <div class="width-fix-content">
                 <a
                   :href="'/profile/' + booking.instructor.id"
-                  class="link-to-profile"
+                  class="link-to-profile full-name-link"
                   >{{ booking.instructor.full_name }}</a
                 >
               </div>
@@ -260,7 +224,7 @@
                     booking.lesson.instructor.profile.notification_methods
                       .length > 0
                   "
-                  >contact</span
+                  >Contact</span
                 >
                 <span
                   class="btn btn-danger"
@@ -514,3 +478,10 @@ export default {
   },
 }
 </script>
+<style lang='scss' scoped>
+
+.full-name-link {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+</style>

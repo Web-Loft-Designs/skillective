@@ -3,8 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Auth;
-use Illuminate\Validation\Rule;
+
 
 class PreRLessonsFilterRequest extends FormRequest
 {

@@ -3,33 +3,19 @@
 namespace App\Observers;
 
 use App\Models\Booking;
-use App\Models\Cart;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Session;
-use Log;
 use App\Repositories\UserRepository;
-
-use App\Notifications\Bookings\BookingCreatedStudentConfirmation;
-use App\Notifications\Bookings\BookingCreatedInstructorNotification;
-
-use App\Notifications\Bookings\BookingApprovedStudentNotification;
-
 use App\Notifications\Bookings\BookingPaymentInEscrowStudentNotification;
 use App\Notifications\Bookings\BookingPaymentInEscrowInstructorNotification;
 use App\Notifications\Bookings\BookingPaymentInEscrowAdminNotification;
-
-//use App\Notifications\Bookings\BookingPaymentDisbursedStudentNotification;
 use App\Notifications\Bookings\BookingPaymentDisbursedInstructorNotification;
 use App\Notifications\Bookings\BookingPaymentDisbursedAdminNotification;
-
 use App\Notifications\Bookings\BookingCancelledStudentNotification;
 use App\Notifications\Bookings\BookingCancelledInstructorNotification;
 use App\Notifications\Bookings\BookingCancelledAdminNotification;
-
 use App\Notifications\Bookings\BookingAutomaticallyCancelledStudentNotification;
 use App\Notifications\Bookings\BookingAutomaticallyCancelledInstructorNotification;
-
 use App\Notifications\Bookings\BookingCantReleaseTransactionAdminNotification;
+use Illuminate\Support\Facades\Log;
 
 
 class BookingObserver

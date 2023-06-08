@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
-use Log;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Discount extends Model
 {
@@ -27,50 +27,57 @@ class Discount extends Model
 
     protected $table = 'discounts';
 
+    /**
+     * @return BelongsTo
+     */
     public function instructor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'instructor_id');
+        return $this->belongsTo(User::class, 'instructor_id');
     }
 
-    static function validateDiscount($discounts, $cart){
-        if($discounts){
-            foreach($discounts as $key => $discount){
+    /**
+     * @param $discounts
+     * @param $cart
+     * @return mixed
+     */
+    static function validateDiscount($discounts, $cart)
+    {
+        if($discounts) {
+            foreach($discounts as $key => $discount) {
                 if($discount->isActivate){
                     continue;
                 }
-
                 $itemsNeedToActivate = $discount->lessons_for_apply;
-                
                 foreach($cart as $cartKey => $cartItem){
-                    if($cartItem->instructor_id != $discount->instructor_id){
+                    if($cartItem->instructor_id != $discount->instructor_id) {
                         continue;
                     }
-                    if($discount->lesson_type == 'all'){
+                    if($discount->lesson_type == 'all') {
                         $itemsNeedToActivate -= 1;
                         continue;
-                    }else if($discount->lesson_type == 'pre-recorded' && $cartItem->pre_r_lesson_id){
-                        $itemsNeedToActivate -= 1;
-                        continue;
-                    }
-                    else if($discount->lesson_type == 'virtual' && $cartItem->lesson->lesson_type == 'virtual'){
+                    }else if($discount->lesson_type == 'pre-recorded' && $cartItem->pre_r_lesson_id) {
                         $itemsNeedToActivate -= 1;
                         continue;
                     }
-                    else if($discount->lesson_type == 'in-person' && $cartItem->lesson->lesson_type == 'in_person'){
+                    else if(!$cartItem->pre_r_lesson_id && $discount->lesson_type == 'virtual' && $cartItem->lesson->lesson_type == 'virtual') {
+                        $itemsNeedToActivate -= 1;
+                        continue;
+                    }
+                    else if(!$cartItem->pre_r_lesson_id && $discount->lesson_type == 'in-person' && $cartItem->lesson->lesson_type == 'in_person') {
                         $itemsNeedToActivate -= 1;
                         continue;
                     }
                 }
-
-                if($itemsNeedToActivate <= 0){
+                if ($itemsNeedToActivate <= 0) {
                     $discounts[$key]->isActivate = true;
-                }else{
+                } else {
                     $discounts[$key]->itemsLeft = $itemsNeedToActivate;
                 }
-
             }
         }
-        
+
         return $discounts;
     }
+
+
 }

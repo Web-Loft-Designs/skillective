@@ -4,21 +4,14 @@ namespace App\Observers;
 
 use App\Models\LessonRequest;
 use App\Models\User;
-use Log;
-use Auth;
-use App\Repositories\LessonRequestRepository;
 use App\Notifications\LessonRequest\LessonRequestApprovedNotification;
 use App\Notifications\LessonRequest\LessonRequestCancelledNotification;
 use App\Notifications\LessonRequest\LessonRequestCreatedNotification;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class LessonRequestObserver
 {
-	/** @var  LessonRequestRepository */
-	private $lessonRequestRepository;
-
-	public function __construct(LessonRequestRepository $lessonRequestRepository) {
-		$this->lessonRequestRepository = $lessonRequestRepository;
-	}
 
 	public function created(LessonRequest $lessonRequest){
 	    if ($lessonRequest->status==LessonRequest::STATUS_PENDING){
@@ -32,11 +25,8 @@ class LessonRequestObserver
 
 	public function updated(LessonRequest $lessonRequest){
         if ($lessonRequest->status==LessonRequest::STATUS_APPROVED){
-//            try{
-                $lessonRequest->student->notify(new LessonRequestApprovedNotification($lessonRequest));
-//            }catch (\Exception $e){
-//                Log::error("LessonRequestApprovedNotification Error for #{$lessonRequest->id} : " . $e->getCode() . ': ' . $e->getMessage());
-//            }
+            $lessonRequest->student->notify(new LessonRequestApprovedNotification($lessonRequest));
+
         }elseif ($lessonRequest->status==LessonRequest::STATUS_CANCELLED){
             try{
                 if (Auth::user() && Auth::user()->hasRole(User::ROLE_STUDENT)){

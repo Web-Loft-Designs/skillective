@@ -4,8 +4,8 @@ namespace App\Spatie\Media;
 
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
-use Spatie\MediaLibrary\Conversion\Conversion;
-use Spatie\MediaLibrary\ImageGenerators\FileTypes\Video;
+use Spatie\MediaLibrary\Conversions\ImageGenerators\Video;
+use Spatie\MediaLibrary\Conversions\Conversion;
 
 class CustomVideoGenerator extends Video
 {

@@ -1,20 +1,16 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: pavel
- * Date: 30.03.2020
- * Time: 19:46
- */
 
 namespace App\Http\Controllers\API;
 
+use App\Facades\TwilioVideo;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Booking;
 use App\Models\Lesson;
 use App\Models\User;
-use TwilioVideo;
-use Auth;
-use Log;
+use Braintree\MerchantAccount;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class VirtualLessonRoomsController extends AppBaseController
@@ -26,12 +22,10 @@ class VirtualLessonRoomsController extends AppBaseController
 
             Booking::whereRaw(' (bookings.student_id = '.Auth::id().' ) OR ( bookings.instructor_id = '.Auth::id().' )')
                 ->join('lessons', 'bookings.lesson_id', '=', "lessons.id")
-//                ->where('lessons.start', '>', date('Y-m-d'))
                 ->whereRaw('( lessons.room_completed <> 1 OR lessons.room_completed IS NULL )')
                 ->whereNotNull('lessons.room_sid')
                 ->with('lesson')
                 ->groupBy('bookings.lesson_id')
-//                ->get()
                 ->each(function($booking) use (&$rooms){
                     $room = TwilioVideo::getRoom( $booking->lesson );
                     if ($room){
@@ -44,6 +38,10 @@ class VirtualLessonRoomsController extends AppBaseController
         return $this->sendResponse($rooms);
     }
 
+    /**
+     * @param Lesson $lesson
+     * @return JsonResponse
+     */
     public function getRoomConnectSettings(Lesson $lesson){
 
         $error = $this->_validateAccess($lesson);
@@ -59,6 +57,10 @@ class VirtualLessonRoomsController extends AppBaseController
         return response()->json(TwilioVideo::getRoomSettings($token, $lesson));
     }
 
+    /**
+     * @param Lesson $lesson
+     * @return JsonResponse
+     */
     public function getLessonAccessToken(Lesson $lesson)
     {
         $error = $this->_validateAccess($lesson);
@@ -69,13 +71,13 @@ class VirtualLessonRoomsController extends AppBaseController
         if ( empty($room = TwilioVideo::getRoom($lesson)) ) {
             try {
                 $room = TwilioVideo::createRoom($lesson);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 return $this->sendError("Can't connect to this room: " . $e->getMessage());
             }
             $lesson->update(['room_sid' => $room->sid]);
-            \Log::debug("created new room: ".$roomName);
+            Log::debug("created new room: ".$roomName);
         }else{
-            \Log::debug('room already exists');
+            Log::debug('room already exists');
         }
 
         $let = Str::random(60);
@@ -84,6 +86,10 @@ class VirtualLessonRoomsController extends AppBaseController
         return response()->json(['lat' => $let]);
     }
 
+    /**
+     * @param $lesson
+     * @return string|null
+     */
     private function _validateAccess($lesson)
     {
         if ($lesson->is_cancelled){
@@ -108,7 +114,7 @@ class VirtualLessonRoomsController extends AppBaseController
         if (config('app.env')=='prod'
             && (
                 $lesson->instructor->bt_submerchant_id==null
-                || $lesson->instructor->bt_submerchant_status!=\Braintree_MerchantAccount::STATUS_ACTIVE
+                || $lesson->instructor->bt_submerchant_status!=MerchantAccount::STATUS_ACTIVE
                 || $lesson->instructor->status != User::STATUS_ACTIVE
             )
         ){

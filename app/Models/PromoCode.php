@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PromoCode extends Model
 {
@@ -26,8 +27,11 @@ class PromoCode extends Model
 
     protected $table = 'promo_codes';
 
+    /**
+     * @return BelongsTo
+     */
     public function instructor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'instructor_id');
+        return $this->belongsTo(User::class, 'instructor_id');
     }
 }

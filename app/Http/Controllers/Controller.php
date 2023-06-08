@@ -2,21 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Booking;
 use App\Models\User;
 use App\Models\Profile;
-use App\Repositories\BookingRepository;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Laravel\Socialite\Facades\Socialite;
-use Auth;
-use DB;
 use Illuminate\Http\Request;
-use Log;
-use Cookie;
 use App\Facades\IncomesCalculator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Controller extends BaseController
 {
@@ -38,7 +33,6 @@ class Controller extends BaseController
 
 		$request = Request::capture();
 		if (!Auth::user()){
-//			view()->share( 'registration_via_instagram_url', Socialite::driver('ig')->with(['redirect_uri' => route('social.instagram.student.registration')])->redirect()->getTargetUrl() );
 
 			$currentPath = '/' . ltrim($request->path() , '/');
 			if(!$request->is('api/*') && strpos( substr($currentPath, strrpos($currentPath, '/') + 1), '.' )===false){
@@ -89,8 +83,6 @@ class Controller extends BaseController
 					$totalAmountInEscrow = IncomesCalculator::totalAmountInEscrow(Auth::user()->id);
 					view()->share( 'totalAmountInEscrow', $totalAmountInEscrow );
 
-					// $totalPayoutYTD = IncomesCalculator::totalPayoutYTD(Auth::user()->id);
-					// view()->share( 'totalPayoutYTD', $totalPayoutYTD );
 				}
 
 				view()->share( 'availableNotificationMethods', Profile::getAvailableNotificationMethods() );

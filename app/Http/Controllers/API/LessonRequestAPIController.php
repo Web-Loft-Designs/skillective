@@ -9,11 +9,13 @@ use App\Models\Lesson;
 use App\Models\LessonRequest;
 use App\Repositories\LessonRepository;
 use App\Repositories\LessonRequestRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
-use Response;
-use Auth;
-use Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Prettus\Validator\Exceptions\ValidatorException;
+
 
 class LessonRequestAPIController extends AppBaseController
 {
@@ -25,32 +27,38 @@ class LessonRequestAPIController extends AppBaseController
 
     public function __construct(LessonRepository $lessonRepo, LessonRequestRepository $lessonRequestRepository)
     {
+        parent::__construct();
         $this->lessonRepository = $lessonRepo;
         $this->lessonRequestRepository = $lessonRequestRepository;
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function index(Request $request)
     {
         try{
             $this->lessonRequestRepository->setPresenter("App\\Presenters\\LessonRequestInListPresenter");
             $requests = $this->lessonRequestRepository->presentResponse($this->lessonRequestRepository->getUserLessonRequests($request, Auth::user()->id));
         }catch (\Exception $e){
-            \Log::error('getUserLessonRequests: ' . $e->getMessage());
+            Log::error('getUserLessonRequests: ' . $e->getMessage());
             $requests = ['data'=>[]];
         }
 
         return $this->sendResponse($requests);
     }
 
+    /**
+     * @param CreateLessonRequestAPIRequest $request
+     * @return JsonResponse
+     * @throws ValidatorException
+     */
     public function store(CreateLessonRequestAPIRequest $request)
     {
-//    	if (!Auth::user()->canAddNewLesson()){
-//			return $this->sendError('To add new lesson you must connect a submerchant account to your profile, upload profile image and have at least one media item in gallery', 400);
-//		}
         $input = $this->_prepareInputData($request);
         $input['status'] = LessonRequest::STATUS_PENDING;
         $lessonRequest = $this->lessonRequestRepository->create($input);
-
         $student = Auth::user();
 
         if ($lessonRequest->instructor->clients()->where('client_id', $student->id)->count() == 0){
@@ -63,11 +71,14 @@ class LessonRequestAPIController extends AppBaseController
         return $this->sendResponse(true, 'Lesson Request created');
     }
 
+    /**
+     * @param LessonRequest $lessonRequest
+     * @param AcceptLessonRequestAPIRequest $request
+     * @return JsonResponse
+     * @throws \Exception
+     */
     public function accept(LessonRequest $lessonRequest, AcceptLessonRequestAPIRequest $request)
     {
-
-        //dd($lessonRequest);
-
         if ($lessonRequest->status!=$lessonRequest::STATUS_PENDING)
             return $this->sendError('You are not able to cancel this request', 403);
 
@@ -96,6 +107,12 @@ class LessonRequestAPIController extends AppBaseController
     }
 
 
+    /**
+     * @param CancelLessonRequestAPIRequest $request
+     * @param LessonRequest $lessonRequest
+     * @return JsonResponse
+     * @throws \Exception
+     */
     public function cancel(CancelLessonRequestAPIRequest $request, LessonRequest $lessonRequest)
     {
         if (Auth::id()!=$lessonRequest->student_id && Auth::id()!=$lessonRequest->instructor_id){
@@ -111,7 +128,11 @@ class LessonRequestAPIController extends AppBaseController
 			return $this->sendError('Can\'t cancel the Lesson Request', 400);
     }
 
-	private function _prepareInputData(Request $request){
+    /**
+     * @param Request $request
+     * @return array
+     */
+    private function _prepareInputData(Request $request){
 		// prepare data
 		$input = $request->only([
 			'genre',

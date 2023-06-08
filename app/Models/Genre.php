@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use File;
-use Image;
+use Intervention\Image\Facades\Image;
 use Prettus\Repository\Contracts\Transformable;
+
 
 /**
  * Class Genre
@@ -64,47 +68,68 @@ class Genre extends Model implements Transformable
         'image' => 'required'
     ];
 
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     **/
+     * @return BelongsToMany
+     */
     public function users()
     {
-        return $this->belongsToMany(\App\Models\User::class, 'user_genre');
+        return $this->belongsToMany(User::class, 'user_genre');
     }
 
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-	 **/
-	public function lessons()
+
+    /**
+     * @return HasMany
+     */
+    public function lessons()
 	{
-		return $this->hasMany(\App\Models\Lesson::class);
+		return $this->hasMany(Lesson::class);
 	}
 
-	public function category()
+    /**
+     * @return BelongsTo
+     */
+    public function category()
 	{
-		return $this->belongsTo(\App\Models\GenreCategory::class, 'genre_category_id');
+		return $this->belongsTo(GenreCategory::class, 'genre_category_id');
 	}
 
-	public function transform()
+    /**
+     * @return array
+     */
+    public function transform()
 	{
 		return [
 			'id' => $this->id,
 			'title' => $this->title,
 			'genre_category_id' => $this->genre_category_id,
 			'image' => $this->getImageUrl(),
-//			'category' => $this->category ? $this->category->transform() : ['id'=>0, 'title'=>'Uncategorized'],
 		];
 	}
 
-	public function toArray(){
+    /**
+     * @return array
+     */
+    public function toArray(){
 		return $this->transform();
 	}
 
-	public function getImageUrl(){
-		if ($this->image)
-			return '/storage/' . self::IMAGES_PATH . $this->image;
-		else
-			return config('app.url') . Setting::getValue('default_genre_image');
+    /**
+     * @return string
+     */
+    public function getImageUrl(){
+// TODO test 'https://skillective.com'
+        if(config('app.env') == 'local') {
+            if($this->image)
+                return '/storage/' . self::IMAGES_PATH . $this->image;
+            else
+                return 'https://skillective.com' . Setting::getValue('default_genre_image');
+        } else {
+            if($this->image)
+                return '/storage/' . self::IMAGES_PATH . $this->image;
+            else
+                return config('app.url') . Setting::getValue('default_genre_image');
+        }
 	}
 
 	public function uploadImage($image){
@@ -135,7 +160,6 @@ class Genre extends Model implements Transformable
 
 	public function deleteOldImage(){
 		$destination = storage_path('app/public/' . self::IMAGES_PATH);
-		// remove the old image
 		if ($this->image!= '' && File::exists($destination.$this->image)) {
 			unlink($destination.$this->image);
 			return true;

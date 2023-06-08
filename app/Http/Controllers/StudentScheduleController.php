@@ -2,25 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Auth;
-use Session;
-use App\Repositories\LessonRepository;
 use App\Repositories\GenreRepository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class StudentScheduleController extends Controller
 {
-	/** @var  LessonRepository */
-	private $lessonRepository;
 
-	/** @var  GenreRepository */
-	private $genreRepository;
+
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param GenreRepository $genreRepository
+     * @return Application|Factory|View
      */
-    public function index(LessonRepository $lessonRepository, GenreRepository $genreRepository)
+    public function index(GenreRepository $genreRepository)
     {
         $vars = [
             'page_title'	=> 'Schedule',

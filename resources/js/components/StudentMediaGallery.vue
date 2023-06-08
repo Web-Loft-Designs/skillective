@@ -1,73 +1,73 @@
 <template>
-    <div id="dashboard-gallery-container" class="dashboard-gallery">
+<!--    <div id="dashboard-gallery-container" class="dashboard-gallery">-->
 
-        <div class="dashboard-gallery-top">
-            <h2>Gallery</h2>
-        </div>
+<!--        <div class="dashboard-gallery-top">-->
+<!--            <h2>Gallery</h2>-->
+<!--        </div>-->
 
-        <div v-if="description!=''" v-html="description"></div>
+<!--        <div v-if="description!=''" v-html="description"></div>-->
 
-        <div v-if="instagramMediaQueue">Instagram media will be loaded to gallery soon</div>
+<!--        <div v-if="instagramMediaQueue">Instagram media will be loaded to gallery soon</div>-->
 
-        <div class="gallery-wrapper row">
-            <div class="col-custom-20 col-md-3 col-sm-6 col-12" v-if="submitUrl!=''">
-                <vue-dropzone id="dashboard-dropzone-media"
-                              ref="dropzone"
-                              :options="getDropOptions()"
-                              @vdropzone-sending="onDZSending"
-                              @vdropzone-success="onDZSuccess"
-                              @vdropzone-complete="onDZComplete"
-                              @vdropzone-error="onDZError">
-                </vue-dropzone>
-            </div>
+<!--        <div class="gallery-wrapper row">-->
+<!--            <div class="col-custom-20 col-md-3 col-sm-6 col-12" v-if="submitUrl!=''">-->
+<!--                <vue-dropzone id="dashboard-dropzone-media"-->
+<!--                              ref="dropzone"-->
+<!--                              :options="getDropOptions()"-->
+<!--                              @vdropzone-sending="onDZSending"-->
+<!--                              @vdropzone-success="onDZSuccess"-->
+<!--                              @vdropzone-complete="onDZComplete"-->
+<!--                              @vdropzone-error="onDZError">-->
+<!--                </vue-dropzone>-->
+<!--            </div>-->
 
-            <div class="col-custom-20 col-md-3 col-sm-6 col-12 gallery-wrapper-item" :class="{'has-video': isVideo(media.url)}" :key="key" v-for="(media, key) in listItems" >
-                <span v-if="isVideo(media.url)">
-                    <a :href="media.url" :id="'media-'+media.id" class="video-link g-item">
-                        <img :src="media.thumb_url"/>
-                        <span class="play-icon"></span>
-                    </a>
-                    <span class="remove" @click="deleteMedia(media)"><img src="/images/remove.png" alt=""></span>
-                    <span class="share">
-                            <img src="/images/share-icon.png" alt="">
-                            <span class="share-tooltip">
-                                <span>Share on:</span>
-                                <a href="#"><img src="/images/insta.png" alt=""></a>
-                                <a href="#"><img src="/images/tw.png" alt=""></a>
-                                <a href="#"><img style="margin-right: 0" src="/images/fb.png" alt=""></a>
-                            </span>
-                    </span>
-                    <!--<span class="info" v-if="media.collection_name=='instagram'">-->
-                        <!--<span><img src="/images/heart-cion.png" alt=""> {{ media.count_likes }}</span>-->
-                        <!--<span><img src="/images/comment-icon.png" alt=""> {{ media.count_comments }}</span>-->
-                    <!--</span>-->
-                </span>
-                <span v-else>
-                    <a :href="media.url" :id="'media-'+media.id" class="image g-item">
-                        <img :src="media.url"/>
-                    </a>
-                    <span class="remove" @click="deleteMedia(media)"><img src="/images/remove.png" alt=""></span>
-                    <span class="share">
-                            <img src="/images/share-icon.png" alt="">
-                             <span class="share-tooltip">
-                                <span>Share on:</span>
-                                                               <a href="#"><img src="/images/insta.png" alt=""></a>
-                                <a data-sharer="twitter" :data-url="siteUrl+'/profile/'+media.model_id+'#media-'+media.id"><img src="/images/tw.png" alt=""></a>
-                                <a data-sharer="facebook" :data-url="siteUrl+'/profile/'+media.model_id+'#media-'+media.id"><img style="margin-right: 0" src="/images/fb.png" alt=""></a>
-                            </span>
-                    </span>
-                    <!--<span class="info" v-if="media.collection_name=='instagram'">-->
-                        <!--<span><img src="/images/heart-cion.png" alt=""> {{ media.count_likes }}</span>-->
-                        <!--<span><img src="/images/comment-icon.png" alt=""> {{ media.count_comments }}</span>-->
-                    <!--</span>-->
-                </span>
-            </div>
-        </div>
-        <div>
-            <a v-if="this.userGalleryMedia.length>0" @click="showMore()" class="more">Show more</a>
-        </div>
-        <div v-if="errorText" class="has-error" v-html="errorText"></div>
-    </div>
+<!--            <div class="col-custom-20 col-md-3 col-sm-6 col-12 gallery-wrapper-item" :class="{'has-video': isVideo(media.url)}" :key="key" v-for="(media, key) in listItems" >-->
+<!--                <span v-if="isVideo(media.url)">-->
+<!--                    <a :href="media.url" :id="'media-'+media.id" class="video-link g-item">-->
+<!--                        <img :src="media.thumb_url"/>-->
+<!--                        <span class="play-icon"></span>-->
+<!--                    </a>-->
+<!--                    <span class="remove" @click="deleteMedia(media)"><img src="/images/remove.png" alt=""></span>-->
+<!--                    <span class="share">-->
+<!--                            <img src="/images/share-icon.png" alt="">-->
+<!--                            <span class="share-tooltip">-->
+<!--                                <span>Share on:</span>-->
+<!--                                <a href="#"><img src="/images/insta.png" alt=""></a>-->
+<!--                                <a href="#"><img src="/images/tw.png" alt=""></a>-->
+<!--                                <a href="#"><img style="margin-right: 0" src="/images/fb.png" alt=""></a>-->
+<!--                            </span>-->
+<!--                    </span>-->
+<!--                    &lt;!&ndash;<span class="info" v-if="media.collection_name=='instagram'">&ndash;&gt;-->
+<!--                        &lt;!&ndash;<span><img src="/images/heart-cion.png" alt=""> {{ media.count_likes }}</span>&ndash;&gt;-->
+<!--                        &lt;!&ndash;<span><img src="/images/comment-icon.png" alt=""> {{ media.count_comments }}</span>&ndash;&gt;-->
+<!--                    &lt;!&ndash;</span>&ndash;&gt;-->
+<!--                </span>-->
+<!--                <span v-else>-->
+<!--                    <a :href="media.url" :id="'media-'+media.id" class="image g-item">-->
+<!--                        <img :src="media.url"/>-->
+<!--                    </a>-->
+<!--                    <span class="remove" @click="deleteMedia(media)"><img src="/images/remove.png" alt=""></span>-->
+<!--                    <span class="share">-->
+<!--                            <img src="/images/share-icon.png" alt="">-->
+<!--                             <span class="share-tooltip">-->
+<!--                                <span>Share on:</span>-->
+<!--                                                               <a href="#"><img src="/images/insta.png" alt=""></a>-->
+<!--                                <a data-sharer="twitter" :data-url="siteUrl+'/profile/'+media.model_id+'#media-'+media.id"><img src="/images/tw.png" alt=""></a>-->
+<!--                                <a data-sharer="facebook" :data-url="siteUrl+'/profile/'+media.model_id+'#media-'+media.id"><img style="margin-right: 0" src="/images/fb.png" alt=""></a>-->
+<!--                            </span>-->
+<!--                    </span>-->
+<!--                    &lt;!&ndash;<span class="info" v-if="media.collection_name=='instagram'">&ndash;&gt;-->
+<!--                        &lt;!&ndash;<span><img src="/images/heart-cion.png" alt=""> {{ media.count_likes }}</span>&ndash;&gt;-->
+<!--                        &lt;!&ndash;<span><img src="/images/comment-icon.png" alt=""> {{ media.count_comments }}</span>&ndash;&gt;-->
+<!--                    &lt;!&ndash;</span>&ndash;&gt;-->
+<!--                </span>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div>-->
+<!--            <a v-if="this.userGalleryMedia.length>0" @click="showMore()" class="more">Show more</a>-->
+<!--        </div>-->
+<!--        <div v-if="errorText" class="has-error" v-html="errorText"></div>-->
+<!--    </div>-->
 </template>
 
 <script>

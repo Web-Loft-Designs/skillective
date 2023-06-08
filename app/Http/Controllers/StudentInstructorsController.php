@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Auth;
-use Session;
 use App\Repositories\UserRepository;
-use Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 
 class StudentInstructorsController extends Controller
 {
-	/** @var  UserRepository */
-	private $userRepository;
+
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param UserRepository $userRepository
+     * @return Application|Factory|View
      */
     public function index(Request $request, UserRepository $userRepository)
     {

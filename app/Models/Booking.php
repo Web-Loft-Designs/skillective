@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use Braintree\MerchantAccount;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Prettus\Repository\Contracts\Transformable;
-use Log;
-use Auth;
 use App\Facades\BraintreeProcessor;
-use App\Models\Setting;
+
 
 class Booking extends Model implements Transformable
 {
@@ -66,12 +65,12 @@ class Booking extends Model implements Transformable
      **/
     public function lesson()
     {
-        return $this->belongsTo(\App\Models\Lesson::class, 'lesson_id');
+        return $this->belongsTo(Lesson::class, 'lesson_id');
 	}
 
 	public function regularNotifications()
 	{
-		return $this->hasMany(\App\Models\RegularNotification::class, 'user_regular_notifications');
+		return $this->hasMany(RegularNotification::class, 'user_regular_notifications');
 	}
 
     /**
@@ -79,7 +78,7 @@ class Booking extends Model implements Transformable
      **/
     public function instructor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'instructor_id');
+        return $this->belongsTo(User::class, 'instructor_id');
     }
 
 	/**
@@ -87,7 +86,7 @@ class Booking extends Model implements Transformable
 	 **/
 	public function student()
 	{
-		return $this->belongsTo(\App\Models\User::class, 'student_id');
+		return $this->belongsTo(User::class, 'student_id');
 	}
 
 	public function transform()
@@ -189,7 +188,7 @@ class Booking extends Model implements Transformable
 			if ($cancelledBy)
 				$this->cancelled_by = $cancelledBy;
 			$this->save();
-//		$this->delete();
+
 			return true;
 		}else{
 			$reason = '';
@@ -277,11 +276,11 @@ class Booking extends Model implements Transformable
 			// few checks to prevent not desired transactions , just an assurance
 			if (!$this->transaction_id
 				&& ($instructorMerchantId = $this->instructor->bt_submerchant_id)!=null
-				&& $this->instructor->bt_submerchant_status==\Braintree_MerchantAccount::STATUS_ACTIVE
+				&& $this->instructor->bt_submerchant_status==MerchantAccount::STATUS_ACTIVE
 				&& !$this->lesson->alreadyStarted()
 				&& !$this->lesson->is_cancelled
 				&& $this->status == self::STATUS_PENDING
-                // && $totalFee < $this->spot_price
+
 			){
 
 				$transaction = BraintreeProcessor::createSellBookingTransactionAndHoldInEscrow(
@@ -307,7 +306,7 @@ class Booking extends Model implements Transformable
 					$reason = "Payment already sent";
 				elseif ($this->instructor->bt_submerchant_id==null)
 					$reason = "No merchant account provided. Please check Profile settings";
-				elseif ($this->instructor->bt_submerchant_status!=\Braintree_MerchantAccount::STATUS_ACTIVE)
+				elseif ($this->instructor->bt_submerchant_status!=MerchantAccount::STATUS_ACTIVE)
 					$reason = "Merchant account not active";
 				elseif ($this->lesson->alreadyStarted())
 					$reason = "Lesson already started";
@@ -315,9 +314,6 @@ class Booking extends Model implements Transformable
 					$reason = "Lesson already cancelled";
 				elseif ($this->status != self::STATUS_PENDING)
 					$reason = "It is not a pending booking";
-				// elseif ($totalFee > $this->spot_price)
-                //     $reason = "Fees service fees are greater than lesson payment amount";
-
 
 				throw new \Exception('Booking #'.$this->id.' can\'t be approved: ' . $reason, 400);
 			}

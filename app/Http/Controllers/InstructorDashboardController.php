@@ -2,26 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Lesson;
 use App\Repositories\BookingRepository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Auth;
-use Cookie;
 use App\Repositories\LessonRepository;
 use App\Repositories\GenreRepository;
 use App\Repositories\UserRepository;
-use App\Models\Profile;
-use Log;
-use App\Notifications\YouMayBeInterestedInLessonNotification;
-use TwilioVideo;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Log;
+use Prettus\Repository\Exceptions\RepositoryException;
 
 class InstructorDashboardController extends Controller
 {
+
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param LessonRepository $lessonRepo
+     * @param GenreRepository $genreRepository
+     * @param UserRepository $userRepository
+     * @param BookingRepository $bookingRepository
+     * @return Application|Factory|View
+     * @throws RepositoryException
      */
     public function index(Request $request, LessonRepository $lessonRepo, GenreRepository $genreRepository, UserRepository $userRepository, BookingRepository $bookingRepository)
     {
@@ -53,7 +57,6 @@ class InstructorDashboardController extends Controller
 		}
 
     	$galleryLimit = 4;
-		$uploadedAfter = null;
         $vars = [
             'page_title'	=> 'Dashboard',
 			'userMedia'		=> Auth::user()->getGalleryMedia($galleryLimit),

@@ -6,14 +6,14 @@ use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\CreateDiscountAPIRequest;
 use App\Http\Requests\API\CreatePromoCodeAPIRequest;
 use App\Notifications\StudentPromoNotification;
-
 use App\Models\Discount;
 use App\Models\PromoCode;
 use App\Models\User;
 use App\Repositories\DiscountRepository;
 use App\Repositories\PromoCodeRepository;
-use Auth;
-use Log;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Prettus\Validator\Exceptions\ValidatorException;
 
 class InstructorDiscountsAPIController extends AppBaseController
 {
@@ -23,11 +23,16 @@ class InstructorDiscountsAPIController extends AppBaseController
 
     public function __construct(DiscountRepository $discountRepo, PromoCodeRepository $promoRepo)
     {
+        parent::__construct();
         $this->discountRepository = $discountRepo;
         $this->promoCodeRepository = $promoRepo;
     }
 
 
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
     public function indexDiscounts($id)
     {
         $discounts = $this->discountRepository->getInstructorsDiscounts($id);
@@ -35,6 +40,10 @@ class InstructorDiscountsAPIController extends AppBaseController
         return  $this->sendResponse($discounts);
     }
 
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
     public function indexPromoCodes($id)
     {
         $promos = $this->promoCodeRepository->getInstructorPromos($id);
@@ -43,9 +52,12 @@ class InstructorDiscountsAPIController extends AppBaseController
     }
 
 
+    /**
+     * @param CreateDiscountAPIRequest $request
+     * @return JsonResponse
+     */
     public function storeDiscount(CreateDiscountAPIRequest $request)
     {
-
         $data = array();
         $data['instructor_id'] = Auth::user()->id;
         $data['title'] = $request->input('title');
@@ -64,9 +76,12 @@ class InstructorDiscountsAPIController extends AppBaseController
         return $this->sendResponse($created);
     }
 
+    /**
+     * @param CreatePromoCodeAPIRequest $request
+     * @return JsonResponse
+     */
     public function storePromoCode(CreatePromoCodeAPIRequest $request)
     {
-
         $data = array();
         $data['instructor_id'] = Auth::user()->id;
         $data['name'] = $request->input('name');
@@ -79,8 +94,6 @@ class InstructorDiscountsAPIController extends AppBaseController
         $data['users_count'] = $request->input('users_count');
         $data['used_time'] = 0;
         $data['used_with_other_discounts'] = $request->input('used_with_other_discounts');
-
-
         $notifyClients = $request->input('notifyClients');
         $created = PromoCode::create($data);
 
@@ -97,22 +110,29 @@ class InstructorDiscountsAPIController extends AppBaseController
         return $this->sendResponse($created);
     }
 
+    /**
+     * @param CreateDiscountAPIRequest $request
+     * @param $discount
+     * @return JsonResponse|void
+     * @throws ValidatorException
+     */
     public function updateDiscount(CreateDiscountAPIRequest $request, $discount)
     {
-
         $discountItem = $this->discountRepository->findWithoutFail($discount);
-
         if (empty($discountItem)) {
             return $this->sendError('Discount not found');
         }
-
         $data = $request->toArray();
-
         $discountItem = $this->discountRepository->update($data, $discountItem['id']);
-
         $this->sendResponse("Discount Updated");
     }
 
+    /**
+     * @param CreatePromoCodeAPIRequest $request
+     * @param $promo
+     * @return JsonResponse|void
+     * @throws ValidatorException
+     */
     public function updatePromo(CreatePromoCodeAPIRequest $request, $promo)
     {
         $promo = $this->promoCodeRepository->findWithoutFail($promo);
@@ -141,6 +161,10 @@ class InstructorDiscountsAPIController extends AppBaseController
         $this->sendResponse("Promo Code Updated");
     }
 
+    /**
+     * @param $discount
+     * @return JsonResponse
+     */
     public function deleteDiscount($discount)
     {
         $discountItem = Discount::where('id', $discount)->first();
@@ -161,6 +185,10 @@ class InstructorDiscountsAPIController extends AppBaseController
     }
 
 
+    /**
+     * @param $promoCode
+     * @return JsonResponse
+     */
     public function deletePromo($promoCode)
     {
 

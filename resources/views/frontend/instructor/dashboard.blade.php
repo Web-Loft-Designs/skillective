@@ -69,13 +69,14 @@
                     <send-notification-form :is-student="false" v-bind:available-notification-methods="{{  json_encode($availableNotificationMethods) }}"></send-notification-form>
                 </div>
 
-                <div class="col-12">
+<!--              <div class="col-12">
                     <div class="dashboard-gallery">
                         <dashboard-media-gallery v-bind:user-media="{{ json_encode($userMedia) }}" v-bind:instagram-media-queue="{{ isset($loadingInstagramProfileImagesInQueue)?'true':'false' }}"></dashboard-media-gallery>
                         <a href="{{ route('instructor.gallery') }}" class="btn btn-secondary btn-block">View Gallery</a>
                     </div>
                 </div>
-
+-->
+<!--
                 <div class="col-12">
                     <div class="invite-block" style="background-image: url('{{asset('images/invide-bg.jpg')}}')">
                         <div>
@@ -89,6 +90,7 @@
                         </div>
                     </div>
                 </div>
+-->
             </div>
         </div>
     </div>

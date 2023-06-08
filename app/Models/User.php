@@ -2,22 +2,32 @@
 
 namespace App\Models;
 
+use Braintree\MerchantAccount;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Log;
+use Spatie\Image\Exceptions\InvalidManipulation;
+use Spatie\Image\Manipulations;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\FileCannotBeAdded;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\MediaLibrary\HasMedia\HasMedia;
-use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
-use Spatie\MediaLibrary\Models\Media;
-use Spatie\Image\Manipulations;
 use Prettus\Repository\Contracts\Transformable;
 
 class User extends Authenticatable implements HasMedia, Transformable
 {
-	use Notifiable, HasRoles, SoftDeletes, HasMediaTrait;
+
+	use Notifiable, HasRoles, SoftDeletes, InteractsWithMedia;
 
 	const STATUS_ON_REVIEW	= 'on_review';
 	const STATUS_APPROVED	= 'approved';
@@ -70,10 +80,10 @@ class User extends Authenticatable implements HasMedia, Transformable
 		'submerchantStatusChanged'
 	];
 
+
     /**
      * @param Builder $query
      * @param string $searchString
-     *
      * @return Builder
      */
     public function scopeSearchFromNameInstagram(Builder $query, string $searchString): Builder
@@ -87,122 +97,170 @@ class User extends Authenticatable implements HasMedia, Transformable
             });
     }
 
-	public function routeNotificationForTwilio()
+    /**
+     * @return string
+     */
+    public function routeNotificationForTwilio()
 	{
 		return prepareMobileForTwilio($this->profile->mobile_phone);
 	}
 
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-	 **/
-	public function genres()
+
+    /**
+     * @return BelongsToMany
+     */
+    public function genres()
 	{
-		return $this->belongsToMany(\App\Models\Genre::class, 'user_genre')->orderBy('title')->where('is_disabled', 0);
+		return $this->belongsToMany(Genre::class, 'user_genre')
+            ->orderBy('title')
+            ->where('is_disabled', 0);
 	}
 
 
-	public function regularNotifications()
+    /**
+     * @return HasMany
+     */
+    public function regularNotifications()
 	{
-		return $this->hasMany(\App\Models\RegularNotification::class, 'user_regular_notifications');
-	}
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-	 **/
-	public function clients()
-	{
-		return $this->belongsToMany(\App\Models\User::class, 'instructor_client', 'instructor_id', 'client_id')->withTimestamps();
+		return $this->hasMany(RegularNotification::class, 'user_regular_notifications');
 	}
 
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-	 **/
-	public function instructors()
+    /**
+     * @return BelongsToMany
+     */
+    public function clients()
 	{
-		return $this->belongsToMany(\App\Models\User::class, 'student_instructor', 'student_id', 'instructor_id')->withTimestamps()->withPivot('is_favorite', 'geo_notifications_allowed', 'virtual_notifications_allowed');
+		return $this->belongsToMany(User::class, 'instructor_client', 'instructor_id', 'client_id')->withTimestamps();
 	}
 
-	/**
-	 * User Profile Relationships.
-	 *
-	 * @var array
-	 */
-	public function profile()
+
+    /**
+     * @return BelongsToMany
+     */
+    public function instructors()
 	{
-		return $this->hasOne(\App\Models\Profile::class);
+		return $this->belongsToMany(
+            User::class,
+            'student_instructor',
+            'student_id',
+            'instructor_id'
+        )->withTimestamps()
+            ->withPivot('is_favorite', 'geo_notifications_allowed', 'virtual_notifications_allowed');
 	}
 
-	/**
-	 * Build Social Relationships.
-	 *
-	 * @var array
-	 */
-	public function social()
+
+    /**
+     * @return HasOne
+     */
+    public function profile()
 	{
-		return $this->hasMany('App\Models\Social');
+		return $this->hasOne(Profile::class);
 	}
 
-	public function instructorInvitations()
+
+    /**
+     * @return HasMany
+     */
+    public function social()
 	{
-		return $this->hasMany('App\Models\Invitation', 'invited_by')->where('invited_as_instructor', 1);
+		return $this->hasMany(Social::class);
 	}
 
-	public function studentInvitations()
+    /**
+     * @return HasMany
+     */
+    public function instructorInvitations()
 	{
-		return $this->hasMany('App\Models\Invitation', 'invited_by')->where('invited_as_instructor', 0);
+		return $this->hasMany(Invitation::class, 'invited_by')
+            ->where('invited_as_instructor', 1);
 	}
 
-	/**
-	 * Build Lesson Relationships.
-	 *
-	 * @var array
-	 */
-	public function lessons()
+    /**
+     * @return HasMany
+     */
+    public function studentInvitations()
 	{
-		return $this->hasMany('App\Models\Lesson', 'instructor_id', 'id');
+		return $this->hasMany(Invitation::class, 'invited_by')
+            ->where('invited_as_instructor', 0);
 	}
 
-	public function discounts()
+
+    /**
+     * @return HasMany
+     */
+    public function lessons()
 	{
-		return $this->hasMany('App\Models\Discount', 'instructor_id', 'id');
+		return $this->hasMany(Lesson::class, 'instructor_id', 'id');
 	}
 
-	public function bookings()
+    /**
+     * @return HasMany
+     */
+    public function discounts()
 	{
-		return $this->hasMany('App\Models\Booking', 'student_id', 'id');
+		return $this->hasMany(Discount::class, 'instructor_id', 'id');
 	}
 
-	public function myLessonsBookings()
+    /**
+     * @return HasMany
+     */
+    public function bookings()
 	{
-		return $this->hasMany('App\Models\Booking', 'instructor_id', 'id');
+		return $this->hasMany(Booking::class, 'student_id', 'id');
 	}
 
-	public function purchasedLessons()
+    /**
+     * @return HasMany
+     */
+    public function myLessonsBookings()
 	{
-		return $this->hasMany('App\Models\PurchasedLesson', 'student_id', 'id');
+		return $this->hasMany(Booking::class, 'instructor_id', 'id');
 	}
 
-	public function myPreLessonsPurchases()
+    /**
+     * @return HasMany
+     */
+    public function purchasedLessons()
 	{
-		return $this->hasMany('App\Models\PurchasedLesson', 'instructor_id', 'id');
+		return $this->hasMany(PurchasedLesson::class, 'student_id', 'id');
 	}
 
-	// student saved payment methods
-	public function paymentMethods()
+    /**
+     * @return HasMany
+     */
+    public function myPreLessonsPurchases()
 	{
-		return $this->hasMany('App\Models\UserPaymentMethod', 'user_id', 'id');
+		return $this->hasMany(PurchasedLesson::class, 'instructor_id', 'id');
 	}
 
-	public function geoLocations()
+    /**
+     * @return HasMany
+     */
+    public function paymentMethods()
 	{
-		return $this->hasMany('App\Models\UserGeoLocation');
+		return $this->hasMany(UserPaymentMethod::class, 'user_id', 'id');
 	}
 
-	public function getName()
+    /**
+     * @return HasMany
+     */
+    public function geoLocations()
+	{
+		return $this->hasMany(UserGeoLocation::class);
+	}
+
+    /**
+     * @return string
+     */
+    public function getName()
 	{
 		return $this->first_name . ' ' . $this->last_name;
 	}
 
-	public function transform()
+    /**
+     * @return array
+     */
+    public function transform()
 	{
 		return [
 			'id' => $this->id,
@@ -211,15 +269,16 @@ class User extends Authenticatable implements HasMedia, Transformable
 			'full_name' => $this->getName(),
 			'email' => $this->getEmail(),
 			'profile' => !empty($this->profile) ? $this->profile->transform(): [],
-			//			'isInstructor' => $this->hasRole(self::ROLE_INSTRUCTOR),
-			//			'isStudent' => $this->hasRole(self::ROLE_STUDENT),
 			'genres' => $this->genres->toArray(),
 			'is_featured' => $this->isFeatured(),
 			'discounts' => $this->discounts->toArray()
 		];
 	}
 
-	public function toArray()
+    /**
+     * @return array
+     */
+    public function toArray()
 	{
 		return [
 			'id' => $this->id,
@@ -228,14 +287,16 @@ class User extends Authenticatable implements HasMedia, Transformable
 			'full_name' => $this->getName(),
 			'email' => $this->getEmail(),
 			'profile' => $this->profile->transform(),
-			//			'isInstructor' => $this->hasRole(self::ROLE_INSTRUCTOR),
-			//			'isStudent' => $this->hasRole(self::ROLE_STUDENT),
 			'genres' => $this->genres->toArray(),
 			'discounts' => $this->discounts->toArray()
 		];
 	}
 
-	public function changePassword($password)
+    /**
+     * @param $password
+     * @return void
+     */
+    public function changePassword($password)
 	{
 		if (strpos($password, 'skillectivefake-') === 0) {
 			$this->attributes['password'] = 'skillectivefake-' . self::encodePassword($password);
@@ -246,33 +307,54 @@ class User extends Authenticatable implements HasMedia, Transformable
 		}
 	}
 
-	public static function encodePassword($password)
+    /**
+     * @param $password
+     * @return string
+     */
+    public static function encodePassword($password)
 	{
-
 		return Hash::make($password);
 	}
 
-	public function checkCurrentPassword($password)
+    /**
+     * @param $password
+     * @return bool
+     */
+    public function checkCurrentPassword($password)
 	{
 		return Hash::check($password, $this->password);
 	}
 
-	public function getEmail()
+    /**
+     * @return mixed|string
+     */
+    public function getEmail()
 	{
 		return $this->hasFakeEmail() ? '' : $this->email;
 	}
 
-	public function hasFakeEmail()
+    /**
+     * @return bool
+     */
+    public function hasFakeEmail()
 	{
 		return strpos($this->email, getFakeEmailBase()) > 0;
 	}
 
-	public function isFeatured()
+    /**
+     * @return HasOne
+     */
+    public function isFeatured()
 	{
-		return $this->hasOne(\App\Models\FeaturedInstructor::class, 'instructor_id');
+		return $this->hasOne(FeaturedInstructor::class, 'instructor_id');
 	}
 
-	public function setStatus($status)
+
+    /**
+     * @param $status
+     * @return void
+     */
+    public function setStatus($status)
 	{
 		if (in_array($status, self::getStatuses())) {
 			$this->status = $status;
@@ -281,7 +363,11 @@ class User extends Authenticatable implements HasMedia, Transformable
 		}
 	}
 
-	public static function getStatuses()
+
+    /**
+     * @return string[]
+     */
+    public static function getStatuses()
 	{
 		return [
 			self::STATUS_ON_REVIEW,
@@ -291,7 +377,11 @@ class User extends Authenticatable implements HasMedia, Transformable
 		];
 	}
 
-	public function setFinishRegistrationToken($str)
+    /**
+     * @param $str
+     * @return void
+     */
+    public function setFinishRegistrationToken($str)
 	{
 		if ($str != '') {
 			$this->finish_registration_token = Hash::make($str);
@@ -301,7 +391,12 @@ class User extends Authenticatable implements HasMedia, Transformable
 		$this->save();
 	}
 
-	public function registerMediaConversions(Media $media = null)
+    /**
+     * @param Media|null $media
+     * @return void
+     * @throws InvalidManipulation
+     */
+    public function registerMediaConversions(Media $media = null): void
 	{
 		$this->addMediaConversion('thumb')
 			->fit(Manipulations::FIT_CROP, 200, 200)
@@ -315,32 +410,40 @@ class User extends Authenticatable implements HasMedia, Transformable
 			->performOnCollections('website_images', 'instagram');
 	}
 
-	public function hasOwnInstructor($instructorId)
+    /**
+     * @param $instructorId
+     * @return mixed
+     */
+    public function hasOwnInstructor($instructorId)
 	{
 		return ($this->instructors->contains($instructorId)); //  $this->instructors()->find($instructorId)!=null
 	}
 
-	public function hasOwnFavoriteInstructor($instructorId)
+    /**
+     * @param $instructorId
+     * @return bool
+     */
+    public function hasOwnFavoriteInstructor($instructorId)
 	{
 		return (($ownInstructor = $this->instructors()->find($instructorId)) != null && $ownInstructor->pivot->is_favorite == 1);
 	}
 
-
-	public function uploadMedia($requestData, $collectionName = 'website_images')
+    /**
+     * @param $requestData
+     * @param $collectionName
+     * @return int
+     */
+    public function uploadMedia($requestData, $collectionName = 'website_images')
 	{
 		$countUploadedMedia = 0;
 		try {
 			foreach ($requestData as $paramName => $paramValue) {
 				if ($paramName == 'media') {
-					if ($paramValue instanceof \Illuminate\Http\UploadedFile) {
-						//						$mime = $paramValue->getClientMimeType();
-						//						$collectionName = strpos($mime, 'video') === false ? 'images' : 'videos';
+					if ($paramValue instanceof UploadedFile) {
 						$this->addMedia($paramValue)->toMediaCollection($collectionName);
 						$countUploadedMedia++;
 					} else { // array of medias
 						for ($i = 0; $i < count($paramValue); $i++) {
-							//							$mime = $paramValue[$i]->getClientMimeType();
-							//							$collectionName = strpos($mime, 'video') === false ? 'images' : 'videos';
 							$this->addMedia($paramValue[$i])->toMediaCollection($collectionName);
 							$countUploadedMedia++;
 						}
@@ -353,7 +456,16 @@ class User extends Authenticatable implements HasMedia, Transformable
 		return $countUploadedMedia;
 	}
 
-	public function addInstagramMedia($mediaUrl, $countLikes = 0, $countComments = 0)
+    /**
+     * @param $mediaUrl
+     * @param $countLikes
+     * @param $countComments
+     * @return void
+     * @throws FileCannotBeAdded
+     * @throws FileDoesNotExist
+     * @throws FileIsTooBig
+     */
+    public function addInstagramMedia($mediaUrl, $countLikes = 0, $countComments = 0)
 	{
 		$collectionName = 'instagram';
 		$this->addMediaFromUrl($mediaUrl)
@@ -361,16 +473,16 @@ class User extends Authenticatable implements HasMedia, Transformable
 			->toMediaCollection($collectionName);
 	}
 
-	public function getGalleryMedia($limit = null)
-	{ // \Illuminate\Support\Carbon $uploadedAfter = null,
+    /**
+     * @param $limit
+     * @return array
+     */
+    public function getGalleryMedia($limit = null)
+	{
 		$media = [];
 		$mediaCollection = $this->media()
 			->whereIn('collection_name', ['website_images', 'instagram'])
 			->orderBy('id', 'DESC');
-
-		//		if ($uploadedAfter!=null){
-		//			$mediaCollection->where('created_at', '>=', $uploadedAfter->format('Y-m-d H:i:s'));
-		//		}
 		if ($limit) {
 			$mediaCollection->limit($limit);
 		}
@@ -391,13 +503,19 @@ class User extends Authenticatable implements HasMedia, Transformable
 		return $media;
 	}
 
-	public function suspend()
+    /**
+     * @return true
+     */
+    public function suspend()
 	{
 		$this->setStatus(self::STATUS_BLOCKED);
 		return true;
 	}
 
-	public function resetBraintreeData()
+    /**
+     * @return void
+     */
+    public function resetBraintreeData()
 	{
 		$this->bt_submerchant_id = null;
 		$this->bt_submerchant_status = null;
@@ -405,7 +523,11 @@ class User extends Authenticatable implements HasMedia, Transformable
 		$this->save();
 	}
 
-	public function setBraintreeData(\Braintree_MerchantAccount $merchantAccountId)
+    /**
+     * @param MerchantAccount $merchantAccountId
+     * @return void
+     */
+    public function setBraintreeData(MerchantAccount $merchantAccountId)
 	{
 		$this->bt_submerchant_id = $merchantAccountId->id;
 		$this->bt_submerchant_status = $merchantAccountId->status;
@@ -413,7 +535,12 @@ class User extends Authenticatable implements HasMedia, Transformable
 		$this->save();
 	}
 
-	public function updateUserSubMerchantStatus($status, $message = '')
+    /**
+     * @param $status
+     * @param $message
+     * @return void
+     */
+    public function updateUserSubMerchantStatus($status, $message = '')
 	{
 		$prevStatus = $this->bt_submerchant_status;
 		$this->bt_submerchant_status = $status;
@@ -423,7 +550,10 @@ class User extends Authenticatable implements HasMedia, Transformable
 			$this->fireModelEvent('submerchantStatusChanged');
 	}
 
-	public function getMaxAllowedInstructorInvites()
+    /**
+     * @return int
+     */
+    public function getMaxAllowedInstructorInvites()
 	{
 		$personalMaxAllowedInstructorInvites = $this->profile->max_allowed_instructor_invites;
 		if ($personalMaxAllowedInstructorInvites == null)
@@ -432,7 +562,10 @@ class User extends Authenticatable implements HasMedia, Transformable
 			return $personalMaxAllowedInstructorInvites;
 	}
 
-	public function canAddNewLesson()
+    /**
+     * @return bool
+     */
+    public function canAddNewLesson()
 	{
 		return ($this->bt_submerchant_id != null
 			&& $this->bt_submerchant_status == 'active'

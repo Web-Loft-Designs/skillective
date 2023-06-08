@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\FaqCategoryRepository;
 use App\Repositories\FaqRepository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Auth;
-use Session;
-use Log;
-use App\Models\Page;
 use App\Models\Testimonial;
 
 class PageController extends Controller
@@ -23,12 +21,12 @@ class PageController extends Controller
         parent::__construct();
     }
 
+
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param FaqRepository $faqRepository
+     * @return Application|Factory|View|never
      */
-    public function index(Request $request, FaqRepository $faqRepository)
+    public function index(FaqRepository $faqRepository)
     {
         $page = getCurrentPage();
         if (!$page){

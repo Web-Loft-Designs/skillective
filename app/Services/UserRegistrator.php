@@ -1,24 +1,25 @@
 <?php
 namespace App\Services;
 
-use App\Http\Requests\StudentSmallRegisterRequest;
 use App\Models\User;
 use App\Models\Invitation;
 use App\Models\Profile;
 use App\Models\UserGeoLocation;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\InstructorRegisterRequest;
 use App\Http\Requests\API\StudentRegisterRequest;
 use Illuminate\Auth\Events\Registered;
-use App\Repositories\UserRepository;
-use DB;
-use Log;
 use Illuminate\Support\Str;
 
 
-
 class UserRegistrator {
-	public function registerInstructor(InstructorRegisterRequest $request)
+    /**
+     * @param InstructorRegisterRequest $request
+     * @return User
+     * @throws \Exception
+     */
+    public function registerInstructor(InstructorRegisterRequest $request)
 	{
 		$inputData = $request->all();
 		$inputData['password'] = 'skillectivefake-' . Str::random(60);
@@ -27,15 +28,15 @@ class UserRegistrator {
 		return $instructor;
 	}
 
-	/**
-	 * Create a new user instance after a valid registration.
-	 *
-	 * @param  array  $data
-	 * @return \App\Models\User
-	 */
-	protected function createInstructor(array $data)
+
+    /**
+     * @param array $data
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function createInstructor(array $data)
 	{
-		\DB::beginTransaction();
+		DB::beginTransaction();
 		try {
 			$userData = [
 				'first_name' => $data['first_name'],
@@ -78,12 +79,9 @@ class UserRegistrator {
 
 			$user->setStatus(User::STATUS_ON_REVIEW);
 
-//			$invitationToken = (isset($data['invitation']) && $data['invitation']) ? $data['invitation'] : null;
-//			$this->_addFavoriteClientsAndInstructorsFromInvitations($user, $invitationToken);
-
 			DB::commit();
 		} catch (\Exception $e) {
-			\DB::rollback();
+			DB::rollback();
 			throw $e;
 		}
 
@@ -91,7 +89,12 @@ class UserRegistrator {
 	}
 
 	/* registration using instagram */
-	public function registerStudent(StudentRegisterRequest $request)
+    /**
+     * @param StudentRegisterRequest $request
+     * @return User
+     * @throws \Exception
+     */
+    public function registerStudent(StudentRegisterRequest $request)
 	{
 		$inputData = $request->all();
 		event(new Registered($student = $this->createStudent($inputData)));
@@ -99,6 +102,12 @@ class UserRegistrator {
 	}
 
     // student must finish registration
+
+    /**
+     * @param $request
+     * @return User
+     * @throws \Exception
+     */
     public function registerInactiveStudent($request)
     {
         $inputData = $request->all();
@@ -114,18 +123,19 @@ class UserRegistrator {
         return $student;
     }
 
-	/**
-	 * Create a new user instance after a valid registration.
-	 *
-	 * @param  array  $data
-	 * @return \App\Models\User
-	 */
-	protected function createStudent(array $data, $status = null)
+
+    /**
+     * @param array $data
+     * @param $status
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function createStudent(array $data, $status = null)
 	{
-		if (!$status)
+        if (!$status)
 			$status = User::STATUS_ACTIVE;
 
-		\DB::beginTransaction();
+		DB::beginTransaction();
 		try {
 			$userData = [
 				'first_name' => $data['first_name'],
@@ -158,17 +168,17 @@ class UserRegistrator {
             $notification[] = 'email';
             if( array_key_exists('sms_notification', $data) ) $notification[] = 'sms';
 
-            if( isset($data['dob']) && $data['dob'] === 'Invalid date' ) $data['dob'] = null;
+            if(isset($data['mobile_phone'])) {
+                $data['mobile_phone'] = transforInputPhoneNumber($data['mobile_phone']); //to format +122222222222
+            }
 
 			$profile = new Profile( [
 				'address'			=> isset($data['address'])?$data['address']:'',
 				'city'				=> isset($data['city'])?$data['city']:'',
 				'state'				=> isset($data['state'])?$data['state']:'',
-				'dob'				=> isset($data['dob'])?$data['dob']:null,
 				'zip'				=> isset($data['zip'])?$data['zip']:'',
 				'mobile_phone'		=> isset($data['mobile_phone'])?$data['mobile_phone']:'',
 				'about_me'			=> isset($data['about_me'])?$data['about_me']:'',
-				'gender'			=> isset($data['gender'])?$data['gender']:'',
 				'instagram_handle'	=> isset($data['instagram_handle'])?$data['instagram_handle']:'',
                 'notification_methods' => isset($data['sms_notification'])?$notification:'',
 			] );
@@ -192,7 +202,7 @@ class UserRegistrator {
 
 			DB::commit();
 		} catch (\Exception $e) {
-			\DB::rollback();
+			DB::rollback();
 			throw $e;
 		}
 

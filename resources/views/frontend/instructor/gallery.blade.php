@@ -5,7 +5,7 @@
             <div class="row">
                 <div class="col-12">
 
-                    <a href="{{ $update_media_from_instagram_url }}">Load Recent Instagram Media</a>
+                    <a href="{{ $update_media_from_instagram_url }}">Import Instagram Posts</a>
 
                     <instructor-media-gallery v-bind:user-media="{{ json_encode($userMedia) }}"
                                               v-bind:instagram-media-queue="{{ isset($loadingInstagramProfileImagesInQueue)?'true':'false' }}"

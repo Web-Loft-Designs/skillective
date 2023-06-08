@@ -3,20 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use Braintree\MerchantAccount;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Profile;
-use App\Models\Genre;
 use App\Models\Setting;
 use App\Repositories\GenreRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\LessonRepository;
 use App\Models\UserGeoLocation;
-use Session;
-use Auth;
+use Illuminate\Support\Facades\Auth;
+use Prettus\Repository\Exceptions\RepositoryException;
 use Spatie\Permission\Models\Role;
 use App\Facades\BraintreeProcessor;
-use Log;
 
 class ProfileController extends Controller
 {
@@ -38,18 +39,17 @@ class ProfileController extends Controller
 		parent::__construct();
 	}
 
-    /**
-     * @param Request $request
-     * @param User $user
-     * @return \Illuminate\View\View
-     */
-    public function show(Request $request, User $user)
-    {
 
+    /**
+     * @param User $user
+     * @return Application|Factory|View|never
+     * @throws RepositoryException
+     */
+    public function show(User $user)
+    {
         if( !$user->id ) {
             $user = Auth::user();
         }
-
         $currentUserIsAdmin = (Auth::user() && Auth::user()->hasRole(User::ROLE_ADMIN));
         if ($user->status!=User::STATUS_ACTIVE && $user->status!=User::STATUS_APPROVED && !$currentUserIsAdmin)
             return abort(404);
@@ -59,10 +59,10 @@ class ProfileController extends Controller
         $userData = $this->userRepository->getUserData($user->id);
         $userData = $this->userRepository->presentResponse($userData)['data'];
 
-        $invitedInstructors = [];
-        $isInstructor = false;
-        if ($user->hasRole(User::ROLE_INSTRUCTOR)) {
-            $isInstructor = true;
+		$invitedInstructors = [];
+		$isInstructor = false;
+		if ($user->hasRole(User::ROLE_INSTRUCTOR)) {
+			$isInstructor = true;
 
             $userData['total_count_lessons'] = $this->lessonRepository->getInstructorsPastBookedLessonsCount($user->id);
             $userData['lessons_rate_min']    = (float)$user->myLessonsBookings()
@@ -122,7 +122,12 @@ class ProfileController extends Controller
         return view("frontend.{$template}.profile", $vars);
     }
 
-	public function edit(Request $request, User $user = null)
+
+    /**
+     * @param User|null $user
+     * @return Application|Factory|View|never
+     */
+    public function edit(User $user = null)
 	{
 		$isAdmin = false;
 		if (!Auth::user()->hasRole(User::ROLE_ADMIN)){
@@ -167,25 +172,17 @@ class ProfileController extends Controller
 			$savedMerchantAccountDetails = BraintreeProcessor::getMerchantAccountDetails($user);
 			// useful for local site which doesn't receive webhook notifications
 			if ($savedMerchantAccountDetails!=null && $savedMerchantAccountDetails['status']=='active' && $user->bt_submerchant_status=='pending'){
-				$this->userRepository->updateUserSubMerchantStatus( $user->bt_submerchant_id, \Braintree_MerchantAccount::STATUS_ACTIVE );
+				$this->userRepository->updateUserSubMerchantStatus( $user->bt_submerchant_id, MerchantAccount::STATUS_ACTIVE );
 			}
-
             $savedMerchantAccountDetails['taxId'] = Auth::user()->tax_id;
             $savedMerchantAccountDetails['legalName'] = Auth::user()->legal_name;
-
 			$vars['savedMerchantAccountDetails']  = $savedMerchantAccountDetails;
-
 		}
-
 		if ($isAdmin){
 			$vars['defaultMaxAllowedInstructorInvites']  = Setting::getValue('max_allowed_instructor_invites');
 			$vars['countInstructorInvitationsSent']  = $user->instructorInvitations()->count();
 			$vars['countInstructorInvitationsApplied']  = $user->instructorInvitations()->whereNotNull('invited_user_id')->count();
 		}
-//		dd(BraintreeProcessor::deleteAllCustomerPaymentMethods($user));
-//		dd(BraintreeProcessor::getAllCustomerPaymentMethods($user));
-//dd(BraintreeProcessor::getSavedCustomerPaymentMethods($user));
-
 		if (!$isAdmin && !$isInstructor){
 			$vars['clientToken'] = BraintreeProcessor::generateClientToken($user);
 			$vars['paymentMethods'] = BraintreeProcessor::getSavedCustomerPaymentMethods($user);

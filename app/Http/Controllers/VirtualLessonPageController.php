@@ -2,19 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\TwilioVideo;
+use Braintree\MerchantAccount;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use App\Models\Lesson;
 use App\Models\User;
-use Auth;
-use Log;
-use TwilioVideo;
+use Illuminate\Support\Facades\Auth;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class VirtualLessonPageController extends Controller
 {
+
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Lesson $lesson
+     * @param Request $request
+     * @return Application|Factory|View
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function index(Lesson $lesson, Request $request)
     {
@@ -45,7 +53,7 @@ class VirtualLessonPageController extends Controller
 		if (config('app.env')=='prod'
 			&& (
 				$lesson->instructor->bt_submerchant_id==null
-				|| $lesson->instructor->bt_submerchant_status!=\Braintree_MerchantAccount::STATUS_ACTIVE
+				|| $lesson->instructor->bt_submerchant_status!=MerchantAccount::STATUS_ACTIVE
 				|| $lesson->instructor->status != User::STATUS_ACTIVE
 			)
 		){

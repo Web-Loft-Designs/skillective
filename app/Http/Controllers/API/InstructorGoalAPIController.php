@@ -3,22 +3,27 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Response;
-use Auth;
 use App\Http\Requests\API\UpdateInstructorGoalAPIRequest;
 use App\Http\Requests\API\DeleteInstructorGoalAPIRequest;
-use App\Models\Profile;
-use App\Models\User;
-use Log;
+
 
 class InstructorGoalAPIController extends AppBaseController
 {
-	public function get(Request $request) {
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function get(Request $request) {
 		return $this->sendResponse($request->user()->profile->getGoal());
 	}
 
-	public function update(UpdateInstructorGoalAPIRequest $request) {
+    /**
+     * @param UpdateInstructorGoalAPIRequest $request
+     * @return JsonResponse
+     */
+    public function update(UpdateInstructorGoalAPIRequest $request) {
 		$currentUser = $request->user();
 
 		$currentUser->profile->goal_value = $request->input('goal_value', null);
@@ -29,7 +34,11 @@ class InstructorGoalAPIController extends AppBaseController
 		return $this->sendResponse(true, 'Goal updated');
 	}
 
-	public function delete(DeleteInstructorGoalAPIRequest $request) {
+    /**
+     * @param DeleteInstructorGoalAPIRequest $request
+     * @return JsonResponse
+     */
+    public function delete(DeleteInstructorGoalAPIRequest $request) {
 		$currentUser = $request->user();
 
 		$currentUser->profile->goal_value = null;

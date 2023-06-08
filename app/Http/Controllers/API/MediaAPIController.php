@@ -4,10 +4,11 @@ namespace App\Http\Controllers\API;
 
 use App\Repositories\UserRepository;
 use App\Http\Controllers\AppBaseController;
-use Response;
-use Auth;
 use App\Http\Requests\API\UploadMediaRequest;
-use Spatie\MediaLibrary\Models\Media;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
 
 class MediaAPIController extends AppBaseController
 {
@@ -16,10 +17,15 @@ class MediaAPIController extends AppBaseController
 
     public function __construct(UserRepository $userRepo)
     {
+        parent::__construct();
         $this->userRepository = $userRepo;
     }
 
-	public function index($user)
+    /**
+     * @param $user
+     * @return array|JsonResponse
+     */
+    public function index($user)
 	{
 		$user = $this->userRepository->findWithoutFail($user);
 		if ($user){

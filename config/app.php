@@ -174,28 +174,20 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
 		Collective\Html\HtmlServiceProvider::class,
 		Laracasts\Flash\FlashServiceProvider::class,
 		Prettus\Repository\Providers\RepositoryServiceProvider::class,
 		\InfyOm\Generator\InfyOmGeneratorServiceProvider::class,
 		\InfyOm\AdminLTETemplates\AdminLTETemplatesServiceProvider::class,
-
 		Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 		Barryvdh\Debugbar\ServiceProvider::class,
-
 		Spatie\Permission\PermissionServiceProvider::class,
-
 		Intervention\Image\ImageServiceProvider::class,
 		NotificationChannels\Twilio\TwilioProvider::class,
 		Tylercd100\Placeholders\ServiceProvider::class,
-
 		SocialiteProviders\Manager\ServiceProvider::class,
-
-		Unisharp\Ckeditor\ServiceProvider::class,
-
+//		Unisharp\Ckeditor\ServiceProvider::class,
 		\Torann\GeoIP\GeoIPServiceProvider::class,
-
 		App\Providers\UserRegistratorServiceProvider::class,
 		App\Providers\BraintreeProcessorServiceProvider::class,
 		App\Providers\IncomesCalculatorServiceProvider::class,
@@ -252,19 +244,14 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
 		'Form'      => Collective\Html\FormFacade::class,
 		'Html'      => Collective\Html\HtmlFacade::class,
 		'Flash'     => Laracasts\Flash\Flash::class,
 		'Image' => Intervention\Image\Facades\Image::class,
-
 		'Debugbar' => Barryvdh\Debugbar\Facade::class,
 		"Placeholders" => Tylercd100\Placeholders\Facades\Placeholders::class,
-
 		'Socialite'    => Laravel\Socialite\Facades\Socialite::class,
-
 		'GeoIP' => \Torann\GeoIP\Facades\GeoIP::class,
-
 		'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 		'BraintreeProcessor' => App\Facades\BraintreeProcessor::class,
 		'InstagramLoader' => App\Facades\InstagramLoader::class,

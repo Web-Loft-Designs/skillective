@@ -2,32 +2,29 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Models\Profile;
 use App\Models\User;
 use App\Models\Setting;
-use App\Models\Social;
-use Illuminate\Support\Str;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Cookie;
+use Laracasts\Flash\Flash;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
-use Session;
-use Log;
-use Auth;
-use Flash;
 use App\Repositories\SocialRepository;
-use App\Repositories\UserRepository;
-use App\Repositories\ProfileRepository;
 use App\Http\Requests\InstructorRegisterRequest;
 use App\Http\Requests\API\StudentRegisterRequest;
 use App\Facades\UserRegistrator;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Http\Controllers\AppBaseController;
 use Faker;
-use Cookie;
 use App\Repositories\InvitationRepository;
-use App\Facades\InstagramLoader;
 
 class SocialController extends AppBaseController
 {
@@ -35,28 +32,18 @@ class SocialController extends AppBaseController
 
 	/** @var  SocialRepository */
 	private $socialRepository;
-
-	/** @var  UserRepository */
-	private $userRepository;
-
-	/** @var  ProfileRepository */
-	private $profileRepository;
-
 	private $defaultProvider = 'ig';
 
-	public function __construct(SocialRepository $socialRepo, UserRepository $userRepo, ProfileRepository $profileRepo)
+	public function __construct(SocialRepository $socialRepo)
 	{
-		$this->userRepository = $userRepo;
+        parent::__construct();
 		$this->socialRepository = $socialRepo;
-		$this->profileRepository = $profileRepo;
 	}
 
+
     /**
-     * Gets the social redirect.
-     *
-     * @param string $provider The provider
-     *
-     * @return Redirect
+     * @param $provider
+     * @return Application|Factory|View|RedirectResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function getSocialRedirect($provider)
     {
@@ -69,28 +56,24 @@ class SocialController extends AppBaseController
         return Socialite::driver($provider)->redirect();
     }
 
+
     /**
-     * Gets the social handle.
-     *
-     * @param string $provider The provider
-     *
-     * @return Redirect
+     * @param $provider
+     * @param Request $request
+     * @return Application|RedirectResponse|Redirector
      */
     public function getSocialHandle($provider, Request $request)
     {
-        if (Input::get('denied') != '') {
+        if ($request->get('denied') != '') {
 			Flash::error('You did not share your profile data with our social app.')->important();
             return redirect()->route('frontend.login');
         }
-//		dd($provider, $request->all());
         try{
             $socialUserObject = Socialite::driver($provider)->user();
 			$currentUser = Auth::user();
             if ($currentUser){ // attach social
 				if ($socialUserObject->id && $provider) {
-//					dd($provider, $socialUserObject);
 					$route = route('profile.edit');
-
 					if ($this->checkUniqueSocialmediaProfile($socialUserObject->id, $provider)){
 						Flash::error( str_replace('{provider}', ucfirst($provider), self::INSTAGRAM_ALREADY_CONNECTED_ERROR) )->important();
 						return redirect($route)->send();
@@ -104,16 +87,10 @@ class SocialController extends AppBaseController
                     return redirect(route('profile.edit'))->send();
                 }
             }else{
-				 // login
 					if (isset($socialUserObject->id) && ($social = $this->socialRepository->getBySocialIdAndProvider($socialUserObject->id, $provider))!==null){
 						$authorizingUser = $social->user;
 						if ($authorizingUser && $authorizingUser->status=='active'){
 							Auth::login($authorizingUser);
-
-//							if ($provider==$this->defaultProvider){
-//								$authorizingUser->profile->instagram_followers_count = $socialUserObject->user['counts']['followed_by'];
-//								$authorizingUser->profile->save();
-//							}
 
                             if ($authorizingUser->hasRole(User::ROLE_INSTRUCTOR)){
                                 $route = session('prev_page', route('instructor.dashboard'));
@@ -133,7 +110,6 @@ class SocialController extends AppBaseController
 						Flash::error('No such user. Register first to login and attach your '.$this->getProviderDisplayName($provider).' profile to your account on site.')->important();
 						return redirect(route('frontend.login'))->send();
 					}
-//				}
             }
         }catch (InvalidStateException $e){
 			Flash::error('Try again please')->important();
@@ -143,9 +119,16 @@ class SocialController extends AppBaseController
         return redirect(route('frontend.login'))->send();
     }
 
-	public function getSocialInstructorRegistration($provider, Request $request, InvitationRepository $invitationRepository) {
-		//$provider = $this->defaultProvider;
-
+    /**
+     * @param $provider
+     * @param Request $request
+     * @param InvitationRepository $invitationRepository
+     * @return array|Application|RedirectResponse|Redirector
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getSocialInstructorRegistration($provider, Request $request, InvitationRepository $invitationRepository)
+    {
 		$redirectRoute = route('instructor.register');
 		if (session()->has('invitation')){
 			$invitation = session()->get('invitation');
@@ -159,7 +142,7 @@ class SocialController extends AppBaseController
 			return redirect($redirectRoute);
 		}
 
-		if (Input::get('denied') != '') {
+		if ($request->get('denied') != '') {
 			Flash::error('You did not share your profile data with our social app.')->important();
 			return redirect($redirectRoute);
 		}
@@ -193,7 +176,6 @@ class SocialController extends AppBaseController
 
 		try{
 			$socialUserObject = Socialite::driver($provider)->user();
-//			dd($socialUserObject);
 			if ($this->checkUniqueSocialmediaProfile($socialUserObject->id, $provider)){
 				$providerName = $provider=='ig' ? 'Instagram' : ucfirst($provider);
 				Flash::error( str_replace('{provider}', $providerName, self::INSTAGRAM_ALREADY_CONNECTED_ERROR) )->important();
@@ -207,13 +189,6 @@ class SocialController extends AppBaseController
 
 			switch ($provider){
 				case 'ig':
-					//			$clientId = config('services.instagram.client_id');
-					//			$clientSecret = config('services.instagram.client_secret');
-					//			$redirectUrl = route('social.instagram.instructor.registration');
-					//			$config = new \SocialiteProviders\Manager\Config($clientId, $clientSecret, $redirectUrl);
-					//			$socialUserObject = Socialite::driver($provider)->setConfig($config)->user();
-
-					// update profile data from instagram (doesnot load profile media)
 					$user->profile->updateProfileWithInstagramData($socialUserObject);
 					break;
 				case 'twitter':
@@ -241,12 +216,16 @@ class SocialController extends AppBaseController
 		return redirect(route('instructor.register'))->send();
 	}
 
-	public function getSocialInstagramMedia(Request $request){
+    /**
+     * @param Request $request
+     * @return Application|RedirectResponse|Redirector
+     */
+    public function getSocialInstagramMedia(Request $request){
 		$provider = $this->defaultProvider;
 
 		$redirectRoute = route('instructor.gallery');
 
-		if (Input::get('denied') != '') {
+		if ($request->get('denied') != '') {
 			Flash::error('You did not share your profile data with our social app.')->important();
 			return redirect($redirectRoute);
 		}
@@ -255,30 +234,24 @@ class SocialController extends AppBaseController
 		$socialiteDriver->redirectUrl( route('social.instagram.media.update') );
 		$socialUserObject = $socialiteDriver->user();
 
-		// testing
-//		InstagramLoader::getOwnRecentMediaUrls($socialUserObject->token, $socialUserObject->user['username']);
-//		exit;
-
 		Auth::user()->profile->updateProfileWithInstagramData($socialUserObject);
 		Flash::info('Your recent Instagram media will be loaded in a few minutes')->important();
 		return redirect($redirectRoute)->send();
 	}
 
-	public function getSocialInstagramStudentRegistration(Request $request) {
+    /**
+     * @param Request $request
+     * @return Application|RedirectResponse|Redirector
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getSocialInstagramStudentRegistration(Request $request) {
 		$provider = $this->defaultProvider;
 		$route = session()->has('current_page') ? session()->get('current_page') : route('home'); // route('student.register')
-
-		// get data from registration form
-//		if (!session()->has('submittedStudent')){
-//			Flash::error('Bad Request')->important();
-//			return redirect($route);
-//		}
-
-		if (Input::get('denied') != '') {
+		if ($request->get('denied') != '') {
 			Flash::error('You did not share your profile data with our social app.')->important();
 			return redirect($route);
 		}
-
 		try{
 			$clientId = config('services.instagram.client_id');
 			$clientSecret = config('services.instagram.client_secret');
@@ -331,6 +304,10 @@ class SocialController extends AppBaseController
 		return redirect($route);
 	}
 
+    /**
+     * @param $provider
+     * @return Application|RedirectResponse|Redirector
+     */
     public function detachSocial($provider)
     {
 		if ($provider) {
@@ -347,11 +324,20 @@ class SocialController extends AppBaseController
 		return redirect(route('profile.edit'))->send();
     }
 
+    /**
+     * @param $socialUserObjectId
+     * @param $provider
+     * @return mixed
+     */
     private function checkUniqueSocialmediaProfile($socialUserObjectId, $provider){
 		return $this->socialRepository->getBySocialIdAndProvider($socialUserObjectId, $provider);
 	}
 
-	private function getProviderDisplayName($provider){
+    /**
+     * @param $provider
+     * @return string
+     */
+    private function getProviderDisplayName($provider){
     	if ($provider=='ig')
 			$provider = 'instagram';
 		return ucfirst($provider);

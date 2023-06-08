@@ -3,17 +3,20 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
-use Response;
-use Auth;
-use Log;
 use App\Facades\BraintreeProcessor;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\API\BraintreeTransactionRequest;
 use App\Models\UserPaymentMethod;
 use App\Models\Booking;
+use Illuminate\Support\Facades\Auth;
 
 class StudentPaymentMethodsAPIController extends AppBaseController
 {
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function index(Request $request)
     {
 		$user = Auth::user();
@@ -21,6 +24,10 @@ class StudentPaymentMethodsAPIController extends AppBaseController
         return $this->sendResponse($methods);
     }
 
+    /**
+     * @param BraintreeTransactionRequest $request
+     * @return JsonResponse
+     */
     public function store(BraintreeTransactionRequest $request)
     {
 		$paymentMethodNonce = $this->_getPaymentMethodNonceFromRequest($request);
@@ -56,7 +63,12 @@ class StudentPaymentMethodsAPIController extends AppBaseController
         return $this->sendResponse(true, 'Payment method saved');
     }
 
-	public function setAsDefaultMethod(Request $request, $paymentMethodToken)
+    /**
+     * @param Request $request
+     * @param $paymentMethodToken
+     * @return JsonResponse
+     */
+    public function setAsDefaultMethod(Request $request, $paymentMethodToken)
 	{
 		$updateResult = BraintreeProcessor::setAsDefaultMethod($paymentMethodToken);
 		if ($updateResult->success)
@@ -65,7 +77,12 @@ class StudentPaymentMethodsAPIController extends AppBaseController
 			return $this->sendError('Can\'t update payment method');
 	}
 
-	public function delete(Request $request, $paymentMethodToken)
+    /**
+     * @param Request $request
+     * @param $paymentMethodToken
+     * @return JsonResponse|void
+     */
+    public function delete(Request $request, $paymentMethodToken)
 	{
 		try{
 			Auth::user()->paymentMethods()->where('payment_method_token', $paymentMethodToken)->each(function($method) use ($paymentMethodToken) {
@@ -90,7 +107,11 @@ class StudentPaymentMethodsAPIController extends AppBaseController
 		}
 	}
 
-	private function _getPaymentMethodNonceFromRequest($request){
+    /**
+     * @param $request
+     * @return mixed
+     */
+    private function _getPaymentMethodNonceFromRequest($request){
 		return $request->input('payment_method_nonce', null);
 	}
 }

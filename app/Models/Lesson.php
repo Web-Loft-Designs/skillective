@@ -2,26 +2,22 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use DateTime;
+use DateTimeZone;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Prettus\Repository\Contracts\Transformable;
-use Illuminate\Support\Str;
-use App\Notifications\StudentBookingConfirmation;
-use App\Notifications\InstructorNewBookingNotification;
-use App\Models\Booking;
-use App\Models\LessonRequest;
-use App\Models\User;
-use Auth;
-use Log;
-use App\Facades\UserRegistrator;
-use App\Http\Requests\API\StudentRegisterRequest;
-use MaksimM\SubqueryMagic\SubqueryMagic;
 use Carbon\Carbon;
 use App\Facades\BraintreeProcessor;
 
 class Lesson extends Model implements Transformable
 {
-	use SoftDeletes, SubqueryMagic;
+	use SoftDeletes;
 
 	public $table = 'lessons';
 
@@ -59,7 +55,8 @@ class Lesson extends Model implements Transformable
 		'room_completed',
 		'private_for_student_id',
 		'count_places_in_spot',
-        'preview'
+        'preview',
+        'title'
 	];
 
 	/**
@@ -85,7 +82,8 @@ class Lesson extends Model implements Transformable
 		'lng' => 'float',
 		'description' => 'string',
 		'timezone_id' => 'string',
-        'preview' => 'string'
+        'preview' => 'string',
+        'title' => 'string'
 	];
 
 	/**
@@ -101,17 +99,16 @@ class Lesson extends Model implements Transformable
 		'spots_count' => 'required',
 		'spot_price' => 'required',
 		'location' => 'required',
-		//        'address' => 'required',
-		//        'city' => 'required',
-		//        'state' => 'required',
-		//        'zip' => 'required'
 	];
 
 	protected $hidden = [
 		'created_at', 'updated_at', 'deleted_at'
 	];
 
-	public static function getLessonTypes()
+    /**
+     * @return string[]
+     */
+    public static function getLessonTypes()
 	{
 		return [
 			'in_person' => 'In Person Location (Instructor Determined)',
@@ -120,44 +117,67 @@ class Lesson extends Model implements Transformable
 		];
 	}
 
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-	 **/
-	public function genre()
+
+    /**
+     * @return BelongsTo
+     */
+    public function genre()
 	{
-		return $this->belongsTo(\App\Models\Genre::class, 'genre_id');
+		return $this->belongsTo(Genre::class, 'genre_id');
 	}
 
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-	 **/
-	public function instructor()
+
+    /**
+     * @return BelongsTo
+     */
+    public function instructor()
 	{
-		return $this->belongsTo(\App\Models\User::class, 'instructor_id');
+		return $this->belongsTo(User::class, 'instructor_id');
 	}
 
-	public function roomChatMessages()
+    /**
+     * @return HasMany
+     */
+    public function roomChatMessages()
 	{
-		return $this->hasMany('App\Models\RoomChatMessage', 'lesson_id', 'id');
+		return $this->hasMany(RoomChatMessage::class, 'lesson_id', 'id');
 	}
 
-	public function regularNotifications()
+    /**
+     * @return HasMany
+     */
+    public function regularNotifications()
 	{
-		return $this->hasMany(\App\Models\RegularNotification::class, 'user_regular_notifications');
+		return $this->hasMany(RegularNotification::class, 'user_regular_notifications');
 	}
 
-	public function bookings()
+    /**
+     * @return HasMany
+     */
+    public function bookings()
 	{
-		return $this->hasMany('App\Models\Booking', 'lesson_id', 'id');
+		return $this->hasMany(Booking::class, 'lesson_id', 'id');
 	}
 
-	public function students()
+    /**
+     * @return HasManyThrough
+     */
+    public function students()
 	{
-		return $this->hasManyThrough('App\Models\User', 'App\Models\Booking', 'lesson_id', 'id', 'id', 'student_id')
-			->whereNotIn('bookings.status', [Booking::STATUS_CANCELLED, Booking::STATUS_PENDING]);
+		return $this->hasManyThrough(
+            User::class,
+            Booking::class,
+            'lesson_id',
+            'id',
+            'id',
+            'student_id'
+        )->whereNotIn('bookings.status', [Booking::STATUS_CANCELLED, Booking::STATUS_PENDING]);
 	}
 
-	public function transform()
+    /**
+     * @return array
+     */
+    public function transform()
 	{
 		return [
 			'id' => (int)$this->id,
@@ -165,7 +185,6 @@ class Lesson extends Model implements Transformable
 			'genre_id' => $this->genre_id,
 			'genre' => $this->genre->transform(),
 			'instructor' => $this->instructor->transform(),
-			//			'students' => $this->students->toArray(),
 			'start' => $this->start->format('Y-m-d H:i:s'),
 			'end' => $this->end->format('Y-m-d H:i:s'),
 			'timezone_id' => getTimezoneAbbrev($this->timezone_id),
@@ -184,10 +203,14 @@ class Lesson extends Model implements Transformable
 			'lesson_type' => $this->lesson_type,
 			'room_sid' => $this->room_sid,
 			'room_completed' => $this->room_completed,
+            'title' => $this->title,
 		];
 	}
 
-	public function isBookableNowByCurrentUser()
+    /**
+     * @return bool
+     */
+    public function isBookableNowByCurrentUser()
 	{
 		return (currentUserCanBook()
 			&&
@@ -202,29 +225,46 @@ class Lesson extends Model implements Transformable
 			($this->private_for_student_id == null || (Auth::user() && $this->private_for_student_id == Auth::id())));
 	}
 
-	public function getCountBookedSpots()
+    /**
+     * @return int
+     */
+    public function getCountBookedSpots()
 	{
-		return $this->bookings()->where('status', '<>', Booking::STATUS_CANCELLED)->count();
+		return $this->bookings()
+            ->where('status', '<>', Booking::STATUS_CANCELLED)
+            ->count();
 	}
 
-	public function getCountFreeSpots()
+    /**
+     * @return int|mixed
+     */
+    public function getCountFreeSpots()
 	{
 		return $this->spots_count - $this->getCountBookedSpots();
 	}
 
-	public function alreadyStarted()
+    /**
+     * @return bool
+     */
+    public function alreadyStarted()
 	{
-		return strtotime($this->start->format('Y-m-d H:i:s')) < strtotime(Carbon::now($this->timezone_id)->format('Y-m-d H:i:s')); // compare lesson datetime with current time on lesson location
+		return strtotime($this->start->format('Y-m-d H:i:s')) < strtotime(Carbon::now($this->timezone_id)
+                ->format('Y-m-d H:i:s')); // compare lesson datetime with current time on lesson location
 	}
 
-	public function book($user_repository, $request, $paymentMethodNonce, $student)
+    /**
+     * @param $user_repository
+     * @param $request
+     * @param $paymentMethodNonce
+     * @param $student
+     * @return Booking
+     * @throws \Exception
+     */
+    public function book($user_repository, $request, $paymentMethodNonce, $student)
 	{
-
 		if(Auth::user() != null){
 			$user_repository->updateUserData(Auth::user()->id, $request);
 		}
-
-
 		if ($paymentMethodNonce) {
 			$device_data = $request->input('device_data', null);
 			$paymentMethod = BraintreeProcessor::createPaymentMethod($student, $paymentMethodNonce, $device_data);
@@ -238,7 +278,6 @@ class Lesson extends Model implements Transformable
 			}
 			$paymentMethod = ['token' => $paymentMethod->token, 'type' => BraintreeProcessor::_getPaymentMethodType($paymentMethod)];
 		}
-
 		if (!$paymentMethod) {
 			throw new \Exception('Payment method not found');
 		}
@@ -252,7 +291,6 @@ class Lesson extends Model implements Transformable
 		$booking->status			= Booking::STATUS_PENDING;
 		$booking->payment_method_token	= $paymentMethod['token'];
 		$booking->payment_method_type	= $paymentMethod['type'];
-
 		$service_fee = $booking->getBookingServiceFeeAmount($this->spot_price);
 		$virtual_fee = $booking->getBookingVirtualFeeAmount($this);
 		$booking->service_fee = $service_fee;
@@ -265,7 +303,6 @@ class Lesson extends Model implements Transformable
 
 			$this->location = $request->input('location');
 			$locationDetails = getLocationDetails($this->location);
-
 			$this->lat = isset($locationDetails['lat']) ? $locationDetails['lat'] : null;
 			$this->lng = isset($locationDetails['lng']) ? $locationDetails['lng'] : null;
 			$this->city = isset($locationDetails['city']) ? $locationDetails['city'] : null;
@@ -277,19 +314,21 @@ class Lesson extends Model implements Transformable
 		}
 
 			if ($this->instructor->clients()->where('client_id', $student->id)->count() == 0) {
-				\Log::info('add instructor client');
+				Log::info('add instructor client');
 				$this->instructor->clients()->attach($student);
 			}
 			if ($student->instructors()->where('instructor_id', $this->instructor_id)->count() == 0) {
-				\Log::info('add client instructor');
+				Log::info('add client instructor');
 				$student->instructors()->attach($this->instructor);
 			}
 
 		return $booking;
 	}
 
-	// can cancel not past and not already cancelled
-	public function cancel()
+    /**
+     * @return true
+     */
+    public function cancel()
 	{
 		$this->bookings()
 			->where('status', '<>', Booking::STATUS_CANCELLED)
@@ -302,11 +341,15 @@ class Lesson extends Model implements Transformable
 		return true;
 	}
 
-	public function save(array $options = [])
+    /**
+     * @param array $options
+     * @return bool|void
+     * @throws \Exception
+     */
+    public function save(array $options = [])
 	{
 		if ($this->lesson_type == 'in_person') {
 			$locationDetails = getLocationDetails($this->location);
-
 			$this->lat = isset($locationDetails['lat']) ? $locationDetails['lat'] : null;
 			$this->lng = isset($locationDetails['lng']) ? $locationDetails['lng'] : null;
 			$this->city = isset($locationDetails['city']) ? $locationDetails['city'] : null;
@@ -316,14 +359,18 @@ class Lesson extends Model implements Transformable
 			$this->timezone_id = isset($locationDetails['timezone_id']) ? $locationDetails['timezone_id'] : null;
 		}
 
-		$time = new \DateTime($this->start, new \DateTimeZone($this->timezone_id));
+		$time = new DateTime($this->start, new DateTimeZone($this->timezone_id));
 		$this->timezone_offset_gmt = $time->format('P');
 
 		parent::save($options);
 	}
 
 
-	public function getLocationAttribute($value)
+    /**
+     * @param $value
+     * @return array|string|string[]
+     */
+    public function getLocationAttribute($value)
 	{
 		if ($this->address != null && $this->state != null)
 			return str_replace(', ,', ', ', "{$this->address} <br/>$this->city, $this->state, $this->zip");
@@ -331,7 +378,10 @@ class Lesson extends Model implements Transformable
 			return $value;
 	}
 
-	public function getRoomType()
+    /**
+     * @return string
+     */
+    public function getRoomType()
 	{
 		if ($this->spots_count <= 4)
 			return 'group-small';
@@ -339,7 +389,11 @@ class Lesson extends Model implements Transformable
 		return 'group';
 	}
 
-	public function createFromLessonRequest(LessonRequest $lessonRequest)
+    /**
+     * @param LessonRequest $lessonRequest
+     * @return mixed
+     */
+    public function createFromLessonRequest(LessonRequest $lessonRequest)
 	{
 		$input = [
 			'instructor_id' => $lessonRequest->instructor_id,
@@ -359,12 +413,27 @@ class Lesson extends Model implements Transformable
 		return $this->create($input);
 	}
 
+    /**
+     * @return string
+     */
     public function getPreviewUrl()
     {
-        if ($this->preview != null){
-            return config('app.url') . '/storage/' . 'lessons/' . $this->instructor_id . '/' . $this->preview;
-        }else{
-            return '';
+        // TODO test 'https://skillective.com'
+        if(config('app.env') == 'local') {
+
+            if ($this->preview != null){
+                return 'https://skillective.com' . '/storage/' . 'lessons/' . $this->instructor_id . '/' . $this->preview;
+            }else{
+                return '';
+            }
+
+        } else {
+            if ($this->preview != null){
+                return config('app.url') . '/storage/' . 'lessons/' . $this->instructor_id . '/' . $this->preview;
+            }else{
+                return '';
+            }
         }
+
     }
 }

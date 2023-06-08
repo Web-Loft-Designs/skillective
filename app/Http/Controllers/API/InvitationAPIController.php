@@ -5,14 +5,14 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\InviteStudentAPIRequest;
 use App\Http\Requests\API\InviteInstructorAPIRequest;
 use App\Models\Setting;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
 use App\Repositories\ProfileRepository;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Invitation;
 use App\Models\User;
-use App\Models\Profile;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -21,12 +21,8 @@ use App\Notifications\InstructorRegistrationInvitation;
 use App\Notifications\StudentRegistrationInvitation;
 use App\Notifications\Admin\InviteNewInstructorRequest;
 use GuzzleHttp\Client as HttpClient;
-use Twilio\Rest\Client;
 
-/**
- * Class BookingAPIController
- * @package App\Http\Controllers\API
- */
+
 
 class InvitationAPIController extends AppBaseController
 {
@@ -42,12 +38,17 @@ class InvitationAPIController extends AppBaseController
 
     public function __construct(UserRepository $userRepository, ProfileRepository $profileRepository)
     {
+        parent::__construct();
         $this->userRepository = $userRepository;
         $this->profileRepository = $profileRepository;
         $this->emailRegexp = getInviteEmailValidationRegexp();
         $this->phoneRegexp = getInviteMobilePhoneValidationRegexp();
     }
 
+    /**
+     * @param InviteInstructorAPIRequest $request
+     * @return JsonResponse
+     */
     public function inviteInstructor(InviteInstructorAPIRequest $request)
     {
         $input = $this->_prepareInputData($request);
@@ -111,6 +112,10 @@ class InvitationAPIController extends AppBaseController
         return $this->sendResponse($count, $successMessage);
     }
 
+    /**
+     * @param InviteStudentAPIRequest $request
+     * @return JsonResponse
+     */
     public function inviteStudent(InviteStudentAPIRequest $request)
     {
         $input = $this->_prepareInputData($request);
@@ -150,6 +155,11 @@ class InvitationAPIController extends AppBaseController
         return $this->sendResponse(true, 'Invitation has been sent');
     }
 
+    /**
+     * @param Request $request
+     * @return array
+     * @throws GuzzleException
+     */
     private function _prepareInputData(Request $request){
         $input = [
             'invited_by'			=> Auth::user()->id,

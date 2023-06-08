@@ -5,16 +5,12 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\AddClientsAPIRequest;
 use App\Http\Requests\API\RemoveClientsAPIRequest;
 use App\Repositories\UserRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
-use Response;
-use Auth;
-use Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
-/**
- * Class ClientController
- * @package App\Http\Controllers\API
- */
 
 class InstructorClientsAPIController extends AppBaseController
 {
@@ -23,15 +19,14 @@ class InstructorClientsAPIController extends AppBaseController
 
     public function __construct(UserRepository $userRepo)
     {
+        parent::__construct();
         $this->userRepository = $userRepo;
     }
 
+
     /**
-     * Display a listing of the Client.
-     * GET|HEAD /clients
-     *
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      */
     public function index(Request $request)
     {
@@ -45,13 +40,10 @@ class InstructorClientsAPIController extends AppBaseController
         return $this->sendResponse($clients);
     }
 
+
     /**
-     * Store a newly created Client in storage.
-     * POST /clients
-     *
      * @param AddClientsAPIRequest $request
-     *
-     * @return Response
+     * @return JsonResponse
      */
     public function add(AddClientsAPIRequest $request)
     {
@@ -67,19 +59,14 @@ class InstructorClientsAPIController extends AppBaseController
         return $this->sendResponse(true, $count_added . ' clients added');
     }
 
+
     /**
-     * Remove the specified Client from storage.
-     * DELETE /clients/{id}
-     *
-     * @param  int $id
-     *
-     * @return Response
+     * @param $id
+     * @return JsonResponse
      */
     public function remove($id)
     {
-        /** @var Client $client */
         $client = $this->userRepository->findWithoutFail($id);
-
         if (empty($client)) {
             return $this->sendError('Client not found');
         }
@@ -89,7 +76,11 @@ class InstructorClientsAPIController extends AppBaseController
         return $this->sendResponse(true, 'Client deleted');
     }
 
-	public function removeMany(RemoveClientsAPIRequest $request)
+    /**
+     * @param RemoveClientsAPIRequest $request
+     * @return JsonResponse
+     */
+    public function removeMany(RemoveClientsAPIRequest $request)
 	{
 		$count_removed = 0;
 		foreach ($request->input('clients') as $clientId){

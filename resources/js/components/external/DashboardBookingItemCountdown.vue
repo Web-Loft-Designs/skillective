@@ -32,16 +32,21 @@
           (props.seconds != undefined ? props.seconds : "")
         }}</template>
       </countdown>
+      <div class='text-btn'>Until event</div>
     </a>
+    <a
+      v-if="showJoinButton && lessonType !== 'virtual'"
+      class="b-dashboar-join"
+      style='cursor: default;'
+    >In progress</a>
     <a
       href="#"
       @click.prevent="
         joinLesson(lesson.id, lesson.instructor.full_name, lesson.genre.title)
       "
       class="b-dashboar-join"
-      v-if="showJoinButton"
-      >Join Lesson</a
-    >
+      v-if="showJoinButton && lessonType === 'virtual'"
+      >Until event</a>
   </div>
 </template>
 
@@ -53,7 +58,7 @@ import moment from "moment";
 
 export default {
   mixins: [siteAPI, skillectiveHelper, manageVideoLesson],
-  props: ["lesson"],
+  props: ["lesson", "lessonType"],
   data() {
     return {
       showJoinButton: false,
@@ -153,3 +158,30 @@ export default {
   },
 };
 </script>
+<style>
+.bookings-table .dashboard-bookings-item--content .cd--control-inner{
+  flex-direction: column-reverse;
+}
+.bookings-table .dashboard-bookings-item--content .b-dashboard-cd{
+  border: 1px solid #999999!important;
+  background-color: #cccccc!important;
+  border-radius: 3px;
+  width: 100%;
+  padding: 9px;
+  text-decoration: none;
+  font-family: Hind Vadodara;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  cursor: not-allowed!important;
+}
+.bookings-table .dashboard-bookings-item--content .cd--control-btn .text-btn{
+  color: #666666!important;
+}
+.bookings-table .dashboard-bookings-item--content .right-side .more-wrap {
+  margin-left: 20px;
+}
+.bookings-table .dashboard-bookings-item--content .cd--control-inner {
+  margin-right: 0 !important;
+}
+</style>

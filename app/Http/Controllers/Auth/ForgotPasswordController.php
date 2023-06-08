@@ -33,7 +33,11 @@ class ForgotPasswordController extends Controller
 		parent::__construct();
     }
 
-	protected function validateEmail(Request $request)
+    /**
+     * @param Request $request
+     * @return void
+     */
+    protected function validateEmail(Request $request)
 	{
 		$request->validate(
 			['email' => 'required|email|email_active'],
