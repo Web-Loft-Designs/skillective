@@ -468,6 +468,7 @@ export default {
 }
 .test-circle {
   background-color: transparent !important;
+  left: 10px !important;
 
 }
 .custom-button {
