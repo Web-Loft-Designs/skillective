@@ -368,7 +368,7 @@
   </div>
   </template>
     <div class='view__all'>
-      <a class='view__all-link' href='/globalshop?lesson_type=in_person'>View All Pre-recorded</a>
+      <a class='view__all-link' href='/globalshop?lesson_type=in_person'>View All Pre-Recorded Lessons</a>
     </div>
 
     <video-lesson-info-popup
