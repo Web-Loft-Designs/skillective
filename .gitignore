@@ -10,6 +10,7 @@
 /storage/app/public/videos/*
 /storage/app/public/lessons/*
 /storage/app/public/media/*
+/storage/app/analytics/*
 /storage/debugbar/*
 /storage/framework/cache/*
 /storage/framework/sessions/*
