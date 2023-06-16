@@ -367,6 +367,10 @@
     </button>
   </div>
   </template>
+    <div class='view__all'>
+      <a class='view__all-link' href='/globalshop?lesson_type=in_person'>View All Pre-Recorded Lessons</a>
+    </div>
+
     <video-lesson-info-popup
       :can-book="canBook"
       ref="videoLessonInfoPopup"
@@ -491,4 +495,20 @@ export default {
 
 <style lang="scss" scoped>
 @import "./VideoLessonsList.scss";
+.view__all {
+  margin-top: 55px;
+  &-link {
+    font-family: Hind Vadodara;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    color: #0AAB14;
+    display: block;
+    max-width: 1340px;
+    margin: 53px auto 0 auto;
+    padding: 0 75px;
+    outline: none;
+  }
+}
 </style>

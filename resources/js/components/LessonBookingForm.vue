@@ -177,8 +177,8 @@
                 v-if="formReadonly == false"
                 v-model="fields.mobile_phone"
                 :class="'form-control'"
-                :placeholder="'(___) ___ ____'"
-                mask="(111) 111 1111"
+                :placeholder="'(___) ___-____'"
+                mask="(111) 111-1111"
               />
               <input
                 v-if="formReadonly == true"
@@ -917,6 +917,7 @@ export default {
     },
   },
   created: function () {
+    console.log(this.user,'123')
     if (
       window.location.hash.search(/venmoSuccess=/) !== -1 &&
       Cookies.get('currentOrderDetails') != undefined
