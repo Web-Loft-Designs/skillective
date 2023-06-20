@@ -373,7 +373,7 @@ class Lesson extends Model implements Transformable
     public function getLocationAttribute($value)
 	{
 		if ($this->address != null && $this->state != null)
-			return str_replace(', ,', ', ', "{$this->address} <br/>$this->city, $this->state, $this->zip");
+			return str_replace(', ,', ', ', "{$this->address} $this->city, $this->state, $this->zip");
 		else
 			return $value;
 	}
