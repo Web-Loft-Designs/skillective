@@ -5,7 +5,6 @@ namespace App\Transformers;
 use Illuminate\Support\Facades\Auth;
 use League\Fractal\TransformerAbstract;
 use App\Models\Lesson;
-use App\Models\Booking;
 
 /**
  * Class LessonSingleTransformer.
