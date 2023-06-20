@@ -480,7 +480,6 @@ export default {
           if (this.triggerView == 'week' || this.triggerView == 'day') {
             this.injectUpDownButtons()
           }
-          let calendarApi = this.$refs.fullCalendar.getApi();
           // calendarApi.scrollTime = moment(this.events[1].start).format(
           //   "HH:mm:ss"
           // );
@@ -501,11 +500,11 @@ export default {
       if (moment(info.event.start, 'x') <= moment(new Date(), 'x')) {
         info.el.className = info.el.className + ' last-event'
       }
-      if (this.heightCalendar > 500) {
-        info.el.className = info.el.className + ' big-event'
-      } else {
-        info.el.className = info.el.className + ' small-event'
-      }
+      // if (this.heightCalendar > 500) {
+      //   info.el.className = info.el.className + ' big-event'
+      // } else {
+      //   info.el.className = info.el.className + ' small-event'
+      // }
       info.el.className = info.el.className + ' test-circle'
       var count =
         parseInt(info.event.extendedProps.spots_count) -
@@ -668,12 +667,5 @@ export default {
 <style lang='scss'>
 .fc-day-grid-event {
   cursor: pointer;
-}
-.big-event {
-  height: 82px !important;
-}
-
-.small-event {
-  height: 45px !important;
 }
 </style>

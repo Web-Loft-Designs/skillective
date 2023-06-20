@@ -565,20 +565,15 @@
   margin: 0 !important;
 }
 .fc-timeGrid-view .fc-event {
-  background-color: #ebffd7;
+  background: #fff !important;
   color: #444444;
   border: 1px solid #8ada00!important;
   font-family: 'Hind Vadodara';
   font-size: 12px;
   font-weight: 700;
-  border: 0;
-  border-top: 1px solid #ddd;
-  //border-bottom: 1px solid #ddd;
-  padding: 2px 9px;
   margin: 0;
   border-radius: 0;
   cursor: pointer;
-  width: 70% !important;
   &:hover {
     z-index: 22;
     .calendar-tooltip {
@@ -665,9 +660,7 @@
   }
 }
 .fc-timeGridDay-view.fc-timeGrid-view .fc-event {
-  padding: 8px;
-  width: 96.6% !important;
-  position: relative;
+  background: #fff !important;
   border: 1px solid #8ada00!important;
   .fc-title {
     color: #444444;
