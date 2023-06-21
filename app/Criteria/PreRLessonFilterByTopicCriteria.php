@@ -19,18 +19,15 @@ class PreRLessonFilterByTopicCriteria implements CriteriaInterface
 		$this->topic = $topic;
 	}
 
+
     /**
-     * Apply criteria in query repository
-     *
-     * @param string              $model
+     * @param $model
      * @param RepositoryInterface $repository
-     *
      * @return mixed
      */
     public function apply($model, RepositoryInterface $repository)
     {
-        $model = $model->whereRaw("CONCAT(title, ' ', description) LIKE '%".escape_like($this->topic)."%'");
-
+        $model = $model->whereRaw("CONCAT(pre_r_lessons.title, ' ', pre_r_lessons.description) LIKE '%".escape_like($this->topic)."%'");
         return $model;
     }
 }

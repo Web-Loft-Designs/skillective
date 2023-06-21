@@ -28,7 +28,7 @@ class HomeController extends AppBaseController
     public function index(Request $request,GenreRepository $genreRepository, TestimonialRepository $testimonialRepository, LessonRepository $lessonRepository, UserRepository $userRepository, PreRLessonRepository $preRLessonRepository)
     {
 		$userIpLocation = '';
-		if (!$this->currentPage){
+		if (!$this->currentPage) {
 			$this->currentPage = getCurrentPage('/');
 			view()->share( 'currentPage', $this->currentPage );
 		}
