@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Models\User;
 use App\Models\PreRecordedLesson;
 use App\Criteria\PreRLessonFilterByContentCriteria;
 use App\Criteria\PreRLessonFilterByGenresListCriteria;
@@ -60,15 +59,15 @@ class PreRLessonRepository extends BaseRepository
      */
     public function getPreRLessons($request)
     {
-
         $this->resetCriteria();
         $this->resetScope();
 
         $this->pushCriteria(new RequestCriteria($request));
         $this->pushCriteria(new LimitOffsetCriteria($request));
 
-        if ($request->filled('instructor_name'))
+        if ($request->filled('instructor_name')) {
             $this->pushCriteria(new PreRLessonFilterByInstructorNameCriteria($request->get('instructor_name')));
+        }
         if ($request->filled('genre')) {
             $this->pushCriteria(new PreRLessonFilterByGenreCriteria($request->get('genre')));
         }
@@ -77,28 +76,28 @@ class PreRLessonRepository extends BaseRepository
         }
 
         $this->scopeQuery(function ($query) use ($request) {
-            $query = $query->select('pre_r_lessons.*')
-                ->join('users', 'pre_r_lessons.instructor_id', '=', "users.id");
-            if( Auth::check() )
-            {
-                if (Auth::user()->hasRole(User::ROLE_INSTRUCTOR)){
-                    $query->groupBy('pre_r_lessons.id');
-                }else if ( Auth::user()->hasRole(User::ROLE_STUDENT) ){
+            $query = $query->join('users', 'pre_r_lessons.instructor_id', '=', 'users.id')
+                ->leftJoin('user_genre', 'users.id', '=', 'user_genre.user_id')
+                ->leftJoin('genres', 'pre_r_lessons.genre_id', '=', 'genres.id');
 
-                    $userGenres = Auth()->user()->genres()->orderBy('title', 'desc')->get()->pluck('id')->toArray();
-                    $ids_ordered = implode(',', $userGenres);
-                    $query->groupBy('pre_r_lessons.id');
-                }
-            }else{
-                $query->groupBy('pre_r_lessons.id');
+            if (Auth::check()) {
+                $query->select('pre_r_lessons.*', DB::raw('COUNT(purchased_lessons.pre_r_lesson_id) AS purchased_count'))
+                    ->leftJoin('purchased_lessons', 'pre_r_lessons.id', '=', 'purchased_lessons.pre_r_lesson_id')
+                    ->leftJoin('user_genre AS ug', 'users.id', '=', 'ug.user_id')
+                    ->groupBy('pre_r_lessons.id')
+                    ->orderByRaw('MAX(IF(ug.user_id IS NULL, 0, 1)) DESC, purchased_count DESC');
+            } else {
+                $query->select('pre_r_lessons.*', DB::raw('COUNT(purchased_lessons.pre_r_lesson_id) AS purchased_count'))
+                    ->leftJoin('purchased_lessons', 'pre_r_lessons.id', '=', 'purchased_lessons.pre_r_lesson_id')
+                    ->groupBy('pre_r_lessons.id')
+                    ->orderByDesc('purchased_count');
             }
+
             return $query;
         });
 
-
         return $this->paginate(21, ['pre_r_lessons.*']);
     }
-
 
     /**
      * @param $request

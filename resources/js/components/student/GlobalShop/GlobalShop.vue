@@ -114,7 +114,7 @@ export default {
         currentPage: this.preloadedPagination.pagination.current_page,
         pageCount: this.preloadedPagination.pagination.total_pages,
       },
-      lessons: this.preloadedLessons.reverse(),
+      lessons: this.preloadedLessons,
     }
   },
 }
