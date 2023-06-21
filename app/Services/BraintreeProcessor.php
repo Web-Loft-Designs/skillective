@@ -326,8 +326,8 @@ class BraintreeProcessor
                 'kind' => 'debit',
                 'name' => "Lesson #{$booking->lesson_id} Booking ",
                 'quantity' => 1,
-                'totalAmount' => $booking->spot_price + $serviceFee + $expectedBrainTreeFee,
-                'unitAmount' => $booking->spot_price + $serviceFee + $expectedBrainTreeFee
+                'totalAmount' => round($booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2),
+                'unitAmount' => round( $booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2)
             ]
         ];
         $options = [
