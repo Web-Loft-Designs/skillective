@@ -3,12 +3,9 @@
 namespace App\Http\Controllers\Backend;
 
 use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Profile;
 use App\Repositories\UserRepository;
 use App\Http\Controllers\Controller;
-use Session;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {

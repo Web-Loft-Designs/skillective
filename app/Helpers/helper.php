@@ -460,11 +460,15 @@ function googleMapsAddressLink($address)
 
 // <<< google api
 
+/**
+ * @param $mobilePhone
+ * @return string
+ */
 function presentMobilePhone($mobilePhone)
 {
-	$mobilePhoneLength = strlen($mobilePhone);
-	$outputPhone = '+' . substr($mobilePhone, -$mobilePhoneLength, -10) . ' (' . substr($mobilePhone, -10, -7) . ')' . ' ' . substr($mobilePhone, -7, -4) . ' ' . substr($mobilePhone, -4);
-	return $outputPhone;
+    $mobilePhone = preg_replace('/\D/', '', $mobilePhone);
+    $outputPhone = '(' . substr($mobilePhone, -10, 3) . ') ' . substr($mobilePhone, -7, 3) . ' ' . substr($mobilePhone, -4);
+    return $outputPhone;
 }
 
 function prepareMobileForTwilio($mobilePhone)

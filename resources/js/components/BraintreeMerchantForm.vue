@@ -110,8 +110,8 @@
 						:disabled="isAdminForm"
 						:class="'form-control'"
 						v-model="merchantAccountDetails.individual_phone"
-						:placeholder="'+1 (___) ___ ____'"
-						mask="\+1 (111) 111 1111"
+						:placeholder="'(___) ___ ____'"
+						mask="(111) 111 1111"
 					/>
 					<span class="help-block" v-if="errors.individual_phone">
 						<strong>{{ errors.individual_phone[0] }}</strong>
