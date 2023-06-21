@@ -145,7 +145,6 @@ class ProfileController extends Controller
 
 		$userData = $this->userRepository->getUserData($user->id);
 		$userData = $this->userRepository->presentResponse($userData)['data'];
-
 		$isInstructor = false;
 		if ($user->hasRole(User::ROLE_INSTRUCTOR)){
 			$isInstructor = true;
