@@ -81,11 +81,13 @@ class PreRLessonRepository extends BaseRepository
                 ->leftJoin('genres', 'pre_r_lessons.genre_id', '=', 'genres.id');
 
             if (Auth::check()) {
+                $userId = Auth::user()->id;
                 $query->select('pre_r_lessons.*', DB::raw('COUNT(purchased_lessons.pre_r_lesson_id) AS purchased_count'))
                     ->leftJoin('purchased_lessons', 'pre_r_lessons.id', '=', 'purchased_lessons.pre_r_lesson_id')
-                    ->leftJoin('user_genre AS ug', 'users.id', '=', 'ug.user_id')
+                    ->orderByRaw('CASE WHEN pre_r_lessons.genre_id IN (SELECT genre_id FROM user_genre WHERE user_id = ?) THEN 0 ELSE 1 END', [$userId])
                     ->groupBy('pre_r_lessons.id')
-                    ->orderByRaw('MAX(IF(ug.user_id IS NULL, 0, 1)) DESC, purchased_count DESC');
+                    ->orderByDesc('purchased_count');
+
             } else {
                 $query->select('pre_r_lessons.*', DB::raw('COUNT(purchased_lessons.pre_r_lesson_id) AS purchased_count'))
                     ->leftJoin('purchased_lessons', 'pre_r_lessons.id', '=', 'purchased_lessons.pre_r_lesson_id')
