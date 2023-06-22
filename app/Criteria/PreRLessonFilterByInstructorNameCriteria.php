@@ -19,12 +19,10 @@ class PreRLessonFilterByInstructorNameCriteria implements CriteriaInterface
 		$this->instructor_name = $instructor_name;
 	}
 
+
     /**
-     * Apply criteria in query repository
-     *
-     * @param string              $model
+     * @param $model
      * @param RepositoryInterface $repository
-     *
      * @return mixed
      */
     public function apply($model, RepositoryInterface $repository)
