@@ -27,7 +27,7 @@ class InstructorDashboardController extends Controller
      * @return Application|Factory|View
      * @throws RepositoryException
      */
-    public function index(Request $request, LessonRepository $lessonRepo, GenreRepository $genreRepository, UserRepository $userRepository, BookingRepository $bookingRepository)
+    public function index(Request $request, LessonRepository $lessonRepo, GenreRepository $genreRepository, UserRepository $userRepository)
     {
 		try{
 			$request = new Request([
@@ -39,23 +39,6 @@ class InstructorDashboardController extends Controller
 			$clients = ['data'=>[]];
 		}
 
-		try{
-			$request = new Request([
-				'limit'	=> 20,
-				'type' => 'all',
-				'sort' => 'date'
-			]);
-
-			$lessonRepo->setPresenter("App\\Presenters\\LessonDashboardPresenter");
-
-			$lessons = $lessonRepo->presentResponse($lessonRepo->getDashboardInstructorLessons($request, Auth::user()->id));
-
-		}catch (\Exception $e){
-
-			Log::error('getInstructorBookings : ' . $e->getMessage());
-			$lessons = ['data'=>[]];
-		}
-
     	$galleryLimit = 4;
         $vars = [
             'page_title'	=> 'Dashboard',
@@ -63,7 +46,7 @@ class InstructorDashboardController extends Controller
 			'siteGenres'	=> $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
 			'userGenres'	=> $genreRepository->presentResponse(Auth::user()->genres)['data'],
 			'clients'		=> $clients,
-			'bookings'		=> $lessons,
+			'bookings'		=> [], //  disabled
             'tax_id'        => Auth::user()->tax_id
         ];
 

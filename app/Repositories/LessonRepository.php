@@ -262,37 +262,42 @@ class LessonRepository extends BaseRepository
     {
         $this->resetCriteria();
         $this->resetScope();
-        if(!$instructor_id)
+
+        if(!$instructor_id) {
             $instructor_id = Auth::user()->id;
+        }
+
         $this->pushCriteria(new LimitOffsetCriteria($request));
         $this->pushCriteria(new RequestCriteria($request));
-        if($request->has('day'))
+
+        if($request->has('day')) {
             $this->pushCriteria(new LessonScheduleForDayCriteria($request));
-        elseif($request->has('week'))
+        } elseif($request->has('week')) {
             $this->pushCriteria(new LessonScheduleForWeekCriteria($request));
-        elseif($request->has('month'))
+        } elseif($request->has('month')) {
             $this->pushCriteria(new LessonScheduleForMonthCriteria($request));
+        }
+
         $this->scopeQuery(function($query) use ($instructor_id) {
-            $query = $query->orderBy('start', 'asc')
-                ->select('lessons.*', DB::raw("SUM(case when ( bookings.id IS NULL ) then 0 else 1 end) as count_booked"))
+            $query = $query->select(DB::raw("lessons.*, DATE_FORMAT(lessons.start, '%Y-%m-%d %H:%i:%s') as formatted_start,
+                                                    SUM(CASE WHEN (bookings.id IS NULL) THEN 0 ELSE 1 END) as count_booked"))
                 ->leftJoin('bookings', function($join) {
                     $join->on('lessons.id', '=', 'bookings.lesson_id')
-                        ->whereRaw(" ( bookings.status <> 'cancelled' OR bookings.status IS NULL ) ");
+                        ->whereRaw("(bookings.status <> 'cancelled' OR bookings.status IS NULL)");
                 })
-                ->groupBy('lessons.id')
-                ->whereRaw(" ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) ")
+                ->whereRaw("(lessons.is_cancelled IS NULL OR lessons.is_cancelled = 0)")
                 ->where('lessons.instructor_id', $instructor_id);
 
+            $currentDate = date('Y-m-d');
+            $query->groupBy('formatted_start', 'lessons.id');
+            $query->whereRaw("DATE(lessons.end) >= '$currentDate'");
+            $query->orderByRaw("DATE(lessons.start) = '$currentDate' DESC, formatted_start ASC");
+
             return $query;
-        })
-            ->with(['genre', 'instructor.profile', 'instructor', 'students']);
+        })->with(['genre', 'instructor.profile', 'instructor', 'students']);
 
-        $perPage = Cookie::get('instructorLessonsPerPage', 20);
+        return $this->get(['lessons.*', 'count_booked']);
 
-        if($request->filled('limit') || $request->has('day') || $request->has('week') || $request->has('month'))
-            return $this->get(['lessons.*', 'count_booked']);
-        else
-            return $this->paginate($perPage, ['lessons.*', 'count_booked']);
     }
 
     /**
@@ -301,51 +306,59 @@ class LessonRepository extends BaseRepository
      * @return LengthAwarePaginator|Collection|mixed
      * @throws RepositoryException
      */
-    public function getDashboardInstructorLessons(Request $request, $instructorUserId = null)
+    public function getInstructorDashboardLessons(Request $request, $instructor_id = null)
     {
         $this->resetCriteria();
         $this->resetScope();
+        if (!$instructor_id) {
+            $instructor_id = Auth::user()->id;
+        }
         $this->pushCriteria(new LimitOffsetCriteria($request));
-        $this->pushCriteria(new InstructorLessonDashboardTypeCriteria($request->get('type')));
-        if(!$instructorUserId)
-            $instructorUserId = Auth::user()->id;
-        $this->scopeQuery(function($query) use ($instructorUserId) {
-            $query->where('lessons.instructor_id', '=', $instructorUserId)
-                ->whereRaw(" ( lessons.is_cancelled is NULL OR lessons.is_cancelled=0 ) ")
-                ->join('users', 'lessons.instructor_id', '=', "users.id")
-                ->join('profiles', 'users.id', '=', "profiles.user_id")
-                ->join('genres', 'lessons.genre_id', '=', "genres.id")
-                ->leftJoin('bookings', 'lessons.id', '=', 'bookings.lesson_id')
-                ->withCount(['bookings' => function($sub_query) {
-                    $sub_query->where('status', '<>', 'cancelled');
-                }]);
+        $this->pushCriteria(new RequestCriteria($request));
+
+        $this->scopeQuery(function ($query) use ($request, $instructor_id) {
+            $currentDate = date('Y-m-d');
+            $query = $query->select(DB::raw("lessons.*, DATE_FORMAT(lessons.start, '%Y-%m-%d %H:%i') as formatted_start,
+                                                SUM(CASE WHEN (bookings.id IS NULL) THEN 0 ELSE 1 END) as count_booked"))
+                ->leftJoin('bookings', function ($join) {
+                    $join->on('lessons.id', '=', 'bookings.lesson_id')
+                        ->whereRaw("(bookings.status <> 'cancelled' OR bookings.status IS NULL)");
+                })
+                ->whereRaw("(lessons.is_cancelled IS NULL OR lessons.is_cancelled = 0)")
+                ->where('lessons.instructor_id', $instructor_id);
+            $query->groupBy('formatted_start', 'lessons.id');
+
+            switch ($request->get('sort')) {
+                case 'price_desc':
+                    $query->orderBy('lessons.spot_price', 'desc');
+                    break;
+                case 'price_asc':
+                    $query->orderBy('lessons.spot_price', 'asc');
+                    break;
+                case 'participants':
+                    $query->orderBy('count_booked', 'desc');
+                    break;
+                case 'date':
+                    $query->orderByRaw("DATE(lessons.start) = '$currentDate' DESC, formatted_start DESC");
+                    break;
+                default:
+                    break;
+            }
+
+            switch ($request->get('type')) {
+                case 'past':
+                    $query->whereDate('lessons.end', '<', $currentDate);
+                    break;
+                default:
+                    break;
+            }
 
             return $query;
-        });
+        })->with(['genre', 'instructor.profile', 'instructor', 'students']);
 
-        if($request->get('type') && $request->get('type') === 'past') {
-            $this->orderBy('lessons.start', 'desc');
-        }
-
-        if($request->get('sort')) {
-            if($request->get('sort') === 'date') {
-                $this->orderBy('lessons.start', 'asc');
-            } else if($request->get('sort') === 'price_asc') {
-                $this->orderBy('lessons.spot_price', 'asc');
-            } else if($request->get('sort') === 'price_desc') {
-                $this->orderBy('lessons.spot_price', 'desc');
-            } else if($request->get('sort') === 'participants') {
-                $this->orderBy('bookings_count', 'desc');
-            }
-        }
-
-        $this->with(['bookings', 'bookings.instructor', 'bookings.student', 'genre']);
-
-        if($request->filled('limit') && $request->input('limit') > 0)
-            return $this->paginate($request->input('limit'), ['lessons.*'])->unique('id');
-        else
-            return $this->paginate($perPage, ['lessons.*']); // TODO Bag !!!!!!!!!!!
+        return $this->get(['lessons.*', 'count_booked']);
     }
+
 
     /**
      * @param $instructor_id
