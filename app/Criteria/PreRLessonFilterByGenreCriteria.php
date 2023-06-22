@@ -20,16 +20,13 @@ class PreRLessonFilterByGenreCriteria implements CriteriaInterface
 	}
 
     /**
-     * Apply criteria in query repository
-     *
-     * @param string              $model
+     * @param $model
      * @param RepositoryInterface $repository
-     *
      * @return mixed
      */
     public function apply($model, RepositoryInterface $repository)
     {
-		$model = $model->where("genre_id", $this->genre_id);
+        $model = $model->where("pre_r_lessons.genre_id", $this->genre_id);
         return $model;
     }
 }

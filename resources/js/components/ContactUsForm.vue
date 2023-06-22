@@ -30,7 +30,7 @@
 
                     <div class="form-group w-50 has-feedback" :class="{ 'has-error' : errors.mobile_phone }">
                         <label>Phone number</label>
-                        <masked-input :class="'form-control'" v-model="fields.mobile_phone" :placeholder="'+1 (___) ___ ____'" mask="\+1 (111) 111 1111" />
+                        <masked-input :class="'form-control'" v-model="fields.mobile_phone" :placeholder="'(___) ___ ____'" mask="(111) 111 1111" />
                         <span class="help-block" v-if="errors.mobile_phone">
                         <strong>{{ errors.mobile_phone[0] }}</strong>
                         </span>

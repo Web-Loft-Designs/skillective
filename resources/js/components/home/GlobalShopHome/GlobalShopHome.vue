@@ -1,6 +1,6 @@
 <template>
   <div class='featured-instructors'>
-    <h2 class='featured-instructors__heading'>Pre-Recorded Lessons</h2>
+    <h2 class='featured-instructors__heading'>Trending Pre-Recorded Lessons</h2>
         <video-lessons-list
           :is-slider='true'
           :can-book="canBook"
