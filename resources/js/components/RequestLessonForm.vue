@@ -165,9 +165,9 @@
                     ||
                     ($v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.valid))
                     }"
-                    :placeholder="'+1 (___) ___ ____'"
+                    :placeholder="'(___) ___ ____'"
                     class='form-control'
-                    mask='\+1 (111) 111 1111'
+                    mask='(111) 111 1111'
                   />
                   <span v-if='$v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.required'>Phone number can't be empty</span>
                   <span v-else-if='$v.modalData.mobile_phone.$dirty && !$v.modalData.mobile_phone.valid'>The mobile phone format is invalid</span>

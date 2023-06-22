@@ -187,7 +187,6 @@
                 v-model="fields.mobile_phone"
                 readonly
               />
-
               <span class="help-block" v-if="errors.mobile_phone">
                 <strong>{{ errors.mobile_phone[0] }}</strong>
               </span>
@@ -917,7 +916,6 @@ export default {
     },
   },
   created: function () {
-    console.log(this.user,'123')
     if (
       window.location.hash.search(/venmoSuccess=/) !== -1 &&
       Cookies.get('currentOrderDetails') != undefined

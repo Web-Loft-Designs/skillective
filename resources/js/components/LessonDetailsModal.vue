@@ -40,7 +40,7 @@
         <p
           class='location'
           v-if="selectedLesson.lesson_type !== 'virtual'"
-          v-html='selectedLesson.location'
+          v-html='showLocation'
         ></p>
         <p v-if='selectedLesson.description'>
           Note: <br/>
@@ -163,6 +163,9 @@ export default {
       if (this?.authStudent || this.authStudent === null) return false
       return this.authStudent.authStudentBooked
     },
+    showLocation() {
+      return `${this.selectedLesson.address} </br> ${this.selectedLesson.location.split(',').slice(-2).join('')}`
+    }
   },
   methods: {
     ...mapActions(['addItemToCartAtStart']),

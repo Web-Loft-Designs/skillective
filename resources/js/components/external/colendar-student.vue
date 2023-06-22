@@ -346,11 +346,11 @@ export default {
       if (moment(info.event.start, "x") <= moment(new Date(), "x")) {
         info.el.className = info.el.className + " last-event";
       }
-      if (this.heightCalendar > 500) {
-        info.el.className = info.el.className + ' big-event'
-      } else {
-        info.el.className = info.el.className + ' small-event'
-      }
+      // if (this.heightCalendar > 500) {
+      //   info.el.className = info.el.className + ' big-event'
+      // } else {
+      //   info.el.className = info.el.className + ' small-event'
+      // }
       info.el.className = info.el.className + ' test-circle';
       var count =
         parseInt(info.event.extendedProps.spots_count) -
@@ -427,8 +427,8 @@ export default {
     &::after {
       position: absolute;
       content: '';
-      top: -7px;
-      left: 3px;
+      bottom: 0;
+      left: 5px;
       width: 55px;
       height: 55px;
       border: 1px solid #8ada00 !important;
@@ -436,12 +436,11 @@ export default {
 
       @media (max-width: 1200px) {
         left: -2px;
-        top: -10px;
+        bottom: -2px
       }
 
       @media (max-width: 991px) {
         left: 10px;
-        top: -8px;
       }
 
       @media (max-width: 767px) {
@@ -449,8 +448,8 @@ export default {
       }
 
       @media (max-width: 585px) {
-        top: 10px;
-        left: 4px;
+        bottom: -10px;
+        left: 2px;
         width: 45px;
         height: 45px;
       }
@@ -468,8 +467,6 @@ export default {
 }
 .test-circle {
   background-color: transparent !important;
-  left: 10px !important;
-
 }
 .custom-button {
   color: #0a0a0a;
