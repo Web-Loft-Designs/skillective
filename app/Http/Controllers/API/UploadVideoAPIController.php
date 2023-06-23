@@ -22,7 +22,12 @@ class UploadVideoAPIController extends AppBaseController
             $user = Auth::user();
 
             $file = Request::file('uploaded_video');
-            $filename = md5(uniqid(rand(), true)) . '.' . $file->getClientOriginalExtension();
+
+            if ($file->getClientMimeType() == 'application/pdf') {
+                $filename = $file->getClientOriginalName();
+            } else {
+                $filename = md5(uniqid(rand(), true)) . '.' . $file->getClientOriginalExtension();
+            }
             $save_path = storage_path('app/public/videos/'.$user->id.'/');
             File::makeDirectory($save_path, 0775, true, true);
             $file->move($save_path, $filename);
