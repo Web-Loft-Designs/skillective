@@ -306,6 +306,9 @@ class LessonRepository extends BaseRepository
      * @return LengthAwarePaginator|Collection|mixed
      * @throws RepositoryException
      */
+    // цей метод виводить уроки як для   instructor/dashboard так і для instructor/bookings
+//     тому є конфлікт у фільтрах для випадку  $request->get('type') == 'past' потрібно щоб фронт спочаткі розділив сторінки
+//     і потім допрацювати новий метод для сторінки instructor/bookings  який буде працювати вірно з своїми фільтрами
     public function getInstructorDashboardLessons(Request $request, $instructor_id = null)
     {
         $this->resetCriteria();
@@ -317,41 +320,56 @@ class LessonRepository extends BaseRepository
         $this->pushCriteria(new RequestCriteria($request));
 
         $this->scopeQuery(function ($query) use ($request, $instructor_id) {
-            $currentDate = date('Y-m-d');
-            $query = $query->select(DB::raw("lessons.*, DATE_FORMAT(lessons.start, '%Y-%m-%d %H:%i') as formatted_start,
-                                                SUM(CASE WHEN (bookings.id IS NULL) THEN 0 ELSE 1 END) as count_booked"))
+            $currentDate = Carbon::now()->format('Y-m-d H-i');
+            $query = $query->select(DB::raw("lessons.*, SUM(CASE WHEN (bookings.id IS NULL) THEN 0 ELSE 1 END) as count_booked"))
                 ->leftJoin('bookings', function ($join) {
                     $join->on('lessons.id', '=', 'bookings.lesson_id')
                         ->whereRaw("(bookings.status <> 'cancelled' OR bookings.status IS NULL)");
                 })
                 ->whereRaw("(lessons.is_cancelled IS NULL OR lessons.is_cancelled = 0)")
                 ->where('lessons.instructor_id', $instructor_id);
-            $query->groupBy('formatted_start', 'lessons.id');
+
+            if ($request->get('type') == 'past') {
+                $request->query->set('sort', 'all');
+            }
+
 
             switch ($request->get('sort')) {
                 case 'price_desc':
+                    $query->whereDate('lessons.start', '>=', $currentDate);
+                    $query->groupBy('lessons.id');
                     $query->orderBy('lessons.spot_price', 'desc');
                     break;
                 case 'price_asc':
+                    $query->whereDate('lessons.start', '>=', $currentDate);
+                    $query->groupBy('lessons.id');
                     $query->orderBy('lessons.spot_price', 'asc');
                     break;
                 case 'participants':
+                    $query->whereDate('lessons.start', '>=', $currentDate);
+                    $query->groupBy('lessons.id');
                     $query->orderBy('count_booked', 'desc');
                     break;
                 case 'date':
-                    $query->orderByRaw("DATE(lessons.start) = '$currentDate' DESC, formatted_start DESC");
+                    $query->whereDate('lessons.start', '>=', $currentDate);
+                    $query->groupBy('lessons.start');
+                    $query->orderBy('lessons.start', 'ASC');
+                    break;
+                case 'all':
+                    break;
+                default:
+                    break;
+            }
+            switch ($request->get('type')) {
+                case 'past':
+                    $query->whereDate('lessons.end', '<', $currentDate);
+                    $query->groupBy('lessons.end');
+                    $query->orderBy('lessons.end', 'desc');
                     break;
                 default:
                     break;
             }
 
-            switch ($request->get('type')) {
-                case 'past':
-                    $query->whereDate('lessons.end', '<', $currentDate);
-                    break;
-                default:
-                    break;
-            }
 
             return $query;
         })->with(['genre', 'instructor.profile', 'instructor', 'students']);
