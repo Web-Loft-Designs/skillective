@@ -138,7 +138,7 @@ Route::group(['middleware' => ['role:Instructor']], function () {
 	Route::delete('instructor/pre-r-lesson/{lesson}', 'PreRLessonsInstructorAPIController@remove');
 
 	Route::get('instructor/bookings', 'InstructorBookingsAPIController@index'); // current instructor bookings
-	Route::get('instructor/bookings/past', 'InstructorBookingsAPIController@index'); // past instructor bookings
+//	Route::get('instructor/bookings/past', 'InstructorBookingsAPIController@index'); // past instructor bookings
 	Route::post('instructor/booking/{booking}/approve', 'InstructorBookingsAPIController@approve'); // + payment process
 	Route::post('instructor/booking/{booking}/reject', 'InstructorBookingsAPIController@reject');
 	Route::post('instructor/bookings/cancel', 'InstructorBookingsAPIController@cancelMany'); // + money return
