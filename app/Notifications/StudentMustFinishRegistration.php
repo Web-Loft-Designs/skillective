@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use App\Models\CustomNotification;
-use App\Models\Facility;
 use App\Models\User;
 
 class StudentMustFinishRegistration extends AbstractCustomNotification
