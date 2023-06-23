@@ -454,56 +454,56 @@
   position: relative;
   tr:nth-child(2) {
     .fc-event-container .fc-day-grid-event {
-      left: calc(3px + 13px);
+      //left: calc(3px + 13px);
     }
   }
   tr:nth-child(3) {
     .fc-event-container .fc-day-grid-event {
-      left: calc(3px + 18px);
+      //left: calc(3px + 18px);
     }
   }
   tr:nth-child(4) {
     .fc-event-container .fc-day-grid-event {
-      left: calc(3px + 23px);
+      //left: calc(3px + 23px);
     }
   }
   tr:nth-child(5) {
     .fc-event-container .fc-day-grid-event {
-      left: calc(3px + 28px);
+      //left: calc(3px + 28px);
     }
   }
   tr:nth-child(6) {
     .fc-event-container .fc-day-grid-event {
-      left: calc(3px + 33px);
+      //left: calc(3px + 33px);
     }
   }
   tr:nth-child(7) {
     .fc-event-container .fc-day-grid-event {
-      left: calc(4px + 38px);
+      //left: calc(4px + 38px);
       display: none !important;
     }
   }
   tr:nth-child(8) {
     .fc-event-container .fc-day-grid-event {
-      left: calc(4px + 43px);
+      //left: calc(4px + 43px);
       display: none !important;
     }
   }
   tr:nth-child(9) {
     .fc-event-container .fc-day-grid-event {
-      left: calc(4px + 48px);
+      //left: calc(4px + 48px);
       display: none !important;
     }
   }
   tr:nth-child(10) {
     .fc-event-container .fc-day-grid-event {
-      left: calc(4px + 53px);
+      //left: calc(4px + 53px);
       display: none !important;
     }
   }
   tr:nth-child(11) {
     .fc-event-container .fc-day-grid-event {
-      left: calc(4px + 58px);
+      //left: calc(4px + 58px);
       display: none !important;
     }
   }
@@ -661,13 +661,13 @@
 }
 .fc-timeGridDay-view.fc-timeGrid-view .fc-event {
   background: #8ada00 !important;
-  border: 1px solid #8ada00!important;
+  border: 1px solid #000!important;
   .fc-title {
     color: #444444;
     font-family: 'Hind Vadodara';
     font-size: 14px;
     font-weight: 600;
-    margin-bottom: 10px;
+    margin-bottom: 2px;
   }
   .fc-time {
     color: #444444;
@@ -699,7 +699,7 @@
   position: absolute;
   top: 0;
   right: 10px;
-  color: #99c56c;
+  color: #000;
   font-family: 'Hind Vadodara';
   font-size: 14px;
   font-weight: 400;
@@ -777,12 +777,12 @@
     position: relative;
     tr:nth-child(2) {
       .fc-event-container .fc-day-grid-event {
-        left: 13px;
+        //left: 13px;
       }
     }
     tr:nth-child(3) {
       .fc-event-container .fc-day-grid-event {
-        left: 18px;
+        //left: 18px;
       }
     }
     tr:nth-child(4) {
