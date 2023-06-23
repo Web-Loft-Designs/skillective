@@ -164,8 +164,8 @@ export default {
       let calendarApi = this.$refs.fullCalendarSmall.getApi()
       calendarApi.changeView('timeGridDay', new Date())
       this.injectUpDownButtons()
-      calendarApi.scrollTime = "08:00:00";
-      calendarApi.scrollToTime("08:00:00");
+      calendarApi.scrollTime = '08:00:00'
+      calendarApi.scrollToTime('08:00:00')
     },
     clearFormAndClosePopup() {
     },
@@ -326,9 +326,9 @@ export default {
         info.el.className = info.el.className + ' small-event'
       }
       info.el.className = info.el.className + ' test-circle'
-      // let count =
-      //   parseInt(info.event.extendedProps.spots_count) -
-      //   parseInt(info.event.extendedProps.count_booked)
+      let count =
+        parseInt(info.event.extendedProps.spots_count) -
+        parseInt(info.event.extendedProps.count_booked)
       // if (count === 1) {
       //   info.el.className = info.el.className + ' red-event'
       // } else if (count === 2) {
@@ -338,11 +338,11 @@ export default {
       // } else {
       //   info.el.className = info.el.className + ' grey-event'
       // }
-      // info.el.innerHTML =
-      //   info.el.innerHTML +
-      //   '<span class="spot-left">Spots left: ' +
-      //   count +
-      //   '</span>'
+      info.el.innerHTML =
+        info.el.innerHTML +
+        '<span class="spot-left">Spots left: ' +
+        count +
+        '</span>'
       if (!this.lessonIdParsed) {
         const params = urlHelper.parseQueryParams()
         if (params.lessonId) {
