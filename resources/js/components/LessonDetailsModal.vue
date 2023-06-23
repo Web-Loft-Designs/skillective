@@ -165,7 +165,7 @@ export default {
     },
     showLocation() {
       // return `${this.selectedLesson.address} </br> ${this.selectedLesson.location.split(',').slice(-2).join('')}`
-      return `${this.selectedLesson.address} </br> ${this.selectedLesson.city} </br> ${this.selectedLesson.state}`
+      return `${this.selectedLesson.address} </br> ${this.selectedLesson.city || ''} ${this.selectedLesson.state || ''} ${this.selectedLesson.zip || ''}`
     }
   },
   methods: {
