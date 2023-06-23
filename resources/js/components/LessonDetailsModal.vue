@@ -164,7 +164,8 @@ export default {
       return this.authStudent.authStudentBooked
     },
     showLocation() {
-      return `${this.selectedLesson.address} </br> ${this.selectedLesson.location.split(',').slice(-2).join('')}`
+      // return `${this.selectedLesson.address} </br> ${this.selectedLesson.location.split(',').slice(-2).join('')}`
+      return `${this.selectedLesson.address} </br> ${this.selectedLesson.city} </br> ${this.selectedLesson.state}`
     }
   },
   methods: {
