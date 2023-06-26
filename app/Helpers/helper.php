@@ -251,7 +251,9 @@ function getMobilePhoneWithoutCountryCodeVerificationRules()
 
 function getMobilePhoneValidationRules()
 {
-	return ['required', 'regex:/^((\+1)|(\+37))\s\([0-9]{3}\)\s[0-9]{3}\s[0-9]{4}$/'];
+//	return ['required', 'regex:/^((\+1)|(\+37))\s\([0-9]{3}\)\s[0-9]{3}\s[0-9]{4}$/'];
+    return ['required', 'regex:/^\(\d{3}\)\s\d{3}\s\d{4}$/'];
+
 }
 
 function getFundingMobilePhoneValidationRules()

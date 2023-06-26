@@ -82,17 +82,18 @@ class PreRLessonRepository extends BaseRepository
 
             if (Auth::check()) {
                 $userId = Auth::user()->id;
-                $query->select('pre_r_lessons.*', DB::raw('COUNT(purchased_lessons.pre_r_lesson_id) AS purchased_count'))
+                $query->select('pre_r_lessons.*')
                     ->leftJoin('purchased_lessons', 'pre_r_lessons.id', '=', 'purchased_lessons.pre_r_lesson_id')
-                    ->orderByRaw('CASE WHEN pre_r_lessons.genre_id IN (SELECT genre_id FROM user_genre WHERE user_id = ?) THEN 0 ELSE 1 END', [$userId])
                     ->groupBy('pre_r_lessons.id')
-                    ->orderByDesc('purchased_count');
+                    ->orderByRaw('CASE WHEN pre_r_lessons.genre_id IN (SELECT genre_id FROM user_genre WHERE user_id = ?) THEN 0 ELSE 1 END', [$userId])
+                    ->orderBy('purchased_lessons.created_at', 'DESC');
 
             } else {
-                $query->select('pre_r_lessons.*', DB::raw('COUNT(purchased_lessons.pre_r_lesson_id) AS purchased_count'))
+                $query->select('pre_r_lessons.*')
                     ->leftJoin('purchased_lessons', 'pre_r_lessons.id', '=', 'purchased_lessons.pre_r_lesson_id')
                     ->groupBy('pre_r_lessons.id')
-                    ->orderByDesc('purchased_count');
+                    ->orderBy('purchased_lessons.created_at', 'DESC');
+
             }
 
             return $query;
