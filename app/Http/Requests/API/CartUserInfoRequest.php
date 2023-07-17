@@ -3,8 +3,9 @@
 namespace App\Http\Requests\API;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class CartUserInfoRequest extends FormRequest
 {
@@ -26,25 +27,37 @@ class CartUserInfoRequest extends FormRequest
     public function rules(Request $request)
     {
 
-        if( !Auth::check() )
-        {
+        if( Auth::check() ) {
             return [
-                'email' => [ 'required', 'string',  'email',  'max:255',  'unique:users' ],
+                'first_name'		=> ['required', 'string', 'max:255'],
+                'last_name'			=> ['required', 'string', 'max:255'],
+                'email'				=> ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore(Auth::user()->id),],
+                'zip'				=> getPostCodeValidationRules(),
+                'dob'				=> getDOBValidationRules(),
+                'mobile_phone'		=> getMobilePhoneValidationRules(),
+                'accept_terms'		=> ['accepted']
+            ];
+        } else {
+            return [
+                'first_name'		=> ['required', 'string', 'max:255'],
+                'last_name'			=> ['required', 'string', 'max:255'],
+                'email'				=> ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'zip'				=> getPostCodeValidationRules(),
+                'dob'				=> getDOBValidationRules(),
+                'mobile_phone'		=> getMobilePhoneValidationRules(),
+                'accept_terms'		=> ['accepted']
             ];
         }
 
-        return [
-            'email' => [ 'required', 'string',  'email',  'max:255' ],
-        ];
-
     }
 
-	public function messages()
-	{
-
-        return [
-            'email.unique'	=> "User with this email is already registered",
+    public function messages()
+    {
+        $mesages = [
+            'email.unique'	=> "Seems you already have an account on our site, login please to book.",
+            'accept_terms.accepted'	=> "Agree to our terms please",
         ];
-
-	}
+        $mesages = array_merge($mesages, getDOBValidationMessages(), getMobilePhoneValidationRules(), getPostCodeValidationRules());
+        return $mesages;
+    }
 }
