@@ -96,13 +96,13 @@
               :class="{ 'has-error': errors.dob }"
             >
               <label>Date of Birth</label>
-
               <dropdown-datepicker
+                v-model="fields.dob"
+                :default-date='fields.dob'
                 :max-year="2021"
                 :min-year="1940"
                 :required='true'
                 display-format="mdy"
-                v-model="fields.dob"
                 submit-format="yyyy-mm-dd"
               ></dropdown-datepicker>
 
