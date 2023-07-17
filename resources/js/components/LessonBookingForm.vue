@@ -178,8 +178,8 @@
                 v-if="formReadonly == false"
                 v-model="fields.mobile_phone"
                 :class="'form-control'"
-                :placeholder="'(___) ___-____'"
-                mask="(111) 111-1111"
+                :placeholder="'(___) ___ ____'"
+                mask="(111) 111 1111"
               />
               <input
                 v-if="formReadonly == true"
