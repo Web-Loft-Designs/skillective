@@ -84,16 +84,14 @@ class PreRLessonRepository extends BaseRepository
                 $userId = Auth::user()->id;
                 $query->select('pre_r_lessons.*')
                     ->leftJoin('purchased_lessons', 'pre_r_lessons.id', '=', 'purchased_lessons.pre_r_lesson_id')
-                    ->groupBy('purchased_lessons.id')
+                    ->groupBy('purchased_lessons.pre_r_lesson_id')
                     ->orderByRaw('CASE WHEN pre_r_lessons.genre_id IN (SELECT genre_id FROM user_genre WHERE user_id = ?) THEN 0 ELSE 1 END', [$userId])
-                    ->orderBy('purchased_lessons.created_at', 'DESC');
-
+                    ->orderByRaw('MAX(purchased_lessons.created_at) DESC');
             } else {
                 $query->select('pre_r_lessons.*')
                     ->leftJoin('purchased_lessons', 'pre_r_lessons.id', '=', 'purchased_lessons.pre_r_lesson_id')
-                    ->groupBy('purchased_lessons.id')
-                    ->orderBy('purchased_lessons.created_at', 'DESC');
-
+                    ->groupBy('purchased_lessons.pre_r_lesson_id')
+                    ->orderByRaw('MAX(purchased_lessons.created_at) DESC');
             }
 
             return $query;
