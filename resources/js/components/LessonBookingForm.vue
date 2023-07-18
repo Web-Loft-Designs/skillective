@@ -91,24 +91,25 @@
               </span>
             </div>
 
-<!--            <div-->
-<!--              class="form-group w-50 has-feedback"-->
-<!--              :class="{ 'has-error': errors.dob }"-->
-<!--            >-->
-<!--              <label>Date of Birth</label>-->
+            <div
+              class="form-group w-50 has-feedback"
+              :class="{ 'has-error': errors.dob }"
+            >
+              <label>Date of Birth</label>
+              <dropdown-datepicker
+                v-model="fields.dob"
+                :default-date='fields.dob'
+                :max-year="2021"
+                :min-year="1940"
+                :required='true'
+                display-format="mdy"
+                submit-format="yyyy-mm-dd"
+              ></dropdown-datepicker>
 
-<!--              <dropdown-datepicker-->
-<!--                :max-year="2021"-->
-<!--                :min-year="1940"-->
-<!--                display-format="mdy"-->
-<!--                v-model="fields.dob"-->
-<!--                submit-format="yyyy-mm-dd"-->
-<!--              ></dropdown-datepicker>-->
-
-<!--              <span class="help-block" v-if="errors.dob">-->
-<!--                <strong>{{ errors.dob[0] }}</strong>-->
-<!--              </span>-->
-<!--            </div>-->
+              <span class="help-block" v-if="errors.dob">
+                <strong>{{ errors.dob[0] }}</strong>
+              </span>
+            </div>
 
 <!--            <div-->
 <!--              class="form-group w-50 has-feedback"-->
@@ -177,8 +178,8 @@
                 v-if="formReadonly == false"
                 v-model="fields.mobile_phone"
                 :class="'form-control'"
-                :placeholder="'(___) ___-____'"
-                mask="(111) 111-1111"
+                :placeholder="'(___) ___ ____'"
+                mask="(111) 111 1111"
               />
               <input
                 v-if="formReadonly == true"
@@ -575,8 +576,9 @@ export default {
       }
     },
     async onSubmitStep1() {
-      if (moment(this.fields.dob))
+      if (this.fields.dob) {
         this.fields.dob = moment(this.fields.dob).format('YYYY-MM-DD')
+      }
       await this.fetchCartTotal()
       await this.fetchCartItems()
       this.apiPost('/api/cart/validate-user-info', this.fields)
