@@ -3,7 +3,6 @@
 namespace App\Notifications\Bookings;
 
 use App\Models\CustomNotification;
-use App\Models\Booking;
 
 class BookingIn1HourNotification extends BookingNotification
 {

@@ -18,7 +18,8 @@ class RegularNotification extends Model
         'status',
         'message',
         'sended_at',
-        'lesson_id'
+        'lesson_id',
+        'date_send_time_utc'
     ];
 
     protected $table = 'regular_notification';
