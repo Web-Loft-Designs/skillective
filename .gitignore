@@ -38,3 +38,4 @@ package.json
 /public/storage
 /database/seeds/TestSeeder.php
 composer.lock
+/htdocs
