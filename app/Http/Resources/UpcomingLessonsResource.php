@@ -33,8 +33,8 @@ class UpcomingLessonsResource extends JsonResource
                     'image' => $this->instructor->profile->getImageUrl(),
                 ]
             ],
-            'start'=> $this->start,
-            'end'=> $this->end,
+            'start'=> $this->start->format('Y-m-d H:i:s'),
+            'end'=> $this->end->format('Y-m-d H:i:s'),
             'timezone_id' => getTimezoneAbbrev($this->timezone_id),
             'timezone_id_name' => $this->timezone_id,
             'spots_count'=> $this->spots_count,

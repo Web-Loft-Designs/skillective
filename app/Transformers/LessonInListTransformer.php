@@ -51,8 +51,8 @@ class LessonInListTransformer extends TransformerAbstract
 //					'gender' => $model->instructor->profile->gender,
 				]
 			],
-			'start'=> $model->start,
-			'end'=> $model->end,
+			'start'=> $model->start->format('Y-m-d H:i:s'),
+			'end'=> $model->end->format('Y-m-d H:i:s'),
 			'timezone_id' => getTimezoneAbbrev($model->timezone_id),
             'timezone_id_name' => $model->timezone_id,
 			'spots_count'=> $model->spots_count,
