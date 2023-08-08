@@ -72,6 +72,8 @@ import AnimLoader from '../../cart/AnimLoader/AnimLoader.vue'
 import lessonService from '../../../services/lessonService'
 import dateHelper from '../../../helpers/dateHelper'
 import {mapActions} from 'vuex'
+import countriesAndTimezones from "countries-and-timezones";
+import moment from "moment-timezone";
 
 export default {
   name: 'UpcomingLessonsNearYou',
@@ -125,7 +127,43 @@ export default {
     }
   },
   async mounted() {
-    this.lessons = await lessonService.upcomingNearbyLessons()
+    await lessonService.upcomingNearbyLessons()
+        .then((response) => {
+          this.lessons = response
+          this.lessons = this.lessons.map(function (item) {
+            item.title = item.genre.title
+            let userTzOffset = new Date().getTimezoneOffset() * 60 * 1000
+            let lessonTimeZoneObj = countriesAndTimezones.getTimezone(item.timezone_id_name)
+            let jan = new Date(0, 1)
+            let jul = new Date(6, 1)
+            let stdTimezoneOffset = Math.max(
+                jan.getTimezoneOffset(),
+                jul.getTimezoneOffset()
+            )
+            let today = new Date()
+            let isDstObserved = false
+            if (today.getTimezoneOffset() < stdTimezoneOffset) isDstObserved = true
+            let _tzOffset = 1
+            isDstObserved
+                ? _tzOffset = lessonTimeZoneObj.dstOffset * 60 * 1000
+                : _tzOffset = lessonTimeZoneObj.utcOffset * 60 * 1000
+            let dummyStart =
+                new Date(item.start.replace(/\s/, 'T')).getTime() -
+                userTzOffset -
+                _tzOffset
+            item.start = moment(dummyStart).format('YYYY-MM-DD HH:mm:ss')
+            let dummyEnd =
+                new Date(item.end.replace(/\s/, 'T')).getTime() -
+                userTzOffset -
+                _tzOffset
+            item.end = moment(dummyEnd).format('YYYY-MM-DD HH:mm:ss')
+            item.date = moment(item.start).format('YYYY-MM-DD')
+            return item
+          })
+          this.lessons = this.lessons.filter(function (item) {
+            return moment().diff(item.end) <= 0
+          })
+        })
     this.isLoading = false
   },
   watch: {
