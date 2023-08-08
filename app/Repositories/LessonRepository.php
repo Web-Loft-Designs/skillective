@@ -2,11 +2,13 @@
 
 namespace App\Repositories;
 
+use App\Http\Resources\UpcomingLessonsResource;
 use App\Models\Lesson;
 use App\Models\Booking;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserGeoLocation;
+use App\Transformers\LessonInListTransformer;
 use Braintree\MerchantAccount;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -528,7 +530,6 @@ class LessonRepository extends BaseRepository
 
     /**
      * @param $ip
-     * @return array
      * @throws RepositoryException
      */
     public function upcomingNearbyLessons($ip)
@@ -616,7 +617,7 @@ class LessonRepository extends BaseRepository
                 ->with(['genre', 'instructor', 'instructor.profile', 'students'])
                 ->get();
 
-            return $upcomingNearByLessons;
+            return UpcomingLessonsResource::collection($upcomingNearByLessons);
         }
         return [];
     }

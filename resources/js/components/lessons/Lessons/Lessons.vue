@@ -79,6 +79,7 @@ import Pagination from "../../student/Pagination/Pagination.vue";
 import AnimLoader from "../../cart/AnimLoader/AnimLoader.vue";
 import lessonService from "../../../services/lessonService";
 import VScrollTo from "vue-scrollto";
+import countriesAndTimezones from "countries-and-timezones";
 
 export default {
     name: "Lessons",
@@ -155,13 +156,45 @@ export default {
                     value: "start_desc"
                 }
             ],
-            lessons: this.preloadedLessons,
             activeLesson: null,
             isLoading: false,
             pagination: {
-                currentPage: this.meta.pagination.current_page,
-                pageCount: this.meta.pagination.total_pages
-            }
+                  currentPage: this.meta.pagination.current_page,
+                  pageCount: this.meta.pagination.total_pages
+              },
+            lessons: this.preloadedLessons.map(function (item) {
+              item.title = item.genre.title;
+              let userTzOffset = new Date().getTimezoneOffset() * 60 * 1000;
+              let lessonTimeZoneObj = countriesAndTimezones.getTimezone(item.timezone_id_name)
+              var jan = new Date(0, 1);
+              var jul = new Date(6, 1);
+              var stdTimezoneOffset = Math.max(
+                  jan.getTimezoneOffset(),
+                  jul.getTimezoneOffset()
+              );
+              var today = new Date();
+              var isDstObserved = false;
+              if (today.getTimezoneOffset() < stdTimezoneOffset) {
+                isDstObserved = true;
+              }
+              var _tzOffset = 1;
+              if (isDstObserved) {
+                _tzOffset = lessonTimeZoneObj.dstOffset * 60 * 1000;
+              } else {
+                _tzOffset = lessonTimeZoneObj.utcOffset * 60 * 1000;
+              }
+              let dummyStart =
+                  new Date(item.start.replace(/\s/, "T")).getTime() -
+                  userTzOffset -
+                  _tzOffset;
+              item.start = moment(dummyStart).format("YYYY-MM-DD HH:mm:ss");
+              let dummyEnd = new Date(item.end.replace(/\s/, "T")).getTime() -
+                  userTzOffset -
+                  _tzOffset;
+              item.end = moment(dummyEnd).format("YYYY-MM-DD HH:mm:ss");
+              item.date = moment(item.start).format("YYYY-MM-DD");
+              return item;
+            })
         };
     },
     computed: {
@@ -250,13 +283,45 @@ export default {
         },
         async loadLessons(params = {}) {
             this.isLoading = true;
-            const data = await lessonService.lessons({
+            let data = await lessonService.lessons({
                 page: this.pagination.currentPage,
                 ...params
             });
             this.pagination.currentPage = data.currentPage;
             this.pagination.pageCount = data.pageCount;
-            this.lessons = data.lessons;
+            this.lessons = data.lessons.map(function (item) {
+                item.title = item.genre.title;
+                let userTzOffset = new Date().getTimezoneOffset() * 60 * 1000;
+                let lessonTimeZoneObj = countriesAndTimezones.getTimezone(item.timezone_id_name)
+                var jan = new Date(0, 1);
+                var jul = new Date(6, 1);
+                var stdTimezoneOffset = Math.max(
+                    jan.getTimezoneOffset(),
+                    jul.getTimezoneOffset()
+                );
+                var today = new Date();
+                var isDstObserved = false;
+                if (today.getTimezoneOffset() < stdTimezoneOffset) {
+                  isDstObserved = true;
+                }
+                var _tzOffset = 1;
+                if (isDstObserved) {
+                  _tzOffset = lessonTimeZoneObj.dstOffset * 60 * 1000;
+                } else {
+                  _tzOffset = lessonTimeZoneObj.utcOffset * 60 * 1000;
+                }
+                let dummyStart =
+                    new Date(item.start.replace(/\s/, "T")).getTime() -
+                    userTzOffset -
+                    _tzOffset;
+                item.start = moment(dummyStart).format("YYYY-MM-DD HH:mm:ss");
+                let dummyEnd = new Date(item.end.replace(/\s/, "T")).getTime() -
+                    userTzOffset -
+                    _tzOffset;
+                item.end = moment(dummyEnd).format("YYYY-MM-DD HH:mm:ss");
+                item.date = moment(item.start).format("YYYY-MM-DD");
+                return item;
+          });
             this.isLoading = false;
             urlHelper.updateQueryParams(
                 {
