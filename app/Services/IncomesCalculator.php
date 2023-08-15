@@ -5,17 +5,21 @@ namespace App\Services;
 use App\Repositories\LessonRepository;
 use App\Repositories\BookingRepository;
 use App\Repositories\PurchasedLessonRepository;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class IncomesCalculator
 {
 
 	private $booking_repository = null;
 	private $purchasedLessons = null;
+	private $lessonRepository = null;
 
-	public function __construct(BookingRepository $booking_repository, PurchasedLessonRepository $purshPreRLessonRepo)
+	public function __construct(BookingRepository $booking_repository, PurchasedLessonRepository $purshPreRLessonRepo, LessonRepository $lessonRepository)
 	{
 		$this->booking_repository = $booking_repository;
 		$this->purchasedLessons = $purshPreRLessonRepo;
+		$this->lessonRepository = $lessonRepository;
 	}
 
     /**
@@ -24,12 +28,14 @@ class IncomesCalculator
      */
     public function totalAmountInEscrow($instructorId)
 	{
-		$preREarned = $this->purchasedLessons->getAmountEarnedForPeriod($instructorId);
-		
-		$earnedVal = $preREarned ? array_values($preREarned)[0] : 0;
-
-		return ($this->booking_repository->totalAmountInEscrow($instructorId) + $earnedVal);
-	}
+        $user = Auth::user();
+        $incomes = $this->getInstructorIncomes($user, Carbon::now()->year, $this->booking_repository, $this->lessonRepository, $this->purchasedLessons);
+        $total = 0;
+        foreach ($incomes as $income) {
+            $total += $income['amountEarned'] + $income['amountBooked'];
+        }
+        return $total;
+    }
 
 
     /**
