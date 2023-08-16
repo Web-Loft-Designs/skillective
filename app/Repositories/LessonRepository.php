@@ -335,25 +335,24 @@ class LessonRepository extends BaseRepository
                 $request->query->set('sort', 'all');
             }
 
-
             switch ($request->get('sort')) {
                 case 'price_desc':
-                    $query->whereDate('lessons.start', '>=', $currentDate);
+                    $query->where('lessons.start', '>=', $currentDate);
                     $query->groupBy('lessons.id');
                     $query->orderBy('lessons.spot_price', 'desc');
                     break;
                 case 'price_asc':
-                    $query->whereDate('lessons.start', '>=', $currentDate);
+                    $query->where('lessons.start', '>=', $currentDate);
                     $query->groupBy('lessons.id');
                     $query->orderBy('lessons.spot_price', 'asc');
                     break;
                 case 'participants':
-                    $query->whereDate('lessons.start', '>=', $currentDate);
+                    $query->where('lessons.start', '>=', $currentDate);
                     $query->groupBy('lessons.id');
                     $query->orderBy('count_booked', 'desc');
                     break;
                 case 'date':
-                    $query->whereDate('lessons.start', '>=', $currentDate);
+                    $query->where('lessons.start', '>=', $currentDate);
                     $query->groupBy('lessons.start');
                     $query->orderBy('lessons.start', 'ASC');
                     break;
@@ -364,14 +363,13 @@ class LessonRepository extends BaseRepository
             }
             switch ($request->get('type')) {
                 case 'past':
-                    $query->whereDate('lessons.end', '<', $currentDate);
+                    $query->where('lessons.end', '<', $currentDate);
                     $query->groupBy('lessons.end');
                     $query->orderBy('lessons.end', 'desc');
                     break;
                 default:
                     break;
             }
-
 
             return $query;
         })->with(['genre', 'instructor.profile', 'instructor', 'students']);
