@@ -17,10 +17,13 @@ class InstructorRegisterController extends AppBaseController
 {
 	use RegistersUsers;
 
-	private $genreRepository = null;
+    /**
+     * @var GenreRepository
+     */
+    private GenreRepository  $genreRepository;
 
 	/** @var  UserRepository */
-	private $userRepository;
+	private UserRepository $userRepository;
 
 	/**
 	 * Create a new controller instance.
@@ -40,8 +43,8 @@ class InstructorRegisterController extends AppBaseController
      * @param InvitationRepository $invitationRepository
      * @return array
      */
-    public function remember(InstructorRegisterRequest $request, InvitationRepository $invitationRepository)
-	{
+    public function remember(InstructorRegisterRequest $request, InvitationRepository $invitationRepository): array
+    {
 		$free_instructor_registration_enabled = Setting::getValue('free_instructor_registration_enabled', 0);
 		$invitation = null;
 
@@ -55,8 +58,9 @@ class InstructorRegisterController extends AppBaseController
 				'invitation' => $invitation->invitation_token
 			]);
 		} else {
-			if ($request->filled('invitation') &&
-                ($invitation = $invitationRepository->findUserInvitation($request->input('invitation'))) == null) {
+			if ( $request->filled('invitation') &&
+                ($invitation = $invitationRepository->findUserInvitation($request->input('invitation'))) == null)
+            {
 				Flash::error('Invitation does not exist')->important();
 				return ['redirect' => route('home')];
 			}
@@ -76,6 +80,7 @@ class InstructorRegisterController extends AppBaseController
 		session()->forget('submittedInstructor');
 		session()->push('submittedInstructor', $request->all());
 
+//   формування url і перенапрвлення  на соц мережу
 		return [
             'redirect' => Socialite::driver($request->provider)
                 ->with(['redirect_uri' => route('social.instructor.registration', ['provider' => $request->provider])])

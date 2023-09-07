@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\User;
 use App\Models\Genre;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 
@@ -16,7 +16,7 @@ class InstructorRegisterRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
 		return !Auth::user();
     }
@@ -26,7 +26,7 @@ class InstructorRegisterRequest extends FormRequest
      *
      * @return array
      */
-    public function rules(Request $request)
+    public function rules(Request $request): array
     {
     	$availableGenresIds	= Genre::select('id')->get()->pluck('id')->toArray();
 
@@ -50,8 +50,8 @@ class InstructorRegisterRequest extends FormRequest
 			];
     }
 
-	public function messages()
-	{
+	public function messages(): array
+    {
 		$mesages = [
 			'accept_terms.accepted'	=> "Agree to our terms please",
 		];

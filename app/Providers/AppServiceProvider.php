@@ -270,8 +270,8 @@ class AppServiceProvider extends ServiceProvider
 		LessonRequest::observe(LessonRequestObserver::class);
 	}
 
-	private function bootIgSocialite()
-	{
+	private function bootIgSocialite(): void
+    {
 		$r = request();
 		$socialite = $this->app->make('Laravel\Socialite\Contracts\Factory');
 		$socialite->extend(

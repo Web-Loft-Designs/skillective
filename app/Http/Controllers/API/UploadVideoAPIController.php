@@ -13,7 +13,7 @@ class UploadVideoAPIController extends AppBaseController
 
     /**
      * @param Request $request
-     * @return JsonResponse|never|void
+     * @return JsonResponse|void
      */
     public function upload(Request $request)
     {
@@ -31,7 +31,7 @@ class UploadVideoAPIController extends AppBaseController
             $save_path = storage_path('app/public/videos/'.$user->id.'/');
             File::makeDirectory($save_path, 0775, true, true);
             $file->move($save_path, $filename);
-            
+
             return $this->sendResponse(config('app.url') . '/storage/' . 'videos/' . $user->id . '/' . $filename);
         }
     }

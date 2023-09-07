@@ -3,7 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>@if (isset($page_title)){{ $page_title }} | @elseif(isset($currentPage)){{ $currentPage->title }} | @endif @if (isset($settings['sitename']) && $settings['sitename'] != ''){{ $settings['sitename'] }}@else{{ config('app.name', '') }}@endif</title>
+    <title>
+        @if (isset($page_title)){{ $page_title }} | @elseif(isset($currentPage)){{ $currentPage->title }} | @endif @if (isset($settings['sitename']) && $settings['sitename'] != ''){{ $settings['sitename'] }}@else{{ config('app.name', '') }}@endif
+
+    </title>
     @if (isset($settings['favicon']) && $settings['favicon'] != '')
         <link rel="shortcut icon" href="{{ $settings['favicon'] }}">
     @endif
@@ -121,17 +124,13 @@
                     @endif
 
 
-                    @if (!Auth::user() && Cookie::get('instructorRegistered') !== null)
-                        <magnific-popup-modal-success class="panding-popup" :show="false"
-                            :config="{closeOnBgClick:true,showCloseBtn:true,enableEscapeKey:false}" ref="modalSuccess">
-                            <panding-popup :modal-window="modalSuccess"
-                                :registration-confirmation-text="'@if (isset($settings['instructor_registration_confirmation_text'])
-                                && $settings['instructor_registration_confirmation_text'])
-                                {!! $settings['instructor_registration_confirmation_text'] !!}
-                                @else{{ 'Your request is being reviewed by Skillective. You will be notified via email
-                                to complete profile once request approved.' }}@endif'">
-
-                            </panding-popup>
+                    @if (!Auth::user() && (Cookie::get('instructorRegistered') !== null))
+                        <magnific-popup-modal-success class="panding-popup" v-bind:show="false"
+                            v-bind:config="{closeOnBgClick:true,showCloseBtn:true,enableEscapeKey:false}" ref="modalSuccess">
+                            <panding-popup
+                                v-bind:modal-window="modalSuccess"
+                                registration-confirmation-text='{{ (isset($settings["instructor_registration_confirmation_text"]) && $settings["instructor_registration_confirmation_text"]) ? $settings["instructor_registration_confirmation_text"] : "Your request is being reviewed by Skillective. You will be notified via email to complete profile once request approved." }}'
+                            ></panding-popup>
                         </magnific-popup-modal-success>
                     @endif
                 </div>

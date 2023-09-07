@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Criteria\InvitationSearchCriteria;
 use App\Models\Invitation;
 use Carbon\Carbon;
+use Closure;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -36,16 +37,17 @@ class InvitationRepository extends BaseRepository
     /**
      * @return string
      */
-    public function presenter()
+    public function presenter(): string
     {
         return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
     }
 
     /**
      * @param $invitation_token
-     * @return \Closure|null
+     * @return Invitation
      */
-    public function findUserInvitation($invitation_token){
+    public function findUserInvitation($invitation_token): Invitation
+    {
 		return $this->findWhere(
 			[
 				'invitation_token' => $invitation_token,
@@ -57,7 +59,8 @@ class InvitationRepository extends BaseRepository
     /**
      * @return string
      */
-    public function getAverageInvitedInstructors(){
+    public function getAverageInvitedInstructors(): string
+    {
 		$firstInvitation = $this->model->orderBy('created_at', 'asc')->first();
 		$countMonths = Carbon::now()->diffInMonths($firstInvitation->created_at);
 		$totalInvites = $this->model->where('invited_as_instructor', 1)->count();

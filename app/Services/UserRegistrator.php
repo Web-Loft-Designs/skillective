@@ -5,6 +5,7 @@ use App\Models\User;
 use App\Models\Invitation;
 use App\Models\Profile;
 use App\Models\UserGeoLocation;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\InstructorRegisterRequest;
@@ -13,14 +14,15 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Str;
 
 
-class UserRegistrator {
+class UserRegistrator
+{
     /**
      * @param InstructorRegisterRequest $request
      * @return User
-     * @throws \Exception
+     * @throws Exception
      */
-    public function registerInstructor(InstructorRegisterRequest $request)
-	{
+    public function registerInstructor(InstructorRegisterRequest $request): User
+    {
 		$inputData = $request->all();
 		$inputData['password'] = 'skillectivefake-' . Str::random(60);
 		event(new Registered($instructor = $this->createInstructor($inputData)));
@@ -32,10 +34,10 @@ class UserRegistrator {
     /**
      * @param array $data
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
-    protected function createInstructor(array $data)
-	{
+    protected function createInstructor(array $data): mixed
+    {
 		DB::beginTransaction();
 		try {
 			$userData = [
@@ -80,7 +82,7 @@ class UserRegistrator {
 			$user->setStatus(User::STATUS_ON_REVIEW);
 
 			DB::commit();
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			DB::rollback();
 			throw $e;
 		}
@@ -92,7 +94,7 @@ class UserRegistrator {
     /**
      * @param StudentRegisterRequest $request
      * @return User
-     * @throws \Exception
+     * @throws Exception
      */
     public function registerStudent(StudentRegisterRequest $request)
 	{
@@ -106,7 +108,7 @@ class UserRegistrator {
     /**
      * @param $request
      * @return User
-     * @throws \Exception
+     * @throws Exception
      */
     public function registerInactiveStudent($request)
     {
@@ -128,7 +130,7 @@ class UserRegistrator {
      * @param array $data
      * @param $status
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     protected function createStudent(array $data, $status = null)
 	{
@@ -201,7 +203,7 @@ class UserRegistrator {
 			$user->setStatus($status);
 
 			DB::commit();
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			DB::rollback();
 			throw $e;
 		}

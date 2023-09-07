@@ -17,7 +17,7 @@ class InstructorGalleryController extends Controller
      * @param GenreRepository $genreRepository
      * @return Application|Factory|View
      */
-    public function index(GenreRepository $genreRepository)
+    public function index(GenreRepository $genreRepository): View|Factory|Application
     {
         $vars = [
             'page_title' => 'Gallery',

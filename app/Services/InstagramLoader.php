@@ -5,23 +5,29 @@ namespace App\Services;
 
 use GuzzleHttp\Client as GuzzleHttpClient;
 use GuzzleHttp\Exception\GuzzleException;
-use Http\Message\RequestFactory;
 use Illuminate\Support\Facades\Log;
 
 
 class InstagramLoader
 {
-    protected $requestFactory;
+    /**
+     * @var GuzzleHttpClient
+     */
+    protected GuzzleHttpClient $requestFactory;
 
-    public function __construct( RequestFactory $requestFactory = null)
+    /**
+     * @param GuzzleHttpClient $requestFactory
+     */
+    public function __construct(GuzzleHttpClient $requestFactory)
     {
-        $this->requestFactory = $requestFactory ?: new GuzzleHttpClient;
+        $this->requestFactory = $requestFactory;
     }
 
     /**
      * @param string $accessToken
      * @param string $instagramHandle
      * @return array
+     * @throws GuzzleException
      */
     public function getOwnRecentMediaUrls(string $accessToken, string $instagramHandle): array
     {
@@ -70,7 +76,7 @@ class InstagramLoader
      * @return mixed
      * @throws GuzzleException
      */
-    private function _makeRequest($url)
+    private function _makeRequest($url): mixed
     {
 		$response = $this->requestFactory->request( 'GET', $url);
 

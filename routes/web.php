@@ -12,6 +12,9 @@
 */
 
 
+use App\Http\Controllers\Auth\InstructorRegisterController;
+use App\Http\Controllers\Auth\SocialController;
+use App\Http\Controllers\InstructorGalleryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'HomeController@index')->name('home');
@@ -20,7 +23,7 @@ Route::get('/instructors', 'InstructorsPageController@index')->name('instructors
 Route::get('/lesson/{lesson}', 'LessonPageController@index')->name('lesson');
 
 
-Route::get('/braintree/webhook', 'BraintreeWebhookController@index'); // TODO: remove this route
+//Route::get('/braintree/webhook', 'BraintreeWebhookController@index'); // TODO: remove this route
 Route::post('/braintree/webhook', 'BraintreeWebhookController@index')->middleware(['guest']);
 
 //Auth::routes();
@@ -32,8 +35,7 @@ Route::group(['middleware'=>['guest']], function () {
 	Route::get('backend/login', 'Auth\BackendLoginController@showLoginForm')->name('login')->middleware(['rememberHttpReferer']);
 	Route::post('backend/login', 'Auth\BackendLoginController@login')->name('login');
 // Instructor registration
-	Route::get('instructor/register', 'Auth\InstructorRegisterController@showRegistrationForm')->name('instructor.register');
-//	Route::get('instructor/register/success', 'Auth\InstructorRegisterController@showSuccessPage')->name('instructor.register.success');
+	Route::get('instructor/register', [InstructorRegisterController::class, 'showRegistrationForm'])->name('instructor.register');
 	// registration via api
 // Student registration
 	Route::get('student/register', 'Auth\StudentRegisterController@showRegistrationForm')->name('student.register');
@@ -44,7 +46,6 @@ Route::group(['middleware'=>['guest']], function () {
 	Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
 	Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 	Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
-
 	Route::get('registration/finish', 'Auth\FinishRegistrationController@index')->name('registration.finish');
 });
 
@@ -56,14 +57,19 @@ Route::get('/profile/edit', 'ProfileController@edit')->name('profile.edit')->mid
 Route::get('/profile/{user?}', 'ProfileController@show')->name('profile'); // user public profile
 
 // Socialite Register Routes
-Route::get('/social/redirect/{provider}', ['as' => 'social.redirect', 'uses' => 'Auth\SocialController@getSocialRedirect']);
-Route::get('/social/handle/{provider}', ['as' => 'social.handle', 'uses' => 'Auth\SocialController@getSocialHandle']);
-Route::get('/social/{provider}/instructor/registration', ['as' => 'social.instructor.registration', 'uses' => 'Auth\SocialController@getSocialInstructorRegistration'])->middleware(['guest']);
-#Route::get('/social/ig/student/registration', ['as' => 'social.instagram.student.registration', 'uses' => 'Auth\SocialController@getSocialInstagramStudentRegistration'])->middleware(['guest']);
-Route::get('/social/ig/load-media', ['as' => 'social.instagram.media.update', 'uses' => 'Auth\SocialController@getSocialInstagramMedia'])->middleware(['role:Instructor']);
+Route::get('/social/redirect/{provider}', [SocialController::class, 'getSocialRedirect'])->name('social.redirect');
+Route::get('/social/handle/{provider}', [SocialController::class, 'getSocialHandle'])->name('social.handle');
+Route::get('/social/{provider}/instructor/registration', [SocialController::class, 'getSocialInstructorRegistration'])
+    ->name('social.instructor.registration')
+    ->middleware(['guest']);
+Route::get('/social/ig/load-media', [SocialController::class, 'getSocialInstagramMedia'])
+    ->name('social.instagram.media.update')
+    ->middleware(['role:Instructor']);
+Route::post('/social/detach/{provider}', [SocialController::class, 'detachSocial'])
+    ->middleware(['auth'])
+    ->name('social.detach');
 
 
-Route::post('/social/detach/{provider}', 'Auth\SocialController@detachSocial')->middleware(['auth'])->name('social.detach');
 Route::get('/globalshop', 'GlobalShopController@index')->name('globalshop');
 Route::get('/checkout', 'CheckoutController@index')->name('checkout');
 Route::get('/cart', 'CartController@index')->name('cart');
@@ -73,7 +79,8 @@ Route::group(['prefix' => 'instructor', 'middleware'=>['role:Instructor']], func
 	Route::get('/schedule', 'InstructorScheduleController@index')->name('instructor.schedule');
 	Route::get('/bookings', 'InstructorBookingsController@index')->name('instructor.bookings');
 	Route::get('/clients', 'InstructorClientsController@index')->name('instructor.clients');
-	Route::get('/gallery', 'InstructorGalleryController@index')->name('instructor.gallery');
+	Route::get('/gallery', [InstructorGalleryController::class,'index'])->name('instructor.gallery');
+
 
 	Route::get('/incomes', 'InstructorIncomesController@index')->name('instructor.incomes');
 	Route::get('/payouts', 'InstructorPayoutsController@index')->name('instructor.payouts');

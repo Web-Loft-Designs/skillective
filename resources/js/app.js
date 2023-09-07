@@ -579,13 +579,11 @@ var app = new Vue({
     }
 });
 
-jQuery(document).ready(function($) {
+jQuery(document).ready(function() {
     if (Cookies.get("instructorRegistered") == 1) {
         app.$refs.modalSuccess.open();
-
         Cookies.remove("instructorRegistered", {
-            path: "/",
-            domain: "." + window.location.hostname
+            path: "/"
         });
     }
 });

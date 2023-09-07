@@ -77,12 +77,13 @@ class Setting extends Model
      * @param $fromCache
      * @return mixed|string
      */
-    public static function getValue($settings_name, $defaultValue = '', $fromCache = true){
-    	if ( $fromCache && ($val = Cache::get("settings.{$settings_name}"))!=null ){
+    public static function getValue($settings_name, $defaultValue = '', $fromCache = true)
+    {
+    	if ( $fromCache && ($val = Cache::get("settings.{$settings_name}"))!=null ) {
     		return $val;
-		}else{
+		} else {
 			$row = self::where('name', $settings_name)->first();
-			if ($row){
+			if ($row) {
 				Cache::forever("settings.{$row->name}", $row->value);
 				return $row->value;
 			}

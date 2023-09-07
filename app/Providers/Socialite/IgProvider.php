@@ -9,7 +9,8 @@ use Laravel\Socialite\Two\User;
 /*
  * New Ig Basic Api
  */
-class IgProvider extends AbstractProvider implements ProviderInterface {
+class IgProvider extends AbstractProvider implements ProviderInterface
+{
 
 
 	protected $scopes = [
