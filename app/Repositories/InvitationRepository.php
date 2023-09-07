@@ -37,7 +37,7 @@ class InvitationRepository extends BaseRepository
     /**
      * @return string
      */
-    public function presenter()
+    public function presenter(): string
     {
         return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
     }
@@ -59,7 +59,8 @@ class InvitationRepository extends BaseRepository
     /**
      * @return string
      */
-    public function getAverageInvitedInstructors(){
+    public function getAverageInvitedInstructors(): string
+    {
 		$firstInvitation = $this->model->orderBy('created_at', 'asc')->first();
 		$countMonths = Carbon::now()->diffInMonths($firstInvitation->created_at);
 		$totalInvites = $this->model->where('invited_as_instructor', 1)->count();

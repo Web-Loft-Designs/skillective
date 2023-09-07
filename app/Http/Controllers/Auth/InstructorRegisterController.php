@@ -17,6 +17,7 @@ class InstructorRegisterController extends Controller
         //  цей метод формує дані для форми реєстрації і показує її  в blade
     public function showRegistrationForm(Request $request, GenreRepository $genreRepository, InvitationRepository $invitationRepository): View|Factory|Application
     {
+
 		session()->forget('invitation');
 		$initialFormData = [];
 		$vars = [];
@@ -33,14 +34,9 @@ class InstructorRegisterController extends Controller
 		$invitation = null;
 
 		if ($request->input('invitation') === 'Nc2Chuxbf83XXnjfDj') {
-
             //  ????  що за хрень ,,,???
-
 		} else {
-			if (
-				$request->filled('invitation')
-				&& ($invitation = $invitationRepository->findUserInvitation($request->input('invitation'))) == null
-			) {
+			if ($request->filled('invitation') && ($invitation = $invitationRepository->findUserInvitation($request->input('invitation'))) == null ) {
 				return abort(404);
 			}
 		}
