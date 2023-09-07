@@ -14,6 +14,7 @@
 
 use App\Http\Controllers\Auth\InstructorRegisterController;
 use App\Http\Controllers\Auth\SocialController;
+use App\Http\Controllers\InstructorGalleryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'HomeController@index')->name('home');
@@ -78,7 +79,8 @@ Route::group(['prefix' => 'instructor', 'middleware'=>['role:Instructor']], func
 	Route::get('/schedule', 'InstructorScheduleController@index')->name('instructor.schedule');
 	Route::get('/bookings', 'InstructorBookingsController@index')->name('instructor.bookings');
 	Route::get('/clients', 'InstructorClientsController@index')->name('instructor.clients');
-	Route::get('/gallery', 'InstructorGalleryController@index')->name('instructor.gallery');
+	Route::get('/gallery', [InstructorGalleryController::class,'index'])->name('instructor.gallery');
+
 
 	Route::get('/incomes', 'InstructorIncomesController@index')->name('instructor.incomes');
 	Route::get('/payouts', 'InstructorPayoutsController@index')->name('instructor.payouts');
