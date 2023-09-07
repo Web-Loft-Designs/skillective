@@ -6,15 +6,13 @@ use App\Models\CustomNotification;
 use App\Models\User;
 use App\Models\Invitation;
 //use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use NotificationChannels\Twilio\TwilioChannel;
 use App\Channels\WhatsAppChannel;
-use NotificationChannels\Twilio\TwilioSmsMessage;
 
 class InstructorRegistrationInvitation extends AbstractCustomNotification //implements ShouldQueue
 {
     /**
-     * @var \App\Models\User
+     * @var User
      */
     private $invitation;
 
@@ -62,7 +60,7 @@ class InstructorRegistrationInvitation extends AbstractCustomNotification //impl
     }
 
     /**
-     * @return \App\Models\CustomNotification
+     * @return CustomNotification
      */
     protected function getCustomNotificationClass(): CustomNotification
     {

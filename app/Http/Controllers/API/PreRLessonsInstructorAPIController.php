@@ -10,16 +10,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Repositories\PreRLessonRepository;
 use Illuminate\Support\Facades\Auth;
-use MicrosoftAzure\Storage\Blob\BlobRestProxy;
-use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
-use MicrosoftAzure\Storage\Blob\Models\CreateBlockBlobOptions;
 use getID3;
 use Prettus\Repository\Exceptions\RepositoryException;
 use Prettus\Validator\Exceptions\ValidatorException;
 
 class PreRLessonsInstructorAPIController extends AppBaseController
 {
-    private $preRLessonRepository;
+    private PreRLessonRepository $preRLessonRepository;
 
     public function __construct(PreRLessonRepository $preRLessonRepo)
     {

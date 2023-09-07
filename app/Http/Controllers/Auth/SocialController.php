@@ -64,6 +64,7 @@ class SocialController extends AppBaseController
      */
     public function getSocialHandle($provider, Request $request)
     {
+
         if ($request->get('denied') != '') {
 			Flash::error('You did not share your profile data with our social app.')->important();
             return redirect()->route('frontend.login');

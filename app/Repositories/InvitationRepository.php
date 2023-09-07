@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Criteria\InvitationSearchCriteria;
 use App\Models\Invitation;
 use Carbon\Carbon;
+use Closure;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -43,9 +44,10 @@ class InvitationRepository extends BaseRepository
 
     /**
      * @param $invitation_token
-     * @return \Closure|null
+     * @return Invitation
      */
-    public function findUserInvitation($invitation_token){
+    public function findUserInvitation($invitation_token): Invitation
+    {
 		return $this->findWhere(
 			[
 				'invitation_token' => $invitation_token,

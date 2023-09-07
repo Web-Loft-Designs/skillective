@@ -8,29 +8,15 @@ use App\Repositories\InvitationRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Cookie;
-use Prettus\Repository\Exceptions\RepositoryException;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Illuminate\Http\Request;
 use App\Models\Setting;
 
 class InstructorRegisterController extends Controller
 {
 
-    /**
-     * @param Request $request
-     * @param GenreRepository $genreRepository
-     * @param InvitationRepository $invitationRepository
-     * @return Application|Factory|View|never
-     * @throws RepositoryException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function showRegistrationForm(Request $request, GenreRepository $genreRepository, InvitationRepository $invitationRepository)
-	{
+        //  цей метод формує дані для форми реєстрації і показує її  в blade
+    public function showRegistrationForm(Request $request, GenreRepository $genreRepository, InvitationRepository $invitationRepository): View|Factory|Application
+    {
 		session()->forget('invitation');
 		$initialFormData = [];
 		$vars = [];
@@ -47,6 +33,9 @@ class InstructorRegisterController extends Controller
 		$invitation = null;
 
 		if ($request->input('invitation') === 'Nc2Chuxbf83XXnjfDj') {
+
+            //  ????  що за хрень ,,,???
+
 		} else {
 			if (
 				$request->filled('invitation')
@@ -85,14 +74,4 @@ class InstructorRegisterController extends Controller
 		return view('auth.instructor-register', $vars);
 	}
 
-    /**
-     * @return Application|Factory|View|RedirectResponse|Redirector
-     */
-    public function showSuccessPage()
-	{
-		if (Cookie::has('instructorRegistered'))
-			return view('auth.instructor-register-success');
-		else
-			return redirect(route('home'));
-	}
 }
