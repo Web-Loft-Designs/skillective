@@ -12,7 +12,10 @@ use Prettus\Repository\Exceptions\RepositoryException;
 
 class PreRLessonsAPIController extends AppBaseController
 {
-    private $preRLessonRepository;
+    /**
+     * @var PreRLessonRepository
+     */
+    private PreRLessonRepository $preRLessonRepository;
 
     public function __construct(PreRLessonRepository $preRLessonRepo)
     {
@@ -25,7 +28,7 @@ class PreRLessonsAPIController extends AppBaseController
      * @return JsonResponse
      * @throws RepositoryException
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $lessons = $this->preRLessonRepository->getPreRLessons($request);
         $this->preRLessonRepository->setPresenter("App\\Presenters\\PreRLessonInListPresenter");
@@ -38,7 +41,7 @@ class PreRLessonsAPIController extends AppBaseController
      * @param $instructor
      * @return JsonResponse
      */
-    public function getPreRecordedLessonsByInstructorId(Request $request, $instructor)
+    public function getPreRecordedLessonsByInstructorId(Request $request, $instructor): JsonResponse
     {
         $instructorLessons = PreRecordedLesson::where('instructor_id', "=", (int) $instructor)
             ->orderBy('pre_r_lessons.created_at', 'desc')

@@ -18,14 +18,16 @@ use Prettus\Repository\Exceptions\RepositoryException;
 class HomeController extends AppBaseController
 {
     /**
+     * @param Request $request
      * @param GenreRepository $genreRepository
      * @param TestimonialRepository $testimonialRepository
      * @param LessonRepository $lessonRepository
      * @param UserRepository $userRepository
+     * @param PreRLessonRepository $preRLessonRepository
      * @return Application|Factory|View
      * @throws RepositoryException
      */
-    public function index(Request $request,GenreRepository $genreRepository, TestimonialRepository $testimonialRepository, LessonRepository $lessonRepository, UserRepository $userRepository, PreRLessonRepository $preRLessonRepository)
+    public function index(Request $request,GenreRepository $genreRepository, TestimonialRepository $testimonialRepository, LessonRepository $lessonRepository, UserRepository $userRepository, PreRLessonRepository $preRLessonRepository): View|Factory|Application
     {
 		$userIpLocation = '';
 		if (!$this->currentPage) {
@@ -33,7 +35,7 @@ class HomeController extends AppBaseController
 			view()->share( 'currentPage', $this->currentPage );
 		}
         $request->query->set('lesson_type', 'pre_recorded');
-        $lessons = $preRLessonRepository->getPreRLessons($request);
+        $lessons = $preRLessonRepository->getTrendingPreRLessons($request);
         $preRLessonRepository->setPresenter("App\\Presenters\\PreRLessonInListPresenter");
         $lessons = $preRLessonRepository->presentResponse($lessons);
 
@@ -48,7 +50,6 @@ class HomeController extends AppBaseController
             'userGenres' => Auth::check() ? $userRepository->presentResponse(Auth::user()->genres)['data'] : [],
             'lessons' => $lessons
 		];
-
         return view('home', $vars);
     }
 }

@@ -37,7 +37,7 @@ class PreRLessonRepository extends BaseRepository
     /**
      * @return string
      */
-    public function presenter()
+    public function presenter(): string
     {
         return "Prettus\\Repository\\Presenter\\ModelFractalPresenter";
     }
@@ -46,7 +46,7 @@ class PreRLessonRepository extends BaseRepository
      * @param $data
      * @return mixed
      */
-    public function presentResponse($data)
+    public function presentResponse($data): mixed
     {
         return $this->presenter->present($data);
     }
@@ -57,7 +57,51 @@ class PreRLessonRepository extends BaseRepository
      * @return LengthAwarePaginator|Collection|mixed
      * @throws RepositoryException
      */
-    public function getPreRLessons($request)
+    public function getPreRLessons($request): mixed
+    {
+        $this->resetCriteria();
+        $this->resetScope();
+
+        $this->pushCriteria(new RequestCriteria($request));
+        $this->pushCriteria(new LimitOffsetCriteria($request));
+
+        if ($request->filled('instructor_name')) {
+            $this->pushCriteria(new PreRLessonFilterByInstructorNameCriteria($request->get('instructor_name')));
+        }
+        if ($request->filled('genre')) {
+            $this->pushCriteria(new PreRLessonFilterByGenreCriteria($request->get('genre')));
+        }
+        if ($request->filled('topic')) {
+            $this->pushCriteria(new PreRLessonFilterByTopicCriteria($request->get('topic')));
+        }
+
+        $this->scopeQuery(function ($query) use ($request) {
+            $query = $query->join('users', 'pre_r_lessons.instructor_id', '=', 'users.id')
+                ->leftJoin('user_genre', 'users.id', '=', 'user_genre.user_id')
+                ->leftJoin('genres', 'pre_r_lessons.genre_id', '=', 'genres.id');
+
+            if (Auth::check()) {
+                $userId = Auth::user()->id;
+                $query->select('pre_r_lessons.*')
+                    ->groupBy('pre_r_lessons.id')
+                    ->orderByRaw('CASE WHEN pre_r_lessons.genre_id IN (SELECT genre_id FROM user_genre WHERE user_id = ?) THEN 0 ELSE 1 END', [$userId]);
+            } else {
+                $query->select('pre_r_lessons.*')
+                    ->groupBy('pre_r_lessons.id')
+                    ->orderBy('pre_r_lessons.created_at', "DESC");
+            }
+
+            return $query;
+        });
+        return $this->paginate(21, ['pre_r_lessons.*']);
+    }
+
+    /**
+     * @param $request
+     * @return mixed
+     * @throws RepositoryException
+     */
+    public function getTrendingPreRLessons($request): mixed
     {
         $this->resetCriteria();
         $this->resetScope();
@@ -105,7 +149,7 @@ class PreRLessonRepository extends BaseRepository
      * @return LengthAwarePaginator|Collection|mixed
      * @throws RepositoryException
      */
-    public function getInstructorPreRLessons($request)
+    public function getInstructorPreRLessons($request): mixed
     {
         $user = Auth::user();
         $instructor_id = $user->id;

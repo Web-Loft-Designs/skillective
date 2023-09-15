@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\PreRLessonsAPIController;
 use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
@@ -82,8 +83,7 @@ Route::get('lessons/search', 'SearchLessonsAPIController@index'); // search less
 Route::get('lessons/upcoming-nearby/{lesson}', 'SearchLessonsAPIController@getSameDayUpcomingNearbyLessonLocationLessons');
 
 Route::get('pre-r-lesson', 'PreRLessonsAPIController@index');
-Route::get('pre-r-lesson/instructor/{instructor}', 'PreRLessonsAPIController@getPreRecordedLessonsByInstructorId');
-
+Route::get('/pre-r-lesson/instructor/{instructor}', [PreRLessonsAPIController::class, 'getPreRecordedLessonsByInstructorId']);
 Route::get('instructors/search', 'SearchInstructorsAPIController@index'); // search instructors
 
 Route::get('lesson/{lesson}', 'LessonsAPIController@details');

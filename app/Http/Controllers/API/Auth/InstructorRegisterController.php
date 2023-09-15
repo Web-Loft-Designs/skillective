@@ -81,6 +81,7 @@ class InstructorRegisterController extends AppBaseController
 		session()->push('submittedInstructor', $request->all());
 
 //   формування url і перенапрвлення  на соц мережу
+ 
 		return [
             'redirect' => Socialite::driver($request->provider)
                 ->with(['redirect_uri' => route('social.instructor.registration', ['provider' => $request->provider])])
