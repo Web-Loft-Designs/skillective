@@ -14,12 +14,13 @@ class GlobalShopController extends Controller
 {
 
     /**
+     * @param Request $request
      * @param GenreRepository $genreRepository
      * @param PreRLessonRepository $preRLessonRepository
      * @return Application|Factory|View
      * @throws RepositoryException
      */
-    public function index(Request $request, GenreRepository $genreRepository, PreRLessonRepository $preRLessonRepository)
+    public function index(Request $request, GenreRepository $genreRepository, PreRLessonRepository $preRLessonRepository): View|Factory|Application
     {
         $lessons = $preRLessonRepository->getPreRLessons($request);
         $preRLessonRepository->setPresenter("App\\Presenters\\PreRLessonInListPresenter");
