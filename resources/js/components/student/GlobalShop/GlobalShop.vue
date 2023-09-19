@@ -69,7 +69,7 @@ export default {
       const params = urlHelper.parseQueryParams()
       this.pagination.currentPage = pageNum
       this.loadLessons(params)
-    }
+    },
     async loadLessons(params = {}) {
       this.isLoading = true
       const data = await lessonService.preRecordedLessons({
@@ -95,7 +95,7 @@ export default {
       },
       lessons: this.preloadedLessons
     }
-  }
+  },
   async created() {
     const params = urlHelper.parseQueryParams()
     urlHelper.updateQueryParams({
