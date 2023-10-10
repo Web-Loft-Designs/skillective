@@ -189,7 +189,7 @@ export default {
       let queryParams = {}
 
       queryParams.type = this.showOnly
-      queryParams.limit = 20
+      queryParams.limit = 1000
       queryParams.sort = this.sort
 
       let getUrl =
