@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('pp_tracking_id', )->nullable()->after('finish_registration_token');
             $table->string('pp_merchant_id', )->nullable()->after('pp_tracking_id');
+            $table->string('pp_referral_id', )->nullable()->after('pp_merchant_id');
 
         });
     }

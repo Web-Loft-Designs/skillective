@@ -484,6 +484,13 @@ class UserRepository extends BaseRepository
         return false;
     }
 
+    public function updateUserPpReferralId(string $ppReferralId, int $userId): bool
+    {
+        $user = $this->find($userId);
+        $user?->update(['pp_referral_id' => $ppReferralId]);
+        return false;
+    }
+
     /**
      * @param array $data
      * @param int $userId

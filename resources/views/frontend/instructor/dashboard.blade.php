@@ -12,9 +12,10 @@
 
     <div class="dashboard-page">
         <div class="container">
-            @if(!$tax_id)
-                <tax-id-reminder-popup></tax-id-reminder-popup>
-            @endif
+{{--   З paypal це не потрібно         --}}
+{{--            @if(!$tax_id)--}}
+{{--                <tax-id-reminder-popup></tax-id-reminder-popup>--}}
+{{--            @endif--}}
             <div class="row">
 
                 @if (isset($upcomingLesson))

@@ -183,7 +183,7 @@ class ProfileController extends Controller
             $savedMerchantAccountDetails['legalName'] = Auth::user()->legal_name;
 			$vars['savedMerchantAccountDetails']  = $savedMerchantAccountDetails;
 
-
+            //  якщо був редірект з paypal обновимо дані інструктора
             if ($request->has(['merchantId', 'merchantIdInPayPal']) && ($user->pp_tracking_id && $user->pp_tracking_id == $request->merchantId)  ) {
                 $this->userRepository->updateUserPpData(
                     [
@@ -193,28 +193,9 @@ class ProfileController extends Controller
                     $user->id);
                 $user->refresh();
             }
-            if ($user->pp_tracking_id) {
-                $result = $this->payPalProcessor->getMerchantDetail($user);
-                if (isset($result['action_url'])) {
-                    $vars['ppMerchantAccount'] = [
-                        'status' => "not complete",
-                        'actionUrl' => $result['action_url'],
-                        'ppMerchantId' => null,
-                        'message' => "Integration is not complete, try again."
-                    ];
-                } else {
-                    $vars['ppMerchantAccount'] = $this->preparationPpMerchantAccount($result, $user);
-                }
 
-            } else {
-                $actionUrl = $this->payPalProcessor->getRegistrationMerchantLink($user);
-                $vars['ppMerchantAccount'] = [
-                    'status' => 'not activated',
-                    'ppMerchantId' => "",
-                    'actionUrl' => $actionUrl,
-                    'message' => ""
-                    ];
-            }
+            // отримати статус та деталі інтеграції з paypal
+            $vars['ppMerchantAccount'] = $this->payPalProcessor->getMerchantDetail($user);
 
 		}
 		if ($isAdmin) {
@@ -230,24 +211,4 @@ class ProfileController extends Controller
 
 		return view("frontend.{$template}.profile-edit", $vars);
 	}
-
-    protected function preparationPpMerchantAccount($data, $user): array
-    {
-        $this->userRepository->updateUserPpData($data, $user->id);
-
-        $status = "Active"; // Pending
-        $message = null;
-
-        if ($data['payments_receivable'] != true || $data['primary_email_confirmed'] != true ) {
-            $status = "Pending";
-            $message = "Please complete your account setup in PayPal to start receiving the payments";
-        }
-
-        return [
-            'status' => $status,
-            'ppMerchantId' => $data['merchant_id'],
-            'message' => $message
-        ];
-
-    }
 }

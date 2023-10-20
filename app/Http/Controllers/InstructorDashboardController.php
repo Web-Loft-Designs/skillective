@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\BookingRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -19,15 +18,13 @@ class InstructorDashboardController extends Controller
 {
 
     /**
-     * @param Request $request
      * @param LessonRepository $lessonRepo
      * @param GenreRepository $genreRepository
      * @param UserRepository $userRepository
-     * @param BookingRepository $bookingRepository
      * @return Application|Factory|View
      * @throws RepositoryException
      */
-    public function index(Request $request, LessonRepository $lessonRepo, GenreRepository $genreRepository, UserRepository $userRepository)
+    public function index( LessonRepository $lessonRepo, GenreRepository $genreRepository, UserRepository $userRepository): View|Factory|Application
     {
 		try{
 			$request = new Request([
@@ -47,7 +44,7 @@ class InstructorDashboardController extends Controller
 			'userGenres'	=> $genreRepository->presentResponse(Auth::user()->genres)['data'],
 			'clients'		=> $clients,
 			'bookings'		=> [], //  disabled
-            'tax_id'        => Auth::user()->tax_id
+//            'tax_id'        => Auth::user()->tax_id   // з paypal це не потрібно
         ];
 
 		$lessonRepo->setPresenter("App\\Presenters\\LessonSinglePresenter");
