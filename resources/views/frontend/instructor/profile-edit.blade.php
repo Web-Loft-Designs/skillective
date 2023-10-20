@@ -3,7 +3,6 @@
 @section('content')
     <?php
 	$loggedUserIsAdmin = ($loggedUserRole==\App\Models\User::ROLE_ADMIN);
-
 	$pageMeta = $currentPage->getAllMeta();
 	$instructor_notifications_block_description= isset($pageMeta['instructor_notifications_block_description']) ? $pageMeta['instructor_notifications_block_description'] : '';
     ?>
@@ -52,6 +51,40 @@
                                         @if( $loggedUserIsAdmin )v-bind:user-id="{{ $userProfileData['id'] }}" @endif
                                 ></profile-notifications-update-form>
                             </div>
+                                    {{-- PayPal  $ppMerchantAccount this is array --}}
+                                <div class="form-wrap" id="paypal-account-trigger">
+                                    <div dir="ltr" style="text-align: left;" trbidi="on">
+
+                                        <p class="login-box-msg">PayPal</p>
+                                        <p class="login-box">Status: {{$ppMerchantAccount['status']}}</p>
+                                        <p class="login-box">Merchant id: {{$ppMerchantAccount['ppMerchantId']}}</p>
+                                        <p class="login-box">Message:  {{$ppMerchantAccount['message']}}</p>
+
+                                        <script>
+                                            (function(d, s, id) {
+                                                let js, ref = d.getElementsByTagName[s](0);
+                                                if (!d.getElementById(id)) {
+                                                    js = d.createElement(s);
+                                                    js.id = id;
+                                                    js.async = true;
+                                                    js.src = "https://www.paypal.com/webapps/merchantboarding/js/lib/lightbox/partner.js";
+                                                    ref.parentNode.insertBefore(js, ref);
+                                                }
+                                            }(document, "script", "paypal-js"));
+                                        </script>
+
+                                        @isset($ppMerchantAccount['actionUrl'])
+                                            <button  class="btn btn-primary">
+                                                <a data-paypal-button="true"
+                                                   href="{{$ppMerchantAccount['actionUrl']}}&displayMode=minibrowser"
+                                                   target="PPFrame">
+                                                    Connect with PayPal
+                                                </a>
+                                            </button>
+                                        @endisset
+
+                                    </div>
+                                </div>
                             <div class="form-wrap" id="merchant-account-trigger">
                                 <braintree-merchant-form
                                         :saved-merchant-account-details="{{ json_encode($savedMerchantAccountDetails) }}"

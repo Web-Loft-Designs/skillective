@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Services\PayPalProcessor;
 use Braintree\MerchantAccount;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -29,12 +31,14 @@ class ProfileController extends Controller
 
 	/** @var  LessonRepository */
 	private $lessonRepository;
+    private $payPalProcessor;
 
 	public function __construct(GenreRepository $genreRepo, UserRepository $userRepo, LessonRepository $lessonRepo)
 	{
 		$this->genreRepository	= $genreRepo;
 		$this->userRepository	= $userRepo;
 		$this->lessonRepository	= $lessonRepo;
+        $this->payPalProcessor = new PayPalProcessor($userRepo);
 
 		parent::__construct();
 	}
@@ -126,8 +130,9 @@ class ProfileController extends Controller
     /**
      * @param User|null $user
      * @return Application|Factory|View|never
+     * @throws Exception
      */
-    public function edit(User $user = null)
+    public function edit(Request $request, User $user = null)
 	{
 		$isAdmin = false;
 		if (!Auth::user()->hasRole(User::ROLE_ADMIN)){
@@ -167,22 +172,57 @@ class ProfileController extends Controller
             'userGenres'	=> $this->genreRepository->presentResponse(Auth::user()->genres)['data']
 		];
 
-		if ($isInstructor){
+		if ($isInstructor) {
+
 			$savedMerchantAccountDetails = BraintreeProcessor::getMerchantAccountDetails($user);
-			// useful for local site which doesn't receive webhook notifications
+//			 useful for local site which doesn't receive webhook notifications
 			if ($savedMerchantAccountDetails!=null && $savedMerchantAccountDetails['status']=='active' && $user->bt_submerchant_status=='pending'){
 				$this->userRepository->updateUserSubMerchantStatus( $user->bt_submerchant_id, MerchantAccount::STATUS_ACTIVE );
 			}
             $savedMerchantAccountDetails['taxId'] = Auth::user()->tax_id;
             $savedMerchantAccountDetails['legalName'] = Auth::user()->legal_name;
 			$vars['savedMerchantAccountDetails']  = $savedMerchantAccountDetails;
+
+
+            if ($request->has(['merchantId', 'merchantIdInPayPal']) && ($user->pp_tracking_id && $user->pp_tracking_id == $request->merchantId)  ) {
+                $this->userRepository->updateUserPpData(
+                    [
+                        'tracking_id' => $request->merchantId,
+                        'merchant_id' => $request->merchantIdInPayPal,
+                    ],
+                    $user->id);
+                $user->refresh();
+            }
+            if ($user->pp_tracking_id) {
+                $result = $this->payPalProcessor->getMerchantDetail($user);
+                if (isset($result['action_url'])) {
+                    $vars['ppMerchantAccount'] = [
+                        'status' => "not complete",
+                        'actionUrl' => $result['action_url'],
+                        'ppMerchantId' => null,
+                        'message' => "Integration is not complete, try again."
+                    ];
+                } else {
+                    $vars['ppMerchantAccount'] = $this->preparationPpMerchantAccount($result, $user);
+                }
+
+            } else {
+                $actionUrl = $this->payPalProcessor->getRegistrationMerchantLink($user);
+                $vars['ppMerchantAccount'] = [
+                    'status' => 'not activated',
+                    'ppMerchantId' => "",
+                    'actionUrl' => $actionUrl,
+                    'message' => ""
+                    ];
+            }
+
 		}
-		if ($isAdmin){
+		if ($isAdmin) {
 			$vars['defaultMaxAllowedInstructorInvites']  = Setting::getValue('max_allowed_instructor_invites');
 			$vars['countInstructorInvitationsSent']  = $user->instructorInvitations()->count();
 			$vars['countInstructorInvitationsApplied']  = $user->instructorInvitations()->whereNotNull('invited_user_id')->count();
 		}
-		if (!$isAdmin && !$isInstructor){
+		if (!$isAdmin && !$isInstructor) {
 			$vars['clientToken'] = BraintreeProcessor::generateClientToken($user);
 			$vars['paymentMethods'] = BraintreeProcessor::getSavedCustomerPaymentMethods($user);
 			$vars['paymentEnvironment'] = config('services.braintree.environment');
@@ -190,4 +230,24 @@ class ProfileController extends Controller
 
 		return view("frontend.{$template}.profile-edit", $vars);
 	}
+
+    protected function preparationPpMerchantAccount($data, $user): array
+    {
+        $this->userRepository->updateUserPpData($data, $user->id);
+
+        $status = "Active"; // Pending
+        $message = null;
+
+        if ($data['payments_receivable'] != true || $data['primary_email_confirmed'] != true ) {
+            $status = "Pending";
+            $message = "Please complete your account setup in PayPal to start receiving the payments";
+        }
+
+        return [
+            'status' => $status,
+            'ppMerchantId' => $data['merchant_id'],
+            'message' => $message
+        ];
+
+    }
 }

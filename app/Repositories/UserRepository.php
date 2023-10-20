@@ -473,6 +473,33 @@ class UserRepository extends BaseRepository
 	}
 
     /**
+     * @param string $ppTrackingId
+     * @param int $userId
+     * @return false
+     */
+    public function updateUserPpTrackingId(string $ppTrackingId, int $userId): bool
+    {
+        $user = $this->find($userId);
+        $user?->update(['pp_tracking_id' => $ppTrackingId]);
+        return false;
+    }
+
+    /**
+     * @param array $data
+     * @param int $userId
+     * @return bool
+     */
+    public function updateUserPpData(array $data, int $userId): bool
+    {
+        $user = $this->find($userId);
+        $user?->update([
+            'pp_tracking_id' => $data['tracking_id'],
+            'pp_merchant_id' => $data['merchant_id'],
+        ]);
+        return false;
+    }
+
+    /**
      * @param $lesson
      * @return LengthAwarePaginator|Collection|mixed
      */

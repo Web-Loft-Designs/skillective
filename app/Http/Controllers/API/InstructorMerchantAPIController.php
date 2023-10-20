@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\AppBaseController;
 use Braintree\MerchantAccount;
 use App\Facades\BraintreeProcessor;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\API\BraintreeCreateMerchantRequest;
@@ -27,11 +28,6 @@ class InstructorMerchantAPIController extends AppBaseController
     }
 
 
-    /**
-     * @param BraintreeCreateMerchantRequest $request
-     * @param UserRepository $userRepository
-     * @return JsonResponse
-     */
     public function create(BraintreeCreateMerchantRequest $request, UserRepository $userRepository)
     {
 		$user = Auth::user();
@@ -75,7 +71,7 @@ class InstructorMerchantAPIController extends AppBaseController
 
                 return $this->sendResponse(BraintreeProcessor::_prepareMerchantAccountOutput($merchantAccount), 'Merchant account created and will be verified soon');
             }
-		}catch (\Exception $e){
+		}catch (Exception $e){
 			Log::info($e);
 			return $this->sendError($e->getMessage(), 400);
 		}
