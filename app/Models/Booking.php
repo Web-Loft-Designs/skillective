@@ -266,7 +266,8 @@ class Booking extends Model implements Transformable
         return number_format((float)$totalFee, 2, '.', '');
     }
 
-	public function approve(){
+	public function approve()
+    {
         $serviceFee = $this->getBookingServiceFeeAmount();
         $virtualLessonFee = $this->getBookingVirtualFeeAmount();
         $processorFee = $this->getBookingPaymentProcessingFeeAmount($this->spot_price, ( $serviceFee+$virtualLessonFee ));

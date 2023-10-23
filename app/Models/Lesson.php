@@ -262,7 +262,7 @@ class Lesson extends Model implements Transformable
      */
     public function book($user_repository, $request, $paymentMethodNonce, $student)
 	{
-		if(Auth::user() != null){
+		if(Auth::user() != null) {
 			$user_repository->updateUserData(Auth::user()->id, $request);
 		}
 		if ($paymentMethodNonce) {

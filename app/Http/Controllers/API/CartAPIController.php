@@ -5,8 +5,6 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\CartUserInfoRequest;
 use App\Http\Requests\API\CheckoutRequest;
-use App\Models\User;
-use Braintree\MerchantAccount;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -294,6 +292,7 @@ class CartAPIController extends AppBaseController
 
                 /**
                  * Approve Booking
+                 * просес покупки
                  */
                 $lesson->book($user_repository, $request, $nonce ? $nonce[$key] : "", $student)->approve();
 
@@ -331,6 +330,10 @@ class CartAPIController extends AppBaseController
                     }
                 }
 
+                /**
+                 * Approve Booking
+                 * просес покупки  preRLesson
+                 */
                 $preRLesson->purchareLesson($user_repository, $request, $nonce ? $nonce[$key] : "", $student);
             }
 
