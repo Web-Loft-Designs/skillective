@@ -10,8 +10,7 @@ use App\Models\Invitation;
 use \App\Repositories\BookingRepository;
 use Illuminate\Console\Command;
 use Faker\Generator as Faker;
-use Notification;
-
+use Illuminate\Support\Facades\Notification;
 use App\Notifications\ContactUsNotification;
 use App\Notifications\StudentRegistrationConfirmation;
 use App\Notifications\StudentMustFinishRegistration;
@@ -113,7 +112,7 @@ class SendPossibleNotificationsForTesting extends Command
 		$fakeUser->notify(new BookingCreatedStudentConfirmation($booking));
 
 		$fakeUser->notify(new BookingCreatedInstructorNotification($booking));
-		
+
 		return;
 
 		Notification::route('mail', $fakeUser->getEmail())->notify(new ContactUsNotification($contactFormData));
