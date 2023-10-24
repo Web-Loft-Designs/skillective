@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
@@ -49,7 +50,7 @@ class ForgotPasswordController extends Controller
     {
         $user = User::where('email', $request->email)->first();
         if ($user->finish_registration_token) {
-            $user->notify(new StudentMustFinishRegistration($user));
+            Notification::route('mail', $user->getEmail())->notify(new StudentMustFinishRegistration($user));
             return $request->wantsJson()
                 ? new JsonResponse(['message' => 'Please check your email first and complete the registration.'], 406)
                 : back()->with('status', 'Please check your email first and complete the registration.');
