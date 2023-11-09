@@ -7,6 +7,7 @@ use App\Repositories\GenreRepository;
 use App\Repositories\UserRepository;
 use App\Facades\BraintreeProcessor;
 use App\Models\User;
+use App\Services\PayPalProcessor;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -15,6 +16,16 @@ use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends Controller
 {
+    private UserRepository $userRepository;
+    private PayPalProcessor $payPalProcessor;
+
+    public function __construct(UserRepository $userRepo)
+    {
+        $this->userRepository	= $userRepo;
+        $this->payPalProcessor = new PayPalProcessor($userRepo);
+
+        parent::__construct();
+    }
 
     /**
      * @param Request $request
@@ -38,21 +49,22 @@ class CheckoutController extends Controller
         }
 
         $vars = [
-            'page_title'    => 'Checkout',
-            'total' => $total,
-            'lessonsCount' => $lessonsInACart,
-            'user'                => $userData,
-            'siteGenres'        => $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
-            'categorizedGenres' => $genreRepository->getCategorizedGenres(),
+            'page_title'        => 'Checkout',
+            'total'             => $total,
+            'lessonsCount'      => $lessonsInACart,
+            'user'              => $userData,
+//            'siteGenres'        => $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
+//            'categorizedGenres' => $genreRepository->getCategorizedGenres(),
         ];
 
         $isStudent = ($user && $user->hasRole(User::ROLE_STUDENT));
         if (!$user || $isStudent) {
             $vars['clientToken'] = BraintreeProcessor::generateClientToken($user);
+//            $vars['clientToken'] = $this->payPalProcessor->generateClientToken($user);
             $vars['paymentEnvironment'] = config('services.braintree.environment');
             $vars['userPaymentMethods'] = $isStudent ? BraintreeProcessor::getSavedCustomerPaymentMethods($user) : [];
         }
-
+dd($vars);
         return view('frontend.checkout', $vars);
     }
 }

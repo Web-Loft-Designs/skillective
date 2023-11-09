@@ -41,6 +41,8 @@ class BraintreeProcessor
             if($user && $user->braintree_customer_id)
                 $options["customerId"] = $user->braintree_customer_id;
             $token = $this->gateway->clientToken()->generate($options);
+//            dd($options, $token);
+
             return $token;
         } catch(\InvalidArgumentException $e) {
             Log::channel('braintree')->info($e->getMessage());

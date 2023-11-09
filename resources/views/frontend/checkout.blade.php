@@ -1,19 +1,22 @@
 @extends('layouts.app-frontend')
 @section('content')
+{{--    <?php--}}
+{{--    dd('666');--}}
+{{--    ?>--}}
     <div class="dashboard-cart-page">
         <div class="container dashboard-cart">
             <div class="row">
 
                 <div class="col-12 register-banner-wrapper" style="box-shadow: none;">
                     <checkout>
-                        <lesson-booking-form 
+                        <lesson-booking-form
                             :lessons-count="{{ json_encode($lessonsCount) }}"
-                            :us-states="{{ json_encode($usStates) }}" 
+                            :us-states="{{ json_encode($usStates) }}"
                             :user="{{ json_encode($user) }}"
                             :user-payment-methods="{{ json_encode($userPaymentMethods) }}"
                             :client-token="'{{ $clientToken }}'" :payment-environment="'{{ $paymentEnvironment }}'"
-                            :categorized-genres="{{ json_encode($categorizedGenres) }}"
-                            :site-genres="{{ json_encode($siteGenres) }}"
+{{--                            :categorized-genres="{{ json_encode($categorizedGenres) }}"--}}
+{{--                            :site-genres="{{ json_encode($siteGenres) }}"--}}
                             :confirmation-text="'{{ str_replace(["\r", "\n"], '', $settings['booking_confirmation_text']) }}'">
                         </lesson-booking-form>
                     </checkout>

@@ -335,11 +335,20 @@ class PayPalProcessor
     {
         $options = [];
 
+//        dd($user);
         try {
-            if ($user && $user->braintree_customer_id)
+
+            if ($user && $user->braintree_customer_id) {
                 $options["customerId"] = $user->braintree_customer_id;
+            }
+
             $token = $this->gateway->clientToken()->generate($options);
+
+            dd($token);
+
             return $token;
+
+
         } catch (\InvalidArgumentException $e) {
             Log::channel('braintree')->info($e->getMessage());
             $user->braintree_customer_id = null;
