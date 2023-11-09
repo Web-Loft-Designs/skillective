@@ -19,7 +19,7 @@ Route::post('/add-to-client-list', 'StudentAddClientListAPIController@addToClien
 Route::post('/contact-us', 'ContactUsAPIController@send');
 Route::post('/become-instructor', 'ContactUsAPIController@becomeInstructor');
 
-Route::group(['middleware' => ['guest', 'api']], function () {
+Route::group(['middleware' => ['guest']], function () {
 
 	Route::post('login', '\App\Http\Controllers\Auth\FrontendLoginController@login')->name('frontend.login');
 	Route::post('instructor/remember', 'Auth\InstructorRegisterController@remember'); // registration in social controller after redirect
@@ -37,7 +37,7 @@ Route::get('/search/genre', 'SearchAPIController@autocompleteGenres');
 Route::get('/search/location', 'SearchAPIController@autocompleteLocations');
 Route::get('user/{user}/media', 'MediaAPIController@index');
 
-Route::group(['middleware' => ['role:Instructor|Student', 'api']], function () {
+Route::group(['middleware' => ['role:Instructor|Student']], function () {
 	Route::get('lesson-requests', 'LessonRequestAPIController@index');
 	Route::post('lesson-request/{lessonRequest}/cancel', 'LessonRequestAPIController@cancel');
 	Route::post('/invite-instructor', 'InvitationAPIController@inviteInstructor');
@@ -47,13 +47,13 @@ Route::group(['middleware' => ['role:Instructor|Student', 'api']], function () {
 	Route::get('virtual-lessons/rooms', 'VirtualLessonRoomsController@getList');
 });
 
-Route::group(['middleware' => ['role:Instructor|Student|Admin', 'api']], function () {
+Route::group(['middleware' => ['role:Instructor|Student|Admin']], function () {
 	Route::post('/send-notifications', 'NotificationsAPIController@notify');
 });
 
-Route::group(['prefix' => 'user', 'middleware' => ['role:Instructor|Student|Admin', 'api']], function () {
+Route::group(['prefix' => 'user', 'middleware' => ['role:Instructor|Student|Admin']], function () {
 
-	Route::get('', 'UserAPIController@getUserData')->middleware(['role:Instructor|Student', 'api']);
+	Route::get('', 'UserAPIController@getUserData')->middleware(['role:Instructor|Student']);
 
 	Route::post('/profile-image', 'ProfileImageAPIController@update');
 	Route::delete('/profile-image', 'ProfileImageAPIController@delete');
@@ -64,16 +64,16 @@ Route::group(['prefix' => 'user', 'middleware' => ['role:Instructor|Student|Admi
 	Route::delete('/media/{media}', 'MediaAPIController@destroy');
 
 	Route::put('/password', 'UserAPIController@updatePassword');
-	Route::put('/password/{user}', 'UserAPIController@updatePassword')->middleware(['role:Admin', 'api']);
+	Route::put('/password/{user}', 'UserAPIController@updatePassword')->middleware(['role:Admin']);
 
 	Route::put('/profile', 'UserAPIController@updateProfile');
-	Route::put('/profile/{user}', 'UserAPIController@updateProfile')->middleware(['role:Admin', 'api']); // update foreign profiles
+	Route::put('/profile/{user}', 'UserAPIController@updateProfile')->middleware(['role:Admin']); // update foreign profiles
 
 	Route::put('/notification_methods', 'UserAPIController@updateNotificationMethods');
-	Route::put('/notification_methods/{user}', 'UserAPIController@updateNotificationMethods')->middleware(['role:Admin', 'api']);
+	Route::put('/notification_methods/{user}', 'UserAPIController@updateNotificationMethods')->middleware(['role:Admin']);
 
-	Route::get('/geo-locations/{user}', 'UserGeoLocationAPIController@index')->middleware(['role:Admin', 'api']);
-	Route::put('/geo-locations/{user}', 'UserGeoLocationAPIController@update')->middleware(['role:Admin', 'api']);
+	Route::get('/geo-locations/{user}', 'UserGeoLocationAPIController@index')->middleware(['role:Admin']);
+	Route::put('/geo-locations/{user}', 'UserGeoLocationAPIController@update')->middleware(['role:Admin']);
 	Route::get('/geo-locations', 'UserGeoLocationAPIController@index');
 	Route::put('/geo-locations', 'UserGeoLocationAPIController@update');
 	Route::delete('/geo-locations/{geolocation}', 'UserGeoLocationAPIController@destroy');
@@ -93,7 +93,7 @@ Route::get('upcoming-lessons', 'LessonsAPIController@upcomingLessons');
 Route::get('instructor/{instructor}/lessons', 'InstructorLessonsAPIController@index'); // current instructor lessons
 
 
-Route::group(['middleware' => ['role:Instructor', 'api']], function () {
+Route::group(['middleware' => ['role:Instructor']], function () {
 
 	Route::post('lesson-request/{lessonRequest}/accept', 'LessonRequestAPIController@accept');
 	Route::post('instructor/uploud-video', 'UploadVideoAPIController@upload');
@@ -169,7 +169,7 @@ Route::get('cart/promo/{promo}', 'CartAPIController@checkIsPromoIsValid');
 
 Route::post('student/instructors', 'StudentInstructorsAPIController@add'); // add many
 Route::post('cart/validate-user-info', 'CartAPIController@validateUserData');
-Route::group(['middleware' => ['role:Student', 'api']], function () {
+Route::group(['middleware' => ['role:Student']], function () {
 	Route::post('cart', 'CartAPIController@store');
 	Route::delete('cart/{cart}', 'CartAPIController@delete');
 
@@ -214,12 +214,12 @@ Route::get('featured-instructors', 'InstructorsAPIController@getFeaturedInstruct
 Route::get('relation-instructors/{instructor}', 'InstructorsAPIController@getRelationInstructors'); // get relation instructors
 
 
-Route::group(['middleware' => ['role:Admin|Instructor', 'api']], function () {
+Route::group(['middleware' => ['role:Admin|Instructor']], function () {
 	Route::delete('lesson/{lesson}', 'LessonsAPIController@cancel');
 	Route::post('lessons/cancel', 'LessonsAPIController@cancelMany');
 });
 
-Route::group(['prefix' => 'admin', 'middleware' => ['role:Admin', 'api']], function () {
+Route::group(['prefix' => 'admin', 'middleware' => ['role:Admin']], function () {
 
 	Route::put('/profile', 'Backend\AdminProfileAPIController@updateProfile');
 
