@@ -500,8 +500,8 @@ class UserRepository extends BaseRepository
     {
         $user = $this->find($userId);
         $user?->update([
-            'pp_tracking_id' => $data['tracking_id'],
             'pp_merchant_id' => $data['merchant_id'],
+            'pp_account_status' => $data['account_status'],
         ]);
         return false;
     }

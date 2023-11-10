@@ -85,13 +85,13 @@
 
                                     </div>
                                 </div>
-                            <div class="form-wrap" id="merchant-account-trigger">
-                                <braintree-merchant-form
-                                        :saved-merchant-account-details="{{ json_encode($savedMerchantAccountDetails) }}"
-                                        v-bind:us-states="{{  json_encode($usStates) }}"
-                                        v-bind:is-admin-form="{{ $loggedUserIsAdmin ? 'true' : 'false' }}"
-                                ></braintree-merchant-form>
-                            </div>
+{{--                            <div class="form-wrap" id="merchant-account-trigger">--}}
+{{--                                <braintree-merchant-form--}}
+{{--                                        :saved-merchant-account-details="{{ json_encode($savedMerchantAccountDetails) }}"--}}
+{{--                                        v-bind:us-states="{{  json_encode($usStates) }}"--}}
+{{--                                        v-bind:is-admin-form="{{ $loggedUserIsAdmin ? 'true' : 'false' }}"--}}
+{{--                                ></braintree-merchant-form>--}}
+{{--                            </div>--}}
                             <div class="form-wrap" id="password-change-trigger">
                                 <profile-password-change
                                         @if( $loggedUserIsAdmin )v-bind:user-id="{{ $userProfileData['id'] }}" @endif

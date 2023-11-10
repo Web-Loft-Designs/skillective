@@ -51,7 +51,7 @@ class User extends Authenticatable implements HasMedia, Transformable
 	 * @var array
 	 */
 	protected $fillable = [
-		'first_name', 'last_name', 'email', 'password', 'accepted_invitation_id', 'tax_id', 'legal_name','pp_tracking_id','pp_merchant_id','pp_referral_id'
+		'first_name', 'last_name', 'email', 'password', 'accepted_invitation_id', 'tax_id', 'legal_name','pp_tracking_id','pp_merchant_id','pp_referral_id','pp_account_status'
 	];
 
 	/**
