@@ -1,7 +1,7 @@
 @extends('layouts.app-frontend')
 @section('content')
 {{--    <?php--}}
-{{--    dd('666');--}}
+{{--    dd($ppClientToken, $ppMerchantId);--}}
 {{--    ?>--}}
     <div class="dashboard-cart-page">
         <div class="container dashboard-cart">
@@ -14,14 +14,12 @@
                             :us-states="{{ json_encode($usStates) }}"
                             :user="{{ json_encode($user) }}"
                             :user-payment-methods="{{ json_encode($userPaymentMethods) }}"
-                            :client-token="'{{ $clientToken }}'" :payment-environment="'{{ $paymentEnvironment }}'"
-{{--                            :categorized-genres="{{ json_encode($categorizedGenres) }}"--}}
-{{--                            :site-genres="{{ json_encode($siteGenres) }}"--}}
+                            :client-token="'{{ $clientToken }}'"
+                            :payment-environment="'{{ $paymentEnvironment }}'"
                             :confirmation-text="'{{ str_replace(["\r", "\n"], '', $settings['booking_confirmation_text']) }}'">
                         </lesson-booking-form>
                     </checkout>
                 </div>
-
             </div>
         </div>
     </div>

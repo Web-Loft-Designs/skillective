@@ -179,8 +179,7 @@ class InstructorLessonsAPIController extends AppBaseController
         }
         $input = $this->_prepareInputData($request);
 
-        if( $input['preview'] )
-        {
+        if( $input['preview'] ) {
             $input['preview'] = basename($input['preview']);
         }
 
@@ -272,10 +271,6 @@ class InstructorLessonsAPIController extends AppBaseController
      */
     public function update($lesson, UpdateLessonAPIRequest $request)
     {
-        // when there are bookings enable updating price only
-
-        // return $this->sendError('Updating lessons disabled');
-
         $input = $this->_prepareInputData($request);
 
         /** @var Lesson $lesson */

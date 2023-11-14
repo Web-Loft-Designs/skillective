@@ -173,32 +173,17 @@ class ProfileController extends Controller
 		];
 
 		if ($isInstructor) {
-//			$savedMerchantAccountDetails = BraintreeProcessor::getMerchantAccountDetails($user);
-////			 useful for local site which doesn't receive webhook notifications
-//			if ($savedMerchantAccountDetails!=null && $savedMerchantAccountDetails['status']=='active' && $user->bt_submerchant_status=='pending'){
-//				$this->userRepository->updateUserSubMerchantStatus( $user->bt_submerchant_id, MerchantAccount::STATUS_ACTIVE );
-//			}
-//            $savedMerchantAccountDetails['taxId'] = Auth::user()->tax_id;
-//            $savedMerchantAccountDetails['legalName'] = Auth::user()->legal_name;
-//			$vars['savedMerchantAccountDetails']  = $savedMerchantAccountDetails;
-//
-//            //  якщо був редірект з paypal обновимо дані інструктора
-//            if ($request->has(['merchantId', 'merchantIdInPayPal']) && ($user->pp_tracking_id && $user->pp_tracking_id == $request->merchantId)  ) {
-//                $this->userRepository->updateUserPpData(
-//                    [
-//                        'tracking_id' => $request->merchantId,
-//                        'merchant_id' => $request->merchantIdInPayPal,
-//                    ],
-//                    $user->id);
-//                $user->refresh();
-//            }
+			$savedMerchantAccountDetails = BraintreeProcessor::getMerchantAccountDetails($user);
+			if ($savedMerchantAccountDetails!=null && $savedMerchantAccountDetails['status']=='active' && $user->bt_submerchant_status=='pending'){
+				$this->userRepository->updateUserSubMerchantStatus( $user->bt_submerchant_id, MerchantAccount::STATUS_ACTIVE );
+			}
+            $savedMerchantAccountDetails['taxId'] = Auth::user()->tax_id;
+            $savedMerchantAccountDetails['legalName'] = Auth::user()->legal_name;
+			$vars['savedMerchantAccountDetails']  = $savedMerchantAccountDetails;
 
-            if (config('paypal.mod') == 'live') {
-                $refererUrl = 'https://www.paypal.com/';
-            } else {
-                $refererUrl = 'https://www.sandbox.paypal.com/';
-            }
 
+
+            $refererUrl = PayPalProcessor::getEnvironmentUrl();
              if ($request->hasHeader('referer') &&  $request->header('referer') == $refererUrl) {
                  //перехват запиту з першого редіректа з пайпалу
                  $vars['ppMerchantAccount'] = $this->payPalProcessor->handleRegisterMerchant($request->all());
@@ -215,10 +200,15 @@ class ProfileController extends Controller
 			$vars['countInstructorInvitationsApplied']  = $user->instructorInvitations()->whereNotNull('invited_user_id')->count();
 		}
 		if (!$isAdmin && !$isInstructor) {
+
+            //  для студента  або покупця
 			$vars['clientToken'] = BraintreeProcessor::generateClientToken($user);
 			$vars['paymentMethods'] = BraintreeProcessor::getSavedCustomerPaymentMethods($user);
 			$vars['paymentEnvironment'] = config('services.braintree.environment');
+
+
 		}
+
 		return view("frontend.{$template}.profile-edit", $vars);
 	}
 }

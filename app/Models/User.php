@@ -568,9 +568,9 @@ class User extends Authenticatable implements HasMedia, Transformable
      */
     public function canAddNewLesson()
 	{
-        // перевірка чи може інструктор створити урок
+        // TODO перевірка чи може інструктор створити урок
 		return (
-           ( ($this->bt_submerchant_id != null && $this->bt_submerchant_status == 'active') || ($this->pp_merchant_id != null) )
+           ($this->pp_merchant_id != null )
 			&& ($this->hasMedia('website_images') || $this->hasMedia('instagram'))
 			&& ($this->profile->avatar != '' && $this->profile->avatar != null)
         );

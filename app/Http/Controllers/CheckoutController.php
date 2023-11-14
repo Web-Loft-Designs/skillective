@@ -53,18 +53,21 @@ class CheckoutController extends Controller
             'total'             => $total,
             'lessonsCount'      => $lessonsInACart,
             'user'              => $userData,
-//            'siteGenres'        => $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
-//            'categorizedGenres' => $genreRepository->getCategorizedGenres(),
         ];
 
         $isStudent = ($user && $user->hasRole(User::ROLE_STUDENT));
         if (!$user || $isStudent) {
             $vars['clientToken'] = BraintreeProcessor::generateClientToken($user);
-//            $vars['clientToken'] = $this->payPalProcessor->generateClientToken($user);
             $vars['paymentEnvironment'] = config('services.braintree.environment');
             $vars['userPaymentMethods'] = $isStudent ? BraintreeProcessor::getSavedCustomerPaymentMethods($user) : [];
+
+            $vars['ppMerchantId'] = PayPalProcessor::getMasterMerchatId();
+            $vars['ppClientToken'] = PayPalProcessor::getClientId();
+            $vars['ppPaymentEnvironment'] = PayPalProcessor::getEnvironment();
+            $vars['ppUserPaymentMethods'] = [];
+
         }
-dd($vars);
+
         return view('frontend.checkout', $vars);
     }
 }

@@ -1,3 +1,8 @@
+
+<?php
+//dd($ppClientToken, $ppMerchantId);
+//?>
+
 <!-- Load the client component. -->
 <script src="https://js.braintreegateway.com/web/3.57.0/js/client.min.js"></script>
 <script src="https://js.braintreegateway.com/web/3.57.0/js/hosted-fields.min.js"></script>

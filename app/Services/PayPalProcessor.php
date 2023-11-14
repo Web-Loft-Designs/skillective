@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Log;
-use phpDocumentor\Reflection\Types\Boolean;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 use Throwable;
 
@@ -30,12 +29,56 @@ class PayPalProcessor
         $this->payPalClient->getAccessToken();
     }
 
+    /**
+     * @return string
+     */
+    public static function getClientId(): string
+    {
+        if (config('paypal.mod') == 'live') {
+            $string = config('paypal.live.client_id');
+        } else {
+            $string = config('paypal.sandbox.client_id');
+        }
+        return $string;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getEnvironment(): string
+    {
+        return config('paypal.mode');
+    }
+
+    /**
+     * @return string
+     */
+    public static function getEnvironmentUrl(): string
+    {
+        if (config('paypal.mod') == 'live') {
+            $Url = 'https://www.paypal.com/';
+        } else {
+            $Url = 'https://www.sandbox.paypal.com/';
+        }
+        return $Url;
+    }
+
+    public static function getMasterMerchatId(): string
+    {
+        if (config('paypal.mod') == 'live') {
+            $string = config('paypal.live.master_partner_id');
+        } else {
+            $string = config('paypal.sandbox.master_partner_id');
+        }
+        return $string;
+    }
 
     public function getMerchantDetail($user): array
     {
         if ($user->pp_referral_id) {
             try {
-                $result = $this->payPalClient->showReferralData($user->pp_referral_id);
+                $ppMerchantId = $this->getPpMerchantId($user);
+                $result = $this->payPalClient->showReferralStatus($ppMerchantId);
                 if (isset($result['error']) && $result['error']['name'] == "USER_BUSINESS_ERROR" ) {
                     // якщо є помилка значити інструктор не проходив по попередній силці генеруємо нову силку для реєстрації
                     $data = $this->getRegistrationMerchantLink($user);
@@ -63,7 +106,6 @@ class PayPalProcessor
                 'message' => "Go to PayPal."
             ];
         }
-
         return $result;
     }
 
@@ -105,15 +147,42 @@ class PayPalProcessor
 
     }
 
+    protected function getPpMerchantId($user): string
+    {
+        if ( !$user->pp_merchant_id) {
+            try {
+                $response =  $this->payPalClient->showPartnerReferralId($user->pp_tracking_id);
+                $this->userRepository->updateUserPpMerchantId($response['merchant_id'], $user->id);
+                return $response['merchant_id'];
+
+            } catch (\Exception $e) {
+                Log::channel('paypal')->error("get getPpMerchantId for {$user->id} is fail");
+                throw new \Exception("server error");
+            }
+        } else {
+            return $user->pp_merchant_id;
+        }
+
+    }
+
+
     protected function parseReferralStatus($data, $user): array
     {
 //        формування інфи для фронта Статус треба допрацювати і меседж також
-        $status = 'Active';
+        // тут можна боробити більше інфи про статус інтеграції продавця та які функції йому доступні
+
+        if($data['payments_receivable'] && $data['primary_email_confirmed']) {
+            $status = "Active";
+            $message = "Pay Pal is connected";
+        } else {
+            $status = "Pending";
+            $message = "Please complete your account setup in PayPal to start receiving the payments";
+        }
         return [
             'status' => $status,
             'ppMerchantId' => $user->pp_merchant_id,
-            'message' => "Active",
-            'activePayOutMethods' => $data['referral_data']['products']
+            'message' => $message,
+            'activePayOutMethods' => $data['products']
         ];
     }
 
