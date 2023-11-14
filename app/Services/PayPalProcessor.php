@@ -63,12 +63,22 @@ class PayPalProcessor
         return $Url;
     }
 
-    public static function getMasterMerchatId(): string
+    public static function getMasterMerchantId(): string
     {
         if (config('paypal.mod') == 'live') {
             $string = config('paypal.live.master_partner_id');
         } else {
             $string = config('paypal.sandbox.master_partner_id');
+        }
+        return $string;
+    }
+
+    public static function getBnCde(): string
+    {
+        if (config('paypal.mod') == 'live') {
+            $string = config('paypal.live.bn_code');
+        } else {
+            $string = config('paypal.sandbox.bn_code');
         }
         return $string;
     }
