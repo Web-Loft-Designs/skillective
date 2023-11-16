@@ -29,6 +29,14 @@ class PayPalProcessor
         $this->payPalClient->getAccessToken();
     }
 
+    public static function getPpAccessToken()
+    {
+        $payPalClient = new PayPalClient();
+        $response = $payPalClient->getAccessToken();
+        $token = $response['access_token'];
+//        dd($payPalClient, $response['access_token']);
+        return $token;
+    }
     /**
      * @return string
      */
@@ -89,11 +97,11 @@ class PayPalProcessor
             try {
                 $ppMerchantId = $this->getPpMerchantId($user);
                 $result = $this->payPalClient->showReferralStatus($ppMerchantId);
-                if (isset($result['error']) && $result['error']['name'] == "USER_BUSINESS_ERROR" ) {
+                if (isset($result['error']) && $result['error']['name'] == "USER_BUSINESS_ERROR") {
                     // якщо є помилка значити інструктор не проходив по попередній силці генеруємо нову силку для реєстрації
                     $data = $this->getRegistrationMerchantLink($user);
                     $result = [
-                        "actionUrl" =>$data['actionUrl'],
+                        "actionUrl" => $data['actionUrl'],
                         'status' => "Not activated",
                         'ppMerchantId' => "",
                         'message' => "Go to PayPal."
@@ -122,15 +130,15 @@ class PayPalProcessor
     public function handleRegisterMerchant($data): array
     {
         if (isset($data['merchantId'])) {
-           $user = $this->userRepository->where('pp_tracking_id', $data['merchantId'])->first();
+            $user = $this->userRepository->where('pp_tracking_id', $data['merchantId'])->first();
             $this->userRepository->updateUserPpData(
                 [
                     'merchant_id' => $data['merchantIdInPayPal'],
                     'account_status' => $data['accountStatus']
                 ], $user->id);
 
-            if($data['permissionsGranted'] == "true" &&
-                $data['consentStatus'] == "true"     &&
+            if ($data['permissionsGranted'] == "true" &&
+                $data['consentStatus'] == "true" &&
                 $data['isEmailConfirmed'] == 'true') {
                 $status = "Active";
                 $message = "Pay Pal is connected";
@@ -159,9 +167,9 @@ class PayPalProcessor
 
     protected function getPpMerchantId($user): string
     {
-        if ( !$user->pp_merchant_id) {
+        if (!$user->pp_merchant_id) {
             try {
-                $response =  $this->payPalClient->showPartnerReferralId($user->pp_tracking_id);
+                $response = $this->payPalClient->showPartnerReferralId($user->pp_tracking_id);
                 $this->userRepository->updateUserPpMerchantId($response['merchant_id'], $user->id);
                 return $response['merchant_id'];
 
@@ -181,7 +189,7 @@ class PayPalProcessor
 //        формування інфи для фронта Статус треба допрацювати і меседж також
         // тут можна боробити більше інфи про статус інтеграції продавця та які функції йому доступні
 
-        if($data['payments_receivable'] && $data['primary_email_confirmed']) {
+        if ($data['payments_receivable'] && $data['primary_email_confirmed']) {
             $status = "Active";
             $message = "Pay Pal is connected";
         } else {
@@ -286,6 +294,40 @@ class PayPalProcessor
                 "show_add_credit_card" => true
             ]
         ];
+    }
+
+    public function createOrder($data)
+    {
+
+        $values = [
+            "intent" => "AUTHORIZE",
+            "purchase_units" => [
+                [
+                    "amount" => [
+                        "currency_code" => $this->payPalClient->getCurrency(),
+                        "value" => $data['total'],
+                    ],
+                ],
+            ],
+            'payment_source' => [
+                'paypal' => [
+                    'experience_context' => [
+                        'brand_name' => config('app.name'),
+                        'payment_method_preference' => 'UNRESTRICTED',
+                        'user_action' => 'PAY_NOW',
+                        'locale' => 'en-US',
+                        'return_url' => config('app.url') . "cart",
+                        'cancel_url' => config('app.url') . "cart",
+
+                    ]
+                ]
+            ]
+        ];
+
+        $order = $this->payPalClient->createOrder($values);
+        dd($data, $values, $order);
+
+        return $order;
     }
 
 }

@@ -525,6 +525,7 @@ export default {
       var vueComponent = this
 
       return new Promise((resolve, reject) => {
+          console.log(this.fields.cardholderName)
         this.braintreeClientInstance.tokenize(
           {
             cardholderName: this.fields.cardholderName,

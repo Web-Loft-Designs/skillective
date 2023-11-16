@@ -61,12 +61,10 @@ class CheckoutController extends Controller
             $vars['paymentEnvironment'] = config('services.braintree.environment');
             $vars['userPaymentMethods'] = $isStudent ? BraintreeProcessor::getSavedCustomerPaymentMethods($user) : [];
 
-            $vars['ppMerchantId'] = PayPalProcessor::getMasterMerchantId();
-            $vars['ppClientToken'] = PayPalProcessor::getClientId();
-            $vars['ppUserPaymentMethods'] = [];
+            $vars['ppAccessToken'] = PayPalProcessor::getPpAccessToken();
 
         }
-//dd($vars);
+
         return view('frontend.checkout', $vars);
     }
 }

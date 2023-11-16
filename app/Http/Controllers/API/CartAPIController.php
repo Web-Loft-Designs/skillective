@@ -5,7 +5,9 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\CartUserInfoRequest;
 use App\Http\Requests\API\CheckoutRequest;
+use App\Services\PayPalProcessor;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\PromoCode;
@@ -21,18 +23,24 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
-
+use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
 
 class CartAPIController extends AppBaseController
 {
 
-    private $cartRepository;
+    private CartRepository $cartRepository;
 
-    public function __construct(cartRepository $cartRepo)
+    private PayPalProcessor $palProcessor;
+    private PayPalClient $payPalClient;
+
+    public function __construct(CartRepository $cartRepo, PayPalProcessor $palProcessor)
     {
         parent::__construct();
         $this->cartRepository = $cartRepo;
+        $this->payPalClient = new PayPalClient();
+        $this->payPalClient->getAccessToken();
+        $this->palProcessor = $palProcessor;
     }
 
 
@@ -58,6 +66,7 @@ class CartAPIController extends AppBaseController
     }
 
 
+    /**
     /**
      * @return JsonResponse
      */
@@ -85,43 +94,34 @@ class CartAPIController extends AppBaseController
      */
     public function getCartSummary(Request $request)
     {
+
         $student_id = null;
         $guest_cart = $request->query('guest_cart');
         $promo_codes = $request->query('promo_codes');
         $message = null;
 
-        if (Auth::user())
-        {
+        if (Auth::user()) {
             $student_id = Auth::user()->id;
 
         }
 
-        /**
-         * Guest Cart
-         */
         $guestCart = json_decode($guest_cart, true);
-        if( count($guestCart) <> 0 )
-        {
-            if (!Auth::user())
-            {
+        if( count($guestCart) <> 0 ) {
+            if (!Auth::user()) {
                 Cookie::queue('guest_cart', $guest_cart, 84600);
             }
 
-        }else{
+        } else {
 
-            if( Cookie::has('guest_cart') )
-            {
-
+            if( Cookie::has('guest_cart') ) {
                 $guestCart = json_decode(Cookie::get('guest_cart'), true);
                 $ids = Arr::pluck($guestCart, 'lesson_id');
-
                 $cart = Cart::where('is_guest', 0)
                     ->where('student_id',  Auth::user()->id)
                     ->whereIn('lesson_id', $ids)
                     ->delete();
 
-                if( $cart )
-                {
+                if( $cart ){
                     $message = 'One or more lessons have been removed from your cart because you have already purchased them.';
                 }
 
@@ -131,7 +131,6 @@ class CartAPIController extends AppBaseController
         }
 
         $response = $this->cartRepository->getCartSummary($student_id, $guest_cart, $promo_codes, $message);
-
         return  $this->sendResponse($response);
     }
 
@@ -141,7 +140,7 @@ class CartAPIController extends AppBaseController
      * @param $promo
      * @return JsonResponse
      */
-    public function checkIsPromoIsValid(Request $request, $promo)
+    public function checkIsPromoIsValid(Request $request, $promo): JsonResponse
     {
         $promo = PromoCode::where('name', '=', $promo)->first();
 
@@ -159,49 +158,10 @@ class CartAPIController extends AppBaseController
 
 
     /**
-     * @return string
-     */
-    private function _checkForLessonAvailability()
-    {
-//         if ( $lesson->getCountFreeSpots()==0 ){
-//         	return 'No free spots left';
-//         }
-//         if ($lesson->private_for_student_id && $lesson->private_for_student_id!=Auth::id()){
-//             return 'You can\'t book this Private Lesson';
-//         }
-//         if ( $lesson->is_cancelled ){
-//         	return 'Lesson cancelled';
-//         }
-//         if ($lesson->alreadyStarted()){
-//         	return 'Lesson already started. Booking disabled.';
-//         }
-//
-//         if (!currentUserCanBook()) {
-//             return 'You have no permissions to book lessons';
-//         }
-//
-//         if (!$lesson->isBookableNowByCurrentUser()){
-//         	return 'Lesson can\'t be booked';
-//         }
-//
-//         if (config('app.env')=='prod'
-//         	&& (
-//         		$lesson->instructor->bt_submerchant_id==null
-//         		|| $lesson->instructor->bt_submerchant_status!=MerchantAccount::STATUS_ACTIVE
-//         		|| $lesson->instructor->status != User::STATUS_ACTIVE
-//         	)
-//         ){
-//         		return 'Instructor not active or doesn\'t have a merchant account';
-//         }
-        return '';
-    }
-
-
-    /**
      * @param Request $request
      * @param UserRepository $user_repository
      * @return JsonResponse
-     * @throws \Exception
+     * @throws Exception
      */
     public function checkout(Request $request, UserRepository $user_repository)
     {
@@ -354,16 +314,10 @@ class CartAPIController extends AppBaseController
     /**
      * @param CartUserInfoRequest $request
      * @return JsonResponse
+     * Перевіряємо дані користувача який купує
      */
-    public function validateUserData(CartUserInfoRequest $request)
+    public function validateUserData(CartUserInfoRequest $request): JsonResponse
     {
-        if (($error = $this->_checkForLessonAvailability()) != '') {
-            return $this->sendError($error, 400);
-        }
-
-        $settingsModel = App::make('App\Models\Setting');
-        $settingsModel->incrementValue('report_count_payment_form_views');
-
         return $this->sendResponse(false, 'User data valid');
     }
 

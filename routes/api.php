@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\CartAPIController;
 use App\Http\Controllers\API\PreRLessonsAPIController;
 use Illuminate\Support\Facades\Route;
 /*
@@ -161,14 +162,17 @@ Route::group(['middleware' => ['role:Instructor']], function () {
 	Route::get('instructor/payouts', 'InstructorPayoutsAPIController@index');
 });
 
-Route::get('cart', 'CartAPIController@index');
-Route::get('cart/has-items', 'CartAPIController@isCartHasItems');
-Route::get('cart/total', 'CartAPIController@getCartSummary');
-Route::post('cart/checkout', 'CartAPIController@checkout');
-Route::get('cart/promo/{promo}', 'CartAPIController@checkIsPromoIsValid');
+// Крзина та оплата
+Route::prefix('/cart')->group(function () {
+    Route::get('/', [CartAPIController::class, 'index']);
+    Route::get('/has-items', [CartAPIController::class, 'isCartHasItems']);
+    Route::get('/total', [CartAPIController::class, 'getCartSummary']);
+    Route::post('/checkout', [CartAPIController::class, 'checkout']);
+    Route::get('/promo/{promo}', [CartAPIController::class, 'checkIsPromoIsValid']);
+    Route::post('/validate-user-info', [CartAPIController::class, 'validateUserData']);
+});
 
 Route::post('student/instructors', 'StudentInstructorsAPIController@add'); // add many
-Route::post('cart/validate-user-info', 'CartAPIController@validateUserData');
 Route::group(['middleware' => ['role:Student']], function () {
 	Route::post('cart', 'CartAPIController@store');
 	Route::delete('cart/{cart}', 'CartAPIController@delete');

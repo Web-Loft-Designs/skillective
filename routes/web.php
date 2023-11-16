@@ -14,6 +14,7 @@
 
 use App\Http\Controllers\Auth\InstructorRegisterController;
 use App\Http\Controllers\Auth\SocialController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\GlobalShopController;
 use App\Http\Controllers\InstructorGalleryController;
 use Illuminate\Support\Facades\Route;
@@ -73,7 +74,9 @@ Route::post('/social/detach/{provider}', [SocialController::class, 'detachSocial
 
 
 Route::get('/globalshop', [GlobalShopController::class, 'index'])->name('globalshop');
-Route::get('/checkout', 'CheckoutController@index')->name('checkout');
+
+Route::get('/checkout', [CheckoutController::class, 'index' ])->name('checkout');
+
 Route::get('/cart', 'CartController@index')->name('cart');
 
 Route::group(['prefix' => 'instructor', 'middleware'=>['role:Instructor']], function () {
