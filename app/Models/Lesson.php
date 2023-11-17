@@ -265,6 +265,7 @@ class Lesson extends Model implements Transformable
 		if(Auth::user() != null) {
 			$user_repository->updateUserData(Auth::user()->id, $request);
 		}
+
 		if ($paymentMethodNonce) {
 			$device_data = $request->input('device_data', null);
 			$paymentMethod = BraintreeProcessor::createPaymentMethod($student, $paymentMethodNonce, $device_data);

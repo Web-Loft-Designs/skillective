@@ -62,6 +62,7 @@ class CheckoutController extends Controller
             $vars['userPaymentMethods'] = $isStudent ? BraintreeProcessor::getSavedCustomerPaymentMethods($user) : [];
 
             $vars['ppAccessToken'] = PayPalProcessor::getPpAccessToken();
+            $vars['ppClientToken'] = PayPalProcessor::getClientId();
 
         }
 

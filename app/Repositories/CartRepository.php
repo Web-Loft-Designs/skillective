@@ -330,9 +330,10 @@ class CartRepository extends BaseRepository
                 $response["total"] += $finishPrice + $service_fee + $processor_fee;
             }
 
-            $response['order'][] = [
+            $response['orders'][] = [
                 'cartId' => $cartItem->id,
                 'instructorId' => $cartItem->instructor_id,
+                'instructorPpId' => $cartItem->lesson->instructor->pp_merchant_id,
                 'lessonId' => $cartItem->lesson_id,
                 'preRlessonId' => $cartItem->pre_r_lesson_id
             ];
