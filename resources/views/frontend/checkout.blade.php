@@ -1,7 +1,7 @@
 @extends('layouts.app-frontend')
 @section('content')
 {{--    <?php--}}
-{{--    dd($total);--}}
+{{--    dd($total, $vaultSetupToken, $ppClientToken);--}}
 {{--    ?>--}}
     <div class="dashboard-cart-page">
         <div class="container dashboard-cart">

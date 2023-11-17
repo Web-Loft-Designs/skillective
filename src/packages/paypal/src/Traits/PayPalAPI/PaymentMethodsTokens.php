@@ -98,6 +98,7 @@ trait PaymentMethodsTokens
     public function createPaymentSetupToken(array $data)
     {
         $this->apiEndPoint = 'v3/vault/setup-tokens';
+        $this->setRequestHeader('PayPal-Request-Id', config('app.key').now()->getTimestamp());
 
         $this->options['json'] = $data;
 

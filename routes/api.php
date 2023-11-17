@@ -164,6 +164,7 @@ Route::group(['middleware' => ['role:Instructor']], function () {
 
 // Крзина та оплата
 Route::prefix('/cart')->group(function () {
+    Route::get('/vault-setup-token', [CartAPIController::class, 'getPpVaultSetupToken']);
     Route::get('/', [CartAPIController::class, 'index']);
     Route::get('/has-items', [CartAPIController::class, 'isCartHasItems']);
     Route::get('/total', [CartAPIController::class, 'getCartSummary']);

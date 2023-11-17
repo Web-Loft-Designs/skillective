@@ -29,12 +29,31 @@ class PayPalProcessor
         $this->payPalClient->getAccessToken();
     }
 
+    public static function getVaultSetupToken($user):string
+    {
+        $data = [
+            'customer' => [
+                'id' => 'customer_' . $user->id,
+                "merchant_customer_id" => $user->email
+        ],
+            'payment_source' => [
+               'card' => (object)[],
+            ]
+        ];
+
+        $payPalClient = new PayPalClient();
+        $payPalClient->getAccessToken();
+
+        $response = $payPalClient->createPaymentSetupToken($data);
+
+        return $response['id'];
+    }
+
     public static function getPpAccessToken()
     {
         $payPalClient = new PayPalClient();
         $response = $payPalClient->getAccessToken();
         $token = $response['access_token'];
-//        dd($payPalClient, $response['access_token']);
         return $token;
     }
     /**

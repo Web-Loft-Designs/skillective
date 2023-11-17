@@ -413,4 +413,17 @@ class CartAPIController extends AppBaseController
 
         return  $this->sendResponse($deletedCartItem);
     }
+
+    public function getPpVaultSetupToken()
+    {
+        if (Auth::check()) {
+            $token = PayPalProcessor::getVaultSetupToken(Auth::user());
+            return response()->json(
+                ['vaultSetupToken' => $token]
+            );
+        } else {
+            return response()->json(['message' => "Error Unauthorized"], 403);
+        }
+
+    }
 }
