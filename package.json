@@ -3,7 +3,8 @@
     "scripts": {
         "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --config=node_modules/laravel-mix/setup/webpack.config.js",
         "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --config=node_modules/laravel-mix/setup/webpack.config.js",
-        "serve": "mix watch -- --watch-options-poll=1000"
+        "serve": "mix watch -- --watch-options-poll=1000",
+        "watch": "mix watch"
     },
     "dependencies": {
         "-": "^0.0.1",
@@ -18,6 +19,7 @@
         "@ivanv/vue-collapse-transition": "^1.0.2",
         "@johmun/vue-tags-input": "^2.1.0",
         "@northwalker/vue-hotel-datepicker": "^2.0.6",
+        "@paypal/paypal-js": "^7.1.0",
         "babel-loader": "^8.2.4",
         "chart.js": "^2.8.0",
         "core-js": "^2.6.12",
