@@ -1,14 +1,13 @@
 
-{{--<?php--}}
-{{--//dd($ppClientToken, $ppMerchantId, ppBnCode);--}}
-{{--?>--}}
+{{--   <?php--}}
+{{-- dd($ppClientToken, $total, $bnCode);--}}
+{{--   ?>--}}
 
-{{--
-client-id - id нашого додатку
-merchant-id - id продавця
---}}
+<script src="https://www.paypal.com/sdk/js?
+components=buttons,card-fields&
+buyer-country=US&
+locale=en_US&
+client-id={{$ppClientToken}}&
+merchant-id=KSLFGLWLXG79G&
+currency=USD"></script>
 
-<script src="https://www.paypal.com/sdk/js?components=buttons,hosted-fields,funding-eligibility,applepay
-    &client-id={{$ppClientToken}}
-    &merchant-id=KSLFGLWLXG79G">
-</script>

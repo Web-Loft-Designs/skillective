@@ -63,6 +63,7 @@ class CheckoutController extends Controller
 
             $vars['ppAccessToken'] = PayPalProcessor::getPpAccessToken();
             $vars['ppClientToken'] = PayPalProcessor::getClientId();
+            $vars['bnCode'] = PayPalProcessor::getBnCde();
 
         }
 
