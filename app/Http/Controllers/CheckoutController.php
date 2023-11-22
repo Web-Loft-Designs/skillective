@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\PayPalProcessor;
 use App\Repositories\CartRepository;
 use App\Repositories\GenreRepository;
 use App\Repositories\UserRepository;
 use App\Facades\BraintreeProcessor;
 use App\Models\User;
-use App\Services\PayPalProcessor;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -17,13 +17,9 @@ use Illuminate\Support\Facades\Auth;
 class CheckoutController extends Controller
 {
     private UserRepository $userRepository;
-    private PayPalProcessor $payPalProcessor;
-
     public function __construct(UserRepository $userRepo)
     {
         $this->userRepository	= $userRepo;
-        $this->payPalProcessor = new PayPalProcessor($userRepo);
-
         parent::__construct();
     }
 
@@ -64,6 +60,7 @@ class CheckoutController extends Controller
             $vars['ppAccessToken'] = PayPalProcessor::getPpAccessToken();
             $vars['ppClientToken'] = PayPalProcessor::getClientId();
             $vars['bnCode'] = PayPalProcessor::getBnCde();
+            $vars['ppUserPaymentMethods'] = $isStudent ? PayPalProcessor::getSavedCustomerPaymentMethods($user) : [];
 
         }
 

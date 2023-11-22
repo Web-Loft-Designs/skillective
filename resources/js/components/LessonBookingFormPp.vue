@@ -1,60 +1,52 @@
 <template>
     <div>
-        <div id="paypal-button-container"></div>
-        <div class="card_container">
-            <form id="card-form">
-                <label for="card-number">Card Number</label>
-                <div ref="cardNumber" class="card_field"></div>
-                <div>
-                    <label for="expiration-date">Expiration Date</label>
-                    <div ref="expirationDate" class="card_field"></div>
-                </div>
-                <div>
-                    <label for="cvv">CVV</label>
-                    <div ref="cvv" class="card_field"></div>
-                </div>
-                <label for="card-holder-name">Name on Card</label>
-                <input type="text" id="card-holder-name" ref="cardHolderName" autocomplete="off" placeholder="card holder name"/>
-                <div>
-                    <label for="card-billing-address-street">Billing Address</label>
-                    <input type="text" id="card-billing-address-street" ref="billingAddressStreet" autocomplete="off" placeholder="street address"/>
-                </div>
-                <div>
-                    <label for="card-billing-address-unit">&nbsp;</label>
-                    <input type="text" id="card-billing-address-unit" ref="billingAddressUnit" autocomplete="off" placeholder="unit"/>
-                </div>
-                <div>
-                    <input type="text" id="card-billing-address-city" ref="billingAddressCity" autocomplete="off" placeholder="city"/>
-                </div>
-                <div>
-                    <input type="text" id="card-billing-address-state" ref="billingAddressState" autocomplete="off" placeholder="state"/>
-                </div>
-                <div>
-                    <input type="text" id="card-billing-address-zip" ref="billingAddressZip" autocomplete="off" placeholder="zip / postal code"/>
-                </div>
-                <div>
-                    <input type="text" id="card-billing-address-country" ref="billingAddressCountry" autocomplete="off" placeholder="country code" />
-                </div>
-                <br/><br/>
-                <button type="submit" class="btn">Pay</button>
-            </form>
+<!--        <div id="paypal-buttons-container"></div>-->
+        <!-- Advanced credit and debit card payments form -->
+        <div class='card_container'>
+            <div align="center"> or </div>
+            <div id='card-number'></div>
+            <div id='expiration-date'></div>
+            <div id='cvv'></div>
+            <div id='card-holder-name'></div>
+            <label>
+                <input type='checkbox' id='vault' name='vault' /> Vault
+            </label>
+            <br><br>
+            <button value='submit' id='submit' class='btn'>Pay</button>
         </div>
     </div>
 </template>
 
 <script>
 import { loadScript } from "@paypal/paypal-js";
-
+import siteAPI from '../mixins/siteAPI.js'
+import skillectiveHelper from "../mixins/skillectiveHelper";
 export default {
     props: {
         total: Object,
         ppClientToken: String,
     },
-
+    mixins: [siteAPI, skillectiveHelper],
     data() {
         return {
-            orderId: null,
+            order: null,
             paypal: null,
+            fields: {
+                first_name: '',
+                last_name: '',
+                email: '',
+                address: '',
+                zip: '',
+                dob: '',
+                gender: '',
+                mobile_phone: '',
+                accept_terms: false,
+                payment_method_token: null,
+                payment_method_nonce: null,
+                device_data: '',
+                lesson_type: '',
+                order: ''
+            },
         };
     },
     mounted() {
@@ -69,9 +61,9 @@ export default {
                     locale: "en_US",
                     components: ["buttons", "card-fields"],
                     merchantId: "KSLFGLWLXG79G",
-                    vault:true,
                     currency: "USD"
                 });
+                // console.log(this.paypal.cardFields.isEligible(), 'cardFields.isEligible()')
                 this.setupPaypalButtons();
             } catch (error) {
                 console.error("Failed to load the PayPal JS SDK script", error);
@@ -80,36 +72,71 @@ export default {
 
         setupPaypalButtons() {
 
-            this.paypal.Buttons({
-                createOrder: () => {
-                    // ... (Your existing createOrder logic)
-                },
-                onApprove: (data) => {
-                    this.captureOrder(data.orderID);
-                },
-            }).render("#paypal-button-container");
+            // this.paypal.Buttons({
+            //     createVaultSetupToken: async () => {
+            //         // The merchant calls their server API to generate a setup token
+            //         // and return it here as a string
+            //         const result = await fetch("api/cart/vault-setup-token", {
+            //             method: "GET",
+            //         })
+            //         return result.vaultSetupToken
+            //     },
+            //     onApprove: async ({ vaultSetupToken }) => {
+            //         return fetch("example.com/create/payment/token", { body: JSON.stringify({ vaultSetupToken }) })
+            //     },
+            //     onError: (error) => {
+            //         console.log("An error occurred: ", error)
+            //     }
+            // }).render("#paypal-buttons-container");
 
             const cardFields = paypal.CardFields({
                 createVaultSetupToken: async () => {
-                    // The merchant calls their server API to generate a setup token
-                    // and return it here as a string
-                    const result = await fetch("https://example.com/api/vault/token", {
-                        method: "POST"
+                    // отримати vaultSetupToken з нашого сервера
+                    const result = await fetch("api/cart/vault-setup-token", {
+                        method: "GET"
                     });
-                    const { id } = await result.json();
-                    return id;
+
+                    const { vaultSetupToken } = await result.json();
+                    return vaultSetupToken;
                 },
                 onApprove: async (data) => {
-                    return fetch(`https://example.com/api/vault/${data.vaultSetupToken}`, {
-                        method: "POST"
-                    });
+                    // запуск процес оплати
+                    this.fields.payment_method_nonce = data.vaultSetupToken;
+                    this.fields.order = this.total;
+                    await this.apiPost('/api/cart/checkout', {
+                        ...this.fields,
+                    })
+
                 },
                 onError: (error) => console.error('Something went wrong:', error)
             })
+
+
+            // Check eligibility and display advanced credit and debit card payments
+
+            console.log(cardFields.isEligible(), 'isEligible()')
+            if (cardFields.isEligible()) {
+                cardFields.NameField().render("#card-holder-name");
+                cardFields.NumberField().render("#card-number");
+                cardFields.ExpiryField().render("#expiration-date");
+                cardFields.CVVField().render("#cvv");
+            } else {
+                // Handle the workflow when credit and debit cards are not available
+            }
+            const submitButton = document.getElementById("submit"); submitButton.addEventListener("click", () => {
+                cardFields
+                    .submit()
+                    .then(() => {
+                        console.log("submit was successful");
+                    })
+                    .catch((error) => {
+                        console.error("submit erred:", error);
+                    });
+            });
         },
-        captureOrder(orderId) {
-            // ... (Your existing captureOrder logic)
-        },
+
+
+
     },
 };
 </script>

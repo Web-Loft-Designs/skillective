@@ -178,7 +178,6 @@ return [
 		Laracasts\Flash\FlashServiceProvider::class,
 		Prettus\Repository\Providers\RepositoryServiceProvider::class,
 		\InfyOm\Generator\InfyOmGeneratorServiceProvider::class,
-		\InfyOm\AdminLTETemplates\AdminLTETemplatesServiceProvider::class,
 		Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 		Barryvdh\Debugbar\ServiceProvider::class,
 		Spatie\Permission\PermissionServiceProvider::class,
@@ -195,6 +194,7 @@ return [
         App\Providers\TwilioVideoServiceProvider::class,
 		Maatwebsite\Excel\ExcelServiceProvider::class,
         App\Providers\BraintreeProcessorServiceProvider::class, // TODO Delete
+        App\Providers\PayPalProcessorServiceProvider::class
 
     ],
 

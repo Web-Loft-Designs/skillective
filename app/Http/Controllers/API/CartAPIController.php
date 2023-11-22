@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Facades\PayPalProcessor;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\CartUserInfoRequest;
 use App\Http\Requests\API\CheckoutRequest;
-use App\Services\PayPalProcessor;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -20,27 +20,18 @@ use App\Repositories\UserRepository;
 use App\Repositories\CartRepository;
 use App\Facades\UserRegistrator;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
-use Srmklive\PayPal\Services\PayPal as PayPalClient;
-
 
 class CartAPIController extends AppBaseController
 {
 
     private CartRepository $cartRepository;
 
-    private PayPalProcessor $palProcessor;
-    private PayPalClient $payPalClient;
-
-    public function __construct(CartRepository $cartRepo, PayPalProcessor $palProcessor)
+    public function __construct(CartRepository $cartRepo)
     {
         parent::__construct();
         $this->cartRepository = $cartRepo;
-        $this->payPalClient = new PayPalClient();
-        $this->payPalClient->getAccessToken();
-        $this->palProcessor = $palProcessor;
     }
 
 
@@ -169,9 +160,11 @@ class CartAPIController extends AppBaseController
 
         $guest_cart = $request->input('guest_cart');
         $promos = $request->input('promo_codes', []);
+        $nonce = $request->input('payment_method_nonce');
 
         $cart = [];
 
+        // отрмання даних з корзини
         if (Auth::user() == null) {
             $input = $request->except(['payment_method_token', 'payment_method_nonce']);
             $srr = new CheckoutRequest($input);
@@ -195,9 +188,7 @@ class CartAPIController extends AppBaseController
             $promo_codes[$promo->id] = $promo;
         }
 
-        $cartCount = count($cart);
 
-        $nonce = $request->input('payment_method_nonce');
         $appendedGenres = array();
 
         $discounts = [];
@@ -215,6 +206,7 @@ class CartAPIController extends AppBaseController
 
         $cartCount = count($cart);
 
+        //  початок побудови платежа для кожної позицїї в корзині
         foreach ($cart as $key => $cartItem) {
             if ($cartItem->lesson_id && !$cartItem->pre_r_lesson_id) {
                 array_push($appendedGenres, $cartItem->lesson->genre_id);
@@ -254,7 +246,13 @@ class CartAPIController extends AppBaseController
                  * Approve Booking
                  * просес покупки
                  */
-                $lesson->book($user_repository, $request, $nonce ? $nonce[$key] : "", $student)->approve();
+
+//                $booking = $lesson->book($user_repository, $request, $nonce ? $nonce[$key] : "", $student);
+//                $booking->approve();
+
+
+                $booking = $lesson->bookPp($user_repository, $request, $nonce ?? "", $student);
+                $booking->approvePp();
 
             } else {
                 array_push($appendedGenres, $cartItem->preRecordedLesson->genre_id);
@@ -414,7 +412,10 @@ class CartAPIController extends AppBaseController
         return  $this->sendResponse($deletedCartItem);
     }
 
-    public function getPpVaultSetupToken()
+    /**
+     * @return JsonResponse
+     */
+    public function getPpVaultSetupToken(): JsonResponse
     {
         if (Auth::check()) {
             $token = PayPalProcessor::getVaultSetupToken(Auth::user());

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('pp_merchant_id', )->nullable()->after('pp_tracking_id');
             $table->string('pp_referral_id', )->nullable()->after('pp_merchant_id');
             $table->string('pp_account_status', )->nullable()->after('pp_referral_id');
+            $table->string('pp_customer_id', )->nullable()->after('pp_account_status');
 
         });
     }
@@ -30,7 +31,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['pp_merchant_id','pp_tracking_id', 'pp_referral_id', 'pp_account_status']);
+            $table->dropColumn(['pp_merchant_id','pp_tracking_id', 'pp_referral_id', 'pp_account_status','pp_customer_id']);
 
         });
     }

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\PayPalProcessor;
 use App\Models\Booking;
-use App\Services\PayPalProcessor;
 use Braintree\MerchantAccount;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
@@ -31,18 +31,14 @@ class ProfileController extends Controller
 
 	/** @var  LessonRepository */
 	private $lessonRepository;
-    private $payPalProcessor;
 
 	public function __construct(GenreRepository $genreRepo, UserRepository $userRepo, LessonRepository $lessonRepo)
 	{
 		$this->genreRepository	= $genreRepo;
 		$this->userRepository	= $userRepo;
 		$this->lessonRepository	= $lessonRepo;
-        $this->payPalProcessor = new PayPalProcessor($userRepo);
-
 		parent::__construct();
 	}
-
 
     /**
      * @param User $user
@@ -186,11 +182,11 @@ class ProfileController extends Controller
             $refererUrl = PayPalProcessor::getEnvironmentUrl();
              if ($request->hasHeader('referer') &&  $request->header('referer') == $refererUrl) {
                  //перехват запиту з першого редіректа з пайпалу
-                 $vars['ppMerchantAccount'] = $this->payPalProcessor->handleRegisterMerchant($request->all());
+                 $vars['ppMerchantAccount'] = PayPalProcessor::handleRegisterMerchant($request->all());
                  // запустити флеш меседж
               } else {
                  // отримати статус та деталі інтеграції з paypal
-                 $vars['ppMerchantAccount'] = $this->payPalProcessor->getMerchantDetail($user);
+                 $vars['ppMerchantAccount'] = PayPalProcessor::getMerchantDetail($user);
              }
 
 		}

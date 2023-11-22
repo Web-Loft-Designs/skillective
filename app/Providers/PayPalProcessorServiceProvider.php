@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
-class BraintreeProcessorServiceProvider extends ServiceProvider
+class PayPalProcessorServiceProvider extends ServiceProvider
 {
     public function boot()
     {
@@ -13,7 +13,7 @@ class BraintreeProcessorServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->app->bind('BraintreeProcessor', \App\Services\BraintreeProcessor::class);
+        $this->app->bind('PayPalProcessor', \App\Services\PayPalProcessor::class);
         parent::register();
     }
 }

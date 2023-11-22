@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Repositories\UserRepository;
+use Braintree\Exception\NotFound;
 use Illuminate\Support\Facades\Log;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 use Throwable;
@@ -29,27 +31,9 @@ class PayPalProcessor
         $this->payPalClient->getAccessToken();
     }
 
-    public static function getVaultSetupToken($user):string
-    {
-        $data = [
-            'customer' => [
-                'id' => 'customer_' . $user->id,
-                "merchant_customer_id" => $user->email
-        ],
-            'payment_source' => [
-               'card' => (object)[],
-            ]
-        ];
 
-        $payPalClient = new PayPalClient();
-        $payPalClient->getAccessToken();
 
-        $response = $payPalClient->createPaymentSetupToken($data);
-
-        return $response['id'];
-    }
-
-    public static function getPpAccessToken()
+    public function getPpAccessToken()
     {
         $payPalClient = new PayPalClient();
         $response = $payPalClient->getAccessToken();
@@ -59,7 +43,7 @@ class PayPalProcessor
     /**
      * @return string
      */
-    public static function getClientId(): string
+    public function getClientId(): string
     {
         if (config('paypal.mod') == 'live') {
             $string = config('paypal.live.client_id');
@@ -72,7 +56,7 @@ class PayPalProcessor
     /**
      * @return string
      */
-    public static function getEnvironment(): string
+    public function getEnvironment(): string
     {
         return config('paypal.mode');
     }
@@ -80,7 +64,7 @@ class PayPalProcessor
     /**
      * @return string
      */
-    public static function getEnvironmentUrl(): string
+    public function getEnvironmentUrl(): string
     {
         if (config('paypal.mod') == 'live') {
             $Url = 'https://www.paypal.com/';
@@ -90,7 +74,7 @@ class PayPalProcessor
         return $Url;
     }
 
-    public static function getMasterMerchantId(): string
+    public function getMasterMerchantId(): string
     {
         if (config('paypal.mod') == 'live') {
             $string = config('paypal.live.master_partner_id');
@@ -100,7 +84,7 @@ class PayPalProcessor
         return $string;
     }
 
-    public static function getBnCde(): string
+    public function getBnCde(): string
     {
         if (config('paypal.mod') == 'live') {
             $string = config('paypal.live.bn_code');
@@ -348,5 +332,195 @@ class PayPalProcessor
 
         return $order;
     }
+
+
+    public function createSellBookingTransactionAndHoldInEscrow($subMerchantId, $paymentMethodVaultToken, $booking, $serviceFee, $expectedBrainTreeFee)
+    {
+        $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
+        $lineItems = [
+            [
+                'description' => $description,
+                'kind' => 'debit',
+                'name' => "Lesson #{$booking->lesson_id} Booking ",
+                'quantity' => 1,
+                'totalAmount' => round($booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2),
+                'unitAmount' => round( $booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2)
+            ]
+        ];
+        $options = [
+            'submitForSettlement' => true,
+            'holdInEscrow' => true,
+        ];
+
+        $studentMobilePhone = $booking->student->profile->mobile_phone;
+        $customer = [
+            'firstName' => $booking->student->first_name,
+            'lastName' => $booking->student->last_name,
+            'phone' => $studentMobilePhone,
+            'email' => $booking->student->email
+        ];
+
+        $descriptor = [
+            'name' => "instructor{$booking->instructor_id}*lesson{$booking->lesson_id}",
+            'phone' => $studentMobilePhone,
+        ];
+
+        $result = $this->gateway->transaction()->sale([
+            'merchantAccountId' => $subMerchantId,
+            'amount' => number_format((float)$booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2, '.', ''),
+            'paymentMethodToken' => $paymentMethodVaultToken,
+            'serviceFeeAmount' => number_format((float)$serviceFee + $expectedBrainTreeFee, 2, '.', ''),
+            'options' => $options,
+            'orderId' => str_pad($booking->id, 6, "0", STR_PAD_LEFT),
+            'customer' => $customer,
+            'descriptor' => $descriptor,
+            'lineItems' => $lineItems
+        ]);
+
+        if($result->success) {
+            return $result->transaction;
+        } else {
+            list($returnError, $codes) = $this->_resultErrorsForResponse($result);
+            throw new \Exception('Can\'t create transaction: ' . $returnError);
+        }
+    }
+
+
+    public function getSavedCustomerPaymentMethods(User $user)
+    {
+        return $methods = [];
+
+
+        try {
+            $c = $this->findCustomer($user);
+
+            if($c) {
+                $savedMethods = $user->paymentMethods->pluck('payment_method_token')->all();
+
+                foreach($c->paymentMethods as $pm) {
+
+                    if(!in_array($pm->token, $savedMethods)) // skip payment methods added when booking made but not added in profile
+                        continue;
+
+                    switch(get_class($pm)) {
+                        case 'Braintree\CreditCard':
+                            $methods['CreditCard'] = [
+                                'last4' => $pm->last4,
+                                'cardholderName' => $pm->cardholderName,
+                                'expirationDate' => $pm->expirationDate,
+                                'is_default' => $pm->default,
+                                'token' => $pm->token
+                            ];
+                            break;
+                        case 'Braintree\PayPalAccount':
+                            $methods['PayPalAccount'] = [
+                                'is_default' => $pm->default,
+                                'token' => $pm->token
+                            ];
+                            break;
+                        case 'Braintree\VenmoAccount':
+                            $methods['VenmoAccount'] = [
+                                'is_default' => $pm->default,
+                                'username' => $pm->username,
+                                'token' => $pm->token
+                            ];
+                            break;
+                    }
+                }
+            }
+            return $methods;
+        } catch(NotFound$e) {
+            Log::channel('braintree')->info($e->getMessage());
+            $user->braintree_customer_id = null;
+            $user->save();
+            return $methods;
+        }
+    }
+
+    public function createPaymentMethod(User $user, $paymentMethodNonce): array
+    {
+        $data = [
+            "payment_source" => [
+                "token" => [
+                    'id' => $paymentMethodNonce,
+                    'type' => "SETUP_TOKEN"
+                ]
+            ],
+            'customer' => [
+                'id' => $user->pp_customer_id
+            ],
+        ];
+
+        try {
+
+            $result = $this->payPalClient->createPaymentSourceToken($data);
+
+            if( !isset($result['error']) ) {
+
+                $paymentMethodType = $this->parseMethodType($result['payment_source']);
+
+                $this->userRepository->savePaymentMethod($user, ['token' => $result['id'] , 'type' => $paymentMethodType]);
+                return ['token' => $result['id'], 'type' => $paymentMethodType];
+            } else {
+                Log::channel('paypal')->error("create payment method for {$user->id} is fail  " . $result['error']['message']);
+                throw new \Exception('Can\'t create payment method: ' . $user->id);
+            }
+
+        } catch (\Exception $e) {
+            Log::channel('paypal')->error("create payment method for {$user->id} is fail");
+            throw new \Exception("'Can\'t create payment method for {$user->id} ");
+        }
+
+    }
+
+    public function getVaultSetupToken($user):string
+    {
+        $data = [
+            'customer' => [
+                'id' => 'customer_' . $user->id,
+                "merchant_customer_id" => $user->email,
+            ],
+            'payment_source' => [
+                'card' => (object)[],
+            ]
+        ];
+
+        try {
+
+            $response = $this->payPalClient->createPaymentSetupToken($data);
+            if ( !isset($response['error']) ) {
+                $user->pp_customer_id = $response['customer']['id'];
+                $user->save();
+                return $response['id'];
+            } else {
+                Log::channel('paypal')->error("create Payment Setup Token for {$user->id} is fail  " . $response['error']['message'] );
+                throw new \Exception("create Payment Setup Token for {$user->id} is fail");
+            }
+
+        } catch (\Exception $e) {
+            Log::channel('paypal')->error("create Payment Setup Token for {$user->id} is fail");
+            throw new \Exception("create Payment Setup Token for {$user->id} is fail");
+        }
+
+    }
+
+
+    protected function parseMethodType($data): string
+    {
+        foreach ($data as $key => $item) {
+
+            $type = match ($key) {
+                "card" => $item['brand'],
+                'paypal' => "PayPal",
+                'venmo' => 'Venmo',
+                default => "Unknown Method",
+            };
+            break;
+
+        }
+
+        return $type;
+    }
+
 
 }

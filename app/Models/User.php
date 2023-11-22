@@ -51,7 +51,13 @@ class User extends Authenticatable implements HasMedia, Transformable
 	 * @var array
 	 */
 	protected $fillable = [
-		'first_name', 'last_name', 'email', 'password', 'accepted_invitation_id', 'tax_id', 'legal_name','pp_tracking_id','pp_merchant_id','pp_referral_id','pp_account_status'
+		'first_name','last_name','email','legal_name',
+        'password', 'accepted_invitation_id','tax_id',
+        'pp_tracking_id',
+        'pp_merchant_id',
+        'pp_referral_id',
+        'pp_account_status',
+        'pp_customer_id',
 	];
 
 	/**
@@ -237,7 +243,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasMany
      */
-    public function paymentMethods()
+    public function findPaymentMethod()
 	{
 		return $this->hasMany(UserPaymentMethod::class, 'user_id', 'id');
 	}

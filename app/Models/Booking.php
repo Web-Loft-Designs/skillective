@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Facades\PayPalProcessor;
 use Braintree\MerchantAccount;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -320,4 +321,69 @@ class Booking extends Model implements Transformable
 			}
 		return true;
 	}
+
+
+    public function approvePp()
+    {
+        $serviceFee = $this->getBookingServiceFeeAmount();
+        $virtualLessonFee = $this->getBookingVirtualFeeAmount();
+        $processorFee = $this->getBookingPaymentProcessingFeeAmount($this->spot_price, ( $serviceFee+$virtualLessonFee ));
+        $totalFee = $this->getBookingTotalFeeAmount();
+
+
+        // few checks to prevent not desired transactions , just an assurance
+        if (!$this->transaction_id
+            && ($instructorMerchantId = $this->instructor->pp_merchant_id)!=null
+            && $this->instructor->pp_account_status=="BUSINESS_ACCOUNT"
+            && !$this->lesson->alreadyStarted()
+            && !$this->lesson->is_cancelled
+            && $this->status == self::STATUS_PENDING
+
+        ){
+
+//            $transaction = BraintreeProcessor::createSellBookingTransactionAndHoldInEscrow(
+//                $instructorMerchantId,
+//                $this->payment_method_token,
+//                $this,
+//                ($serviceFee + $virtualLessonFee),
+//                $processorFee
+//            );
+
+            $transaction = PayPalProcessor::createSellBookingTransactionAndHoldInEscrow(
+                $instructorMerchantId,
+                $this->payment_method_token,
+                $this,
+                ($serviceFee + $virtualLessonFee),
+                $processorFee
+            );
+
+
+            $this->transaction_id		= $transaction->id;
+            $this->transaction_status	= $transaction->status;
+            $this->transaction_created_at	= now();
+            $this->service_fee			= $serviceFee;
+            $this->processor_fee		= $processorFee;
+            $this->virtual_fee          = $virtualLessonFee;
+            $this->setStatusAttribute(self::STATUS_ESCROW);
+            $this->save();
+        }
+        else{
+            $reason = '';
+            if ($this->transaction_id)
+                $reason = "Payment already sent";
+            elseif ($this->instructor->bt_submerchant_id==null)
+                $reason = "No merchant account provided. Please check Profile settings";
+            elseif ($this->instructor->bt_submerchant_status!=MerchantAccount::STATUS_ACTIVE)
+                $reason = "Merchant account not active";
+            elseif ($this->lesson->alreadyStarted())
+                $reason = "Lesson already started";
+            elseif ($this->lesson->is_cancelled)
+                $reason = "Lesson already cancelled";
+            elseif ($this->status != self::STATUS_PENDING)
+                $reason = "It is not a pending booking";
+
+            throw new \Exception('Booking #'.$this->id.' can\'t be approved: ' . $reason, 400);
+        }
+        return true;
+    }
 }

@@ -513,6 +513,16 @@ class UserRepository extends BaseRepository
         return false;
     }
 
+    public function savePaymentMethod($user, $data): void
+    {
+
+      $user->findPaymentMethod()->create([
+            'payment_method_type' => $data['type'],
+            'payment_method_token' => $data['token']
+        ]);
+
+    }
+
     /**
      * @param $lesson
      * @return LengthAwarePaginator|Collection|mixed
