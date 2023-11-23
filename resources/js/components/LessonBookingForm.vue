@@ -605,7 +605,6 @@ export default {
         this.clearSubmittedForm()
         this.successText = null
         this.bookingStep = 3
-        this.fetchCartTotal()
         this.fetchCartItems()
         this.checkoutSuccess = true
       }

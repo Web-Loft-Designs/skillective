@@ -10,20 +10,24 @@
 
                 <div class="col-12 register-banner-wrapper" style="box-shadow: none;">
                     <checkout>
-{{--                           <lesson-booking-form--}}
-{{--                                  :lessons-count="{{ json_encode($lessonsCount) }}"--}}
-{{--                                :us-states="{{ json_encode($usStates) }}"--}}
-{{--                                :user="{{ json_encode($user) }}"--}}
-{{--                                :user-payment-methods="{{ json_encode($userPaymentMethods) }}"--}}
-{{--                                :client-token="'{{ $clientToken }}'"--}}
-{{--                                :payment-environment="'{{ $paymentEnvironment }}'"--}}
-{{--                                :confirmation-text="'{{ str_replace(["\r", "\n"], '', $settings['booking_confirmation_text']) }}'"--}}
-{{--                                :ppAccessToken = "'{{$ppAccessToken}}'">--}}
-{{--                            </lesson-booking-form>--}}
+{{--                                  Braintree              --}}
+{{--                           <lesson-booking-form --}}
+{{--                                  :lessons-count="{{ json_encode($lessonsCount) }}" --}}
+{{--                                :us-states="{{ json_encode($usStates) }}" --}}
+{{--                             +   :user="{{ json_encode($user) }}" --}}
+{{--                             +   :user-payment-methods="{{ json_encode($userPaymentMethods) }}" --}}
+{{--                                :client-token="'{{ $clientToken }}'" --}}
+{{--                                :payment-environment="'{{ $paymentEnvironment }}'" --}}
+{{--                                :confirmation-text="'{{ str_replace(["\r", "\n"], '', $settings['booking_confirmation_text']) }}'" --}}
+{{--                                :ppAccessToken = "'{{$ppAccessToken}}'"> --}}
+{{--                            </lesson-booking-form> --}}
 {{--                                  Paypal             --}}
                         <lesson-booking-form-pp
                         :total="{{json_encode($total)}}"
-                        :pp-client-token="'{{$ppClientToken}}'">
+                        :pp-client-token="'{{$ppClientToken}}'"
+                        :user-payment-methods="{{ json_encode($userPaymentMethods) }}"
+                        :user="{{ json_encode($user) }}"
+                        >
                         </lesson-booking-form-pp>
                     </checkout>
                 </div>
@@ -33,5 +37,5 @@
 @endsection
 
 @section('scripts')
-{{--      @include('frontend.partials.payment-processing-scripts')--}}
+   {{--   @include('frontend.partials.payment-processing-scripts')      Braintree              --}}
 @endsection
