@@ -421,10 +421,11 @@ class UserRepository extends BaseRepository
      * @param $userId
      * @return User
      */
-    public function getUserData($userId)
-	{
-		if (!$userId)
-			$userId = Auth::user()->id;
+    public function getUserData($userId): User
+    {
+		if (!$userId) {
+            $userId = Auth::user()->id;
+        }
 		return $this->with(['profile', 'genres', 'genres.category', 'roles'])->find($userId);
 	}
 

@@ -57,7 +57,6 @@ class CheckoutController extends Controller
             $vars['paymentEnvironment'] = config('services.braintree.environment');
             $vars['userPaymentMethods'] = $isStudent ? BraintreeProcessor::getSavedCustomerPaymentMethods($user) : [];
 
-            $vars['ppAccessToken'] = PayPalProcessor::getPpAccessToken();
             $vars['ppClientToken'] = PayPalProcessor::getClientId();
             $vars['bnCode'] = PayPalProcessor::getBnCde();
             $vars['ppUserPaymentMethods'] = $isStudent ? PayPalProcessor::getSavedCustomerPaymentMethods($user) : [];

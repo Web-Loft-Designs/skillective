@@ -386,18 +386,48 @@ class PayPalProcessor
     }
 
 
-    public function getSavedCustomerPaymentMethods(User $user)
+    public function getSavedCustomerPaymentMethods(User $user): array
     {
-
-
-    return $methods = [];
-
+        if (!$user->pp_customer_id) {
+            return [];
+        }
+        $issetTokens = $user->findPaymentMethod()->get();
+        if (!$issetTokens) {
+            return [];
+        }
 
         try {
-            $result = $this->payPalClient->setCustomerSource($user->pp_customer_id)->listPaymentSourceTokens();
+            $methods = [];
+            foreach ($issetTokens as $token) {
 
-            dd($result);
+                $result = $this->payPalClient->showPaymentSourceTokenDetails($token->payment_method_token);
+
+                foreach ($result['payment_source'] as $key => $source) {
+
+                    switch ($key) {
+                        case 'card':
+                            $item = [
+                                'payment_id' => $token->id,
+                                'type' => $key,
+                                'last_digits' => $source['last_digits'],
+                                'brand' => $source['brand'],
+                            ];
+                            break;
+                        default:
+                            $item = [
+                                'payment_id' => $token->id,
+                                'type' =>$key,
+                                'last_digits' => null,
+                                'brand' => null,
+                            ];
+                    }
+                    $methods[] = $item;
+                }
+
+            }
+
             return $methods;
+
         } catch(\Exception $e) {
             Log::channel('paypal')->error("found payment method for {$user->id} is fail");
             throw new \Exception("found payment method for {$user->id} is fail");
@@ -487,6 +517,27 @@ class PayPalProcessor
         }
 
         return $type;
+    }
+
+    protected function buildMethodsData($data)
+    {
+
+        foreach ($data as $item) {
+
+            if (!in_array($item['id'], $issetTokens)) {
+                $paymentMethodType = $this->parseMethodType($item['payment_source']);
+                $this->userRepository->savePaymentMethod($user, ['token' => $item['id'] , 'type' => $paymentMethodType]);
+            }
+
+            $method[] = [
+
+            ];
+
+            dd($data, $item['id'], $issetTokens);
+        }
+
+
+        return $method;
     }
 
 

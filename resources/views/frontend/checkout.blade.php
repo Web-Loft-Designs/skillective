@@ -1,9 +1,10 @@
 @extends('layouts.app-frontend')
 @section('content')
 
-{{--   <?php--}}
-{{-- dd($ppClientToken, $total);--}}
-{{--   ?>--}}
+   <?php
+// dd($ppClientToken, $total, $ppUserPaymentMethods);
+//    dd(\Illuminate\Support\Facades\Auth::user()->pp_customer_id);
+   ?>
     <div class="dashboard-cart-page">
         <div class="container dashboard-cart">
             <div class="row">
@@ -25,7 +26,7 @@
                         <lesson-booking-form-pp
                         :total="{{json_encode($total)}}"
                         :pp-client-token="'{{$ppClientToken}}'"
-                        :user-payment-methods="{{ json_encode($userPaymentMethods) }}"
+                        :user-payment-methods="{{ json_encode($ppUserPaymentMethods) }}"
                         :user="{{ json_encode($user) }}"
                         >
                         </lesson-booking-form-pp>
