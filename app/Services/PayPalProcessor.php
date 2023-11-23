@@ -388,52 +388,19 @@ class PayPalProcessor
 
     public function getSavedCustomerPaymentMethods(User $user)
     {
-        return $methods = [];
+
+
+    return $methods = [];
 
 
         try {
-            $c = $this->findCustomer($user);
+            $result = $this->payPalClient->setCustomerSource($user->pp_customer_id)->listPaymentSourceTokens();
 
-            if($c) {
-                $savedMethods = $user->paymentMethods->pluck('payment_method_token')->all();
-
-                foreach($c->paymentMethods as $pm) {
-
-                    if(!in_array($pm->token, $savedMethods)) // skip payment methods added when booking made but not added in profile
-                        continue;
-
-                    switch(get_class($pm)) {
-                        case 'Braintree\CreditCard':
-                            $methods['CreditCard'] = [
-                                'last4' => $pm->last4,
-                                'cardholderName' => $pm->cardholderName,
-                                'expirationDate' => $pm->expirationDate,
-                                'is_default' => $pm->default,
-                                'token' => $pm->token
-                            ];
-                            break;
-                        case 'Braintree\PayPalAccount':
-                            $methods['PayPalAccount'] = [
-                                'is_default' => $pm->default,
-                                'token' => $pm->token
-                            ];
-                            break;
-                        case 'Braintree\VenmoAccount':
-                            $methods['VenmoAccount'] = [
-                                'is_default' => $pm->default,
-                                'username' => $pm->username,
-                                'token' => $pm->token
-                            ];
-                            break;
-                    }
-                }
-            }
+            dd($result);
             return $methods;
-        } catch(NotFound$e) {
-            Log::channel('braintree')->info($e->getMessage());
-            $user->braintree_customer_id = null;
-            $user->save();
-            return $methods;
+        } catch(\Exception $e) {
+            Log::channel('paypal')->error("found payment method for {$user->id} is fail");
+            throw new \Exception("found payment method for {$user->id} is fail");
         }
     }
 
