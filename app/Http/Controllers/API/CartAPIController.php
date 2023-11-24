@@ -250,8 +250,9 @@ class CartAPIController extends AppBaseController
 //                $booking = $lesson->book($user_repository, $request, $nonce ? $nonce[$key] : "", $student);
 //                $booking->approve();
 
-
+                $nonce = null;
                 $booking = $lesson->bookPp($user_repository, $request, $nonce ?? "", $student);
+
                 $booking->approvePp();
 
             } else {

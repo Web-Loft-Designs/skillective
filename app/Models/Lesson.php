@@ -339,16 +339,17 @@ class Lesson extends Model implements Transformable
             // якщо у покупця нема жодного платіжного токену ( методу )
             $paymentMethod = PayPalProcessor::createPaymentMethod($student, $paymentMethodNonce);
         } else {
-
             // знайти збережений платіжний метод ( токен )
-            $paymentMethodToken = $request->input('payment_method_token', null);
-            $paymentMethod = PayPalProcessor::findPaymentMethod($paymentMethodToken);
+            // payment_method_token  id збереженого токену
+//            $paymentMethodToken = $request->input('payment_method_token', null);
+            $paymentMethodToken = 16;
+            $paymentMethod = UserPaymentMethod::find($paymentMethodToken);
 
-            if (!$paymentMethod || $paymentMethod->customerId != $student->braintree_customer_id) {
-                Log::error("Student {$student->id} booking : Payment method not defined");
+            if (!$paymentMethod || $paymentMethod->user_id != $student->id) {
+                Log::channel('paypal')->error("Student {$student->id} booking : Payment method not defined" );
                 throw new \Exception('Payment method not defined');
             }
-            $paymentMethod = ['token' => $paymentMethod->token, 'type' => BraintreeProcessor::_getPaymentMethodType($paymentMethod)];
+            $paymentMethod = ['token' => $paymentMethod->payment_method_token, 'type' => $paymentMethod->payment_method_type];
         }
         if (!$paymentMethod) {
             throw new \Exception('Payment method not found');
@@ -361,13 +362,14 @@ class Lesson extends Model implements Transformable
         $booking->instructor_id		= $this->instructor_id;
         $booking->student_id		= $student->id;
         $booking->status			= Booking::STATUS_PENDING;
-        $booking->payment_method_token	= $request->payment_method_token;
-        $booking->payment_method_type	= "payment_method_type";
+        $booking->payment_method_token	= $paymentMethod['token'];
+        $booking->payment_method_type	= $paymentMethod['type'];
         $service_fee = $booking->getBookingServiceFeeAmount($this->spot_price);
         $virtual_fee = $booking->getBookingVirtualFeeAmount($this);
         $booking->service_fee = $service_fee;
         $booking->virtual_fee  = $virtual_fee;
         $booking->processor_fee		= $booking->getBookingPaymentProcessingFeeAmount($this->spot_price, $service_fee + $virtual_fee);
+
         $booking->save();
 
 

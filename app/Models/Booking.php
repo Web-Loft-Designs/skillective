@@ -6,6 +6,7 @@ use App\Facades\PayPalProcessor;
 use Braintree\MerchantAccount;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use phpDocumentor\Reflection\PseudoTypes\Numeric_;
 use Prettus\Repository\Contracts\Transformable;
 use App\Facades\BraintreeProcessor;
 
@@ -209,9 +210,11 @@ class Booking extends Model implements Transformable
 	}
 
 
-	public function getBookingServiceFeeAmount($spotPrice = null){
-        if ($spotPrice==null)
+	public function getBookingServiceFeeAmount($spotPrice = null): float
+    {
+        if ($spotPrice==null) {
             $spotPrice = $this->spot_price;
+        }
 
         $serviceFeeFixed = (float)Setting::getValue('skillective_service_fee_fixed', 0); // $
         $serviceFeePercent = (float)Setting::getValue('skillective_service_fee_percent', 0); // $
@@ -223,7 +226,8 @@ class Booking extends Model implements Transformable
         return number_format((float)$serviceFee, 2, '.', '');
     }
 
-    public function getBookingPaymentProcessingFeeAmount($spotPrice = null, $serviceFees = 0){
+    public function getBookingPaymentProcessingFeeAmount($spotPrice = null, $serviceFees = 0)
+    {
 	    if ($spotPrice==null)
             $spotPrice = $this->spot_price;
 
@@ -235,7 +239,8 @@ class Booking extends Model implements Transformable
         return number_format((float)$processorFee, 2, '.', '');
     }
 
-    public function getBookingVirtualFeeAmount(Lesson $lesson = null){
+    public function getBookingVirtualFeeAmount(Lesson $lesson = null)
+    {
         if ($lesson==null)
             $lesson = $this->lesson;
 
@@ -257,7 +262,8 @@ class Booking extends Model implements Transformable
         return number_format((float)$virtualLessonFee, 2, '.', '');
     }
 
-    public function getBookingTotalFeeAmount(Lesson $lesson = null, $spotPrice = null){
+    public function getBookingTotalFeeAmount(Lesson $lesson = null, $spotPrice = null)
+    {
         $serviceFee = $this->getBookingServiceFeeAmount($spotPrice);
         $virtualLessonFee = $this->getBookingVirtualFeeAmount($lesson);
 
@@ -328,12 +334,10 @@ class Booking extends Model implements Transformable
         $serviceFee = $this->getBookingServiceFeeAmount();
         $virtualLessonFee = $this->getBookingVirtualFeeAmount();
         $processorFee = $this->getBookingPaymentProcessingFeeAmount($this->spot_price, ( $serviceFee+$virtualLessonFee ));
-        $totalFee = $this->getBookingTotalFeeAmount();
-
 
         // few checks to prevent not desired transactions , just an assurance
         if (!$this->transaction_id
-            && ($instructorMerchantId = $this->instructor->pp_merchant_id)!=null
+            && ($this->instructor->pp_merchant_id)!=null
             && $this->instructor->pp_account_status=="BUSINESS_ACCOUNT"
             && !$this->lesson->alreadyStarted()
             && !$this->lesson->is_cancelled
@@ -341,23 +345,13 @@ class Booking extends Model implements Transformable
 
         ){
 
-//            $transaction = BraintreeProcessor::createSellBookingTransactionAndHoldInEscrow(
-//                $instructorMerchantId,
-//                $this->payment_method_token,
-//                $this,
-//                ($serviceFee + $virtualLessonFee),
-//                $processorFee
-//            );
-
             $transaction = PayPalProcessor::createSellBookingTransactionAndHoldInEscrow(
-                $instructorMerchantId,
                 $this->payment_method_token,
                 $this,
                 ($serviceFee + $virtualLessonFee),
                 $processorFee
             );
-
-
+dd($transaction);
             $this->transaction_id		= $transaction->id;
             $this->transaction_status	= $transaction->status;
             $this->transaction_created_at	= now();

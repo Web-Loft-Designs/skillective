@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Models\UserPaymentMethod;
 use App\Repositories\UserRepository;
 use Braintree\Exception\NotFound;
 use Illuminate\Support\Facades\Log;
@@ -32,7 +33,6 @@ class PayPalProcessor
     }
 
 
-
     public function getPpAccessToken()
     {
         $payPalClient = new PayPalClient();
@@ -40,6 +40,7 @@ class PayPalProcessor
         $token = $response['access_token'];
         return $token;
     }
+
     /**
      * @return string
      */
@@ -299,90 +300,116 @@ class PayPalProcessor
         ];
     }
 
-    public function createOrder($data)
-    {
 
-        $values = [
-            "intent" => "AUTHORIZE",
-            "purchase_units" => [
-                [
-                    "amount" => [
-                        "currency_code" => $this->payPalClient->getCurrency(),
-                        "value" => $data['total'],
-                    ],
+    public function createSellBookingTransactionAndHoldInEscrow($paymentMethodVaultToken, $booking, $serviceFee, $expectedBrainTreeFee)
+    {
+        // в залежності що прийде з фронта token paypal venmo
+//        $paymentSource = [
+//            'card' => [
+//                'vault_id' => $paymentMethodVaultToken
+//            ],
+//            'paypal' => [
+//                'vault_id' => $paymentMethodVaultToken
+//            ],
+//            'venmo' => [
+//                'vault_id' => $paymentMethodVaultToken
+//            ]
+//        ];
+
+
+        $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
+        $totalAmount = round($booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2);
+        $currency = $this->payPalClient->getCurrency();
+        $handlingFee = number_format((float)$expectedBrainTreeFee, 2, '.', '');
+        $platformFee = number_format((float)$serviceFee, 2, '.', '');
+        $subMerchantId = $booking->instructor->pp_merchant_id;
+        $subMerchantEmail = $booking->instructor->email;
+
+//        dd($totalAmount, $booking->spot_price, $platformFee, $handlingFee);
+
+        $data = [
+            "intent" => "CAPTURE",
+            'payment_source' => [
+                'card' => [
+                    'vault_id' => $paymentMethodVaultToken
                 ],
             ],
-            'payment_source' => [
-                'paypal' => [
-                    'experience_context' => [
-                        'brand_name' => config('app.name'),
-                        'payment_method_preference' => 'UNRESTRICTED',
-                        'user_action' => 'PAY_NOW',
-                        'locale' => 'en-US',
-                        'return_url' => config('app.url') . "cart",
-                        'cancel_url' => config('app.url') . "cart",
-
+            "purchase_units" => [
+                [
+                    'reference_id' => "booking_" . $booking->id,
+                    'description' => $description,
+                    'custom_id' => "booking_" . $booking->id,
+                    'invoice_id' => "booking_" . $booking->id,
+                    'soft_descriptor' => "*lesson*" . $booking->lesson_id,
+                    'items' => [
+                        [
+                            'name' => $booking->lesson->genre->title . " Lesson",
+                            'quantity' => 1,
+                            'description' => $description,
+                            'sku' => "lesson_" . $booking->lesson_id,
+                            'unit_amount' => [
+                                "currency_code" => $currency,
+                                "value" => $booking->spot_price,
+                            ],
+                            'tax' => [
+                                "currency_code" => $currency,
+                                "value" => $platformFee,
+                            ]
+                        ]
+                    ],
+                    "amount" => [
+                        "currency_code" => $currency,
+                        "value" => $totalAmount,
+                        'breakdown' => [
+                            'item_total' => [
+                                "currency_code" => $currency,
+                                "value" => $booking->spot_price,
+                            ],
+                            'handling' => [
+                                "currency_code" => $currency,
+                                "value" => $handlingFee,
+                            ],
+                            'tax_total' => [
+                                "currency_code" => $currency,
+                                "value" => $platformFee,
+                            ]
+                        ],
+                    ],
+                    'payer' => [
+                        'email_address' => $subMerchantEmail,
+                        'merchant_id' => $subMerchantId
+                    ],
+                    'payment_instruction' => [
+                        'platform_fees' => [
+                            [
+                                'amount' => [
+                                    "currency_code" => $currency,
+                                    "value" => $platformFee,
+                                ],
+                                'pater' => [
+                                    'merchant_id' => $this->getMasterMerchantId()
+                                ]
+                            ]
+                        ],
+                        'disbursement_mode' => "DELAYED",
                     ]
-                ]
-            ]
+
+                ],
+            ],
         ];
 
-        $order = $this->payPalClient->createOrder($values);
-        dd($data, $values, $order);
+//dd($data);
+        try {
 
-        return $order;
-    }
+            $order = $this->payPalClient->createOrder($data);
 
+            dd($order);
 
-    public function createSellBookingTransactionAndHoldInEscrow($subMerchantId, $paymentMethodVaultToken, $booking, $serviceFee, $expectedBrainTreeFee)
-    {
-        $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
-        $lineItems = [
-            [
-                'description' => $description,
-                'kind' => 'debit',
-                'name' => "Lesson #{$booking->lesson_id} Booking ",
-                'quantity' => 1,
-                'totalAmount' => round($booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2),
-                'unitAmount' => round( $booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2)
-            ]
-        ];
-        $options = [
-            'submitForSettlement' => true,
-            'holdInEscrow' => true,
-        ];
-
-        $studentMobilePhone = $booking->student->profile->mobile_phone;
-        $customer = [
-            'firstName' => $booking->student->first_name,
-            'lastName' => $booking->student->last_name,
-            'phone' => $studentMobilePhone,
-            'email' => $booking->student->email
-        ];
-
-        $descriptor = [
-            'name' => "instructor{$booking->instructor_id}*lesson{$booking->lesson_id}",
-            'phone' => $studentMobilePhone,
-        ];
-
-        $result = $this->gateway->transaction()->sale([
-            'merchantAccountId' => $subMerchantId,
-            'amount' => number_format((float)$booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2, '.', ''),
-            'paymentMethodToken' => $paymentMethodVaultToken,
-            'serviceFeeAmount' => number_format((float)$serviceFee + $expectedBrainTreeFee, 2, '.', ''),
-            'options' => $options,
-            'orderId' => str_pad($booking->id, 6, "0", STR_PAD_LEFT),
-            'customer' => $customer,
-            'descriptor' => $descriptor,
-            'lineItems' => $lineItems
-        ]);
-
-        if($result->success) {
-            return $result->transaction;
-        } else {
-            list($returnError, $codes) = $this->_resultErrorsForResponse($result);
-            throw new \Exception('Can\'t create transaction: ' . $returnError);
+        } catch (\Exception $e) {
+            Log::channel('paypal')->error('Can\'t create transaction: ');
+            throw new \Exception('Can\'t create transaction: ');
         }
+
     }
 
 
@@ -416,7 +443,7 @@ class PayPalProcessor
                         default:
                             $item = [
                                 'payment_id' => $token->id,
-                                'type' =>$key,
+                                'type' => $key,
                                 'last_digits' => null,
                                 'brand' => null,
                             ];
@@ -428,7 +455,7 @@ class PayPalProcessor
 
             return $methods;
 
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             Log::channel('paypal')->error("found payment method for {$user->id} is fail");
             throw new \Exception("found payment method for {$user->id} is fail");
         }
@@ -452,11 +479,11 @@ class PayPalProcessor
 
             $result = $this->payPalClient->createPaymentSourceToken($data);
 
-            if( !isset($result['error']) ) {
+            if (!isset($result['error'])) {
 
                 $paymentMethodType = $this->parseMethodType($result['payment_source']);
 
-                $this->userRepository->savePaymentMethod($user, ['token' => $result['id'] , 'type' => $paymentMethodType]);
+                $this->userRepository->savePaymentMethod($user, ['token' => $result['id'], 'type' => $paymentMethodType]);
                 return ['token' => $result['id'], 'type' => $paymentMethodType];
             } else {
                 Log::channel('paypal')->error("create payment method for {$user->id} is fail  " . $result['error']['message']);
@@ -470,7 +497,7 @@ class PayPalProcessor
 
     }
 
-    public function getVaultSetupToken($user):string
+    public function getVaultSetupToken($user): string
     {
         $data = [
             'customer' => [
@@ -485,12 +512,12 @@ class PayPalProcessor
         try {
 
             $response = $this->payPalClient->createPaymentSetupToken($data);
-            if ( !isset($response['error']) ) {
+            if (!isset($response['error'])) {
                 $user->pp_customer_id = $response['customer']['id'];
                 $user->save();
                 return $response['id'];
             } else {
-                Log::channel('paypal')->error("create Payment Setup Token for {$user->id} is fail  " . $response['error']['message'] );
+                Log::channel('paypal')->error("create Payment Setup Token for {$user->id} is fail  " . $response['error']['message']);
                 throw new \Exception("create Payment Setup Token for {$user->id} is fail");
             }
 
@@ -517,27 +544,6 @@ class PayPalProcessor
         }
 
         return $type;
-    }
-
-    protected function buildMethodsData($data)
-    {
-
-        foreach ($data as $item) {
-
-            if (!in_array($item['id'], $issetTokens)) {
-                $paymentMethodType = $this->parseMethodType($item['payment_source']);
-                $this->userRepository->savePaymentMethod($user, ['token' => $item['id'] , 'type' => $paymentMethodType]);
-            }
-
-            $method[] = [
-
-            ];
-
-            dd($data, $item['id'], $issetTokens);
-        }
-
-
-        return $method;
     }
 
 
