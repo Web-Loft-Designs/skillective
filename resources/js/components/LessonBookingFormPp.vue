@@ -11,17 +11,17 @@
         <div class='user-info-title'>
           <h3 class='login-box-msg'>Profile</h3>
           <button
-              v-if='bookingStep === 2'
-              class='prev-step-btn'
-              @click='editUserInformation'
+            v-if='bookingStep === 2'
+            class='prev-step-btn'
+            @click='editUserInformation'
           >
             Edit
           </button>
         </div>
         <form
-            v-if='bookingStep === 1'
-            method='post'
-            @submit.prevent='onSubmitStep1'
+          v-if='bookingStep === 1'
+          method='post'
+          @submit.prevent='onSubmitStep1'
         >
           <div v-if='user === null'>
             <p class='custom-padding'>
@@ -35,19 +35,19 @@
               <label>Your name</label>
             </div>
             <div
-                :class="{ 'has-error': errors.first_name }"
-                class='form-group first-name has-feedback'
+              :class="{ 'has-error': errors.first_name }"
+              class='form-group first-name has-feedback'
             >
 
               <input
-                  v-model='fields.first_name'
-                  :readonly='formReadonly === true'
-                  class='form-control'
-                  name='first_name'
-                  placeholder='First Name'
-                  required
-                  type='text'
-                  value
+                v-model='fields.first_name'
+                :readonly='formReadonly === true'
+                class='form-control'
+                name='first_name'
+                placeholder='First Name'
+                required
+                type='text'
+                value
               />
               <span v-if='errors.first_name' class='help-block'>
                 <strong>{{ errors.first_name[0] }}</strong>
@@ -55,18 +55,18 @@
             </div>
 
             <div
-                :class="{ 'has-error': errors.last_name }"
-                class='form-group last-name has-feedback'
+              :class="{ 'has-error': errors.last_name }"
+              class='form-group last-name has-feedback'
             >
               <input
-                  v-model='fields.last_name'
-                  :readonly='formReadonly === true'
-                  class='form-control'
-                  name='last_name'
-                  placeholder='Last Name'
-                  required
-                  type='text'
-                  value
+                v-model='fields.last_name'
+                :readonly='formReadonly === true'
+                class='form-control'
+                name='last_name'
+                placeholder='Last Name'
+                required
+                type='text'
+                value
               />
               <span v-if='errors.last_name' class='help-block'>
                 <strong>{{ errors.last_name[0] }}</strong>
@@ -74,18 +74,18 @@
             </div>
 
             <div
-                :class="{ 'has-error': errors.zip }"
-                class='form-group w-50 has-feedback'
+              :class="{ 'has-error': errors.zip }"
+              class='form-group w-50 has-feedback'
             >
               <label>ZIP</label>
               <input
-                  v-model='fields.zip'
-                  :readonly='formReadonly === true'
-                  class='form-control'
-                  name='zip'
-                  placeholder='ZIP code'
-                  type='text'
-                  value
+                v-model='fields.zip'
+                :readonly='formReadonly === true'
+                class='form-control'
+                name='zip'
+                placeholder='ZIP code'
+                type='text'
+                value
               />
               <span v-if='errors.zip' class='help-block'>
                 <strong>{{ errors.zip[0] }}</strong>
@@ -93,18 +93,18 @@
             </div>
 
             <div
-                :class="{ 'has-error': errors.dob }"
-                class='form-group w-50 has-feedback'
+              :class="{ 'has-error': errors.dob }"
+              class='form-group w-50 has-feedback'
             >
               <label>Date of Birth</label>
               <dropdown-datepicker
-                  v-model='fields.dob'
-                  :default-date='fields.dob'
-                  :max-year='2021'
-                  :min-year='1940'
-                  :required='true'
-                  display-format='mdy'
-                  submit-format='yyyy-mm-dd'
+                v-model='fields.dob'
+                :default-date='fields.dob'
+                :max-year='2021'
+                :min-year='1940'
+                :required='true'
+                display-format='mdy'
+                submit-format='yyyy-mm-dd'
               ></dropdown-datepicker>
 
               <span v-if='errors.dob' class='help-block'>
@@ -113,19 +113,19 @@
             </div>
 
             <div
-                :class="{ 'has-error': errors.email }"
-                class='form-group w-50 has-feedback'
+              :class="{ 'has-error': errors.email }"
+              class='form-group w-50 has-feedback'
             >
               <label>Email</label>
               <input
-                  v-model='fields.email'
-                  :readonly='formReadonly === true'
-                  class='form-control'
-                  name='email'
-                  placeholder='Email'
-                  required
-                  type='email'
-                  value
+                v-model='fields.email'
+                :readonly='formReadonly === true'
+                class='form-control'
+                name='email'
+                placeholder='Email'
+                required
+                type='email'
+                value
               />
               <span v-if='errors.email' class='help-block'>
                 <strong>{{ errors.email[0] }}</strong>
@@ -133,24 +133,24 @@
             </div>
 
             <div
-                :class="{ 'has-error': errors.mobile_phone }"
-                class='form-group w-50 has-feedback'
+              :class="{ 'has-error': errors.mobile_phone }"
+              class='form-group w-50 has-feedback'
             >
               <label>Phone number</label>
 
               <masked-input
-                  v-if='formReadonly === false'
-                  v-model='fields.mobile_phone'
-                  :class="'form-control'"
-                  :placeholder="'(___) ___ ____'"
-                  mask='(111) 111 1111'
+                v-if='formReadonly === false'
+                v-model='fields.mobile_phone'
+                :class="'form-control'"
+                :placeholder="'(___) ___ ____'"
+                mask='(111) 111 1111'
               />
               <input
-                  v-if='formReadonly === true'
-                  v-model='fields.mobile_phone'
-                  class='form-control'
-                  readonly
-                  type='text'
+                v-if='formReadonly === true'
+                v-model='fields.mobile_phone'
+                class='form-control'
+                readonly
+                type='text'
               />
               <span v-if='errors.mobile_phone' class='help-block'>
                 <strong>{{ errors.mobile_phone[0] }}</strong>
@@ -158,33 +158,33 @@
             </div>
 
             <div
-                v-if="lesson_type === 'in_person_client'"
-                :class="{ 'has-error': errors.location }"
-                class='form-group has-feedback'
+              v-if="lesson_type === 'in_person_client'"
+              :class="{ 'has-error': errors.location }"
+              class='form-group has-feedback'
             >
 
               <label>Location</label>
               <input
-                  ref='lessonLocation'
-                  v-model='fields.location'
-                  class='form-control'
-                  name='location'
-                  required
-                  type='text'
-                  value
+                ref='lessonLocation'
+                v-model='fields.location'
+                class='form-control'
+                name='location'
+                required
+                type='text'
+                value
               />
             </div>
             <div
-                :class="{ 'has-error': errors.accept_terms }"
-                class='checkout-terms form-group checkbox-wrapper has-feedback'
+              :class="{ 'has-error': errors.accept_terms }"
+              class='checkout-terms form-group checkbox-wrapper has-feedback'
             >
               <div class='field'>
                 <label for='accept-terms'>
                   <input
-                      id='accept-terms'
-                      v-model='fields.accept_terms'
-                      :value='1'
-                      type='checkbox'
+                    id='accept-terms'
+                    v-model='fields.accept_terms'
+                    :value='1'
+                    type='checkbox'
                   />
                   <span class='checkmark'></span>
                   I agree to the
@@ -202,9 +202,9 @@
 
             <div class='form-group'>
               <button
-                  :disabled='!fields.accept_terms'
-                  class='btn btn-block'
-                  type='submit'
+                :disabled='!fields.accept_terms'
+                class='btn btn-block'
+                type='submit'
               >
                 Continue to Payment
               </button>
@@ -219,80 +219,131 @@
           <h3 class='custom-padding'>Please Submit Payment</h3>
           <p>Step 2/2</p>
         </div>
-
-                <div
-                  v-if='user != null && userPaymentMethods.length > 1'
-                  class='checkbox-wrapper mb-5 has-feedback'
-                >
-                  <div class='field'>
-                    <label for='stored-payment-information'>
-                      <input
-                        id='stored-payment-information'
-                        v-model='useSavedMethod'
-                        type='checkbox'
-                      />
-                      <span class='checkmark'></span>
-                      Use stored payment information
-                    </label>
-                  </div>
-                </div>
-
+        <div
+          v-if='user != null && userPaymentMethods.length === 1'
+          class='checkbox-wrapper mb-5 has-feedback'
+        >
+          <div class='mb-4'>Use stored payment information:</div>
+          <div class='field'>
+            <label class='mx-4' for='stored-payment-information'>
+              <input
+                id='stored-payment-information'
+                v-model='useSavedMethod'
+                type='checkbox'
+              />
+              <span class='checkmark'></span>
+              {{ userPaymentMethods[0].type }} {{ userPaymentMethods[0].brand || '' }}
+            </label>
+          </div>
+        </div>
+        <div
+          v-if='user != null && userPaymentMethods.length > 1'
+          class='checkbox-wrapper mb-5 has-feedback'
+        >
+          <div class='mb-4'>Use stored payment information:</div>
+          <label v-for='(method, index) in userPaymentMethods' :key='index' class='mx-4'>
+            <input
+              v-model='selectedPaymentArr[index]'
+              :value='method.payment_id'
+              type='checkbox'
+              @change='toggleUseSavedMethods(method.payment_id, index)'
+            />
+            {{ method.type }} {{ method.brand || '' }}
+          </label>
+        </div>
         <div>
-          <div class='payment-option-header'>
+          <div class='payment-option-header mb-4'>
             <img alt src='/images/card-icon.png'/>
           </div>
-
           <div class='card_container'>
             <div>
               <div>
                 <label>Card number</label>
-                <div id='card-number'></div>
+                <div v-show='!isSelectedPaymentMethod' id='card-number'></div>
+                <input
+                  v-show='isSelectedPaymentMethod'
+                  :value='lastFour'
+                  class='form-control-pp'
+                  disabled
+                  placeholder='____ ____ ____ ____'
+                  type='text'
+                />
               </div>
 
               <div>
                 <label>Cardholder name</label>
-                <div id='card-holder-name'></div>
+                <div v-show='!isSelectedPaymentMethod' id='card-holder-name'></div>
+                <input
+                  v-show='isSelectedPaymentMethod'
+                  class='form-control-pp'
+                  disabled
+                  type='text'
+                  value='********** ************'
+                />
               </div>
 
               <div>
                 <label>Expiry date</label>
-                <div id='expiration-date'></div>
+                <div v-show='!isSelectedPaymentMethod' id='expiration-date'></div>
+                <input
+                  v-show='isSelectedPaymentMethod'
+                  class='form-control-pp'
+                  disabled
+                  type='text'
+                  value='** / **'
+                />
               </div>
 
               <div>
                 <label>CVC/CVV</label>
-                <div id='cvv'></div>
+                <div v-show='!isSelectedPaymentMethod' id='cvv'></div>
+                <input
+                  v-show='isSelectedPaymentMethod'
+                  class='form-control-pp'
+                  disabled
+                  type='text'
+                  value='***'
+                />
               </div>
 
-
               <div class='form-group'>
-
                 <button
-                    id='onSubmitStepCreditCard2'
-                    value='submit'
-                    class='btn'
+                  v-show='!isSelectedPaymentMethod'
+                  id='onSubmitStepCreditCard2'
+                  class='btn btn-block'
+                  type='button'
+                  value='submit'
                 >
                   Submit Payment
                 </button>
-
+                <button
+                  v-show='isSelectedPaymentMethod'
+                  class='btn btn-block'
+                  type='button'
+                  @click='book()'
+                >
+                  Submit Payment
+                </button>
               </div>
             </div>
           </div>
         </div>
+        <div id='paypal-buttons-container'></div>
+      </div>
+
+      <!-- Successfull Booking -->
+      <div v-if='bookingStep === 3'>
+        <div class='lesson-success' v-html='confirmationText'></div>
       </div>
     </div>
-
-
-    <div id='paypal-buttons-container'></div>
-
 
   </div>
 </template>
 
 <script>
 import MaskedInput from 'vue-masked-input'
-import {loadScript} from '@paypal/paypal-js'
-import {mapActions} from 'vuex'
+import { loadScript } from '@paypal/paypal-js'
+import { mapActions } from 'vuex'
 import DropdownDatepicker from 'vue-dropdown-datepicker'
 import siteAPI from '../mixins/siteAPI.js'
 import skillectiveHelper from '../mixins/skillectiveHelper'
@@ -307,10 +358,11 @@ export default {
   },
   mixins: [siteAPI, skillectiveHelper],
   props: {
+    confirmationText: String,
     userPaymentMethods: Array,
     user: Object,
     total: Object,
-    ppClientToken: String,
+    ppClientToken: String
   },
   data() {
     return {
@@ -336,6 +388,9 @@ export default {
       booking: null,
       formReadonly: false,
       useSavedMethod: false,
+      selectedPaymentArr: [],
+      selectedPaymentId: null,
+      selectedPaymentIndex: null,
       venmoNotSupported: false,
       orderId: null,
       paypal: null,
@@ -346,8 +401,8 @@ export default {
   },
   created() {
     if (
-        window.location.hash.search(/venmoSuccess=/) !== -1 &&
-        Cookies.get('currentOrderDetails') != undefined
+      window.location.hash.search(/venmoSuccess=/) !== -1 &&
+      Cookies.get('currentOrderDetails') != undefined
     ) {
       let currentOrderDetails = Cookies.get('currentOrderDetails')
       if (typeof currentOrderDetails == 'string') currentOrderDetails = JSON.parse(currentOrderDetails)
@@ -373,199 +428,97 @@ export default {
   },
   mounted() {
     this.initNewPlacesAutocomplete('lessonLocation')
-      console.log(this.paymentMethods, "saved methods")
+    console.log(this.paymentMethods, 'saved methods')
+  },
+  computed: {
+    isSelectedPaymentMethod() {
+      return this.useSavedMethod || this.selectedPaymentArr.includes(true)
+    },
+    lastFour() {
+      return `**** **** **** ${ this.userPaymentMethods.length && this.useSavedMethod ? this.userPaymentMethods[0].last_digits : this.userPaymentMethods[this.selectedPaymentIndex]?.last_digits }`
+    }
   },
   methods: {
     ...mapActions({
       fetchCartItems: 'fetchCartItems'
     }),
-
     async initializePaypal() {
       try {
         this.paypal = await loadScript({
-            clientId: this.ppClientToken,
-            buyerCountry: 'US',  // удалити при запуску на продакшені !!!!!!!
-            locale: 'en_US',
-            components: ["buttons","funding-eligibility","marks","card-fields"],
-            currency: 'USD',
-            // dataClientToken: this.user.pp_customer_id,
+          clientId: this.ppClientToken,
+          buyerCountry: 'US',  // удалити при запуску на продакшені !!!!!!!
+          locale: 'en_US',
+          components: ['buttons', 'funding-eligibility', 'marks', 'card-fields'],
+          currency: 'USD'
+          // dataClientToken: this.user.pp_customer_id,
         })
-
-          this.initPaymentMethod();
+        this.initPaymentMethod()
       } catch (error) {
         console.error('Failed to load the PayPal JS SDK script', error)
       }
     },
-
-      initPaymentMethod() {
-
-          console.log(this.paypal.isFundingEligible(this.paypal.FUNDING.PAYPAL), " is elig PAYPAL")
-          console.log(this.paypal.isFundingEligible(this.paypal.FUNDING.CARD), " is elig CARD")
-          console.log(this.paypal.isFundingEligible(this.paypal.FUNDING.VENMO), " is elig VENMO")
-          console.log(this.paypal.isFundingEligible(this.paypal.FUNDING.CREDIT), " is elig CREDIT")
-
-          if (this.paypal.FUNDING.CARD) {
-              this.renderCardForm();
-          }
-
-          if (this.paypal.FUNDING.PAYPAL) {
-              this.renderPayPalButton();
-          }
-
-      },
-
-      renderPayPalButton() {
-          this.paypal.Buttons({
-              style: {
-                  layout: 'vertical',
-                  color:  'gold',
-                  shape:  'pill',
-                  label:  'paypal'
-              },
-              // createOrder() {
-              //     console.log('Buttons create order')
-              // }
-          }).render('#paypal-buttons-container');
-
-      },
-
-      renderCardForm() {
-          const cardFields = this.paypal.CardFields({
-              createVaultSetupToken: async () => {
-                  // отримати vaultSetupToken з нашого сервера
-                  const result = await fetch("api/cart/vault-setup-token", {
-                      method: "GET"
-                  });
-
-                  const { vaultSetupToken } = await result.json();
-                  return vaultSetupToken;
-              },
-              onApprove: async (data) => {
-                  // запуск процес оплати
-                  // payment_method_token
-                  this.fields.payment_method_nonce = data.vaultSetupToken;
-                  this.fields.order = this.total;
-                  await this.apiPost('/api/cart/checkout', {
-                      ...this.fields,
-                  })
-
-              },
-              onError: (error) => console.error('Something went wrong:', error)
+    initPaymentMethod() {
+      console.log(this.paypal.isFundingEligible(this.paypal.FUNDING.PAYPAL), ' is elig PAYPAL')
+      console.log(this.paypal.isFundingEligible(this.paypal.FUNDING.CARD), ' is elig CARD')
+      console.log(this.paypal.isFundingEligible(this.paypal.FUNDING.VENMO), ' is elig VENMO')
+      console.log(this.paypal.isFundingEligible(this.paypal.FUNDING.CREDIT), ' is elig CREDIT')
+      if (this.paypal.FUNDING.CARD) this.renderCardForm()
+      if (this.paypal.FUNDING.PAYPAL) this.renderPayPalButton()
+    },
+    renderPayPalButton() {
+      this.paypal.Buttons({
+        style: {
+          layout: 'vertical',
+          color: 'gold',
+          shape: 'pill',
+          label: 'paypal'
+        }
+        // createOrder() {
+        //     console.log('Buttons create order')
+        // }
+      }).render('#paypal-buttons-container')
+    },
+    renderCardForm() {
+      const cardFields = this.paypal.CardFields({
+        createVaultSetupToken: async () => {
+          // отримати vaultSetupToken з нашого сервера
+          const result = await fetch('api/cart/vault-setup-token', {
+            method: 'GET'
           })
-
-          if (cardFields.isEligible()) {
-              cardFields.NameField().render("#card-holder-name");
-              cardFields.NumberField().render("#card-number");
-              cardFields.ExpiryField().render("#expiration-date");
-              cardFields.CVVField().render("#cvv");
-          } else {
-              // Handle the workflow when credit and debit cards are not available
-          }
-
-          const submitButton = document.getElementById("onSubmitStepCreditCard2");
-            submitButton.addEventListener("click", () => {
-              cardFields
-                  .submit()
-                  .then(() => {
-                      console.log("submit was successful");
-                  })
-                  .catch((error) => {
-                      console.error("submit erred:", error);
-                  });
-          });
-
-      },
-
-    // setupPaypalInput() {
-    //   const styleObject = {
-    //     input: {
-    //       'font-size': '16 px',
-    //       'font-family': 'monospace',
-    //       'font-weight': 'lighter',
-    //       color: 'blue'
-    //     },
-    //     '.invalid': {
-    //       color: 'purple'
-    //     },
-    //     '.purple': {
-    //       color: 'purple'
-    //     }
-    //   }
-      // const cardField = this.paypal.CardFields({
-      //   style: styleObject,
-      //   createOrder: function (data, actions) {
-      //     console.log(data, 'data')
-      //     console.log(actions, 'actions')
-          // return fetch('/api/paypal/order/create/', {
-          //   method: 'post'
-          // })
-          //   .then((res) => {
-          //     console.log(res.json(), 'res.json()')
-          //     return res.json()
-          //   })
-          //   .then((orderData) => {
-          //     console.log(orderData.id, 'orderData.id')
-          //     return orderData.id
-          //   })
-        // },
-        // onApprove: function (data, actions) {
-        //   const {orderID} = data
-        //   return fetch('/api/paypal/orders/${orderID}/capture/', {
-        //     method: 'post'
-        //   })
-        //       .then((res) => {
-        //         return res.json()
-        //       })
-        //       .then((orderData) => {
-        //         // Redirect to success page
-        //       })
-        // }
-        // inputEvents: {
-        //   onChange: function (data) {
-        //     // Handle a change event in any of the fields
-        //   },
-        //   onFocus: function (data) {
-        //     // Handle a focus event in any of the fields
-        //   },
-        //   onBlur: function (data) {
-        //     // Handle a blur event in any of the fields
-        //   },
-        //   onInputSubmitRequest: function (data) {
-        //     // Handle an attempt to submit the entire card form
-        //     // while focusing any of the fields
-        //   }
-        // }
-      // })
-      // Define the container for each field and the submit button
-      // const cardNameContainer = document.getElementById('card-name-field-container') // Optional field
-      // const cardNumberContainer = document.getElementById('card-number-field-container')
-      // const cardCvvContainer = document.getElementById('card-cvv-field-container')
-      // const cardExpiryContainer = document.getElementById('card-expiry-field-container')
-      // const multiCardFieldButton = document.getElementById('multi-card-field-button')
-      // // Render each field after checking for eligibility
-      // if (cardField.isEligible()) {
-      //   const nameField = cardField.NameField()
-      //   nameField.render(cardNameContainer)
-      //   const numberField = cardField.NumberField()
-      //   numberField.render(cardNumberContainer)
-      //   const cvvField = cardField.CVVField()
-      //   cvvField.render(cardCvvContainer)
-      //   const expiryField = cardField.ExpiryField()
-      //   expiryField.render(cardExpiryContainer)
-      //   // Add click listener to the submit button and call the submit function on the CardField component
-      //   multiCardFieldButton.addEventListener('click', () => {
-      //     cardField
-      //         .submit()
-      //         .then(() => {
-      //           console.log('submit')
-      //         })
-      //         .catch((err) => {
-      //           // Handle an unsuccessful payment
-      //         })
-      //   })
-      // }
-
-
+          const { vaultSetupToken } = await result.json()
+          return vaultSetupToken
+        },
+        onApprove: async (data) => {
+          // запуск процес оплати
+          // payment_method_token
+          this.fields.payment_method_nonce = data.vaultSetupToken
+          this.fields.order = this.total
+          this.fields.payment_method_token = null
+          await this.apiPost('/api/cart/checkout', {
+            ...this.fields
+          })
+        },
+        onError: (error) => console.error('Something went wrong:', error)
+      })
+      if (cardFields.isEligible()) {
+        cardFields.NameField().render('#card-holder-name')
+        cardFields.NumberField().render('#card-number')
+        cardFields.ExpiryField().render('#expiration-date')
+        cardFields.CVVField().render('#cvv')
+      } else {
+        // Handle the workflow when credit and debit cards are not available
+      }
+      const submitButton = document.getElementById('onSubmitStepCreditCard2')
+      submitButton.addEventListener('click', () => {
+        cardFields.submit()
+          .then(() => {
+            console.log('submit was successful')
+          })
+          .catch((error) => {
+            console.error('submit erred:', error)
+          })
+      })
+    },
     async onSubmitStep1() {
       if (this.fields.dob) {
         this.fields.dob = moment(this.fields.dob).format('YYYY-MM-DD')
@@ -573,25 +526,22 @@ export default {
       await this.fetchCartItems()
       this.apiPost('/api/cart/validate-user-info', this.fields)
     },
-
     initNewPlacesAutocomplete(_ref) {
       let thisComponent = this
       let autocomplete = this.initializeLocationField(this.$refs[_ref], [
         'address'
       ])
       google.maps.event.addListener(
-          autocomplete,
-          'place_changed',
-          function (e) {
-            thisComponent.fields.location = thisComponent.$refs[_ref].value
-          }
+        autocomplete,
+        'place_changed',
+        function (e) {
+          thisComponent.fields.location = thisComponent.$refs[_ref].value
+        }
       )
     },
-
     editUserInformation() {
       this.bookingStep = 1
     },
-
     componentHandlePostResponse(responseData) {
       if (this.bookingStep === 1) {
         this.bookingStep = 2
@@ -607,6 +557,37 @@ export default {
         this.fetchCartItems()
         this.checkoutSuccess = true
       }
+    },
+    book() {
+      if (moment(this.fields.dob)) this.fields.dob = moment(this.fields.dob).format('YYYY-MM-DD')
+      this.fields.payment_method_token = this.selectedPaymentId
+      this.apiPost('/api/cart/checkout', {
+        ...this.fields,
+        guest_cart: guestCartHelper.getProducts(),
+        promo_codes: guestCartHelper.getPromos()
+      })
+    },
+    toggleUseSavedMethods(value, index) {
+      this.selectedPaymentIndex = index
+      const oldSelectedPaymentId = this.selectedPaymentId
+      this.selectedPaymentArr = this.selectedPaymentArr.map((el, i) => (i === index ? el = true : el = false))
+      this.selectedPaymentId = value
+      if (oldSelectedPaymentId === value) {
+        this.selectedPaymentArr = this.selectedPaymentArr.map((el, i) => (i === index ? el = false : el = false))
+        this.selectedPaymentId = null
+        this.selectedPaymentIndex = null
+      }
+    }
+  },
+  watch: {
+    useSavedMethod() {
+      if (this.useSavedMethod) {
+        this.selectedPaymentId = this.userPaymentMethods[0].payment_id
+        console.log(this.selectedPaymentId)
+      } else {
+        this.selectedPaymentId = null
+        console.log(this.selectedPaymentId)
+      }
     }
   }
 }
@@ -614,4 +595,17 @@ export default {
 
 <style>
 /* Add your styles if needed */
+.form-control-pp {
+  border: 0.0625rem solid #909697;
+  border-radius: 0.25rem;
+  box-sizing: border-box;
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 2.125rem;
+  line-height: 1.5rem;
+  padding: 1.25rem 0.75rem;
+  width: calc(100% - 12px);
+  height: 67px;
+  margin: 6px 6px 14px 6px;
+}
 </style>
