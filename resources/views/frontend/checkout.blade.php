@@ -28,6 +28,7 @@
                         :pp-client-token="'{{$ppClientToken}}'"
                         :user-payment-methods="{{ json_encode($ppUserPaymentMethods) }}"
                         :user="{{ json_encode($user) }}"
+                        :confirmation-text="'{{ str_replace(["\r", "\n"], '', $settings['booking_confirmation_text']) }}'"
                         >
                         </lesson-booking-form-pp>
                     </checkout>
