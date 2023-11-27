@@ -240,19 +240,11 @@ class CartAPIController extends AppBaseController
                     }
                 }
 
-
-
                 /**
                  * Approve Booking
-                 * просес покупки
+                 * просес створення транзакції
                  */
-
-//                $booking = $lesson->book($user_repository, $request, $nonce ? $nonce[$key] : "", $student);
-//                $booking->approve();
-
-                $nonce = null;
                 $booking = $lesson->bookPp($user_repository, $request, $nonce ?? "", $student);
-
                 $booking->approvePp();
 
             } else {
@@ -260,8 +252,6 @@ class CartAPIController extends AppBaseController
 
                 $preRLesson = new PreRecordedLesson(json_decode(json_encode($cartItem->preRecordedLesson), true));
                 $request->request->add(['pre_r_lesson_id' => $cartItem->preRecordedLesson->id]);
-
-
 
                 foreach($discounts as $discountKey => $discount){
                     if($discount->lesson_type == "all" || $discount->lesson_type == 'pre-recorded'){

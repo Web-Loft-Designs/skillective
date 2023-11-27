@@ -271,7 +271,10 @@ class PayPalProcessor
                                     "PAYMENT",
                                     "REFUND",
                                     "PARTNER_FEE",
+                                    "DELAY_FUNDS_DISBURSEMENT",
                                     "ACCESS_MERCHANT_INFORMATION",
+                                    "ADVANCED_TRANSACTIONS_SEARCH",
+                                    "VAULT"
                                 ],
                             ]
                         ]
@@ -324,8 +327,6 @@ class PayPalProcessor
         $platformFee = number_format((float)$serviceFee, 2, '.', '');
         $subMerchantId = $booking->instructor->pp_merchant_id;
         $subMerchantEmail = $booking->instructor->email;
-
-//        dd($totalAmount, $booking->spot_price, $platformFee, $handlingFee);
 
         $data = [
             "intent" => "CAPTURE",
@@ -397,13 +398,17 @@ class PayPalProcessor
                 ],
             ],
         ];
-
-//dd($data);
         try {
-
-            $order = $this->payPalClient->createOrder($data);
-
-            dd($order);
+            $transaction = $this->payPalClient->setRequestHeaders([
+                'PayPal-Request-Id' => config('app.key'),
+                'PayPal-Partner-Attribution-Id' => $this->getBnCde()
+                ])->createOrder($data);
+            if (!isset($transaction['error'])) {
+                return $transaction;
+            } else {
+                Log::channel('paypal')->error('Can\'t create transaction: ' . $transaction['error']['message']);
+                throw new \Exception('Can\'t create transaction: ');
+            }
 
         } catch (\Exception $e) {
             Log::channel('paypal')->error('Can\'t create transaction: ');
@@ -412,6 +417,35 @@ class PayPalProcessor
 
     }
 
+
+    public function getAllCustomerPaymentMethods(User $user): array
+    {
+        if (!$user->pp_customer_id) {
+            return [];
+        }
+
+        try {
+
+            $result = $this->payPalClient->setCustomerSource($user->pp_customer_id)->listPaymentSourceTokens(totals: false);
+            dd($result);
+            foreach ($result['payment_tokens'] as $paymentToken) {
+//dd($paymentToken);
+                // звірити з нашою базою даних і також удалити токени
+                $deleteR = $this->payPalClient->deletePaymentSourceToken($paymentToken['id']);
+
+//                dd($deleteR);
+
+            }
+
+
+            dd("stop");
+            return $result;
+
+        } catch (\Exception $e) {
+            Log::channel('paypal')->error("found payment method for {$user->id} is fail");
+            throw new \Exception("found payment method for {$user->id} is fail");
+        }
+    }
 
     public function getSavedCustomerPaymentMethods(User $user): array
     {
@@ -544,6 +578,21 @@ class PayPalProcessor
         }
 
         return $type;
+    }
+
+    public function releaseTransactionFromEscrow($transactionId): array
+    {
+        $order = $this->payPalClient->showOrderDetails($transactionId);
+        $referenceId = $order['purchase_units'][0]['payments']['captures'][0]['id'];
+
+        return $this->payPalClient->setRequestHeaders([
+            'PayPal-Request-Id' => config('app.key'),
+            'PayPal-Partner-Attribution-Id' => $this->getBnCde()
+        ])->createReferencedBatchPayoutItem([
+            "reference_id" => $referenceId,
+            "reference_type" => "TRANSACTION_ID"
+        ]);
+
     }
 
 
