@@ -95,9 +95,6 @@ class PurchasedLessonRepository extends BaseRepository
     public function getAmountEarnedForPeriod($instructorId, $period = '')
 	{
 
-		// G TODO
-		// ADD WHERE WITH STATUSES!
-
 		$this->resetCriteria();
 		$this->resetScope();
 		$this->scopeQuery(function ($query) use ($instructorId, $period) {
@@ -160,10 +157,6 @@ class PurchasedLessonRepository extends BaseRepository
      */
     public function getHappenedLessonsPayedInEscrow($limit = null)
 	{
-		// TODO  Тут щось не доробляно амерекосами
-
-		$timePastHappened = 8; // hours
-		$nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
 		$escrowStatus = PurchasedLesson::STATUS_ESCROW;
 		$escrowErrorStatus = PurchasedLesson::STATUS_UNABLE_ESCROW_RELEASE;
 		$this->resetCriteria();
@@ -172,8 +165,9 @@ class PurchasedLessonRepository extends BaseRepository
 			->select('purchased_lessons.*')
 			->whereRaw(" ( purchased_lessons.status='$escrowStatus' OR purchased_lessons.status='$escrowErrorStatus' ) ")
 			->orderBy('purchased_lessons.created_at', 'asc');
-		if ($limit)
-			$this->model = $this->model->limit($limit);
+		if ($limit) {
+            $this->model = $this->model->limit($limit);
+        }
 
 		return $this->model->get();
 	}

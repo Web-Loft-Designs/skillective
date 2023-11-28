@@ -3,9 +3,8 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\UserPaymentMethod;
 use App\Repositories\UserRepository;
-use Braintree\Exception\NotFound;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 use Throwable;
@@ -32,13 +31,21 @@ class PayPalProcessor
         $this->payPalClient->getAccessToken();
     }
 
+    /**
+     * @throws Exception
+     */
+    protected function getRandomString():string
+    {
+        $randomBytes = random_bytes(100);
+        $randomString = base64_encode($randomBytes);
+        return substr(str_replace(['/', '+', '='], '', $randomString), 0, 100);
+    }
 
     public function getPpAccessToken()
     {
         $payPalClient = new PayPalClient();
         $response = $payPalClient->getAccessToken();
-        $token = $response['access_token'];
-        return $token;
+        return $response['access_token'];
     }
 
     /**
@@ -97,28 +104,50 @@ class PayPalProcessor
 
     public function getMerchantDetail($user): array
     {
-        if ($user->pp_referral_id) {
+        if ($user->pp_referral_id && !$user->pp_merchant_id) {
             try {
-                $ppMerchantId = $this->getPpMerchantId($user);
-                $result = $this->payPalClient->showReferralStatus($ppMerchantId);
-                if (isset($result['error']) && $result['error']['name'] == "USER_BUSINESS_ERROR") {
-                    // якщо є помилка значити інструктор не проходив по попередній силці генеруємо нову силку для реєстрації
-                    $data = $this->getRegistrationMerchantLink($user);
-                    $result = [
-                        "actionUrl" => $data['actionUrl'],
+                $result = $this->payPalClient->showReferralData($user->pp_referral_id);
+
+                if (!isset($result['error'])) {
+
+                    $link = [];
+                    foreach ($result['links'] as $item) {
+                        if ($item['rel'] == "action_url") {
+                            $link['actionUrl'] = $item['href'];
+                        }
+                    }
+
+                    return [
+                        "actionUrl" => $link['actionUrl'],
                         'status' => "Not activated",
                         'ppMerchantId' => "",
                         'message' => "Go to PayPal."
                     ];
                 } else {
-                    $result = $this->parseReferralStatus($result, $user);
+                    Log::channel('paypal')->error("show Referral Status PayPal for user {$user->id} is fail" . $result['error']['message']);
+                    throw new Exception("show Referral Status PayPal for user {$user->id} is fail" . $result['error']['message']);
                 }
-
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::channel('paypal')->error("show Referral Status PayPal for user {$user->id} is fail");
-                throw new \Exception("show Referral Status PayPal for user {$user->id} is fail");
+                throw new Exception("show Referral Status PayPal for user {$user->id} is fail");
             }
 
+        } elseif ($user->pp_merchant_id) {
+            try {
+                $result = $this->payPalClient->showReferralStatus($user->pp_merchant_id);
+
+                if (!isset($result['error'])) {
+
+                    return $this->parseReferralStatus($result, $user);
+
+                } else {
+                    Log::channel('paypal')->error("show Referral Status PayPal for user {$user->id} is fail" . $result['error']['message']);
+                    throw new Exception("show Referral Status PayPal for user {$user->id} is fail" . $result['error']['message']);
+                }
+            } catch (Exception $e) {
+                Log::channel('paypal')->error("show Referral Status PayPal for user {$user->id} is fail");
+                throw new Exception("show Referral Status PayPal for user {$user->id} is fail");
+            }
         } else {
             $data = $this->getRegistrationMerchantLink($user);
             $result = [
@@ -151,38 +180,18 @@ class PayPalProcessor
                 $message = "Please complete your account setup in PayPal to start receiving the payments";
             }
 
-            $result = [
+            return [
                 'status' => $status,
                 'ppMerchantId' => $data['merchantIdInPayPal'],
                 'message' => $message
             ];
 
         } else {
-            $result = [
+            return [
                 'status' => "Not activated",
                 'ppMerchantId' => '',
                 'message' => "incorrect data"
             ];
-        }
-
-        return $result;
-
-    }
-
-    protected function getPpMerchantId($user): string
-    {
-        if (!$user->pp_merchant_id) {
-            try {
-                $response = $this->payPalClient->showPartnerReferralId($user->pp_tracking_id);
-                $this->userRepository->updateUserPpMerchantId($response['merchant_id'], $user->id);
-                return $response['merchant_id'];
-
-            } catch (\Exception $e) {
-                Log::channel('paypal')->error("get getPpMerchantId for {$user->id} is fail");
-                throw new \Exception("server error");
-            }
-        } else {
-            return $user->pp_merchant_id;
         }
 
     }
@@ -215,9 +224,10 @@ class PayPalProcessor
 
         try {
             $result = $this->payPalClient->createPartnerReferral($partnerParams);
+
             if (isset($result['error'])) {
-                Log::channel('paypal')->error("createPartnerReferral for {$user->id} is fail", $result['error']);
-                throw new \Exception($result['error']['message']);
+                Log::channel('paypal')->error("createPartnerReferral for {$user->id} is fail", $result['error']['message']);
+                throw new Exception($result['error']['message']);
             } else {
                 $link = [];
                 foreach ($result['links'] as $item) {
@@ -230,9 +240,9 @@ class PayPalProcessor
                 $this->userRepository->updateUserPpReferralId($ppReferralId, $user->id);
                 return $link;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::channel('paypal')->error("createPartnerReferral for {$user->id} is fail");
-            throw new \Exception("createPartnerReferral for {$user->id} is fail");
+            throw new Exception("createPartnerReferral for {$user->id} is fail");
         }
 
     }
@@ -274,7 +284,6 @@ class PayPalProcessor
                                     "DELAY_FUNDS_DISBURSEMENT",
                                     "ACCESS_MERCHANT_INFORMATION",
                                     "ADVANCED_TRANSACTIONS_SEARCH",
-                                    "VAULT"
                                 ],
                             ]
                         ]
@@ -289,9 +298,6 @@ class PayPalProcessor
             ],
             'products' => [
                 'EXPRESS_CHECKOUT',
-//                'PAYMENT_METHODS', при першій інтеграції можна запростити тільки 1 параметр остальні окремо
-//                'PPCP',
-//                'ADVANCED_VAULTING'
             ],
             "partner_config_override" => [
                 "partner_logo_url" => asset('uploads/favicon.png'),
@@ -307,17 +313,11 @@ class PayPalProcessor
     public function createSellBookingTransactionAndHoldInEscrow($paymentMethodVaultToken, $booking, $serviceFee, $expectedBrainTreeFee)
     {
         // в залежності що прийде з фронта token paypal venmo
-//        $paymentSource = [
-//            'card' => [
-//                'vault_id' => $paymentMethodVaultToken
-//            ],
-//            'paypal' => [
-//                'vault_id' => $paymentMethodVaultToken
-//            ],
-//            'venmo' => [
-//                'vault_id' => $paymentMethodVaultToken
-//            ]
-//        ];
+        $userPaymentSource = [
+            'card' => ['vault_id' => $paymentMethodVaultToken],
+//            'paypal' => [ 'vault_id' => $paymentMethodVaultToken ],
+//            'venmo' => [ 'vault_id' => $paymentMethodVaultToken ]
+        ];
 
 
         $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
@@ -330,11 +330,6 @@ class PayPalProcessor
 
         $data = [
             "intent" => "CAPTURE",
-            'payment_source' => [
-                'card' => [
-                    'vault_id' => $paymentMethodVaultToken
-                ],
-            ],
             "purchase_units" => [
                 [
                     'reference_id' => "booking_" . $booking->id,
@@ -376,7 +371,7 @@ class PayPalProcessor
                             ]
                         ],
                     ],
-                    'payer' => [
+                    'payee' => [
                         'email_address' => $subMerchantEmail,
                         'merchant_id' => $subMerchantId
                     ],
@@ -387,7 +382,7 @@ class PayPalProcessor
                                     "currency_code" => $currency,
                                     "value" => $platformFee,
                                 ],
-                                'pater' => [
+                                'payer' => [
                                     'merchant_id' => $this->getMasterMerchantId()
                                 ]
                             ]
@@ -399,22 +394,135 @@ class PayPalProcessor
             ],
         ];
         try {
-            $transaction = $this->payPalClient->setRequestHeaders([
-                'PayPal-Request-Id' => config('app.key'),
+
+            $order = $this->payPalClient->setRequestHeaders([
+                'PayPal-Request-Id' => $this->getRandomString(),
                 'PayPal-Partner-Attribution-Id' => $this->getBnCde()
-                ])->createOrder($data);
-            if (!isset($transaction['error'])) {
-                return $transaction;
+            ])->createOrder($data);
+
+            if (!isset($order['error'])) {
+
+                return $this->payPalClient->setRequestHeaders([
+                    'PayPal-Request-Id' => $this->getRandomString(),
+                    'PayPal-Partner-Attribution-Id' => $this->getBnCde()
+                ])->capturePaymentOrder($order['id'], [ 'payment_source' => $userPaymentSource ]);
+
             } else {
-                Log::channel('paypal')->error('Can\'t create transaction: ' . $transaction['error']['message']);
-                throw new \Exception('Can\'t create transaction: ');
+                Log::channel('paypal')->error('Can\'t create transaction: ' . $order['error']['message']);
+                throw new Exception('Can\'t create transaction: ');
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::channel('paypal')->error('Can\'t create transaction: ');
-            throw new \Exception('Can\'t create transaction: ');
+            throw new Exception('Can\'t create transaction: ');
         }
 
+    }
+
+    public function createSellPurchasereLessonTransaction($subMerchantId, $paymentMethodVaultToken, $purchasedLesson, $serviceFee, $processorFee)
+    {
+        // в залежності що прийде з фронта token paypal venmo
+        $userPaymentSource = [
+            'card' => ['vault_id' => $paymentMethodVaultToken],
+//            'paypal' => ['vault_id' => $paymentMethodVaultToken],
+//            'venmo' => [ 'vault_id' => $paymentMethodVaultToken ]
+        ];
+
+        $description = "{$purchasedLesson->preRecordedLesson->title} Lesson #{$purchasedLesson->pre_r_lesson_id}, booking #{$purchasedLesson->id}, (instructor #{$purchasedLesson->instructor_id})";
+        $totalAmount = round($purchasedLesson->price + $serviceFee + $processorFee, 2);
+        $currency = $this->payPalClient->getCurrency();
+        $handlingFee = number_format((float)$processorFee, 2, '.', '');
+        $platformFee = number_format((float)$serviceFee, 2, '.', '');
+        $subMerchantEmail = $purchasedLesson->instructor->email;
+
+        $data = [
+            "intent" => "CAPTURE",
+            "purchase_units" => [
+                [
+                    'reference_id' => "booking_" . $purchasedLesson->id,
+                    'description' => $description,
+                    'custom_id' => "booking_" . $purchasedLesson->id,
+                    'invoice_id' => "booking_" . $purchasedLesson->id,
+                    'soft_descriptor' => "*lesson*" . $purchasedLesson->pre_r_lesson_id,
+                    'items' => [
+                        [
+                            'name' => $purchasedLesson->preRecordedLesson->title . " Lesson",
+                            'quantity' => 1,
+                            'description' => $description,
+                            'sku' => "lesson_" . $purchasedLesson->pre_r_lesson_id,
+                            'unit_amount' => [
+                                "currency_code" => $currency,
+                                "value" => $purchasedLesson->price,
+                            ],
+                            'tax' => [
+                                "currency_code" => $currency,
+                                "value" => $platformFee,
+                            ]
+                        ]
+                    ],
+                    "amount" => [
+                        "currency_code" => $currency,
+                        "value" => $totalAmount,
+                        'breakdown' => [
+                            'item_total' => [
+                                "currency_code" => $currency,
+                                "value" => $purchasedLesson->price,
+                            ],
+                            'handling' => [
+                                "currency_code" => $currency,
+                                "value" => $handlingFee,
+                            ],
+                            'tax_total' => [
+                                "currency_code" => $currency,
+                                "value" => $platformFee,
+                            ]
+                        ],
+                    ],
+                    'payee' => [
+                        'email_address' => $subMerchantEmail,
+                        'merchant_id' => $subMerchantId
+                    ],
+                    'payment_instruction' => [
+                        'platform_fees' => [
+                            [
+                                'amount' => [
+                                    "currency_code" => $currency,
+                                    "value" => $platformFee,
+                                ],
+                                'payer' => [
+                                    'merchant_id' => $this->getMasterMerchantId()
+                                ]
+                            ]
+                        ],
+                        'disbursement_mode' => "INSTANT",
+                    ]
+
+                ],
+            ],
+        ];
+
+        try {
+            $order = $this->payPalClient->setRequestHeaders([
+                'PayPal-Request-Id' => $this->getRandomString(),
+                'PayPal-Partner-Attribution-Id' => $this->getBnCde()
+            ])->createOrder($data);
+
+            if (!isset($order['error'])) {
+
+                return $this->payPalClient->setRequestHeaders([
+                    'PayPal-Request-Id' => $this->getRandomString(),
+                    'PayPal-Partner-Attribution-Id' => $this->getBnCde()
+                ])->capturePaymentOrder($order['id'], [ 'payment_source' => $userPaymentSource ]);
+
+            } else {
+                Log::channel('paypal')->error('Can\'t create transaction: ' . $order['error']['message']);
+                throw new Exception('Can\'t create transaction: ');
+            }
+
+        } catch (Exception $e) {
+            Log::channel('paypal')->error('Can\'t create transaction: ');
+            throw new Exception('Can\'t create transaction: ');
+        }
     }
 
 
@@ -441,9 +549,9 @@ class PayPalProcessor
             dd("stop");
             return $result;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::channel('paypal')->error("found payment method for {$user->id} is fail");
-            throw new \Exception("found payment method for {$user->id} is fail");
+            throw new Exception("found payment method for {$user->id} is fail");
         }
     }
 
@@ -489,9 +597,9 @@ class PayPalProcessor
 
             return $methods;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::channel('paypal')->error("found payment method for {$user->id} is fail");
-            throw new \Exception("found payment method for {$user->id} is fail");
+            throw new Exception("found payment method for {$user->id} is fail");
         }
     }
 
@@ -521,12 +629,12 @@ class PayPalProcessor
                 return ['token' => $result['id'], 'type' => $paymentMethodType];
             } else {
                 Log::channel('paypal')->error("create payment method for {$user->id} is fail  " . $result['error']['message']);
-                throw new \Exception('Can\'t create payment method: ' . $user->id);
+                throw new Exception('Can\'t create payment method: ' . $user->id);
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::channel('paypal')->error("create payment method for {$user->id} is fail");
-            throw new \Exception("'Can\'t create payment method for {$user->id} ");
+            throw new Exception("'Can\'t create payment method for {$user->id} ");
         }
 
     }
@@ -552,12 +660,12 @@ class PayPalProcessor
                 return $response['id'];
             } else {
                 Log::channel('paypal')->error("create Payment Setup Token for {$user->id} is fail  " . $response['error']['message']);
-                throw new \Exception("create Payment Setup Token for {$user->id} is fail");
+                throw new Exception("create Payment Setup Token for {$user->id} is fail");
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::channel('paypal')->error("create Payment Setup Token for {$user->id} is fail");
-            throw new \Exception("create Payment Setup Token for {$user->id} is fail");
+            throw new Exception("create Payment Setup Token for {$user->id} is fail");
         }
 
     }
@@ -576,17 +684,19 @@ class PayPalProcessor
             break;
 
         }
-
         return $type;
     }
 
+    /**
+     * @throws Throwable
+     */
     public function releaseTransactionFromEscrow($transactionId): array
     {
         $order = $this->payPalClient->showOrderDetails($transactionId);
         $referenceId = $order['purchase_units'][0]['payments']['captures'][0]['id'];
 
         return $this->payPalClient->setRequestHeaders([
-            'PayPal-Request-Id' => config('app.key'),
+            'PayPal-Request-Id' => $this->getRandomString(),
             'PayPal-Partner-Attribution-Id' => $this->getBnCde()
         ])->createReferencedBatchPayoutItem([
             "reference_id" => $referenceId,

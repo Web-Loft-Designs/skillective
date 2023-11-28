@@ -45,6 +45,7 @@ class PpReleaseFromEscrowHappenedLessonsPayments extends Command
 			->getHappenedLessonsPayedInEscrowBookings(50)
 			->each(function (Booking $booking) {
 				try{
+
 				    $response = PayPalProcessor::releaseTransactionFromEscrow($booking->transaction_id);
 
                     if(!isset($response['error'])) {

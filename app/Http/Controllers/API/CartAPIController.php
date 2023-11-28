@@ -154,7 +154,7 @@ class CartAPIController extends AppBaseController
      * @return JsonResponse
      * @throws Exception
      */
-    public function checkout(Request $request, UserRepository $user_repository)
+    public function checkout(Request $request, UserRepository $user_repository): JsonResponse
     {
         $student = null;
 
@@ -281,9 +281,10 @@ class CartAPIController extends AppBaseController
 
                 /**
                  * Approve Booking
-                 * просес покупки  preRLesson
+                 * просес створення транзакції preRLesson
                  */
-                $preRLesson->purchareLesson($user_repository, $request, $nonce ? $nonce[$key] : "", $student);
+
+                $preRLesson->purchaseLessonPp($user_repository, $request, $nonce ?? "", $student);
             }
 
             if (Auth::user() != null) {

@@ -63,7 +63,6 @@ trait Orders
     public function updateOrder(string $order_id, array $data)
     {
         $this->apiEndPoint = "v2/checkout/orders/{$order_id}";
-        $this->setRequestHeader('PayPal-Request-Id', config('app.key'));
 
         $this->options['json'] = $data;
 
@@ -85,8 +84,6 @@ trait Orders
     public function confirmOrder(string $order_id, array $data)
     {
         $this->apiEndPoint = "v2/checkout/orders/{$order_id}/confirm-payment-source";
-        $this->setRequestHeader('PayPal-Request-Id', config('app.key'));
-
         $this->options['json'] = (object) $data;
 
         $this->verb = 'post';
@@ -109,7 +106,6 @@ trait Orders
     public function authorizePaymentOrder(string $order_id, array $data = [])
     {
         $this->apiEndPoint = "v2/checkout/orders/{$order_id}/authorize";
-        $this->setRequestHeader('PayPal-Request-Id', config('app.key'));
 
         $this->options['json'] = (object) $data;
 
@@ -133,7 +129,6 @@ trait Orders
     public function capturePaymentOrder(string $order_id, array $data = [])
     {
         $this->apiEndPoint = "v2/checkout/orders/{$order_id}/capture";
-        $this->setRequestHeader('PayPal-Request-Id', config('app.key'));
 
         $this->options['json'] = (object) $data;
 

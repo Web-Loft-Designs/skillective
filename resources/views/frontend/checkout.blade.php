@@ -1,4 +1,5 @@
 @extends('layouts.app-frontend')
+
 @section('content')
     <div class="dashboard-cart-page">
         <div class="container dashboard-cart">
@@ -11,6 +12,7 @@
                         :user-payment-methods="{{ json_encode($ppUserPaymentMethods) }}"
                         :user="{{ json_encode($user) }}"
                         :confirmation-text="'{{ str_replace(["\r", "\n"], '', $settings['booking_confirmation_text']) }}'"
+                        :bn-code="'{{$bnCode}}'"
                         >
                         </lesson-booking-form-pp>
                     </checkout>

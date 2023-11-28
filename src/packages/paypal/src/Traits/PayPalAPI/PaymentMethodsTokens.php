@@ -20,7 +20,6 @@ trait PaymentMethodsTokens
     public function createPaymentSourceToken(array $data)
     {
         $this->apiEndPoint = 'v3/vault/payment-tokens';
-        $this->setRequestHeader('PayPal-Request-Id', config('app.key'));
 
         $this->options['json'] = $data;
 
@@ -99,7 +98,6 @@ trait PaymentMethodsTokens
     public function createPaymentSetupToken(array $data)
     {
         $this->apiEndPoint = 'v3/vault/setup-tokens';
-        $this->setRequestHeader('PayPal-Request-Id', config('app.key'));
 
         $this->options['json'] = $data;
 
@@ -120,7 +118,6 @@ trait PaymentMethodsTokens
     public function showPaymentSetupTokenDetails(string $token)
     {
         $this->apiEndPoint = "v3/vault/setup-tokens/{$token}";
-        $this->setRequestHeader('PayPal-Request-Id', config('app.key'));
 
         $this->verb = 'get';
 

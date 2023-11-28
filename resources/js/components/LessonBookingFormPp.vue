@@ -362,7 +362,8 @@ export default {
     userPaymentMethods: Array,
     user: Object,
     total: Object,
-    ppClientToken: String
+    ppClientToken: String,
+    bnCode: String,
   },
   data() {
     return {
@@ -428,7 +429,6 @@ export default {
   },
   mounted() {
     this.initNewPlacesAutocomplete('lessonLocation')
-    console.log(this.paymentMethods, 'saved methods')
   },
   computed: {
     isSelectedPaymentMethod() {
@@ -449,7 +449,10 @@ export default {
           buyerCountry: 'US',  // удалити при запуску на продакшені !!!!!!!
           locale: 'en_US',
           components: ['buttons', 'funding-eligibility', 'marks', 'card-fields'],
-          currency: 'USD'
+          currency: 'USD',
+          vault: true,
+          disableFunding: ['venmo,paylater'],
+          dataPartnerAttributionId: this.bnCode,
           // dataClientToken: this.user.pp_customer_id,
         })
         this.initPaymentMethod()
@@ -458,10 +461,6 @@ export default {
       }
     },
     initPaymentMethod() {
-      console.log(this.paypal.isFundingEligible(this.paypal.FUNDING.PAYPAL), ' is elig PAYPAL')
-      console.log(this.paypal.isFundingEligible(this.paypal.FUNDING.CARD), ' is elig CARD')
-      console.log(this.paypal.isFundingEligible(this.paypal.FUNDING.VENMO), ' is elig VENMO')
-      console.log(this.paypal.isFundingEligible(this.paypal.FUNDING.CREDIT), ' is elig CREDIT')
       if (this.paypal.FUNDING.CARD) this.renderCardForm()
       if (this.paypal.FUNDING.PAYPAL) this.renderPayPalButton()
     },

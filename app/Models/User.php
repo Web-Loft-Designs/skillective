@@ -275,6 +275,7 @@ class User extends Authenticatable implements HasMedia, Transformable
 			'last_name' => $this->last_name,
 			'full_name' => $this->getName(),
 			'email' => $this->getEmail(),
+            'pp_customer_id' => $this->pp_customer_id,
 			'profile' => !empty($this->profile) ? $this->profile->transform(): [],
 			'genres' => $this->genres->toArray(),
 			'is_featured' => $this->isFeatured(),

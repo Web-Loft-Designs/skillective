@@ -49,6 +49,7 @@ class CheckoutController extends Controller
             $vars['ppUserPaymentMethods'] = $isStudent ? PayPalProcessor::getSavedCustomerPaymentMethods($user) : [];
 
         }
+
         return view('frontend.checkout', $vars);
     }
 }

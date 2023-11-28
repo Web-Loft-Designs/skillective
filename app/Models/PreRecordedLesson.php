@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Facades\PayPalProcessor;
 use Illuminate\Database\Eloquent\Model;
-use App\Facades\BraintreeProcessor;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +31,7 @@ class PreRecordedLesson extends Model
     /**
      * @return BelongsTo
      */
-    public function genre()
+    public function genre(): BelongsTo
     {
         return $this->belongsTo(Genre::class, 'genre_id');
     }
@@ -39,7 +39,7 @@ class PreRecordedLesson extends Model
     /**
      * @return BelongsTo
      */
-    public function instructor()
+    public function instructor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'instructor_id');
     }
@@ -47,7 +47,7 @@ class PreRecordedLesson extends Model
     /**
      * @return HasMany
      */
-    public function files()
+    public function files(): HasMany
     {
         return $this->hasMany(PreRLessonFile::class, 'pre_r_lesson_id', 'id');
     }
@@ -55,7 +55,7 @@ class PreRecordedLesson extends Model
     /**
      * @return string
      */
-    public function getPreviewUrl()
+    public function getPreviewUrl(): string
     {
         return config('app.url') . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->preview;
     }
@@ -63,7 +63,7 @@ class PreRecordedLesson extends Model
     /**
      * @return string
      */
-    public function getVideoUrl()
+    public function getVideoUrl(): string
     {
         return config('app.url') . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->video;
     }
@@ -105,68 +105,56 @@ class PreRecordedLesson extends Model
         return number_format((float)$processorFee, 2, '.', '');
     }
 
-    /**
-     * @param $user_repository
-     * @param $request
-     * @param $paymentMethodNonce
-     * @param $student
-     * @return PurchasedLesson
-     * @throws \Exception
-     */
-    public function purchareLesson($user_repository, $request, $paymentMethodNonce, $student)
+
+    public function purchaseLessonPp($user_repository, $request, $paymentMethodNonce, $student): PurchasedLesson
     {
-		if(Auth::user() != null){
-			$user_repository->updateUserData(Auth::user()->id, $request);
-		}
-
-        if ($paymentMethodNonce) {
-            $device_data = $request->input('device_data', null);
-
-            $paymentMethod = BraintreeProcessor::createPaymentMethod($student, $paymentMethodNonce, $device_data);
-        } else {
-            $paymentMethodToken = $request->input('payment_method_token', null);
-            $paymentMethod = BraintreeProcessor::findPaymentMethod($paymentMethodToken);
-
-            if (!$paymentMethod || $paymentMethod->customerId != $student->braintree_customer_id) {
-                Log::error("Student {$student->id} booking : Payment method not defined");
-                throw new \Exception('Payment method not defined');
-            }
-            $paymentMethod = ['token' => $paymentMethod->token, 'type' => BraintreeProcessor::_getPaymentMethodType($paymentMethod)];
+        if(Auth::user() != null) {
+            $user_repository->updateUserData(Auth::user()->id, $request);
         }
 
+        if ($paymentMethodNonce) {
+            $paymentMethod = PayPalProcessor::createPaymentMethod($student, $paymentMethodNonce);
+        } else {
+            $paymentMethod = UserPaymentMethod::find($request->input('payment_method_token', null));
+            if (!$paymentMethod || $paymentMethod->user_id != $student->id) {
+                Log::channel('paypal')->error("Student {$student->id} booking : Payment method not defined" );
+                throw new \Exception('Payment method not defined');
+            }
+            $paymentMethod = ['token' => $paymentMethod->payment_method_token, 'type' => $paymentMethod->payment_method_type];
+        }
         if (!$paymentMethod) {
             throw new \Exception('Payment method not found');
         }
 
-        $purchashedLesson = new PurchasedLesson();
-        $purchashedLesson->pre_r_lesson_id = $request->input('pre_r_lesson_id', '');
-        $purchashedLesson->student_id        = $student->id;
-        $purchashedLesson->instructor_id        = $this->instructor_id;
-        $purchashedLesson->price                = $this->price;
-        $purchashedLesson->status            = PurchasedLesson::STATUS_PENDING;
-        $purchashedLesson->payment_method_token    = $paymentMethod['token'];
-        $purchashedLesson->payment_method_type    = $paymentMethod['type'];
-        $service_fee = $this->getPreRecordedLessonServiceFeeAmount($this->price);
-        $purchashedLesson->service_fee = $service_fee;
-        $purchashedLesson->processor_fee = $this->getPreRecordedLessonPaymentProcessingFeeAmount($this->price, $service_fee);
-        $instructorMerchantId = $this->instructor->bt_submerchant_id;
+        $purchasedLesson = new PurchasedLesson();
+        $purchasedLesson->pre_r_lesson_id         = $request->input('pre_r_lesson_id', '');
+        $purchasedLesson->student_id              = $student->id;
+        $purchasedLesson->instructor_id           = $this->instructor_id;
+        $purchasedLesson->price                   = $this->price;
+        $purchasedLesson->status                  = PurchasedLesson::STATUS_PENDING;
+        $purchasedLesson->payment_method_token    = $paymentMethod['token'];
+        $purchasedLesson->payment_method_type     = $paymentMethod['type'];
+        $service_fee                              = $this->getPreRecordedLessonServiceFeeAmount($this->price);
+        $purchasedLesson->service_fee             = $service_fee;
+        $purchasedLesson->processor_fee           = $this->getPreRecordedLessonPaymentProcessingFeeAmount($this->price, $service_fee);
+        $instructorMerchantId                     = $this->instructor->pp_merchant_id;
 
-        $purchashedLesson->save();
+        $purchasedLesson->save();
 
-        $transaction = BraintreeProcessor::createPurchasereLessonTransactionAndHoldInEscrow(
+        $transaction = PayPalProcessor::createSellPurchasereLessonTransaction(
             $instructorMerchantId,
-            $purchashedLesson->payment_method_token,
-            $purchashedLesson,
-            $purchashedLesson->service_fee,
-            $purchashedLesson->processor_fee
+            $purchasedLesson->payment_method_token,
+            $purchasedLesson,
+            $purchasedLesson->service_fee,
+            $purchasedLesson->processor_fee
         );
 
-        $purchashedLesson->transaction_id        = $transaction->id;
-        $purchashedLesson->transaction_status    = $transaction->status;
-        $purchashedLesson->transaction_created_at    = now();
-        $purchashedLesson->setStatusAttribute(PurchasedLesson::STATUS_ESCROW);
-        $purchashedLesson->save();
+        $purchasedLesson->transaction_id        = $transaction['id'];
+        $purchasedLesson->transaction_status    = $transaction['status'];
+        $purchasedLesson->transaction_created_at    = now();
+        $purchasedLesson->setStatusAttribute(PurchasedLesson::STATUS_ESCROW);
+        $purchasedLesson->save();
 
-        return $purchashedLesson;
+        return $purchasedLesson;
     }
 }
