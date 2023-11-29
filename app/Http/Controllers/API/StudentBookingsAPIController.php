@@ -63,7 +63,7 @@ class StudentBookingsAPIController extends AppBaseController
      * @param Booking $booking
      * @return JsonResponse
      */
-    public function cancel(Booking $booking)
+    public function cancel(Booking $booking): JsonResponse
     {
 		$this->_requestCancellation($booking);
         return $this->sendResponse(true, 'Booking cancellation request sent to instructor');
@@ -73,8 +73,8 @@ class StudentBookingsAPIController extends AppBaseController
      * @param CancelBookingsAPIRequest $request
      * @return JsonResponse
      */
-    public function cancelMany(CancelBookingsAPIRequest $request)
-	{
+    public function cancelMany(CancelBookingsAPIRequest $request): JsonResponse
+    {
 		$count_cancelled = 0;
 		foreach ($request->input('bookings') as $bookingId){
 			$booking = $this->bookingRepository->findWithoutFail($bookingId);
@@ -106,14 +106,15 @@ class StudentBookingsAPIController extends AppBaseController
      * @param Booking $booking
      * @return true
      */
-    private function _requestCancellation(Booking $booking){
+    private function _requestCancellation(Booking $booking): bool
+    {
 		$booking->has_cancellation_request = 1;
 		$booking->cancellation_request_created_at = now();
 		$booking->save();
 
 		try{
 			$booking->instructor->notify(new BookingCancellationRequestInstructorNotification($booking));
-		}catch (\Exception $e){
+		} catch (\Exception $e) {
 			Log::error("BookingCancellationRequestInstructorNotification Error: " . $e->getCode() . ': ' . $e->getMessage());
 		}
 		return true;

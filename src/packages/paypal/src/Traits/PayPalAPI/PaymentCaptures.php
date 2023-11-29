@@ -2,6 +2,8 @@
 
 namespace Srmklive\PayPal\Traits\PayPalAPI;
 
+use Throwable;
+
 trait PaymentCaptures
 {
     /**
@@ -9,7 +11,7 @@ trait PaymentCaptures
      *
      * @param string $capture_id
      *
-     * @throws \Throwable
+     * @throws Throwable
      *
      * @return array|\Psr\Http\Message\StreamInterface|string
      *
@@ -32,7 +34,7 @@ trait PaymentCaptures
      * @param float  $amount
      * @param string $note
      *
-     * @throws \Throwable
+     * @throws Throwable
      *
      * @return array|\Psr\Http\Message\StreamInterface|string
      *
@@ -50,6 +52,22 @@ trait PaymentCaptures
             'invoice_id'    => $invoice_id,
             'note_to_payer' => $note,
         ];
+
+        $this->verb = 'post';
+
+        return $this->doPayPalRequest();
+    }
+
+    /**
+     * @param string $capture_id
+     * @return float|object|int|bool|array|string|null
+     * @throws Throwable
+     */
+    public function refundAllCapturedPayment(string $capture_id): float|object|int|bool|array|string|null
+    {
+        $this->apiEndPoint = "v2/payments/captures/{$capture_id}/refund";
+
+        $this->options['json'] = (object)[];
 
         $this->verb = 'post';
 

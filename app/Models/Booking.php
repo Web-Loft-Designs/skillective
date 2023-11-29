@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Facades\PayPalProcessor;
-use Braintree\MerchantAccount;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use phpDocumentor\Reflection\PseudoTypes\Numeric_;
+use Illuminate\Support\Facades\Log;
 use Prettus\Repository\Contracts\Transformable;
-use App\Facades\BraintreeProcessor;
-
+use Exception;
+use Throwable;
 
 class Booking extends Model implements Transformable
 {
@@ -20,23 +21,25 @@ class Booking extends Model implements Transformable
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
-	const STATUS_PENDING	= 'pending'; // waiting merchant approval
-	const STATUS_APPROVED	= 'approved'; // NOT USED  merchant approved booking / payment collected by marketplace account
-	const STATUS_ESCROW		= 'payment_in_escrow'; // money on marketplace account
-	const STATUS_ESCROW_RELEASED		= 'payment_released'; // money transferring to merchant account
-	const STATUS_UNABLE_ESCROW_RELEASE	= 'payment_release_error'; // can't release transaction, reason sent to admin emails
-	const STATUS_COMPLETE	= 'complete'; // money moved to merchant account
-	const STATUS_CANCELLED	= 'cancelled'; // merchant cancelled booking , money must go back to student
+    const STATUS_PENDING = 'pending'; // waiting merchant approval
+    const STATUS_APPROVED = 'approved'; // NOT USED  merchant approved booking / payment collected by marketplace account
+    const STATUS_ESCROW = 'payment_in_escrow'; // money on marketplace account
+    const STATUS_ESCROW_RELEASED = 'payment_released'; // money transferring to merchant account
+    const STATUS_UNABLE_ESCROW_RELEASE = 'payment_release_error'; // can't release transaction, reason sent to admin emails
+    const STATUS_COMPLETE = 'complete'; // money moved to merchant account
+    const STATUS_CANCELLED = 'cancelled'; // merchant cancelled booking , money must go back to student
 
     protected $dates = ['deleted_at', 'transaction_created_at'];
 
     public $fillable = [
-    	'instructor_id',
-		'student_id',
+        'instructor_id',
+        'student_id',
         'spot_price',
-		'special_request',
-		'lesson_id',
-		'disconnected', // wheter room participant was refused from video lesson
+        'special_request',
+        'lesson_id',
+        'disconnected', // wheter room participant was refused from video lesson
+//        'pp_reference_id',
+//        'pp_processor_fee'
     ];
 
     /**
@@ -47,172 +50,171 @@ class Booking extends Model implements Transformable
     protected $casts = [
         'instructor_id' => 'integer',
         'student_id' => 'integer',
-		'lesson_id' => 'integer',
+        'lesson_id' => 'integer',
         'spot_price' => 'float',
         'special_request' => 'string',
-		'has_cancellation_request' => 'boolean',
-		'cancellation_request_created_at' => 'datetime',
+        'has_cancellation_request' => 'boolean',
+        'cancellation_request_created_at' => 'datetime',
         'disconnected' => 'boolean'
     ];
 
-	/**
-	 * Additional observable events.
-	 */
-	protected $observables = [
-		'statusChanged',
-	];
+    /**
+     * Additional observable events.
+     */
+    protected $observables = [
+        'statusChanged',
+    ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      **/
-    public function lesson()
+    public function lesson(): BelongsTo
     {
         return $this->belongsTo(Lesson::class, 'lesson_id');
-	}
+    }
 
-	public function regularNotifications()
-	{
-		return $this->hasMany(RegularNotification::class, 'user_regular_notifications');
-	}
+    public function regularNotifications(): HasMany
+    {
+        return $this->hasMany(RegularNotification::class, 'user_regular_notifications');
+    }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      **/
-    public function instructor()
+    public function instructor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'instructor_id');
     }
 
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-	 **/
-	public function student()
-	{
-		return $this->belongsTo(User::class, 'student_id');
-	}
-
-	public function transform()
-	{
-		return [
-			'id'				=> $this->id,
-			'instructor_id'		=> $this->instructor_id,
-			'student_id'		=> $this->student_id,
-			'lesson_id'			=> $this->lesson_id,
-			'student'			=> $this->student->transform(),
-			'instructor'		=> $this->instructor->transform(),
-			'lesson'			=> $this->lesson->transform(),
-			'spot_price'		=> $this->spot_price,
-			'special_request'	=> $this->special_request,
-			'status'			=> $this->status,
-			'has_cancellation_request'			=> $this->has_cancellation_request,
-            'disconnected'			=> $this->disconnected
-		];
-	}
-
-	public static function getStatuses()
-	{
-		return [
-			self::STATUS_PENDING,
-//			self::STATUS_APPROVED,
-			self::STATUS_ESCROW,
-			self::STATUS_ESCROW_RELEASED,
-			self::STATUS_UNABLE_ESCROW_RELEASE,
-			self::STATUS_CANCELLED,
-			self::STATUS_COMPLETE
-		];
-	}
-
-	public static function getStatusTitle($status)
-	{
-		switch ($status){
-			case self::STATUS_ESCROW:
-				return 'In Escrow';
-				break;
-			case self::STATUS_ESCROW_RELEASED:
-				return 'Released from Escrow';
-				break;
-			case self::STATUS_UNABLE_ESCROW_RELEASE:
-				return 'Unable release from Escrow';
-				break;
-			case self::STATUS_CANCELLED:
-				return 'Cancelled';
-				break;
-			case self::STATUS_COMPLETE:
-				return 'Complete';
-				break;
-			default:
-				return ucfirst(str_replace('_', ' ', $status));
-		}
-	}
-
-	public function setStatusAttribute($status)
-	{
-		if (in_array($status, self::getStatuses() ) && $this->status!==$status){
-			$this->attributes['status'] = $status;
-		}
-	}
-
-	public function save(array $options = array()) {
-		$statusChanged = $this->isDirty('status') ? true : false;
-
-		parent::save($options);
-
-		if($statusChanged) {
-			$this->fireModelEvent('statusChanged');
-		}
-	}
-
-	public function saveQuietly(array $options = [])
-	{
-		return static::withoutEvents(function () use ($options) {
-			return $this->save($options);
-		});
-	}
-
-	public function cancel($cancelledBy){
-		// few checks to prevent not desired transactions , just an assurance
-		if (
-			(!$this->lesson->alreadyStarted() && $this->status != self::STATUS_CANCELLED)
-			||
-			($this->lesson->alreadyStarted() && $this->status == self::STATUS_PENDING)
-		) {
-			if ($this->transaction_id) {
-				try {
-					BraintreeProcessor::cancelTransaction( $this->transaction_id );
-				}catch (\Exception $e){
-					if ($e->getCode()!=91512) // already cancelled
-						throw new \Exception($e->getMessage(), $e->getCode());
-				}
-			}
-			$this->setStatusAttribute( self::STATUS_CANCELLED );
-			$this->transaction_status = 'cancelled';
-			$this->has_cancellation_request = 0;
-			if ($cancelledBy)
-				$this->cancelled_by = $cancelledBy;
-			$this->save();
-
-			return true;
-		}else{
-			$reason = '';
-			if ($this->lesson->alreadyStarted())
-				$reason = "Lesson already started";
-			elseif ($this->status == self::STATUS_CANCELLED)
-				$reason = "Already cancelled";
-
-			throw new \Exception('Booking #'.$this->id.' can\'t be cancelled: ' . $reason, 400);
-		}
-		return false;
-	}
-
-	public function autoCancel(){
-		$cancelledBy = null;
-		$this->cancel($cancelledBy);
-	}
-
-
-	public function getBookingServiceFeeAmount($spotPrice = null): float
+    /**
+     * @return BelongsTo
+     **/
+    public function student(): BelongsTo
     {
-        if ($spotPrice==null) {
+        return $this->belongsTo(User::class, 'student_id');
+    }
+
+    public function transform(): array
+    {
+        return [
+            'id' => $this->id,
+            'instructor_id' => $this->instructor_id,
+            'student_id' => $this->student_id,
+            'lesson_id' => $this->lesson_id,
+            'student' => $this->student->transform(),
+            'instructor' => $this->instructor->transform(),
+            'lesson' => $this->lesson->transform(),
+            'spot_price' => $this->spot_price,
+            'special_request' => $this->special_request,
+            'status' => $this->status,
+            'has_cancellation_request' => $this->has_cancellation_request,
+            'disconnected' => $this->disconnected
+        ];
+    }
+
+    public static function getStatuses(): array
+    {
+        return [
+            self::STATUS_PENDING,
+//			self::STATUS_APPROVED,
+            self::STATUS_ESCROW,
+            self::STATUS_ESCROW_RELEASED,
+            self::STATUS_UNABLE_ESCROW_RELEASE,
+            self::STATUS_CANCELLED,
+            self::STATUS_COMPLETE
+        ];
+    }
+
+    public static function getStatusTitle($status): string
+    {
+        switch ($status) {
+            case self::STATUS_ESCROW:
+                return 'In Escrow';
+                break;
+            case self::STATUS_ESCROW_RELEASED:
+                return 'Released from Escrow';
+                break;
+            case self::STATUS_UNABLE_ESCROW_RELEASE:
+                return 'Unable release from Escrow';
+                break;
+            case self::STATUS_CANCELLED:
+                return 'Cancelled';
+                break;
+            case self::STATUS_COMPLETE:
+                return 'Complete';
+                break;
+            default:
+                return ucfirst(str_replace('_', ' ', $status));
+        }
+    }
+
+    public function setStatusAttribute($status): void
+    {
+        if (in_array($status, self::getStatuses()) && $this->status !== $status) {
+            $this->attributes['status'] = $status;
+        }
+    }
+
+    public function save(array $options = array())
+    {
+        $statusChanged = $this->isDirty('status') ? true : false;
+
+        parent::save($options);
+
+        if ($statusChanged) {
+            $this->fireModelEvent('statusChanged');
+        }
+    }
+
+    public function saveQuietly(array $options = [])
+    {
+        return static::withoutEvents(function () use ($options) {
+            return $this->save($options);
+        });
+    }
+
+    public function cancel($cancelledBy): bool
+    {
+        // few checks to prevent not desired transactions , just an assurance
+        if ((!$this->lesson->alreadyStarted() && $this->status != self::STATUS_CANCELLED) || ($this->lesson->alreadyStarted() && $this->status == self::STATUS_PENDING)) {
+            if ($this->transaction_id) {
+                try {
+                    PayPalProcessor::cancelTransaction($this->transaction_id);
+                } catch (Exception|Throwable $e) {
+                    Log::channel('paypal')->error('Can\'t cancel transaction. Transaction ' . $this->transaction_id . ' not found');
+                    throw new Exception('Can\'t cancel transaction. Transaction ' . $this->transaction_id . ' not found');
+                }
+            }
+            $this->setStatusAttribute(self::STATUS_CANCELLED);
+            $this->transaction_status = 'cancelled';
+            $this->has_cancellation_request = 0;
+            if ($cancelledBy) {
+                $this->cancelled_by = $cancelledBy;
+            }
+            $this->save();
+
+            return true;
+        } else {
+            $reason = '';
+            if ($this->lesson->alreadyStarted())
+                $reason = "Lesson already started";
+            elseif ($this->status == self::STATUS_CANCELLED)
+                $reason = "Already cancelled";
+
+            throw new \Exception('Booking #' . $this->id . ' can\'t be cancelled: ' . $reason, 400);
+        }
+    }
+
+    public function autoCancel()
+    {
+        $cancelledBy = null;
+        $this->cancel($cancelledBy);
+    }
+
+
+    public function getBookingServiceFeeAmount($spotPrice = null): float
+    {
+        if ($spotPrice == null) {
             $spotPrice = $this->spot_price;
         }
 
@@ -228,29 +230,28 @@ class Booking extends Model implements Transformable
 
     public function getBookingPaymentProcessingFeeAmount($spotPrice = null, $serviceFees = 0)
     {
-	    if ($spotPrice==null)
+        if ($spotPrice == null) {
             $spotPrice = $this->spot_price;
-
-        $braintreeProcessingFee = (float)Setting::getValue('braintree_processing_fee', 2.9); // %
-        $braintreeTransactionFee = (float)Setting::getValue('braintree_transaction_fee', 0.3); // $
-
-        $processorFee = (($spotPrice+$serviceFees)/100) * $braintreeProcessingFee + $braintreeTransactionFee;
+        }
+        $braintreeProcessingFee = (float)Setting::getValue('braintree_processing_fee', 2.99); // %
+        $braintreeTransactionFee = (float)Setting::getValue('braintree_transaction_fee', 0.49); // $
+        $processorFee = (($spotPrice + $serviceFees) / 100) * $braintreeProcessingFee + $braintreeTransactionFee;
 
         return number_format((float)$processorFee, 2, '.', '');
     }
 
     public function getBookingVirtualFeeAmount(Lesson $lesson = null)
     {
-        if ($lesson==null)
+        if ($lesson == null)
             $lesson = $this->lesson;
 
         $virtualLessonFee = 0;
-        if ($lesson->lesson_type=='virtual'){
+        if ($lesson->lesson_type == 'virtual') {
             $roomType = $lesson->getRoomType();
 
-            if ($roomType=='group'){
+            if ($roomType == 'group') {
                 $twilioMinutePrice = (float)Setting::getValue('twilio_group_fee', 0.01);
-            }else{
+            } else {
                 $twilioMinutePrice = (float)Setting::getValue('twilio_small_group_fee', 0.004);
             }
 
@@ -267,93 +268,39 @@ class Booking extends Model implements Transformable
         $serviceFee = $this->getBookingServiceFeeAmount($spotPrice);
         $virtualLessonFee = $this->getBookingVirtualFeeAmount($lesson);
 
-        $processorFee = $this->getBookingPaymentProcessingFeeAmount($spotPrice, ( $serviceFee+$virtualLessonFee ) );
+        $processorFee = $this->getBookingPaymentProcessingFeeAmount($spotPrice, ($serviceFee + $virtualLessonFee));
         $totalFee = $serviceFee + $processorFee + $virtualLessonFee;
 
         return number_format((float)$totalFee, 2, '.', '');
     }
 
-    // TODO  DELETE
-//	public function approve()
-//    {
-//        $serviceFee = $this->getBookingServiceFeeAmount();
-//        $virtualLessonFee = $this->getBookingVirtualFeeAmount();
-//        $processorFee = $this->getBookingPaymentProcessingFeeAmount($this->spot_price, ( $serviceFee+$virtualLessonFee ));
-//        $totalFee = $this->getBookingTotalFeeAmount();
-//
-//
-//			// few checks to prevent not desired transactions , just an assurance
-//			if (!$this->transaction_id
-//				&& ($instructorMerchantId = $this->instructor->bt_submerchant_id)!=null
-//				&& $this->instructor->bt_submerchant_status==MerchantAccount::STATUS_ACTIVE
-//				&& !$this->lesson->alreadyStarted()
-//				&& !$this->lesson->is_cancelled
-//				&& $this->status == self::STATUS_PENDING
-//
-//			){
-//
-//				$transaction = BraintreeProcessor::createSellBookingTransactionAndHoldInEscrow(
-//					$instructorMerchantId,
-//					$this->payment_method_token,
-//					$this,
-//                    ($serviceFee + $virtualLessonFee),
-//                    $processorFee
-//				);
-//
-//				$this->transaction_id		= $transaction->id;
-//				$this->transaction_status	= $transaction->status;
-//				$this->transaction_created_at	= now();
-//				$this->service_fee			= $serviceFee;
-//				$this->processor_fee		= $processorFee;
-//				$this->virtual_fee          = $virtualLessonFee;
-//				$this->setStatusAttribute(self::STATUS_ESCROW);
-//				$this->save();
-//			}
-//			else{
-//				$reason = '';
-//				if ($this->transaction_id)
-//					$reason = "Payment already sent";
-//				elseif ($this->instructor->bt_submerchant_id==null)
-//					$reason = "No merchant account provided. Please check Profile settings";
-//				elseif ($this->instructor->bt_submerchant_status!=MerchantAccount::STATUS_ACTIVE)
-//					$reason = "Merchant account not active";
-//				elseif ($this->lesson->alreadyStarted())
-//					$reason = "Lesson already started";
-//				elseif ($this->lesson->is_cancelled)
-//					$reason = "Lesson already cancelled";
-//				elseif ($this->status != self::STATUS_PENDING)
-//					$reason = "It is not a pending booking";
-//
-//				throw new \Exception('Booking #'.$this->id.' can\'t be approved: ' . $reason, 400);
-//			}
-//		return true;
-//	}
-
-
     public function approvePp(): bool
     {
         $serviceFee = $this->getBookingServiceFeeAmount();
         $virtualLessonFee = $this->getBookingVirtualFeeAmount();
-        $processorFee = $this->getBookingPaymentProcessingFeeAmount($this->spot_price, ( $serviceFee+$virtualLessonFee ));
+        $totalServiceFee = (float) $serviceFee + (float) $virtualLessonFee;
+        $processorFee = $this->getBookingPaymentProcessingFeeAmount($this->spot_price, $totalServiceFee);
 
         // few checks to prevent not desired transactions , just an assurance
-        if (!$this->transaction_id && ($this->instructor->pp_merchant_id)!=null
+        if (!$this->transaction_id && ($this->instructor->pp_merchant_id) != null
             && $this->instructor->pp_account_status == "BUSINESS_ACCOUNT" && !$this->lesson->alreadyStarted()
-            && !$this->lesson->is_cancelled && $this->status == self::STATUS_PENDING)  {
+            && !$this->lesson->is_cancelled && $this->status == self::STATUS_PENDING) {
 
             $transaction = PayPalProcessor::createSellBookingTransactionAndHoldInEscrow(
                 $this->payment_method_token,
                 $this,
-                ($serviceFee + $virtualLessonFee),
+                $totalServiceFee,
                 $processorFee
             );
 
-            $this->transaction_id		= $transaction['id'];
-            $this->transaction_status	= $transaction['status'];
-            $this->transaction_created_at	= now();
-            $this->service_fee			= $serviceFee;
-            $this->processor_fee		= $processorFee;
-            $this->virtual_fee          = $virtualLessonFee;
+            $this->transaction_id = $transaction['id'];
+            $this->transaction_status = $transaction['status'];
+            $this->transaction_created_at = now();
+            $this->service_fee = $serviceFee;
+            $this->processor_fee = $processorFee;  //  налог прогнозований
+            $this->pp_reference_id = $transaction['purchase_units'][0]['payments']['captures'][0]['id'];
+            $this->pp_processor_fee = $transaction['purchase_units'][0]['payments']['captures'][0]['seller_receivable_breakdown']['paypal_fee']['value']; // налог отриманий фактичний
+            $this->virtual_fee = $virtualLessonFee;
             $this->setStatusAttribute(self::STATUS_ESCROW);
             $this->save();
         } else {
@@ -371,7 +318,7 @@ class Booking extends Model implements Transformable
             elseif ($this->status != self::STATUS_PENDING)
                 $reason = "It is not a pending booking";
 
-            throw new \Exception('Booking #'.$this->id.' can\'t be approved: ' . $reason, 400);
+            throw new \Exception('Booking #' . $this->id . ' can\'t be approved: ' . $reason, 400);
         }
         return true;
     }

@@ -46,7 +46,7 @@ class PpReleaseFromEscrowHappenedLessonsPayments extends Command
 			->each(function (Booking $booking) {
 				try{
 
-				    $response = PayPalProcessor::releaseTransactionFromEscrow($booking->transaction_id);
+				    $response = PayPalProcessor::releaseTransactionFromEscrow($booking->pp_reference_id);
 
                     if(!isset($response['error'])) {
 
@@ -57,19 +57,19 @@ class PpReleaseFromEscrowHappenedLessonsPayments extends Command
                         $booking->setStatusAttribute(Booking::STATUS_ESCROW_RELEASED);
                         $booking->save();
 
-                        Log::channel('paypal')->info("releaseTransactionFromEscrow booking:{$booking->id} , transaction:{$booking->transaction_id}");
+                        Log::channel('paypal')->info("releaseTransactionFromEscrow booking:{$booking->id} , reference:{$booking->pp_reference_id}");
 
                     } else {
                         $booking->setStatusAttribute(Booking::STATUS_UNABLE_ESCROW_RELEASE);
                         $booking->status_reason = 'Can\'t release from escrow. ';
                         $booking->save();
-                        Log::channel('paypal')->error('Booking #'.$booking->id.', Transaction #'.$booking->transaction_id.': Can\'t release from escrow. ' . $response['error']['message']);
+                        Log::channel('paypal')->error('Booking #'.$booking->id.', reference #'.$booking->pp_reference_id.': Can\'t release from escrow. ' . $response['error']['message']);
                     }
 				} catch (\Exception $e) {
 					$booking->setStatusAttribute(Booking::STATUS_UNABLE_ESCROW_RELEASE);
 					$booking->status_reason = 'Can\'t release from escrow. ' . $e->getMessage();
 					$booking->save();
-                    Log::channel('paypal')->error('Booking #'.$booking->id.', Transaction #'.$booking->transaction_id.': Can\'t release from escrow. ' . $e->getMessage());
+                    Log::channel('paypal')->error('Booking #'.$booking->id.', reference #'.$booking->pp_reference_id.': Can\'t release from escrow. ' . $e->getMessage());
 				}
         });
     }

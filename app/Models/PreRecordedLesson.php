@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-
 class PreRecordedLesson extends Model
 {
     const CREATED_AT = 'created_at';
@@ -149,8 +148,10 @@ class PreRecordedLesson extends Model
             $purchasedLesson->processor_fee
         );
 
-        $purchasedLesson->transaction_id        = $transaction['id'];
-        $purchasedLesson->transaction_status    = $transaction['status'];
+        $purchasedLesson->transaction_id            = $transaction['id'];
+        $purchasedLesson->pp_reference_id           = $transaction['purchase_units'][0]['payments']['captures'][0]['id'];
+        $purchasedLesson->pp_processor_fee          = $transaction['purchase_units'][0]['payments']['captures'][0]['seller_receivable_breakdown']['paypal_fee']['value']; // налог отриманий фактичний
+        $purchasedLesson->transaction_status        = $transaction['status'];
         $purchasedLesson->transaction_created_at    = now();
         $purchasedLesson->setStatusAttribute(PurchasedLesson::STATUS_ESCROW);
         $purchasedLesson->save();

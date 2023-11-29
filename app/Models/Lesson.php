@@ -341,19 +341,19 @@ class Lesson extends Model implements Transformable
         }
 
         $booking = new Booking();
-        $booking->lesson_id = $request->input('lesson_id', '');;
-        $booking->special_request	= $request->input('special_request', '');
-        $booking->spot_price		= $this->spot_price;
-        $booking->instructor_id		= $this->instructor_id;
-        $booking->student_id		= $student->id;
-        $booking->status			= Booking::STATUS_PENDING;
+        $booking->lesson_id             = $request->input('lesson_id', '');;
+        $booking->special_request	    = $request->input('special_request', '');
+        $booking->spot_price		    = $this->spot_price;
+        $booking->instructor_id		    = $this->instructor_id;
+        $booking->student_id		    = $student->id;
+        $booking->status			    = Booking::STATUS_PENDING;
         $booking->payment_method_token	= $paymentMethod['token'];
         $booking->payment_method_type	= $paymentMethod['type'];
-        $service_fee = $booking->getBookingServiceFeeAmount($this->spot_price);
-        $virtual_fee = $booking->getBookingVirtualFeeAmount($this);
-        $booking->service_fee = $service_fee;
-        $booking->virtual_fee  = $virtual_fee;
-        $booking->processor_fee		= $booking->getBookingPaymentProcessingFeeAmount($this->spot_price, $service_fee + $virtual_fee);
+        $service_fee                    = $booking->getBookingServiceFeeAmount($this->spot_price);
+        $virtual_fee                    = $booking->getBookingVirtualFeeAmount($this);
+        $booking->service_fee           = $service_fee;
+        $booking->virtual_fee           = $virtual_fee;
+        $booking->processor_fee		    = $booking->getBookingPaymentProcessingFeeAmount($this->spot_price, $service_fee + $virtual_fee);
 
         $booking->save();
 

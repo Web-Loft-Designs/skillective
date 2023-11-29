@@ -39,6 +39,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('bookings:release_payments_from_pp_escrow')
             ->hourly()
             ->withoutOverlapping();
+        $schedule->command('purchased_lessons:release_payments_from_escrow')
+            ->hourly()
+            ->withoutOverlapping();
         // close rooms for past lessons
         $schedule->command('past_lessons_rooms:complete')
             ->everyMinute()

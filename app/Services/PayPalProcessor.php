@@ -282,7 +282,6 @@ class PayPalProcessor
                                     "REFUND",
                                     "PARTNER_FEE",
                                     "DELAY_FUNDS_DISBURSEMENT",
-                                    "ACCESS_MERCHANT_INFORMATION",
                                     "ADVANCED_TRANSACTIONS_SEARCH",
                                 ],
                             ]
@@ -310,8 +309,9 @@ class PayPalProcessor
     }
 
 
-    public function createSellBookingTransactionAndHoldInEscrow($paymentMethodVaultToken, $booking, $serviceFee, $expectedBrainTreeFee)
+    public function createSellBookingTransactionAndHoldInEscrow($paymentMethodVaultToken, $booking, $totalServiceFee, $processorFee)
     {
+
         // в залежності що прийде з фронта token paypal venmo
         $userPaymentSource = [
             'card' => ['vault_id' => $paymentMethodVaultToken],
@@ -319,12 +319,11 @@ class PayPalProcessor
 //            'venmo' => [ 'vault_id' => $paymentMethodVaultToken ]
         ];
 
-
-        $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
-        $totalAmount = round($booking->spot_price + $serviceFee + $expectedBrainTreeFee, 2);
         $currency = $this->payPalClient->getCurrency();
-        $handlingFee = number_format((float)$expectedBrainTreeFee, 2, '.', '');
-        $platformFee = number_format((float)$serviceFee, 2, '.', '');
+        $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
+        $totalAmount = round($booking->spot_price + $totalServiceFee + $processorFee, 2);
+//        $ppFee = number_format((float)$processorFee, 2, '.', '');
+        $sklFee = number_format((float)$totalServiceFee, 2, '.', '');
         $subMerchantId = $booking->instructor->pp_merchant_id;
         $subMerchantEmail = $booking->instructor->email;
 
@@ -337,39 +336,10 @@ class PayPalProcessor
                     'custom_id' => "booking_" . $booking->id,
                     'invoice_id' => "booking_" . $booking->id,
                     'soft_descriptor' => "*lesson*" . $booking->lesson_id,
-                    'items' => [
-                        [
-                            'name' => $booking->lesson->genre->title . " Lesson",
-                            'quantity' => 1,
-                            'description' => $description,
-                            'sku' => "lesson_" . $booking->lesson_id,
-                            'unit_amount' => [
-                                "currency_code" => $currency,
-                                "value" => $booking->spot_price,
-                            ],
-                            'tax' => [
-                                "currency_code" => $currency,
-                                "value" => $platformFee,
-                            ]
-                        ]
-                    ],
                     "amount" => [
                         "currency_code" => $currency,
                         "value" => $totalAmount,
-                        'breakdown' => [
-                            'item_total' => [
-                                "currency_code" => $currency,
-                                "value" => $booking->spot_price,
-                            ],
-                            'handling' => [
-                                "currency_code" => $currency,
-                                "value" => $handlingFee,
-                            ],
-                            'tax_total' => [
-                                "currency_code" => $currency,
-                                "value" => $platformFee,
-                            ]
-                        ],
+
                     ],
                     'payee' => [
                         'email_address' => $subMerchantEmail,
@@ -380,16 +350,12 @@ class PayPalProcessor
                             [
                                 'amount' => [
                                     "currency_code" => $currency,
-                                    "value" => $platformFee,
+                                    "value" => $sklFee,
                                 ],
-                                'payer' => [
-                                    'merchant_id' => $this->getMasterMerchantId()
-                                ]
                             ]
                         ],
                         'disbursement_mode' => "DELAYED",
                     ]
-
                 ],
             ],
         ];
@@ -401,11 +367,11 @@ class PayPalProcessor
             ])->createOrder($data);
 
             if (!isset($order['error'])) {
-
                 return $this->payPalClient->setRequestHeaders([
                     'PayPal-Request-Id' => $this->getRandomString(),
                     'PayPal-Partner-Attribution-Id' => $this->getBnCde()
                 ])->capturePaymentOrder($order['id'], [ 'payment_source' => $userPaymentSource ]);
+
 
             } else {
                 Log::channel('paypal')->error('Can\'t create transaction: ' . $order['error']['message']);
@@ -419,6 +385,59 @@ class PayPalProcessor
 
     }
 
+
+    /**
+     * @throws Throwable
+     */
+    public function releaseTransactionFromEscrow($referenceId): array
+    {
+        return $this->payPalClient->setRequestHeaders([
+            'PayPal-Request-Id' => $this->getRandomString(),
+            'PayPal-Partner-Attribution-Id' => $this->getBnCde()
+        ])->createReferencedBatchPayoutItem([
+            "reference_id" => $referenceId,
+            "reference_type" => "TRANSACTION_ID"
+        ]);
+    }
+
+    public function cancelTransaction($transactionId): bool
+    {
+        try {
+            $order = $this->payPalClient->showOrderDetails($transactionId);
+
+            if(isset($order['purchase_units'][0]['payments']['captures'][0]['id'])) {
+                $merchantId = $order['purchase_units'][0]['payee']['merchant_id'];
+                $this->payPalClient->setRequestHeaders([
+                    'PayPal-Request-Id' => $this->getRandomString(),
+                    'PayPal-Auth-Assertion' => $this->getAuthAssertionValue($this->getClientId(), $merchantId)
+                ])->refundAllCapturedPayment($order['purchase_units'][0]['payments']['captures'][0]['id']);
+
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (Exception|Throwable $e) {
+            Log::channel('paypal')->error('Can\'t cancel transaction. Transaction '.$transactionId.' not found');
+            throw new Exception('Can\'t cancel transaction. Transaction '.$transactionId.' not found');
+        }
+
+    }
+
+    protected function getAuthAssertionValue( $clientId, string $sellerPayerId): string
+    {
+        $header = [
+            "alg" => "none"
+        ];
+        $encodedHeader = rtrim(strtr(base64_encode(json_encode($header)), '+/', '-_'), '=');
+        $payload = [
+            "iss" => $clientId,
+            "payer_id" => $sellerPayerId
+        ];
+        $encodedPayload = rtrim(strtr(base64_encode(json_encode($payload)), '+/', '-_'), '=');
+        return $encodedHeader . '.' . $encodedPayload . '.';
+    }
+
     public function createSellPurchasereLessonTransaction($subMerchantId, $paymentMethodVaultToken, $purchasedLesson, $serviceFee, $processorFee)
     {
         // в залежності що прийде з фронта token paypal venmo
@@ -427,13 +446,10 @@ class PayPalProcessor
 //            'paypal' => ['vault_id' => $paymentMethodVaultToken],
 //            'venmo' => [ 'vault_id' => $paymentMethodVaultToken ]
         ];
-
         $description = "{$purchasedLesson->preRecordedLesson->title} Lesson #{$purchasedLesson->pre_r_lesson_id}, booking #{$purchasedLesson->id}, (instructor #{$purchasedLesson->instructor_id})";
         $totalAmount = round($purchasedLesson->price + $serviceFee + $processorFee, 2);
         $currency = $this->payPalClient->getCurrency();
-        $handlingFee = number_format((float)$processorFee, 2, '.', '');
         $platformFee = number_format((float)$serviceFee, 2, '.', '');
-        $subMerchantEmail = $purchasedLesson->instructor->email;
 
         $data = [
             "intent" => "CAPTURE",
@@ -444,42 +460,11 @@ class PayPalProcessor
                     'custom_id' => "booking_" . $purchasedLesson->id,
                     'invoice_id' => "booking_" . $purchasedLesson->id,
                     'soft_descriptor' => "*lesson*" . $purchasedLesson->pre_r_lesson_id,
-                    'items' => [
-                        [
-                            'name' => $purchasedLesson->preRecordedLesson->title . " Lesson",
-                            'quantity' => 1,
-                            'description' => $description,
-                            'sku' => "lesson_" . $purchasedLesson->pre_r_lesson_id,
-                            'unit_amount' => [
-                                "currency_code" => $currency,
-                                "value" => $purchasedLesson->price,
-                            ],
-                            'tax' => [
-                                "currency_code" => $currency,
-                                "value" => $platformFee,
-                            ]
-                        ]
-                    ],
                     "amount" => [
                         "currency_code" => $currency,
                         "value" => $totalAmount,
-                        'breakdown' => [
-                            'item_total' => [
-                                "currency_code" => $currency,
-                                "value" => $purchasedLesson->price,
-                            ],
-                            'handling' => [
-                                "currency_code" => $currency,
-                                "value" => $handlingFee,
-                            ],
-                            'tax_total' => [
-                                "currency_code" => $currency,
-                                "value" => $platformFee,
-                            ]
-                        ],
                     ],
                     'payee' => [
-                        'email_address' => $subMerchantEmail,
                         'merchant_id' => $subMerchantId
                     ],
                     'payment_instruction' => [
@@ -489,14 +474,10 @@ class PayPalProcessor
                                     "currency_code" => $currency,
                                     "value" => $platformFee,
                                 ],
-                                'payer' => [
-                                    'merchant_id' => $this->getMasterMerchantId()
-                                ]
                             ]
                         ],
-                        'disbursement_mode' => "INSTANT",
+                        'disbursement_mode' => "DELAYED",
                     ]
-
                 ],
             ],
         ];
@@ -652,7 +633,6 @@ class PayPalProcessor
         ];
 
         try {
-
             $response = $this->payPalClient->createPaymentSetupToken($data);
             if (!isset($response['error'])) {
                 $user->pp_customer_id = $response['customer']['id'];
@@ -687,23 +667,6 @@ class PayPalProcessor
         return $type;
     }
 
-    /**
-     * @throws Throwable
-     */
-    public function releaseTransactionFromEscrow($transactionId): array
-    {
-        $order = $this->payPalClient->showOrderDetails($transactionId);
-        $referenceId = $order['purchase_units'][0]['payments']['captures'][0]['id'];
-
-        return $this->payPalClient->setRequestHeaders([
-            'PayPal-Request-Id' => $this->getRandomString(),
-            'PayPal-Partner-Attribution-Id' => $this->getBnCde()
-        ])->createReferencedBatchPayoutItem([
-            "reference_id" => $referenceId,
-            "reference_type" => "TRANSACTION_ID"
-        ]);
-
-    }
 
 
 }
