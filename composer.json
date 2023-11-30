@@ -63,7 +63,8 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
-            "Tylercd100\\Placeholders\\":"src/packages/laravel-placeholders-master/src"
+            "Tylercd100\\Placeholders\\":"src/packages/laravel-placeholders-master/src",
+            "Srmklive\\PayPal\\": "src/packages/paypal/src"
         },
         "classmap": [
             "database/seeders",

@@ -525,6 +525,7 @@ export default {
       var vueComponent = this
 
       return new Promise((resolve, reject) => {
+          console.log(this.fields.cardholderName)
         this.braintreeClientInstance.tokenize(
           {
             cardholderName: this.fields.cardholderName,
@@ -554,20 +555,20 @@ export default {
       this.bookingStep = 1
     },
     async onSubmitStepCreditCard2() {
-      if (this.getTotal.count > 0) {
-        if (this.selectedPaymentMethodObj == null) {
+      if (this.getTotal.count > 0) {  // перевірка кількості позицій в корзині тут визивається  1 зайвий заппит  getTotal  замість цого можнна використати  this.total.count
+        if (this.selectedPaymentMethodObj == null) {   // перевірка чи у поточного користувача є платіжний метод  user-payment-methods
           let i = 0
-          const payment_method_nonce = []
+          const payment_method_nonce = []  // назва змінної куди треба записати отриманий токен
 
-          while (i < this.getTotal.count) {
-            let token = await this.fetchBrainthreeToken()
-            payment_method_nonce.push(token)
-            i++
+          while (i < this.getTotal.count) {                   // отримання токену  VaultSetupToken  для кожної позиції
+            let token = await this.fetchBrainthreeToken()     //  замість даної логіки використати запит на наш сервер
+            payment_method_nonce.push(token)                 // отримати стартовий токен  VaultSetupToken і передати у paypal
+            i++                                             // від paypal отримати оновлений токен для кожної позиції к корзині і зберегти у змінну  payment_method_nonce
           }
 
           this.fields.payment_method_nonce = payment_method_nonce
 
-          setTimeout(() => {
+          setTimeout(() => {    // викликати відправку форми оплати з оновленими даними на наш  маршрут   /api/cart/checkout
             this.book()
           }, 1)
         } else {
@@ -604,7 +605,6 @@ export default {
         this.clearSubmittedForm()
         this.successText = null
         this.bookingStep = 3
-        this.fetchCartTotal()
         this.fetchCartItems()
         this.checkoutSuccess = true
       }

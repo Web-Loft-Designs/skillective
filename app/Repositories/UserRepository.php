@@ -421,10 +421,11 @@ class UserRepository extends BaseRepository
      * @param $userId
      * @return User
      */
-    public function getUserData($userId)
-	{
-		if (!$userId)
-			$userId = Auth::user()->id;
+    public function getUserData($userId): User
+    {
+		if (!$userId) {
+            $userId = Auth::user()->id;
+        }
 		return $this->with(['profile', 'genres', 'genres.category', 'roles'])->find($userId);
 	}
 
@@ -471,6 +472,57 @@ class UserRepository extends BaseRepository
 		}
 		return false;
 	}
+
+    /**
+     * @param string $ppTrackingId
+     * @param int $userId
+     * @return false
+     */
+    public function updateUserPpTrackingId(string $ppTrackingId, int $userId): bool
+    {
+        $user = $this->find($userId);
+        $user?->update(['pp_tracking_id' => $ppTrackingId]);
+        return false;
+    }
+
+    public function updateUserPpReferralId(string $ppReferralId, int $userId): bool
+    {
+        $user = $this->find($userId);
+        $user?->update(['pp_referral_id' => $ppReferralId]);
+        return false;
+    }
+
+    public function updateUserPpMerchantId(string $merchantId, int $userId): bool
+    {
+        $user = $this->find($userId);
+        $user?->update(['pp_merchant_id' => $merchantId]);
+        return false;
+    }
+
+    /**
+     * @param array $data
+     * @param int $userId
+     * @return bool
+     */
+    public function updateUserPpData(array $data, int $userId): bool
+    {
+        $user = $this->find($userId);
+        $user?->update([
+            'pp_merchant_id' => $data['merchant_id'],
+            'pp_account_status' => $data['account_status'],
+        ]);
+        return false;
+    }
+
+    public function savePaymentMethod($user, $data): void
+    {
+
+      $user->findPaymentMethod()->create([
+            'payment_method_type' => $data['type'],
+            'payment_method_token' => $data['token']
+        ]);
+
+    }
 
     /**
      * @param $lesson

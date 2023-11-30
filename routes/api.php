@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\API\CartAPIController;
+use App\Http\Controllers\API\InstructorBookingsAPIController;
 use App\Http\Controllers\API\PreRLessonsAPIController;
+use App\Http\Controllers\API\StudentBookingsAPIController;
 use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
@@ -142,7 +145,7 @@ Route::group(['middleware' => ['role:Instructor']], function () {
 	Route::post('instructor/booking/{booking}/approve', 'InstructorBookingsAPIController@approve'); // + payment process
 	Route::post('instructor/booking/{booking}/reject', 'InstructorBookingsAPIController@reject');
 	Route::post('instructor/bookings/cancel', 'InstructorBookingsAPIController@cancelMany'); // + money return
-	Route::delete('instructor/booking/{booking}', 'InstructorBookingsAPIController@cancel'); // cancel approved booking
+	Route::delete('instructor/booking/{booking}', [InstructorBookingsAPIController::class, 'cancel']); // cancel approved booking
 	Route::put('instructor/booking/approve/{booking}', 'InstructorBookingsAPIController@approve'); // confirm pending booking
 
 	Route::get('instructor/clients', 'InstructorClientsAPIController@index'); // current instructor clients
@@ -161,14 +164,18 @@ Route::group(['middleware' => ['role:Instructor']], function () {
 	Route::get('instructor/payouts', 'InstructorPayoutsAPIController@index');
 });
 
-Route::get('cart', 'CartAPIController@index');
-Route::get('cart/has-items', 'CartAPIController@isCartHasItems');
-Route::get('cart/total', 'CartAPIController@getCartSummary');
-Route::post('cart/checkout', 'CartAPIController@checkout');
-Route::get('cart/promo/{promo}', 'CartAPIController@checkIsPromoIsValid');
+// Крзина та оплата
+Route::prefix('/cart')->group(function () {
+    Route::get('/vault-setup-token', [CartAPIController::class, 'getPpVaultSetupToken']);
+    Route::get('/', [CartAPIController::class, 'index']);
+    Route::get('/has-items', [CartAPIController::class, 'isCartHasItems']);
+    Route::get('/total', [CartAPIController::class, 'getCartSummary']);
+    Route::post('/checkout', [CartAPIController::class, 'checkout']);
+    Route::get('/promo/{promo}', [CartAPIController::class, 'checkIsPromoIsValid']);
+    Route::post('/validate-user-info', [CartAPIController::class, 'validateUserData']);
+});
 
 Route::post('student/instructors', 'StudentInstructorsAPIController@add'); // add many
-Route::post('cart/validate-user-info', 'CartAPIController@validateUserData');
 Route::group(['middleware' => ['role:Student']], function () {
 	Route::post('cart', 'CartAPIController@store');
 	Route::delete('cart/{cart}', 'CartAPIController@delete');
@@ -176,7 +183,7 @@ Route::group(['middleware' => ['role:Student']], function () {
 	Route::post('lesson-request', 'LessonRequestAPIController@store');
 	Route::get('student/bookings', 'StudentBookingsAPIController@index'); // current student bookings
 	Route::get('student/bookings/export', 'StudentBookingsAPIController@export'); // current instructor lessons EXPORT
-	Route::delete('student/booking/{booking}', 'StudentBookingsAPIController@cancel'); // request cancellation booking
+	Route::delete('student/booking/{booking}', [StudentBookingsAPIController::class, 'cancel']); // request cancellation booking
 	Route::post('student/bookings/cancel', 'StudentBookingsAPIController@cancelMany'); // request cancellation many
 	Route::get('student/bookings/past', 'StudentBookingsAPIController@index'); // past student bookings
 	Route::post('student/bookings/share', 'StudentBookingsAPIController@share'); // share student bookings calendar

@@ -51,7 +51,13 @@ class User extends Authenticatable implements HasMedia, Transformable
 	 * @var array
 	 */
 	protected $fillable = [
-		'first_name', 'last_name', 'email', 'password', 'accepted_invitation_id', 'tax_id', 'legal_name'
+		'first_name','last_name','email','legal_name',
+        'password', 'accepted_invitation_id','tax_id',
+        'pp_tracking_id',
+        'pp_merchant_id',
+        'pp_referral_id',
+        'pp_account_status',
+        'pp_customer_id',
 	];
 
 	/**
@@ -79,6 +85,7 @@ class User extends Authenticatable implements HasMedia, Transformable
 		'statusChanged',
 		'submerchantStatusChanged'
 	];
+
 
 
     /**
@@ -236,7 +243,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasMany
      */
-    public function paymentMethods()
+    public function findPaymentMethod()
 	{
 		return $this->hasMany(UserPaymentMethod::class, 'user_id', 'id');
 	}
@@ -268,6 +275,7 @@ class User extends Authenticatable implements HasMedia, Transformable
 			'last_name' => $this->last_name,
 			'full_name' => $this->getName(),
 			'email' => $this->getEmail(),
+            'pp_customer_id' => $this->pp_customer_id,
 			'profile' => !empty($this->profile) ? $this->profile->transform(): [],
 			'genres' => $this->genres->toArray(),
 			'is_featured' => $this->isFeatured(),
@@ -567,9 +575,11 @@ class User extends Authenticatable implements HasMedia, Transformable
      */
     public function canAddNewLesson()
 	{
-		return ($this->bt_submerchant_id != null
-			&& $this->bt_submerchant_status == 'active'
+        // TODO перевірка чи може інструктор створити урок
+		return (
+           ($this->pp_merchant_id != null )
 			&& ($this->hasMedia('website_images') || $this->hasMedia('instagram'))
-			&& ($this->profile->avatar != '' && $this->profile->avatar != null));
+			&& ($this->profile->avatar != '' && $this->profile->avatar != null)
+        );
 	}
 }

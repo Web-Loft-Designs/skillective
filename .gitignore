@@ -29,13 +29,10 @@ yarn-error.log
 /.vscode
 /.hg
 /.hgignore
-package-lock.json
-package.json
 /public/css/app.css
 /public/css/app-front.css
 /public/js/app.js
 /public/js/app.js.LICENSE.txt
 /public/storage
 /database/seeds/TestSeeder.php
-composer.lock
 /htdocs

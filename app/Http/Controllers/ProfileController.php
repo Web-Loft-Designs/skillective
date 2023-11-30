@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\PayPalProcessor;
 use App\Models\Booking;
 use Braintree\MerchantAccount;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -35,10 +37,8 @@ class ProfileController extends Controller
 		$this->genreRepository	= $genreRepo;
 		$this->userRepository	= $userRepo;
 		$this->lessonRepository	= $lessonRepo;
-
 		parent::__construct();
 	}
-
 
     /**
      * @param User $user
@@ -126,8 +126,9 @@ class ProfileController extends Controller
     /**
      * @param User|null $user
      * @return Application|Factory|View|never
+     * @throws Exception
      */
-    public function edit(User $user = null)
+    public function edit(Request $request, User $user = null)
 	{
 		$isAdmin = false;
 		if (!Auth::user()->hasRole(User::ROLE_ADMIN)){
@@ -167,25 +168,31 @@ class ProfileController extends Controller
             'userGenres'	=> $this->genreRepository->presentResponse(Auth::user()->genres)['data']
 		];
 
-		if ($isInstructor){
-			$savedMerchantAccountDetails = BraintreeProcessor::getMerchantAccountDetails($user);
-			// useful for local site which doesn't receive webhook notifications
-			if ($savedMerchantAccountDetails!=null && $savedMerchantAccountDetails['status']=='active' && $user->bt_submerchant_status=='pending'){
-				$this->userRepository->updateUserSubMerchantStatus( $user->bt_submerchant_id, MerchantAccount::STATUS_ACTIVE );
-			}
-            $savedMerchantAccountDetails['taxId'] = Auth::user()->tax_id;
-            $savedMerchantAccountDetails['legalName'] = Auth::user()->legal_name;
-			$vars['savedMerchantAccountDetails']  = $savedMerchantAccountDetails;
+		if ($isInstructor) {
+            $refererUrl = PayPalProcessor::getEnvironmentUrl();
+             if ($request->hasHeader('referer') &&  $request->header('referer') == $refererUrl) {
+                 //перехват запиту з першого редіректа з пайпалу
+                 $vars['ppMerchantAccount'] = PayPalProcessor::handleRegisterMerchant($request->all());
+                 // запустити флеш меседж
+              } else {
+                 // отримати статус та деталі інтеграції з paypal
+                 $vars['ppMerchantAccount'] = PayPalProcessor::getMerchantDetail($user);
+             }
+
 		}
-		if ($isAdmin){
+		if ($isAdmin) {
 			$vars['defaultMaxAllowedInstructorInvites']  = Setting::getValue('max_allowed_instructor_invites');
 			$vars['countInstructorInvitationsSent']  = $user->instructorInvitations()->count();
 			$vars['countInstructorInvitationsApplied']  = $user->instructorInvitations()->whereNotNull('invited_user_id')->count();
 		}
-		if (!$isAdmin && !$isInstructor){
+		if (!$isAdmin && !$isInstructor) {
+
+            //  для студента  або покупця
 			$vars['clientToken'] = BraintreeProcessor::generateClientToken($user);
 			$vars['paymentMethods'] = BraintreeProcessor::getSavedCustomerPaymentMethods($user);
 			$vars['paymentEnvironment'] = config('services.braintree.environment');
+
+
 		}
 
 		return view("frontend.{$template}.profile-edit", $vars);

@@ -328,7 +328,6 @@ class CartRepository extends BaseRepository
                 $response["subtotal"] += round($cartItem->preRecordedLesson->price, 2);
                 $response["fee"] += $service_fee + $processor_fee;
                 $response["total"] += $finishPrice + $service_fee + $processor_fee;
-
             }
         }
 

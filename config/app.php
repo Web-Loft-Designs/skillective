@@ -178,7 +178,6 @@ return [
 		Laracasts\Flash\FlashServiceProvider::class,
 		Prettus\Repository\Providers\RepositoryServiceProvider::class,
 		\InfyOm\Generator\InfyOmGeneratorServiceProvider::class,
-		\InfyOm\AdminLTETemplates\AdminLTETemplatesServiceProvider::class,
 		Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 		Barryvdh\Debugbar\ServiceProvider::class,
 		Spatie\Permission\PermissionServiceProvider::class,
@@ -189,13 +188,14 @@ return [
 //		Unisharp\Ckeditor\ServiceProvider::class,
 		\Torann\GeoIP\GeoIPServiceProvider::class,
 		App\Providers\UserRegistratorServiceProvider::class,
-		App\Providers\BraintreeProcessorServiceProvider::class,
 		App\Providers\IncomesCalculatorServiceProvider::class,
 		App\Providers\ReportsBuilderServiceProvider::class,
 		App\Providers\InstagramLoaderServiceProvider::class,
         App\Providers\TwilioVideoServiceProvider::class,
-
 		Maatwebsite\Excel\ExcelServiceProvider::class,
+        App\Providers\BraintreeProcessorServiceProvider::class, // TODO Delete
+        App\Providers\PayPalProcessorServiceProvider::class
+
     ],
 
     /*
@@ -253,9 +253,10 @@ return [
 		'Socialite'    => Laravel\Socialite\Facades\Socialite::class,
 		'GeoIP' => \Torann\GeoIP\Facades\GeoIP::class,
 		'Excel' => Maatwebsite\Excel\Facades\Excel::class,
-		'BraintreeProcessor' => App\Facades\BraintreeProcessor::class,
 		'InstagramLoader' => App\Facades\InstagramLoader::class,
         'TwilioVideo' => \App\Facades\TwilioVideo::class,
+        'BraintreeProcessor' => App\Facades\BraintreeProcessor::class,//  TODO DELETE
+
     ],
 
 ];

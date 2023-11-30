@@ -2,28 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\PayPalProcessor;
 use App\Repositories\CartRepository;
-use App\Repositories\GenreRepository;
 use App\Repositories\UserRepository;
-use App\Facades\BraintreeProcessor;
 use App\Models\User;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
     /**
-     * @param Request $request
      * @param CartRepository $cartRepository
-     * @param GenreRepository $genreRepository
      * @param UserRepository $userRepository
-     * @return Application|Factory|View
+     * @return View
      */
-    public function index(Request $request, CartRepository $cartRepository, GenreRepository $genreRepository, UserRepository $userRepository)
+    public function index(CartRepository $cartRepository, UserRepository $userRepository): View
     {
         $userData = null;
         $user = Auth::user();
@@ -38,19 +36,18 @@ class CheckoutController extends Controller
         }
 
         $vars = [
-            'page_title'    => 'Checkout',
-            'total' => $total,
-            'lessonsCount' => $lessonsInACart,
-            'user'                => $userData,
-            'siteGenres'        => $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
-            'categorizedGenres' => $genreRepository->getCategorizedGenres(),
+            'page_title'        => 'Checkout',
+            'total'             => $total,
+            'lessonsCount'      => $lessonsInACart,
+            'user'              => $userData,
         ];
 
         $isStudent = ($user && $user->hasRole(User::ROLE_STUDENT));
         if (!$user || $isStudent) {
-            $vars['clientToken'] = BraintreeProcessor::generateClientToken($user);
-            $vars['paymentEnvironment'] = config('services.braintree.environment');
-            $vars['userPaymentMethods'] = $isStudent ? BraintreeProcessor::getSavedCustomerPaymentMethods($user) : [];
+            $vars['ppClientToken'] = PayPalProcessor::getClientId();
+            $vars['bnCode'] = PayPalProcessor::getBnCde();
+            $vars['ppUserPaymentMethods'] = $isStudent ? PayPalProcessor::getSavedCustomerPaymentMethods($user) : [];
+
         }
 
         return view('frontend.checkout', $vars);

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Facades\PayPalProcessor;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Database\Eloquent\Model;
@@ -252,78 +253,135 @@ class Lesson extends Model implements Transformable
                 ->format('Y-m-d H:i:s')); // compare lesson datetime with current time on lesson location
 	}
 
-    /**
-     * @param $user_repository
-     * @param $request
-     * @param $paymentMethodNonce
-     * @param $student
-     * @return Booking
-     * @throws \Exception
-     */
-    public function book($user_repository, $request, $paymentMethodNonce, $student)
-	{
-		if(Auth::user() != null){
-			$user_repository->updateUserData(Auth::user()->id, $request);
-		}
-		if ($paymentMethodNonce) {
-			$device_data = $request->input('device_data', null);
-			$paymentMethod = BraintreeProcessor::createPaymentMethod($student, $paymentMethodNonce, $device_data);
-		} else {
-			$paymentMethodToken = $request->input('payment_method_token', null);
-			$paymentMethod = BraintreeProcessor::findPaymentMethod($paymentMethodToken);
+    // TODO  DELETE
+//    public function book($user_repository, $request, $paymentMethodNonce, $student)
+//	{
+//		if(Auth::user() != null) {
+//			$user_repository->updateUserData(Auth::user()->id, $request);
+//		}
+//
+//		if ($paymentMethodNonce) {
+//			$device_data = $request->input('device_data', null);
+//			$paymentMethod = BraintreeProcessor::createPaymentMethod($student, $paymentMethodNonce, $device_data);
+//		} else {
+//			$paymentMethodToken = $request->input('payment_method_token', null);
+//			$paymentMethod = BraintreeProcessor::findPaymentMethod($paymentMethodToken);
+//
+//			if (!$paymentMethod || $paymentMethod->customerId != $student->braintree_customer_id) {
+//				Log::error("Student {$student->id} booking : Payment method not defined");
+//				throw new \Exception('Payment method not defined');
+//			}
+//			$paymentMethod = ['token' => $paymentMethod->token, 'type' => BraintreeProcessor::_getPaymentMethodType($paymentMethod)];
+//		}
+//		if (!$paymentMethod) {
+//			throw new \Exception('Payment method not found');
+//		}
+//
+//		$booking = new Booking();
+//		$booking->lesson_id = $request->input('lesson_id', '');;
+//		$booking->special_request	= $request->input('special_request', '');
+//		$booking->spot_price		= $this->spot_price;
+//		$booking->instructor_id		= $this->instructor_id;
+//		$booking->student_id		= $student->id;
+//		$booking->status			= Booking::STATUS_PENDING;
+//		$booking->payment_method_token	= $paymentMethod['token'];
+//		$booking->payment_method_type	= $paymentMethod['type'];
+//		$service_fee = $booking->getBookingServiceFeeAmount($this->spot_price);
+//		$virtual_fee = $booking->getBookingVirtualFeeAmount($this);
+//		$booking->service_fee = $service_fee;
+//		$booking->virtual_fee  = $virtual_fee;
+//		$booking->processor_fee		= $booking->getBookingPaymentProcessingFeeAmount($this->spot_price, $service_fee + $virtual_fee);
+//		$booking->save();
+//
+//
+//		if ($this->lesson_type == 'in_person_client' && $request->input('location')) {
+//
+//			$this->location = $request->input('location');
+//			$locationDetails = getLocationDetails($this->location);
+//			$this->lat = isset($locationDetails['lat']) ? $locationDetails['lat'] : null;
+//			$this->lng = isset($locationDetails['lng']) ? $locationDetails['lng'] : null;
+//			$this->city = isset($locationDetails['city']) ? $locationDetails['city'] : null;
+//			$this->state = isset($locationDetails['state']) ? $locationDetails['state'] : null;
+//			$this->address = isset($locationDetails['address']) ? $locationDetails['address'] : null;
+//			$this->zip = isset($locationDetails['zip']) ? $locationDetails['zip'] : null;
+//
+//			$this->save();
+//		}
+//
+//			if ($this->instructor->clients()->where('client_id', $student->id)->count() == 0) {
+//				Log::info('add instructor client');
+//				$this->instructor->clients()->attach($student);
+//			}
+//			if ($student->instructors()->where('instructor_id', $this->instructor_id)->count() == 0) {
+//				Log::info('add client instructor');
+//				$student->instructors()->attach($this->instructor);
+//			}
+//
+//		return $booking;
+//	}
 
-			if (!$paymentMethod || $paymentMethod->customerId != $student->braintree_customer_id) {
-				Log::error("Student {$student->id} booking : Payment method not defined");
-				throw new \Exception('Payment method not defined');
-			}
-			$paymentMethod = ['token' => $paymentMethod->token, 'type' => BraintreeProcessor::_getPaymentMethodType($paymentMethod)];
-		}
-		if (!$paymentMethod) {
-			throw new \Exception('Payment method not found');
-		}
+    public function bookPp($user_repository, $request, $paymentMethodNonce, $student): Booking
+    {
+        if(Auth::user() != null) {
+            $user_repository->updateUserData(Auth::user()->id, $request);
+        }
 
-		$booking = new Booking();
-		$booking->lesson_id = $request->input('lesson_id', '');;
-		$booking->special_request	= $request->input('special_request', '');
-		$booking->spot_price		= $this->spot_price;
-		$booking->instructor_id		= $this->instructor_id;
-		$booking->student_id		= $student->id;
-		$booking->status			= Booking::STATUS_PENDING;
-		$booking->payment_method_token	= $paymentMethod['token'];
-		$booking->payment_method_type	= $paymentMethod['type'];
-		$service_fee = $booking->getBookingServiceFeeAmount($this->spot_price);
-		$virtual_fee = $booking->getBookingVirtualFeeAmount($this);
-		$booking->service_fee = $service_fee;
-		$booking->virtual_fee  = $virtual_fee;
-		$booking->processor_fee		= $booking->getBookingPaymentProcessingFeeAmount($this->spot_price, $service_fee + $virtual_fee);
-		$booking->save();
+        if ($paymentMethodNonce) {
+            $paymentMethod = PayPalProcessor::createPaymentMethod($student, $paymentMethodNonce);
+        } else {
+            $paymentMethod = UserPaymentMethod::find($request->input('payment_method_token', null));
+            if (!$paymentMethod || $paymentMethod->user_id != $student->id) {
+                Log::channel('paypal')->error("Student {$student->id} booking : Payment method not defined" );
+                throw new \Exception('Payment method not defined');
+            }
+            $paymentMethod = ['token' => $paymentMethod->payment_method_token, 'type' => $paymentMethod->payment_method_type];
+        }
+        if (!$paymentMethod) {
+            throw new \Exception('Payment method not found');
+        }
+
+        $booking = new Booking();
+        $booking->lesson_id             = $request->input('lesson_id', '');;
+        $booking->special_request	    = $request->input('special_request', '');
+        $booking->spot_price		    = $this->spot_price;
+        $booking->instructor_id		    = $this->instructor_id;
+        $booking->student_id		    = $student->id;
+        $booking->status			    = Booking::STATUS_PENDING;
+        $booking->payment_method_token	= $paymentMethod['token'];
+        $booking->payment_method_type	= $paymentMethod['type'];
+        $service_fee                    = $booking->getBookingServiceFeeAmount($this->spot_price);
+        $virtual_fee                    = $booking->getBookingVirtualFeeAmount($this);
+        $booking->service_fee           = $service_fee;
+        $booking->virtual_fee           = $virtual_fee;
+        $booking->processor_fee		    = $booking->getBookingPaymentProcessingFeeAmount($this->spot_price, $service_fee + $virtual_fee);
+
+        $booking->save();
 
 
-		if ($this->lesson_type == 'in_person_client' && $request->input('location')) {
+        if ($this->lesson_type == 'in_person_client' && $request->input('location')) {
+            $this->location = $request->input('location');
+            $locationDetails = getLocationDetails($this->location);
+            $this->lat = isset($locationDetails['lat']) ? $locationDetails['lat'] : null;
+            $this->lng = isset($locationDetails['lng']) ? $locationDetails['lng'] : null;
+            $this->city = isset($locationDetails['city']) ? $locationDetails['city'] : null;
+            $this->state = isset($locationDetails['state']) ? $locationDetails['state'] : null;
+            $this->address = isset($locationDetails['address']) ? $locationDetails['address'] : null;
+            $this->zip = isset($locationDetails['zip']) ? $locationDetails['zip'] : null;
 
-			$this->location = $request->input('location');
-			$locationDetails = getLocationDetails($this->location);
-			$this->lat = isset($locationDetails['lat']) ? $locationDetails['lat'] : null;
-			$this->lng = isset($locationDetails['lng']) ? $locationDetails['lng'] : null;
-			$this->city = isset($locationDetails['city']) ? $locationDetails['city'] : null;
-			$this->state = isset($locationDetails['state']) ? $locationDetails['state'] : null;
-			$this->address = isset($locationDetails['address']) ? $locationDetails['address'] : null;
-			$this->zip = isset($locationDetails['zip']) ? $locationDetails['zip'] : null;
+            $this->save();
+        }
 
-			$this->save();
-		}
+        if ($this->instructor->clients()->where('client_id', $student->id)->count() == 0) {
+            Log::info('add instructor client');
+            $this->instructor->clients()->attach($student);
+        }
+        if ($student->instructors()->where('instructor_id', $this->instructor_id)->count() == 0) {
+            Log::info('add client instructor');
+            $student->instructors()->attach($this->instructor);
+        }
 
-			if ($this->instructor->clients()->where('client_id', $student->id)->count() == 0) {
-				Log::info('add instructor client');
-				$this->instructor->clients()->attach($student);
-			}
-			if ($student->instructors()->where('instructor_id', $this->instructor_id)->count() == 0) {
-				Log::info('add client instructor');
-				$student->instructors()->attach($this->instructor);
-			}
-
-		return $booking;
-	}
+        return $booking;
+    }
 
     /**
      * @return true
@@ -418,15 +476,12 @@ class Lesson extends Model implements Transformable
      */
     public function getPreviewUrl()
     {
-        // TODO test 'https://skillective.com'
         if(config('app.env') == 'local') {
-
             if ($this->preview != null){
                 return 'https://skillective.com' . '/storage/' . 'lessons/' . $this->instructor_id . '/' . $this->preview;
             }else{
                 return '';
             }
-
         } else {
             if ($this->preview != null){
                 return config('app.url') . '/storage/' . 'lessons/' . $this->instructor_id . '/' . $this->preview;
@@ -434,6 +489,5 @@ class Lesson extends Model implements Transformable
                 return '';
             }
         }
-
     }
 }

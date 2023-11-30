@@ -221,6 +221,10 @@ Vue.component(
     require("./components/LessonBookingForm.vue").default
 );
 Vue.component(
+  "lesson-booking-form-pp",
+  require("./components/LessonBookingFormPp.vue").default
+);
+Vue.component(
     "location-modal",
     require("./components/SearchLessonDetailsModal.vue").default
 );

@@ -174,14 +174,12 @@ class InstructorLessonsAPIController extends AppBaseController
      */
     public function store(CreateLessonAPIRequest $request)
     {
-
         if (!Auth::user()->canAddNewLesson()) {
             return $this->sendError('To add new lesson you must connect a submerchant account to your profile, upload profile image and have at least one media item in gallery', 400);
         }
         $input = $this->_prepareInputData($request);
 
-        if( $input['preview'] )
-        {
+        if( $input['preview'] ) {
             $input['preview'] = basename($input['preview']);
         }
 
@@ -273,10 +271,6 @@ class InstructorLessonsAPIController extends AppBaseController
      */
     public function update($lesson, UpdateLessonAPIRequest $request)
     {
-        // when there are bookings enable updating price only
-
-        // return $this->sendError('Updating lessons disabled');
-
         $input = $this->_prepareInputData($request);
 
         /** @var Lesson $lesson */

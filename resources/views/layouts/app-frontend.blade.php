@@ -98,7 +98,7 @@
             <div class="clearfix"></div>
             @include('flash::message')
 
-            @include('frontend/partials/merchant-status')
+{{--            @include('frontend/partials/merchant-status') Вивод меседжов про статус привязки Braintree --}}
 
             <div class="clearfix"></div>
 

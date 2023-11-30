@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CancelBookingsAPIRequest;
 use App\Repositories\BookingRepository;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -34,7 +35,7 @@ class InstructorBookingsAPIController extends AppBaseController
 		try{
             $this->bookingRepository->setPresenter("App\\Presenters\\BookingInListPresenter");
 			$bookings = $this->bookingRepository->presentResponse($this->bookingRepository->getInstructorBookings($request, Auth::user()->id));
-		}catch (\Exception $e){
+		}catch (Exception $e){
 			Log::error('getInstructorBookings : ' . $e->getMessage());
 			$bookings = ['data'=>[]];
 		}
@@ -46,11 +47,10 @@ class InstructorBookingsAPIController extends AppBaseController
     /**
      * @param $id
      * @return JsonResponse
-     * @throws \Exception
+     * @throws Exception
      */
-    public function cancel($id)
+    public function cancel($id): JsonResponse
     {
-        /** @var Booking $booking */
         $booking = $this->bookingRepository->findWithoutFail($id);
 
         if (empty($booking)) {
@@ -76,7 +76,7 @@ class InstructorBookingsAPIController extends AppBaseController
 				$cancelledBy = Auth::user()->id;
 				$booking->cancel($cancelledBy);
 				$count_cancelled++;
-			}catch (\Exception $e){
+			}catch (Exception $e){
 				$errors[] = trim($e->getMessage(), '<br>');
 			}
 		}
@@ -112,7 +112,7 @@ class InstructorBookingsAPIController extends AppBaseController
 
 			$booking->approve();
 
-		}catch (\Exception $e){
+		}catch (Exception $e){
 			Log::error('Booking #' . $id . ' approval error:' . $e->getMessage());
 			//'Payment can\'t be processed. The payment method choosen while booking this lesson is not available.'
 			return $this->sendError('Booking #' . $id . ' approval error:(' . $e->getCode() . ')'. $e->getMessage());
