@@ -186,13 +186,11 @@ class ProfileController extends Controller
 		}
 		if (!$isAdmin && !$isInstructor) {
             //  для студента  або покупця
+//			$vars['paymentEnvironment'] = config('services.braintree.environment');
 //			$vars['clientToken'] = BraintreeProcessor::generateClientToken($user);
 //			$vars['paymentMethods'] = BraintreeProcessor::getSavedCustomerPaymentMethods($user);
             $vars['clientToken'] = PayPalProcessor::getClientId();
 			$vars['paymentMethods'] = PayPalProcessor::getSavedCustomerPaymentMethods($user);
-            // delete
-			$vars['paymentEnvironment'] = config('services.braintree.environment');
-
 
 		}
 

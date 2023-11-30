@@ -210,7 +210,6 @@ Route::group(['middleware' => ['role:Student']], function () {
 
 	Route::get('student/payment-methods', [StudentPaymentMethodsAPIController::class, 'index']); // get student payment methods
 	Route::post('student/payment-method', [StudentPaymentMethodsAPIController::class, 'store']); // add student payment method
-//	Route::put('student/payment-method/set-as-default/{paymentMethodToken}', [StudentPaymentMethodsAPIController::class, 'token']); // update student payment method
 	Route::delete('student/payment-method/{paymentMethodToken}', [StudentPaymentMethodsAPIController::class, 'delete']); // delete student payment method data
 
     Route::get('student/genres', 'StudentLibraryAPIController@getStudentGenres');

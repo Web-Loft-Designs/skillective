@@ -13,7 +13,7 @@ class PayPalTransactionRequest extends APIRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
 		return Auth::user()->hasRole(User::ROLE_STUDENT);
     }
@@ -23,10 +23,10 @@ class PayPalTransactionRequest extends APIRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-			'payment_method_nonce'			=> ['required']
+			'payment_method_nonce' => ['required','string','max:255']
 		];
     }
 }

@@ -74,8 +74,7 @@
 
                                 <profile-payment-account-pp
                                         :client-token="'{{ $clientToken }}'"
-                                        :user-payment-methods="{{ json_encode($paymentMethods) }}"
-                                        :payment-environment="'{{ $paymentEnvironment }}'">
+                                        :user-payment-methods="{{ json_encode($paymentMethods) }}">
                                 </profile-payment-account-pp>
                             </div>
                         @endif
@@ -108,8 +107,8 @@
     </div>
 @endsection
 
-@if( !$loggedUserIsAdmin )
-@section('scripts')
-    @include('frontend.partials.payment-processing-scripts')
-@endsection
-@endif
+{{--@if( !$loggedUserIsAdmin )--}}
+{{--@section('scripts')--}}
+{{--    @include('frontend.partials.payment-processing-scripts')--}}
+{{--@endsection--}}
+{{--@endif--}}

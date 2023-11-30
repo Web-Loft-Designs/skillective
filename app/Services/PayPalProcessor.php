@@ -424,6 +424,12 @@ class PayPalProcessor
 
     }
 
+    /**
+     * @param $clientId
+     * @param string $sellerPayerId
+     * @return string
+     * create jwt token
+     */
     protected function getAuthAssertionValue($clientId, string $sellerPayerId): string
     {
         $header = [
@@ -518,11 +524,6 @@ class PayPalProcessor
         }
 
         try {
-//            $metInPp = $this->payPalClient->setCustomerSource($user->pp_customer_id)->listPaymentSourceTokens();
-//            $tDet = $this->payPalClient->showPaymentSourceTokenDetails("8r36377456857352s");
-//            $tDet = $this->payPalClient->setRequestHeader('PayPal-Request-Id', $this->getRandomString())->deletePaymentSetupToken("62922193n3405950k");
-//            dd($tDet);
-//            dd($user->pp_customer_id, $metInPp, $tDet);
             $methods = [];
             foreach ($userPaymentMethods as $method) {
                 $result = $this->payPalClient->showPaymentSourceTokenDetails($method->payment_method_token);
@@ -577,7 +578,7 @@ class PayPalProcessor
         }
     }
 
-    public function createPaymentMethod(User $user, $paymentMethodNonce): array
+    public function createPaymentMethod(User $user, string $paymentMethodNonce): array
     {
         $data = [
             "payment_source" => [
@@ -592,15 +593,14 @@ class PayPalProcessor
         ];
 
         try {
-
             $result = $this->payPalClient->createPaymentSourceToken($data);
 
             if (!isset($result['error'])) {
-
-                $paymentMethodType = $this->parseMethodType($result['payment_source']);
-
-                $this->userRepository->savePaymentMethod($user, ['token' => $result['id'], 'type' => $paymentMethodType]);
-                return ['token' => $result['id'], 'type' => $paymentMethodType];
+                $source = $result['payment_source'][array_key_first($result['payment_source'])];
+                // зберегти або оновити
+                $this->userRepository->savePaymentMethod( $user, $result['id'], array_key_first($result['payment_source']) );
+//                повернкти результат
+                return ['token' => $result['id'], 'type' => array_key_first($result['payment_source']), 'source' => $source ];
             } else {
                 Log::channel('paypal')->error("create payment method for {$user->id} is fail  " . $result['error']['message']);
                 throw new Exception('Can\'t create payment method: ' . $user->id);
@@ -654,21 +654,16 @@ class PayPalProcessor
 
     }
 
-
-    protected function parseMethodType($data): string
+    public function deletePaymentMethod(string $customerId, string $token): bool
     {
-        foreach ($data as $key => $item) {
-
-            $type = match ($key) {
-                "card" => $item['brand'],
-                'paypal' => "PayPal",
-                'venmo' => 'Venmo',
-                default => "Unknown Method",
-            };
-            break;
-
+        try {
+            $this->payPalClient->deletePaymentSourceToken($token);
+            return true;
+        } catch (Exception $e) {
+            Log::channel('paypal')->error("delete Payment method is fail" );
+            throw new Exception("delete Payment method is fail");
         }
-        return $type;
+
     }
 
 
