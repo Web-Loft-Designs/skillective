@@ -2,11 +2,13 @@
 
 namespace App\Console\Commands;
 
-use App\Facades\PayPalProcessor;
 use App\Models\PurchasedLesson;
 use App\Repositories\PurchasedLessonRepository;
 use Illuminate\Console\Command;
+use App\Facades\BraintreeProcessor;
 use Illuminate\Support\Facades\Log;
+
+
 class ReleaseFromEscrowPurchasedLessons extends Command
 {
     /**
@@ -21,7 +23,7 @@ class ReleaseFromEscrowPurchasedLessons extends Command
      *
      * @var string
      */
-    protected $description = "release purchased lessons from escrow";
+    protected $description = "release payments for happened lessons from braintree merketplace escrow after 2 hours after lesson started";
 
     /**
      * Create a new command instance.
@@ -29,7 +31,7 @@ class ReleaseFromEscrowPurchasedLessons extends Command
      * @return void
      */
 
-    private PurchasedLessonRepository $purchasedLessonsRepo;
+    private $purchasedLessonsRepo = null;
 
     public function __construct(PurchasedLessonRepository $purchasedLessonsRepo)
     {
@@ -40,40 +42,25 @@ class ReleaseFromEscrowPurchasedLessons extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return mixed
      */
-    public function handle(): void
+    public function handle()
     {
 		$limit = 200;
 		$this->purchasedLessonsRepo
 			->getHappenedLessonsPayedInEscrow($limit)
 			->each(function (PurchasedLesson $purchasedLesson) {
-                try{
-                    $response = PayPalProcessor::releaseTransactionFromEscrow($purchasedLesson->pp_reference_id);
-
-                    if(!isset($response['error'])) {
-
-                        if (isset($response['processing_state']['reason'])) {
-                            $purchasedLesson->status_reason = $response['processing_state']['reason'];
-                        }
-                        $purchasedLesson->setStatusAttribute(PurchasedLesson::STATUS_ESCROW_RELEASED);
-                        $purchasedLesson->save();
-
-                        Log::channel('paypal')->info("releaseTransactionFromEscrow purchasedLesson:{$purchasedLesson->id} , reference:{$purchasedLesson->pp_reference_id}");
-
-                    } else {
-                        $purchasedLesson->setStatusAttribute(PurchasedLesson::STATUS_UNABLE_ESCROW_RELEASE);
-                        $purchasedLesson->status_reason = 'Can\'t release from escrow. ';
-                        $purchasedLesson->save();
-                        Log::channel('paypal')->error('purchasedLesson #'.$purchasedLesson->id.', reference #'.$purchasedLesson->pp_reference_id.': Can\'t release from escrow. ' . $response['error']['message']);
-                    }
-                } catch (\Exception $e) {
-                    $purchasedLesson->setStatusAttribute(PurchasedLesson::STATUS_UNABLE_ESCROW_RELEASE);
-                    $purchasedLesson->status_reason = 'Can\'t release from escrow. ' . $e->getMessage();
-                    $purchasedLesson->save();
-                    Log::channel('paypal')->error('purchasedLesson #'.$purchasedLesson->id.', reference #'.$purchasedLesson->pp_reference_id.': Can\'t release from escrow. ' . $e->getMessage());
-                }
-
+				try{
+					Log::channel('braintree')->info("Purchasare Lesson booking:{$purchasedLesson->id} , transaction:{$purchasedLesson->transaction_id}");
+					BraintreeProcessor::releaseTransactionFromEscrow($purchasedLesson->transaction_id);
+					$purchasedLesson->setStatusAttribute(PurchasedLesson::STATUS_ESCROW_RELEASED);
+					$purchasedLesson->save();
+				}catch (\Exception $e){
+					$purchasedLesson->setStatusAttribute(PurchasedLesson::STATUS_UNABLE_ESCROW_RELEASE);
+					$purchasedLesson->status_reason = 'Can\'t release from escrow. ' . $e->getMessage();
+					$purchasedLesson->save();
+					Log::channel('braintree')->error('Purchasare Lesson #'.$purchasedLesson->id.', Transaction #'.$purchasedLesson->transaction_id.': Can\'t release from escrow. ' . $e->getMessage());
+				}
         });
     }
 }
