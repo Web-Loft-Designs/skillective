@@ -257,7 +257,10 @@ Vue.component(
     "profile-payment-account",
     require("./components/ProfilePaymentAccount").default
 );
-
+Vue.component(
+    "profile-payment-account-pp",
+    require("./components/ProfilePaymentAccountPp.vue").default
+);
 Vue.component(
     "braintree-merchant-form",
     require("./components/BraintreeMerchantForm.vue").default

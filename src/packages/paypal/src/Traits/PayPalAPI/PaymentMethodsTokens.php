@@ -2,6 +2,8 @@
 
 namespace Srmklive\PayPal\Traits\PayPalAPI;
 
+use Throwable;
+
 trait PaymentMethodsTokens
 {
     use PaymentMethodsTokens\Helpers;
@@ -11,7 +13,7 @@ trait PaymentMethodsTokens
      *
      * @param array $data
      *
-     * @throws \Throwable
+     * @throws Throwable
      *
      * @return array|\Psr\Http\Message\StreamInterface|string
      *
@@ -89,7 +91,7 @@ trait PaymentMethodsTokens
      *
      * @param array $data
      *
-     * @throws \Throwable
+     * @throws Throwable
      *
      * @return array|\Psr\Http\Message\StreamInterface|string
      *
@@ -120,6 +122,20 @@ trait PaymentMethodsTokens
         $this->apiEndPoint = "v3/vault/setup-tokens/{$token}";
 
         $this->verb = 'get';
+
+        return $this->doPayPalRequest();
+    }
+
+    /**
+     * @param string $token
+     * @return array|bool|float|int|object|string|null
+     * @throws Throwable
+     */
+    public function deletePaymentSetupToken(string $token)
+    {
+        $this->apiEndPoint = "v3/vault/setup-tokens/{$token}";
+
+        $this->verb = 'delete';
 
         return $this->doPayPalRequest();
     }

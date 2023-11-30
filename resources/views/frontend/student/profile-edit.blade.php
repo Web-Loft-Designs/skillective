@@ -66,11 +66,17 @@
                         </div>
                         @if( !$loggedUserIsAdmin )
                             <div class="form-wrap" id="payment-account-trigger">
-                                <profile-payment-account
+{{--                                <profile-payment-account--}}
+{{--                                        :client-token="'{{ $clientToken }}'"--}}
+{{--                                        :user-payment-methods="{{ json_encode($paymentMethods) }}"--}}
+{{--                                        :payment-environment="'{{ $paymentEnvironment }}'">--}}
+{{--                                </profile-payment-account>--}}
+
+                                <profile-payment-account-pp
                                         :client-token="'{{ $clientToken }}'"
                                         :user-payment-methods="{{ json_encode($paymentMethods) }}"
                                         :payment-environment="'{{ $paymentEnvironment }}'">
-                                </profile-payment-account>
+                                </profile-payment-account-pp>
                             </div>
                         @endif
                          @if( !Auth::user()->hasFakeEmail() )

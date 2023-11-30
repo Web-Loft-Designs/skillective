@@ -481,7 +481,7 @@ export default {
       const cardFields = this.paypal.CardFields({
         createVaultSetupToken: async () => {
           // отримати vaultSetupToken з нашого сервера
-          const result = await fetch('api/cart/vault-setup-token', {
+          const result = await fetch('api/cart/vault-setup-token?method=card', {
             method: 'GET'
           })
           const { vaultSetupToken } = await result.json()

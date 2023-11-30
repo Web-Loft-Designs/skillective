@@ -34,7 +34,7 @@ class PayPalProcessor
     /**
      * @throws Exception
      */
-    protected function getRandomString():string
+    protected function getRandomString(): string
     {
         $randomBytes = random_bytes(100);
         $randomString = base64_encode($randomBytes);
@@ -370,7 +370,7 @@ class PayPalProcessor
                 return $this->payPalClient->setRequestHeaders([
                     'PayPal-Request-Id' => $this->getRandomString(),
                     'PayPal-Partner-Attribution-Id' => $this->getBnCde()
-                ])->capturePaymentOrder($order['id'], [ 'payment_source' => $userPaymentSource ]);
+                ])->capturePaymentOrder($order['id'], ['payment_source' => $userPaymentSource]);
 
 
             } else {
@@ -405,7 +405,7 @@ class PayPalProcessor
         try {
             $order = $this->payPalClient->showOrderDetails($transactionId);
 
-            if(isset($order['purchase_units'][0]['payments']['captures'][0]['id'])) {
+            if (isset($order['purchase_units'][0]['payments']['captures'][0]['id'])) {
                 $merchantId = $order['purchase_units'][0]['payee']['merchant_id'];
                 $this->payPalClient->setRequestHeaders([
                     'PayPal-Request-Id' => $this->getRandomString(),
@@ -418,13 +418,13 @@ class PayPalProcessor
             }
 
         } catch (Exception|Throwable $e) {
-            Log::channel('paypal')->error('Can\'t cancel transaction. Transaction '.$transactionId.' not found');
-            throw new Exception('Can\'t cancel transaction. Transaction '.$transactionId.' not found');
+            Log::channel('paypal')->error('Can\'t cancel transaction. Transaction ' . $transactionId . ' not found');
+            throw new Exception('Can\'t cancel transaction. Transaction ' . $transactionId . ' not found');
         }
 
     }
 
-    protected function getAuthAssertionValue( $clientId, string $sellerPayerId): string
+    protected function getAuthAssertionValue($clientId, string $sellerPayerId): string
     {
         $header = [
             "alg" => "none"
@@ -493,7 +493,7 @@ class PayPalProcessor
                 return $this->payPalClient->setRequestHeaders([
                     'PayPal-Request-Id' => $this->getRandomString(),
                     'PayPal-Partner-Attribution-Id' => $this->getBnCde()
-                ])->capturePaymentOrder($order['id'], [ 'payment_source' => $userPaymentSource ]);
+                ])->capturePaymentOrder($order['id'], ['payment_source' => $userPaymentSource]);
 
             } else {
                 Log::channel('paypal')->error('Can\'t create transaction: ' . $order['error']['message']);
@@ -507,75 +507,68 @@ class PayPalProcessor
     }
 
 
-    public function getAllCustomerPaymentMethods(User $user): array
-    {
-        if (!$user->pp_customer_id) {
-            return [];
-        }
-
-        try {
-
-            $result = $this->payPalClient->setCustomerSource($user->pp_customer_id)->listPaymentSourceTokens(totals: false);
-            dd($result);
-            foreach ($result['payment_tokens'] as $paymentToken) {
-//dd($paymentToken);
-                // звірити з нашою базою даних і також удалити токени
-                $deleteR = $this->payPalClient->deletePaymentSourceToken($paymentToken['id']);
-
-//                dd($deleteR);
-
-            }
-
-
-            dd("stop");
-            return $result;
-
-        } catch (Exception $e) {
-            Log::channel('paypal')->error("found payment method for {$user->id} is fail");
-            throw new Exception("found payment method for {$user->id} is fail");
-        }
-    }
-
     public function getSavedCustomerPaymentMethods(User $user): array
     {
         if (!$user->pp_customer_id) {
             return [];
         }
-        $issetTokens = $user->findPaymentMethod()->get();
-        if (!$issetTokens) {
+        $userPaymentMethods = $user->findPaymentMethod()->get();
+        if (!$userPaymentMethods) {
             return [];
         }
 
         try {
+//            $metInPp = $this->payPalClient->setCustomerSource($user->pp_customer_id)->listPaymentSourceTokens();
+//            $tDet = $this->payPalClient->showPaymentSourceTokenDetails("8r36377456857352s");
+//            $tDet = $this->payPalClient->setRequestHeader('PayPal-Request-Id', $this->getRandomString())->deletePaymentSetupToken("62922193n3405950k");
+//            dd($tDet);
+//            dd($user->pp_customer_id, $metInPp, $tDet);
             $methods = [];
-            foreach ($issetTokens as $token) {
-
-                $result = $this->payPalClient->showPaymentSourceTokenDetails($token->payment_method_token);
-
+            foreach ($userPaymentMethods as $method) {
+                $result = $this->payPalClient->showPaymentSourceTokenDetails($method->payment_method_token);
                 foreach ($result['payment_source'] as $key => $source) {
 
                     switch ($key) {
                         case 'card':
-                            $item = [
-                                'payment_id' => $token->id,
+                            $methods['card'] = [
+                                'payment_id' => $method->id,
                                 'type' => $key,
                                 'last_digits' => $source['last_digits'],
                                 'brand' => $source['brand'],
                             ];
                             break;
+                        case 'paypal':
+                            $methods['paypal'] = [
+                                'payment_id' => $method->id,
+                                'type' => $key,
+                                'last_digits' => "",
+                                'brand' => "",
+                                'is_default' => '',
+                                'token' => ""
+                            ];
+                            break;
+                        case 'venmo':
+                            $methods['venmo'] = [
+                                'payment_id' => $method->id,
+                                'type' => $key,
+                                'last_digits' => "",
+                                'brand' => "",
+                                'is_default' => '',
+                                'token' => ""
+                            ];
+                            break;
                         default:
-                            $item = [
-                                'payment_id' => $token->id,
+                            $methods['NaN'] = [
+                                'payment_id' => $method->id,
                                 'type' => $key,
                                 'last_digits' => null,
                                 'brand' => null,
                             ];
                     }
-                    $methods[] = $item;
+
                 }
 
             }
-
             return $methods;
 
         } catch (Exception $e) {
@@ -620,17 +613,28 @@ class PayPalProcessor
 
     }
 
-    public function getVaultSetupToken($user): string
+    public function getVaultSetupToken($user, string $type): string
     {
         $data = [
             'customer' => [
                 'id' => 'customer_' . $user->id,
                 "merchant_customer_id" => $user->email,
             ],
-            'payment_source' => [
-                'card' => (object)[],
-            ]
         ];
+
+        switch ($type) {
+            case 'card':
+                $data['payment_source'] =  [ 'card' => (object)[] ];
+                break;
+            case 'paypal':
+                $data['payment_source'] =  [ 'paypal' => (object)[] ];
+                break;
+            case 'venmo':
+                $data['payment_source'] =  [ 'venmo' => (object)[] ];
+                break;
+            default:
+                throw new Exception("create Payment Setup Token for {$user->id} is fail");
+        }
 
         try {
             $response = $this->payPalClient->createPaymentSetupToken($data);
@@ -666,7 +670,6 @@ class PayPalProcessor
         }
         return $type;
     }
-
 
 
 }

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Facades\PayPalProcessor;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\CartUserInfoRequest;
 use App\Http\Requests\API\CheckoutRequest;
@@ -404,19 +403,5 @@ class CartAPIController extends AppBaseController
         return  $this->sendResponse($deletedCartItem);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function getPpVaultSetupToken(): JsonResponse
-    {
-        if (Auth::check()) {
-            $token = PayPalProcessor::getVaultSetupToken(Auth::user());
-            return response()->json(
-                ['vaultSetupToken' => $token]
-            );
-        } else {
-            return response()->json(['message' => "Error Unauthorized"], 403);
-        }
 
-    }
 }

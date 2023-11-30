@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Facades\PayPalProcessor;
 use App\Http\Controllers\AppBaseController;
 use App\Facades\BraintreeProcessor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\API\BraintreeTransactionRequest;
+use App\Http\Requests\API\PayPalTransactionRequest;
 use App\Models\UserPaymentMethod;
 use App\Models\Booking;
 use Illuminate\Support\Facades\Auth;
@@ -25,10 +26,10 @@ class StudentPaymentMethodsAPIController extends AppBaseController
     }
 
     /**
-     * @param BraintreeTransactionRequest $request
+     * @param PayPalTransactionRequest $request
      * @return JsonResponse
      */
-    public function store(BraintreeTransactionRequest $request)
+    public function store(PayPalTransactionRequest $request)
     {
 		$paymentMethodNonce = $this->_getPaymentMethodNonceFromRequest($request);
 		$user = Auth::user();
@@ -114,4 +115,32 @@ class StudentPaymentMethodsAPIController extends AppBaseController
     private function _getPaymentMethodNonceFromRequest($request){
 		return $request->input('payment_method_nonce', null);
 	}
+
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getPpVaultSetupToken(Request $request): JsonResponse
+    {
+        $type = "";
+        $request->whenFilled('method', function ($method) use(&$type) {
+            $type = match ($method) {
+                'paypal' => "paypal",
+                'venmo' => 'venmo',
+                default => "card",
+            };
+        });
+
+        if (Auth::check()) {
+            $token = PayPalProcessor::getVaultSetupToken(Auth::user(), $type);
+            return response()->json(
+                ['vaultSetupToken' => $token]
+            );
+        } else {
+            return response()->json(['message' => "Error Unauthorized"], 403);
+        }
+
+    }
+
 }
