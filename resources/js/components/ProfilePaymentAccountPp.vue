@@ -199,11 +199,8 @@ export default {
             await axios.post('/api/student/payment-method',
                 { payment_method_nonce: data.vaultSetupToken},
                 { baseURL: "https://skillective.dvl.to/"} )
-                .then( this.successText = 'Payment method saved' )
-                .catch( this.errorText = 'Can\'t process your data.')
-
         },
-        onError: (error) => console.error('Something went wrong:', error)
+        onError: (error) => console.log('Something went wrong:', error)
       })
 
       if (cardFields.isEligible()) {
@@ -212,25 +209,22 @@ export default {
         cardFields.ExpiryField().render('#expiration-date')
         cardFields.CVVField().render('#cvv')
       } else {
-        // Handle the workflow when credit and debit cards are not available
+        console.log("обробити нормальний вивод помилки")
       }
 
       const submitButton = document.getElementById('onSubmitStepCreditCard')
       submitButton.addEventListener('click', () => {
         cardFields.submit()
           .then(() => {
-            console.log('submit was successful')
+            this.successText = 'Payment method saved'
           })
           .catch((error) => {
-            console.error('submit erred:', error)
+            this.errorText = 'Can\'t process your data.'
+            console.log(error, "обробити нормальний вивод помилки")
           })
       })
     },
 
-
-    setAsDefaultPaymentMethod() {
-      this.apiPut('/api/student/payment-method/set-as-default/' + this.selectedPaymentMethodObj.token)
-    },
     deletePaymentMethod() {
       this.apiDelete('/api/student/payment-method/' + this.selectedPaymentMethodObj.token)
     },
@@ -249,38 +243,17 @@ export default {
       this.getPaymentMethods()
     },
 
-    componentHandlePutResponse(responseData) {
-      this.getPaymentMethods()
-    },
-
-    componentHandlePostResponse(responseData) {
-
-        console.log(responseData, "POST RESP")
-
-      if (responseData.success) {
-        this.successText = 'Payment method saved'
-      } else {
-        this.errorText = 'Can\'t process your data.'
-      }
-
-    },
-
-
     setSelectedPaymentMethodObj(_paymentMethod) {
       console.log(this.paymentMethods[_paymentMethod], " setSelectedPaymentMethodObj")
 
     },
-
-    getSavedCardNumberVal(_last4) {
-      return ('•••• •••• •••• ' + _last4)
-    }
 
 
   },
   created() {
 
     this.paymentMethods = this.userPaymentMethods
-
+      console.log(this.paymentMethods)
     // this.setSelectedPaymentMethodObj(this.paymentMethod)
     this.initializePaypal()
   },
