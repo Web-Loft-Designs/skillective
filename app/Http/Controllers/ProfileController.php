@@ -179,6 +179,7 @@ class ProfileController extends Controller
              }
 
 		}
+
 		if ($isAdmin) {
 			$vars['defaultMaxAllowedInstructorInvites']  = Setting::getValue('max_allowed_instructor_invites');
 			$vars['countInstructorInvitationsSent']  = $user->instructorInvitations()->count();

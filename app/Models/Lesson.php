@@ -258,7 +258,6 @@ class Lesson extends Model implements Transformable
         if(Auth::user() != null) {
             $user_repository->updateUserData(Auth::user()->id, $request);
         }
-
         if ($paymentMethodNonce) {
             $paymentMethod = PayPalProcessor::createPaymentMethod($student, $paymentMethodNonce);
         } else {

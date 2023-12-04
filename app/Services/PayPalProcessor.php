@@ -315,7 +315,6 @@ class PayPalProcessor
         $currency = $this->payPalClient->getCurrency();
         $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
         $totalAmount = round($booking->spot_price + $totalServiceFee + $processorFee, 2);
-//        $ppFee = number_format((float)$processorFee, 2, '.', '');
         $sklFee = number_format((float)$totalServiceFee, 2, '.', '');
         $subMerchantId = $booking->instructor->pp_merchant_id;
         $subMerchantEmail = $booking->instructor->email;
@@ -351,6 +350,10 @@ class PayPalProcessor
                     ]
                 ],
             ],
+            "application_context" => [
+                "shipping_preference" => "NO_SHIPPING"
+            ],
+
         ];
         try {
 
@@ -478,6 +481,9 @@ class PayPalProcessor
                         'disbursement_mode' => "DELAYED",
                     ]
                 ],
+            ],
+            "application_context" => [
+                "shipping_preference" => "NO_SHIPPING"
             ],
         ];
 

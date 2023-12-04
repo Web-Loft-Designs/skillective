@@ -142,7 +142,7 @@ export default {
           components: ['buttons', 'card-fields'],
           vault: true,
           disableFunding: ['paylater'],
-          dataUserIdToken: this.dataUserIdToken,
+          // dataUserIdToken: this.dataUserIdToken,
         })
 
         this.initPaymentMethod()
@@ -153,7 +153,7 @@ export default {
     },
     initPaymentMethod() {
       this.renderCardForm()
-      // this.renderPayPalButton()
+      this.renderPayPalButton()
     },
     renderPayPalButton() {
       this.paypal.Buttons({
