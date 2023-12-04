@@ -141,7 +141,7 @@ export default {
           locale: 'en_US',
           components: ['buttons', 'card-fields'],
           vault: true,
-          disableFunding: ['venmo,paylater'],
+          disableFunding: ['paylater'],
           dataUserIdToken: this.dataUserIdToken,
         })
 
@@ -153,12 +153,12 @@ export default {
     },
     initPaymentMethod() {
       this.renderCardForm()
-      this.renderPayPalButton()
+      // this.renderPayPalButton()
     },
     renderPayPalButton() {
       this.paypal.Buttons({
         createVaultSetupToken: async () => {
-          const result = await axios.post('/api/student/vault-setup-token?method=paypal')
+          const result = await axios.post('/api/cart/vault-setup-token?method=paypal')
           return result.data.vaultSetupToken;
         },
         onApprove: async (data) => {
@@ -178,10 +178,9 @@ export default {
       }).render('#paypal-buttons-container')
     },
     renderCardForm() {
-
       const cardFields = this.paypal.CardFields({
         createVaultSetupToken: async () => {
-          const result = await axios.post('/api/student/vault-setup-token?method=card')
+          const result = await axios.post('/api/cart/vault-setup-token?method=card')
           return result.data.vaultSetupToken;
         },
         onApprove: async (data) => {
@@ -241,7 +240,7 @@ export default {
   },
   created() {
     this.paymentMethods = this.userPaymentMethods
-    console.log(this.paymentMethods, "Methods")
+    console.log(this.paymentMethods, "userPaymentMethods")
     // this.setSelectedPaymentMethodObj(this.paymentMethod)
     this.initializePaypal()
   },

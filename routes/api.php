@@ -210,7 +210,6 @@ Route::group(['middleware' => ['role:Student']], function () {
 	Route::get('instructors', 'InstructorsAPIController@index'); // get instructors list to add as student instructors
 
 	Route::get('student/payment-methods', [StudentPaymentMethodsAPIController::class, 'index']); // get student payment methods
-    Route::post('student/vault-setup-token', [StudentPaymentMethodsAPIController::class, 'getPpVaultSetupToken']);
 	Route::post('student/payment-method', [StudentPaymentMethodsAPIController::class, 'store']); // add student payment method
 	Route::delete('student/payment-method/{paymentMethodToken}', [StudentPaymentMethodsAPIController::class, 'delete']); // delete student payment method data
 

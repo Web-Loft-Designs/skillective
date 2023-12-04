@@ -1,5 +1,9 @@
 @extends('layouts.app-frontend')
 
+@php
+ $ppUserPaymentMethods ? $methods = $ppUserPaymentMethods : $methods = (object)[];
+@endphp
+
 @section('content')
     <div class="dashboard-cart-page">
         <div class="container dashboard-cart">
@@ -9,7 +13,7 @@
                         <lesson-booking-form-pp
                         :total="{{json_encode($total)}}"
                         :pp-client-token="'{{$ppClientToken}}'"
-                        :user-payment-methods="{{ json_encode($ppUserPaymentMethods) }}"
+                        :user-payment-methods="{{ json_encode($methods) }}"
                         :user="{{ json_encode($user) }}"
                         :confirmation-text="'{{ str_replace(["\r", "\n"], '', $settings['booking_confirmation_text']) }}'"
                         :bn-code="'{{$bnCode}}'"

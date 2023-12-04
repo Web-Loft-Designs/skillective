@@ -506,14 +506,14 @@ class PayPalProcessor
     }
 
 
-    public function getSavedCustomerPaymentMethods(User $user): array
+    public function getSavedCustomerPaymentMethods(User $user): ?array
     {
         if (!$user->pp_customer_id) {
-            return [];
+            return null;
         }
         $userPaymentMethods = $user->findPaymentMethod()->get();
         if (!$userPaymentMethods) {
-            return [];
+            return null;
         }
 
         try {

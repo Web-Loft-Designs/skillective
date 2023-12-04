@@ -359,7 +359,7 @@ export default {
   mixins: [siteAPI, skillectiveHelper],
   props: {
     confirmationText: String,
-    userPaymentMethods: Array,
+    userPaymentMethods: Object,
     user: Object,
     total: Object,
     ppClientToken: String,
