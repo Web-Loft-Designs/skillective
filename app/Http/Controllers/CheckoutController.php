@@ -47,6 +47,8 @@ class CheckoutController extends Controller
             $vars['ppClientToken'] = PayPalProcessor::getClientId();
             $vars['bnCode'] = PayPalProcessor::getBnCde();
             $vars['ppUserPaymentMethods'] = $isStudent ? PayPalProcessor::getSavedCustomerPaymentMethods($user) : [];
+            $vars['masterMerchantId'] = PayPalProcessor::getMasterMerchantId();
+            $vars['dataUserIdToken'] = PayPalProcessor::getDataUserIdToken($user);
 
         }
 

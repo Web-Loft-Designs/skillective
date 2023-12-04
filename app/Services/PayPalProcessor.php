@@ -41,13 +41,6 @@ class PayPalProcessor
         return substr(str_replace(['/', '+', '='], '', $randomString), 0, 100);
     }
 
-    public function getPpAccessToken()
-    {
-        $payPalClient = new PayPalClient();
-        $response = $payPalClient->getAccessToken();
-        return $response['access_token'];
-    }
-
     /**
      * @return string
      */
@@ -527,6 +520,7 @@ class PayPalProcessor
             $methods = [];
             foreach ($userPaymentMethods as $method) {
                 $result = $this->payPalClient->showPaymentSourceTokenDetails($method->payment_method_token);
+
                 foreach ($result['payment_source'] as $key => $source) {
 
                     switch ($key) {
@@ -587,9 +581,6 @@ class PayPalProcessor
                     'type' => "SETUP_TOKEN"
                 ]
             ],
-            'customer' => [
-                'id' => $user->pp_customer_id
-            ],
         ];
 
         try {
@@ -598,9 +589,12 @@ class PayPalProcessor
             if (!isset($result['error'])) {
                 $source = $result['payment_source'][array_key_first($result['payment_source'])];
                 // зберегти або оновити
-                $this->userRepository->savePaymentMethod( $user, $result['id'], array_key_first($result['payment_source']) );
+                $this->userRepository->savePaymentMethod($user, $result['id'], array_key_first($result['payment_source']));
+                // зберегти pp_customer_id
+                $user->pp_customer_id = $result['customer']['id'];
+                $user->save();
 //                повернкти результат
-                return ['token' => $result['id'], 'type' => array_key_first($result['payment_source']), 'source' => $source ];
+                return ['token' => $result['id'], 'type' => array_key_first($result['payment_source']), 'source' => $source];
             } else {
                 Log::channel('paypal')->error("create payment method for {$user->id} is fail  " . $result['error']['message']);
                 throw new Exception('Can\'t create payment method: ' . $user->id);
@@ -615,22 +609,31 @@ class PayPalProcessor
 
     public function getVaultSetupToken($user, string $type): string
     {
-        $data = [
-            'customer' => [
-                'id' => 'customer_' . $user->id,
-                "merchant_customer_id" => $user->email,
-            ],
-        ];
-
         switch ($type) {
             case 'card':
-                $data['payment_source'] =  [ 'card' => (object)[] ];
+                $data['payment_source'] = ['card' => (object)[]];
                 break;
             case 'paypal':
-                $data['payment_source'] =  [ 'paypal' => (object)[] ];
+                $data['payment_source'] = [
+                    'paypal' => [
+                        "usage_type" => "PLATFORM",
+                        "experience_context" => [
+                            "return_url" => config('app.url') . 'profile/edit',
+                            "cancel_url" => config('app.url') . 'profile/edit'
+                        ]
+                    ]
+                ];
                 break;
             case 'venmo':
-                $data['payment_source'] =  [ 'venmo' => (object)[] ];
+                $data['payment_source'] = [
+                    'venmo' => [
+                        "usage_type" => "PLATFORM",
+                        "experience_context" => [
+                            "return_url" => config('app.url') . 'profile/edit',
+                            "cancel_url" => config('app.url') . 'profile/edit'
+                        ]
+                    ]
+                ];
                 break;
             default:
                 throw new Exception("create Payment Setup Token for {$user->id} is fail");
@@ -639,8 +642,6 @@ class PayPalProcessor
         try {
             $response = $this->payPalClient->createPaymentSetupToken($data);
             if (!isset($response['error'])) {
-                $user->pp_customer_id = $response['customer']['id'];
-                $user->save();
                 return $response['id'];
             } else {
                 Log::channel('paypal')->error("create Payment Setup Token for {$user->id} is fail  " . $response['error']['message']);
@@ -660,8 +661,29 @@ class PayPalProcessor
             $this->payPalClient->deletePaymentSourceToken($token);
             return true;
         } catch (Exception $e) {
-            Log::channel('paypal')->error("delete Payment method is fail" );
+            Log::channel('paypal')->error("delete Payment method is fail");
             throw new Exception("delete Payment method is fail");
+        }
+
+    }
+
+
+    /**
+     * @param User $user
+     * @return string
+     * @throws Throwable
+     */
+    public function getDataUserIdToken(User $user): string
+    {
+        try {
+            $client = new PayPalClient();
+            $response = $client->getCustomerAccessToken($user->pp_customer_id ?? null);
+
+            return $response['id_token'];
+
+        } catch (Exception $e) {
+            Log::channel('paypal')->error("get user id token is fail");
+            throw new Exception("get user id token is fail");
         }
 
     }

@@ -167,7 +167,7 @@ Route::group(['middleware' => ['role:Instructor']], function () {
 
 // Крзина та оплата
 Route::prefix('/cart')->group(function () {
-    Route::get('/vault-setup-token', [StudentPaymentMethodsAPIController::class, 'getPpVaultSetupToken']);
+    Route::post('/vault-setup-token', [StudentPaymentMethodsAPIController::class, 'getPpVaultSetupToken']);
     Route::get('/', [CartAPIController::class, 'index']);
     Route::get('/has-items', [CartAPIController::class, 'isCartHasItems']);
     Route::get('/total', [CartAPIController::class, 'getCartSummary']);
@@ -177,6 +177,7 @@ Route::prefix('/cart')->group(function () {
 });
 
 Route::post('student/instructors', 'StudentInstructorsAPIController@add'); // add many
+
 Route::group(['middleware' => ['role:Student']], function () {
 	Route::post('cart', 'CartAPIController@store');
 	Route::delete('cart/{cart}', 'CartAPIController@delete');
@@ -209,6 +210,7 @@ Route::group(['middleware' => ['role:Student']], function () {
 	Route::get('instructors', 'InstructorsAPIController@index'); // get instructors list to add as student instructors
 
 	Route::get('student/payment-methods', [StudentPaymentMethodsAPIController::class, 'index']); // get student payment methods
+    Route::post('student/vault-setup-token', [StudentPaymentMethodsAPIController::class, 'getPpVaultSetupToken']);
 	Route::post('student/payment-method', [StudentPaymentMethodsAPIController::class, 'store']); // add student payment method
 	Route::delete('student/payment-method/{paymentMethodToken}', [StudentPaymentMethodsAPIController::class, 'delete']); // delete student payment method data
 

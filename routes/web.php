@@ -164,10 +164,10 @@ Route::group(['prefix' => 'backend', 'middleware'=>['rememberHttpReferer', 'role
 	Route::get('/profile/edit', 'Backend\ProfileController@edit')->name('admin.profile.edit');
 });
 
-Route::group(['middleware' => ['role:Admin']], function () {
-	Route::get('/laravel-filemanager', '\UniSharp\LaravelFilemanager\Controllers\LfmController@show');
-	Route::post('/laravel-filemanager/upload', '\UniSharp\LaravelFilemanager\Controllers\UploadController@upload');
-	// list all lfm routes here...
-});
+//Route::group(['middleware' => ['role:Admin']], function () {
+//	Route::get('/laravel-filemanager', '\UniSharp\LaravelFilemanager\Controllers\LfmController@show');
+//	Route::post('/laravel-filemanager/upload', '\UniSharp\LaravelFilemanager\Controllers\UploadController@upload');
+//	// list all lfm routes here...
+//});
 
 Route::any('{all}', 'PageController@index')->where('all', '.*');

@@ -13,6 +13,8 @@
                         :user="{{ json_encode($user) }}"
                         :confirmation-text="'{{ str_replace(["\r", "\n"], '', $settings['booking_confirmation_text']) }}'"
                         :bn-code="'{{$bnCode}}'"
+                        :data-user-id-token="{{ json_encode($dataUserIdToken) }}"
+                        :master-merchant-id="{{ json_encode($masterMerchantId) }}"
                         >
                         </lesson-booking-form-pp>
                     </checkout>

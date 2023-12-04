@@ -1,6 +1,6 @@
 <template>
   <div id='password-payment-account'>
-    <form id='payment-method-form' method='post' @submit.prevent='onSubmit'>
+    <form id='payment-method-form'>
 
       <p class='login-box-msg'>Payment Methods123</p>
       <div class='form-group has-feedback mb-5'>
@@ -10,109 +10,85 @@
             <span class='checkmark'></span>
             Credit Card <img alt='Credit Card' class='ml-2' src='/images/card-icon.png'>
           </label>
-          <!--          <label class="radio-item" for="paypal">-->
-          <!--            <input v-model="paymentMethod" name="payment_system" type="radio" id="paypal" value="PayPalAccount">-->
-          <!--            <span class="checkmark"></span>-->
-          <!--            <img src="/images/payPal.svg" alt="Paypal">-->
-          <!--          </label>-->
-          <!--                    <label class="radio-item" for="venmo">-->
-          <!--                        <input v-model="paymentMethod" name="payment_system" type="radio" id="venmo" value="VenmoAccount">-->
-          <!--                        <span class="checkmark"></span>-->
-          <!--                        <img src="/images/venmo.png" alt="Venmo">-->
-          <!--                    </label>-->
         </div>
       </div>
 
-      <div v-if="paymentMethod === 'CreditCard'" >
-          <div class='payment-option mt-5 pt-5 active'>
-            <div class='card_container'>
+      <div id='paypal-buttons-container'></div>
+
+      <div v-if="paymentMethod === 'CreditCard'">
+        <div class='payment-option mt-5 pt-5 active'>
+          <div class='card_container'>
+            <div>
               <div>
-                <div>
-                  <label>Card number</label>
-                  <div v-show='!isSelectedPaymentMethod' id='card-number'></div>
-                  <input
+                <label>Card number</label>
+                <div v-show='!isSelectedPaymentMethod' id='card-number'></div>
+                <input
                     v-show='isSelectedPaymentMethod'
                     :value='lastFour'
                     class='form-control-pp'
                     disabled
                     placeholder='____ ____ ____ ____'
                     type='text'
-                  />
-                </div>
+                />
+              </div>
 
-                <div>
-                  <label>Cardholder name</label>
-                  <div v-show='!isSelectedPaymentMethod' id='card-holder-name'></div>
-                  <input
+              <div>
+                <label>Cardholder name</label>
+                <div v-show='!isSelectedPaymentMethod' id='card-holder-name'></div>
+                <input
                     v-show='isSelectedPaymentMethod'
                     class='form-control-pp'
                     disabled
                     type='text'
                     value='********** ************'
-                  />
-                </div>
+                />
+              </div>
 
-                <div>
-                  <label>Expiry date</label>
-                  <div v-show='!isSelectedPaymentMethod' id='expiration-date'></div>
-                  <input
+              <div>
+                <label>Expiry date</label>
+                <div v-show='!isSelectedPaymentMethod' id='expiration-date'></div>
+                <input
                     v-show='isSelectedPaymentMethod'
                     class='form-control-pp'
                     disabled
                     type='text'
                     value='** / **'
-                  />
-                </div>
+                />
+              </div>
 
-                <div>
-                  <label>CVC/CVV</label>
-                  <div v-show='!isSelectedPaymentMethod' id='cvv'></div>
-                  <input
+              <div>
+                <label>CVC/CVV</label>
+                <div v-show='!isSelectedPaymentMethod' id='cvv'></div>
+                <input
                     v-show='isSelectedPaymentMethod'
                     class='form-control-pp'
                     disabled
                     type='text'
                     value='***'
-                  />
-                </div>
+                />
+              </div>
 
-                <div class='form-group'>
-                  <button
+              <div class='form-group'>
+                <button
                     v-show='!isSelectedPaymentMethod'
                     id='onSubmitStepCreditCard'
                     class='btn btn-primary btn-flat'
                     type='button'
                     value='submit'
-                  >
-                    Save
-                  </button>
-                  <button
+                >
+                  Save
+                </button>
+                <button
                     v-show='isSelectedPaymentMethod'
                     class='btn btn-primary btn-flat'
                     type='button'
-                  >
-                    Delete payment method
-                  </button>
-                </div>
+                >
+                  Delete payment method
+                </button>
               </div>
             </div>
+          </div>
 
-        </div>
-      </div>
-      <div v-show="paymentMethod === 'PayPalAccount'" id='paypal-buttons-container'></div>
-      <div v-if="paymentMethod === 'PayPalAccount'" class='d-flex flex-wrap'>
-        <div v-if='(this.selectedPaymentMethodObj==null)'>
-          Connect PayPal Account
-          <div id='paypal-button'></div>
-<!--          <div v-if="waitPaypalInitialization==true">Wait while PayPal initializes the button</div>-->
-        </div>
-        <div class='form-group'>
-<!--          <button v-if="(this.selectedPaymentMethodObj!=null && this.selectedPaymentMethodObj.is_default==false)" type="button" class="btn btn-primary btn-flat" @click="setAsDefaultPaymentMethod()">Set as default method</button>-->
-          <button
-            v-if='(this.selectedPaymentMethodObj!=null)' class='btn btn-primary btn-flat' type='button'
-            @click='deletePaymentMethod()'
-          >Delete payment method
-          </button>
         </div>
       </div>
 
@@ -124,14 +100,16 @@
 </template>
 
 <script>
-import { loadScript } from '@paypal/paypal-js'
+import {loadScript} from '@paypal/paypal-js'
 import siteAPI from '../mixins/siteAPI.js'
 
 export default {
   mixins: [siteAPI],
   props: [
     'clientToken',
-    'userPaymentMethods'
+    'userPaymentMethods',
+    'dataUserIdToken',
+    'masterMerchantId'
   ],
   data() {
     return {
@@ -147,7 +125,9 @@ export default {
       venmoNotSupported: false,
       paypal: null,
       isSelectedPaymentMethod: false,
-      lastFour: '**** **** **** 1234'
+      lastFour: '**** **** **** 1234',
+      errorText: "",
+      successText: ''
     }
   },
   methods: {
@@ -156,12 +136,13 @@ export default {
       try {
         this.paypal = await loadScript({
           clientId: this.clientToken,
+          merchantId: this.masterMerchantId,
           buyerCountry: 'US',  // удалити при запуску на продакшені !!!!!!!
           locale: 'en_US',
-          components: ['buttons', 'funding-eligibility', 'marks', 'card-fields'],
+          components: ['buttons', 'card-fields'],
           vault: true,
           disableFunding: ['venmo,paylater'],
-          // dataClientToken: this.user.pp_customer_id,
+          dataUserIdToken: this.dataUserIdToken,
         })
 
         this.initPaymentMethod()
@@ -171,11 +152,22 @@ export default {
 
     },
     initPaymentMethod() {
-      if (this.paypal.FUNDING.CARD) this.renderCardForm()
-      // if (this.paypal.FUNDING.PAYPAL) this.renderPayPalButton()
+      this.renderCardForm()
+      this.renderPayPalButton()
     },
     renderPayPalButton() {
       this.paypal.Buttons({
+        createVaultSetupToken: async () => {
+          const result = await axios.post('/api/student/vault-setup-token?method=paypal')
+          return result.data.vaultSetupToken;
+        },
+        onApprove: async (data) => {
+          console.log(data, "onApprove PayPal")
+          await axios.post('/api/student/payment-method',
+              {payment_method_nonce: data.vaultSetupToken})
+        },
+        onError: (error) => console.log('Something went wrong:', error),
+
         style: {
           layout: 'vertical',
           color: 'gold',
@@ -189,16 +181,13 @@ export default {
 
       const cardFields = this.paypal.CardFields({
         createVaultSetupToken: async () => {
-          const result = await axios.get('api/cart/vault-setup-token?method=card', {
-              baseURL: "https://skillective.dvl.to/"
-          })
-            return result.data.vaultSetupToken;
+          const result = await axios.post('/api/student/vault-setup-token?method=card')
+          return result.data.vaultSetupToken;
         },
         onApprove: async (data) => {
-            console.log(data, "onApprove")
-            await axios.post('/api/student/payment-method',
-                { payment_method_nonce: data.vaultSetupToken},
-                { baseURL: "https://skillective.dvl.to/"} )
+          console.log(data, "onApprove")
+          await axios.post('/api/student/payment-method',
+              {payment_method_nonce: data.vaultSetupToken})
         },
         onError: (error) => console.log('Something went wrong:', error)
       })
@@ -215,13 +204,13 @@ export default {
       const submitButton = document.getElementById('onSubmitStepCreditCard')
       submitButton.addEventListener('click', () => {
         cardFields.submit()
-          .then(() => {
-            this.successText = 'Payment method saved'
-          })
-          .catch((error) => {
-            this.errorText = 'Can\'t process your data.'
-            console.log(error, "обробити нормальний вивод помилки")
-          })
+            .then(() => {
+              this.successText = 'Payment method saved'
+            })
+            .catch((error) => {
+              this.errorText = 'Can\'t process your data.'
+              console.log(error, "обробити нормальний вивод помилки")
+            })
       })
     },
 
@@ -233,7 +222,7 @@ export default {
     },
 
     componentHandleGetResponse(responseData) {
-        console.log(responseData, " HandleGetResponse")
+      console.log(responseData, " HandleGetResponse")
       this.paymentMethods = responseData.data
       this.setSelectedPaymentMethodObj(this.paymentMethod)
     },
@@ -251,9 +240,8 @@ export default {
 
   },
   created() {
-
     this.paymentMethods = this.userPaymentMethods
-      console.log(this.paymentMethods)
+    console.log(this.paymentMethods, "Methods")
     // this.setSelectedPaymentMethodObj(this.paymentMethod)
     this.initializePaypal()
   },

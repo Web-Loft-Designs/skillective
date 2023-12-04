@@ -190,7 +190,9 @@ class ProfileController extends Controller
 //			$vars['clientToken'] = BraintreeProcessor::generateClientToken($user);
 //			$vars['paymentMethods'] = BraintreeProcessor::getSavedCustomerPaymentMethods($user);
             $vars['clientToken'] = PayPalProcessor::getClientId();
+            $vars['masterMerchantId'] = PayPalProcessor::getMasterMerchantId();
 			$vars['paymentMethods'] = PayPalProcessor::getSavedCustomerPaymentMethods($user);
+			$vars['dataUserIdToken'] = PayPalProcessor::getDataUserIdToken($user);
 
 		}
 

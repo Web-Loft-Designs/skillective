@@ -364,6 +364,8 @@ export default {
     total: Object,
     ppClientToken: String,
     bnCode: String,
+    dataUserIdToken: String,
+    masterMerchantId: String
   },
   data() {
     return {
@@ -443,17 +445,18 @@ export default {
       fetchCartItems: 'fetchCartItems'
     }),
     async initializePaypal() {
+      console.log(this.userPaymentMethods, 'userPaymentMethods')
       try {
         this.paypal = await loadScript({
           clientId: this.ppClientToken,
+          merchantId: this.masterMerchantId,
           buyerCountry: 'US',  // удалити при запуску на продакшені !!!!!!!
           locale: 'en_US',
           components: ['buttons', 'funding-eligibility', 'marks', 'card-fields'],
           currency: 'USD',
           vault: true,
-          disableFunding: ['venmo,paylater'],
-          dataPartnerAttributionId: this.bnCode,
-          // dataClientToken: this.user.pp_customer_id,
+          disableFunding: ['paylater'],
+          // dataUserIdToken: this.dataUserIdToken,
         })
         this.initPaymentMethod()
       } catch (error) {
@@ -462,34 +465,45 @@ export default {
     },
     initPaymentMethod() {
       if (this.paypal.FUNDING.CARD) this.renderCardForm()
-      if (this.paypal.FUNDING.PAYPAL) this.renderPayPalButton()
+      // поки кнопки не працюють
+      // if (this.paypal.FUNDING.PAYPAL) this.renderPayPalButton()
     },
-    renderPayPalButton() {
-      this.paypal.Buttons({
-        style: {
-          layout: 'vertical',
-          color: 'gold',
-          shape: 'pill',
-          label: 'paypal'
-        }
-        // createOrder() {
-        //     console.log('Buttons create order')
-        // }
-      }).render('#paypal-buttons-container')
-    },
+      renderPayPalButton() {
+          this.paypal.Buttons({
+              createVaultSetupToken: async () => {
+                  const result = await axios.post('/api/cart/vault-setup-token?method=paypal')
+                  return result.data.vaultSetupToken;
+              },
+              onApprove: async (data) => {
+                  this.fields.payment_method_nonce = data.vaultSetupToken
+                  this.fields.order = this.total
+                  this.fields.payment_method_token = null
+
+                  await this.apiPost('/api/cart/checkout', {
+                      ...this.fields
+                  })
+              },
+              onError: (error) => console.log('Something went wrong:', error),
+
+              style: {
+                  layout: 'vertical',
+                  color: 'gold',
+                  shape: 'pill',
+                  label: 'paypal'
+              }
+
+          }).render('#paypal-buttons-container')
+      },
     renderCardForm() {
       const cardFields = this.paypal.CardFields({
         createVaultSetupToken: async () => {
-          // отримати vaultSetupToken з нашого сервера
-          const result = await fetch('api/cart/vault-setup-token?method=card', {
-            method: 'GET'
+          const result = await fetch('/api/cart/vault-setup-token?method=card', {
+            method: 'POST'
           })
           const { vaultSetupToken } = await result.json()
           return vaultSetupToken
         },
         onApprove: async (data) => {
-          // запуск процес оплати
-          // payment_method_token
           this.fields.payment_method_nonce = data.vaultSetupToken
           this.fields.order = this.total
           this.fields.payment_method_token = null
