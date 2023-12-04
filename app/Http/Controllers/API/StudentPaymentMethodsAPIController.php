@@ -74,9 +74,13 @@ class StudentPaymentMethodsAPIController extends AppBaseController
         $type = "";
         $request->whenFilled('method', function ($method) use (&$type) {
             $type = match ($method) {
+
                 'paypal' => "paypal",
+
                 'venmo' => 'venmo',
+
                 default => "card",
+
             };
         });
 
