@@ -276,6 +276,7 @@ class Booking extends Model implements Transformable
 
     public function approvePp(): bool
     {
+
         $serviceFee = $this->getBookingServiceFeeAmount();
         $virtualLessonFee = $this->getBookingVirtualFeeAmount();
         $totalServiceFee = (float) $serviceFee + (float) $virtualLessonFee;
@@ -283,7 +284,7 @@ class Booking extends Model implements Transformable
 
         // few checks to prevent not desired transactions , just an assurance
         if (!$this->transaction_id && ($this->instructor->pp_merchant_id) != null
-            && $this->instructor->pp_account_status == PayPalProcessor::STATUS_ACTIVE && !$this->lesson->alreadyStarted()
+            && $this->instructor->pp_account_status == \App\Services\PayPalProcessor::STATUS_ACTIVE && !$this->lesson->alreadyStarted()
             && !$this->lesson->is_cancelled && $this->status == self::STATUS_PENDING) {
 
             $transaction = PayPalProcessor::createSellBookingTransactionAndHoldInEscrow(
