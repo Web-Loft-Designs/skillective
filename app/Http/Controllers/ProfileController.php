@@ -16,6 +16,7 @@ use App\Repositories\UserRepository;
 use App\Repositories\LessonRepository;
 use App\Models\UserGeoLocation;
 use Illuminate\Support\Facades\Auth;
+use Laracasts\Flash\Flash;
 use Prettus\Repository\Exceptions\RepositoryException;
 use Spatie\Permission\Models\Role;
 use App\Facades\BraintreeProcessor;
@@ -172,7 +173,6 @@ class ProfileController extends Controller
              if ($request->hasHeader('referer') &&  $request->header('referer') == $refererUrl) {
                  //перехват запиту з першого редіректа з пайпалу
                  $vars['ppMerchantAccount'] = PayPalProcessor::handleRegisterMerchant($request->all());
-                 // TODO запустити флеш меседж
               } else {
                  // отримати статус та деталі інтеграції з paypal
                  $vars['ppMerchantAccount'] = PayPalProcessor::getMerchantDetail($user);

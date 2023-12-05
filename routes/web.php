@@ -17,6 +17,7 @@ use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\GlobalShopController;
 use App\Http\Controllers\InstructorGalleryController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'HomeController@index')->name('home');
@@ -24,9 +25,7 @@ Route::get('/lessons', 'LessonsPageController@index')->name('lessons');
 Route::get('/instructors', 'InstructorsPageController@index')->name('instructors');
 Route::get('/lesson/{lesson}', 'LessonPageController@index')->name('lesson');
 
-
-//Route::get('/braintree/webhook', 'BraintreeWebhookController@index'); // TODO: remove this route
-Route::post('/braintree/webhook', 'BraintreeWebhookController@index')->middleware(['guest']);
+//Route::post('/braintree/webhook', 'BraintreeWebhookController@index')->middleware(['guest']);
 
 //Auth::routes();
 Route::group(['middleware'=>['guest']], function () {
@@ -45,7 +44,6 @@ Route::group(['middleware'=>['guest']], function () {
 
 // General Password Reset
 	Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
-//	Route::post('password/email', 'Auth\ForgotPasswordController@checkFinishRegistration')->name('password.email');
 	Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
 	Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 	Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
@@ -55,9 +53,9 @@ Route::group(['middleware'=>['guest']], function () {
 // Logout
 Route::post('logout', 'Auth\FrontendLoginController@logout')->name('logout');
 
-Route::get('/profile/edit/{user}', 'ProfileController@edit')->name('profile.edituser')->middleware(['role:Admin']); // edit user profile
-Route::get('/profile/edit', 'ProfileController@edit')->name('profile.edit')->middleware(['role:Instructor|Student']); // edit own profile
-Route::get('/profile/{user?}', 'ProfileController@show')->name('profile'); // user public profile
+Route::get('/profile/edit/{user}', [ProfileController::class, 'edit'])->name('profile.edituser')->middleware(['role:Admin']); // edit user profile
+Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit')->middleware(['role:Instructor|Student']); // edit own profile
+Route::get('/profile/{user?}', [ProfileController::class, 'show'])->name('profile'); // user public profile
 
 // Socialite Register Routes
 Route::get('/social/redirect/{provider}', [SocialController::class, 'getSocialRedirect'])->name('social.redirect');
@@ -85,15 +83,11 @@ Route::group(['prefix' => 'instructor', 'middleware'=>['role:Instructor']], func
 	Route::get('/bookings', 'InstructorBookingsController@index')->name('instructor.bookings');
 	Route::get('/clients', 'InstructorClientsController@index')->name('instructor.clients');
 	Route::get('/gallery', [InstructorGalleryController::class,'index'])->name('instructor.gallery');
-
-
 	Route::get('/incomes', 'InstructorIncomesController@index')->name('instructor.incomes');
 	Route::get('/payouts', 'InstructorPayoutsController@index')->name('instructor.payouts');
 	Route::get('/invite-instructor', 'InstructorInvitesController@index')->name('instructor.invites');
-
 	Route::get('/my-shop', 'InstructorMyShopController@index')->name('instructor.my-shop');
 	Route::get('/my-shop/video/{video}', 'InstructorMyShopVideoController@index')->name('instructor.my-shop.video');
-
 	Route::get('/discount-management', 'InstructorDiscountManagementController@index')->name('instructor.discount-management');
 });
 
@@ -103,8 +97,6 @@ Route::group(['prefix' => 'student', 'middleware'=>['role:Student']], function (
 	Route::get('/bookings', 'StudentBookingsController@index')->name('student.bookings');
 	Route::get('/instructors', 'StudentInstructorsController@index')->name('student.instructors');
 	Route::get('/gallery', 'StudentGalleryController@index')->name('student.gallery');
-
-
 	Route::get('/library', 'StudentLibraryController@index')->name('student.library');
 	Route::get('/library/video/{video}', 'StudentLibraryVideoController@index')->name('student.library.video');
 });

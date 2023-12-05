@@ -44,7 +44,6 @@ class InstructorDashboardController extends Controller
 			'userGenres'	=> $genreRepository->presentResponse(Auth::user()->genres)['data'],
 			'clients'		=> $clients,
 			'bookings'		=> [], //  disabled
-//            'tax_id'        => Auth::user()->tax_id   // з paypal це не потрібно
         ];
 
 		$lessonRepo->setPresenter("App\\Presenters\\LessonSinglePresenter");
@@ -58,7 +57,6 @@ class InstructorDashboardController extends Controller
         if ($upcomingLesson && Cookie::get('hiddenUpcomingLessonId')!=$upcomingLesson['id']){
 			$vars['upcomingLesson'] = $lessonRepo->presentResponse($upcomingLesson)['data'];
 		}
-
         return view('frontend.instructor.dashboard', $vars);
     }
 

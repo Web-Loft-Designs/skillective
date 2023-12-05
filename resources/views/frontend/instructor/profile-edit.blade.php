@@ -54,12 +54,8 @@
                                     {{-- PayPal  $ppMerchantAccount this is array --}}
                                 <div class="form-wrap" id="paypal-account-trigger">
                                     <div dir="ltr" style="text-align: left;" trbidi="on">
-
                                         <p class="login-box-msg">PayPal</p>
                                         <p class="login-box">Status: {{$ppMerchantAccount['status']}}</p>
-                                        <p class="login-box">Merchant id: {{$ppMerchantAccount['ppMerchantId']}}</p>
-                                        <p class="login-box">Message:  {{$ppMerchantAccount['message']}}</p>
-
                                         <script>
                                             (function(d, s, id) {
                                                 let js, ref = d.getElementsByTagName[s](0);

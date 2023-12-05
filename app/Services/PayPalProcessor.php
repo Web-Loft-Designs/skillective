@@ -11,7 +11,9 @@ use Throwable;
 
 class PayPalProcessor
 {
-
+    const STATUS_ACTIVE = 'active';
+    const STATUS_NOT_CONNECTED = 'not connected';
+    const STATUS_SUSPENDED = 'suspended';
     /**
      * @var UserRepository
      */
@@ -31,6 +33,18 @@ class PayPalProcessor
         $this->payPalClient->getAccessToken();
     }
 
+    /**
+     * @return bool
+     * @throws Throwable
+     */
+    public function checkConnect(): bool
+    {
+        $response = $this->payPalClient->getAccessToken();
+        if (!isset($response['error']) && isset($response['access_token']) ) {
+            return true;
+        }
+        return false;
+    }
     /**
      * @throws Exception
      */
@@ -95,6 +109,40 @@ class PayPalProcessor
         return $string;
     }
 
+    public function checkMerchantStatus(User $user): void
+    {
+        if ($user->pp_merchant_id) {
+            try {
+                $result = $this->payPalClient->showReferralStatus($user->pp_merchant_id);
+                if (!isset($result['error'])) {
+                    if (!$result['payments_receivable']) {
+                        $user->pp_account_status = self::STATUS_SUSPENDED;
+                        $user->bt_submerchant_status_reason = "You have not provided the necessary permissions for Skillective";
+                        $user->save();
+                    } elseif (!$result['primary_email_confirmed']) {
+                        $user->pp_account_status = self::STATUS_SUSPENDED;
+                        $user->bt_submerchant_status_reason = "You have not verified your PaPal account";
+                        $user->save();
+                    }elseif (!isset($result['oauth_integrations'])) {
+                        $user->pp_account_status = self::STATUS_SUSPENDED;
+                        $user->bt_submerchant_status_reason = "You have not provided the necessary permissions for Skillective";
+                        $user->save();
+                    } else {
+                        $user->pp_account_status = self::STATUS_ACTIVE;
+                        $user->bt_submerchant_status_reason = null;
+                        $user->save();
+                    }
+                } else {
+                    Log::channel('paypal')->error("show Referral Status PayPal for user {$user->id} is fail" . $result['error']['message']);
+                    throw new Exception("show Referral Status PayPal for user {$user->id} is fail" . $result['error']['message']);
+                }
+            } catch (Exception $e) {
+                Log::channel('paypal')->error("show Referral Status PayPal for user {$user->id} is fail");
+                throw new Exception("show Referral Status PayPal for user {$user->id} is fail");
+            }
+        }
+    }
+
     public function getMerchantDetail($user): array
     {
         if ($user->pp_referral_id && !$user->pp_merchant_id) {
@@ -112,9 +160,7 @@ class PayPalProcessor
 
                     return [
                         "actionUrl" => $link['actionUrl'],
-                        'status' => "Not activated",
-                        'ppMerchantId' => "",
-                        'message' => "Go to PayPal."
+                        'status' => self::STATUS_NOT_CONNECTED,
                     ];
                 } else {
                     Log::channel('paypal')->error("show Referral Status PayPal for user {$user->id} is fail" . $result['error']['message']);
@@ -131,7 +177,15 @@ class PayPalProcessor
 
                 if (!isset($result['error'])) {
 
-                    return $this->parseReferralStatus($result, $user);
+                    if ($result['payments_receivable'] && $result['primary_email_confirmed'] && isset($result['oauth_integrations'])) {
+                        return [ 'status' => self::STATUS_ACTIVE ];
+                    } else {
+                        $data = $this->getRegistrationMerchantLink($user);
+                        return [
+                            'status' => self::STATUS_SUSPENDED,
+                            "actionUrl" => $data['actionUrl'],
+                            ];
+                    }
 
                 } else {
                     Log::channel('paypal')->error("show Referral Status PayPal for user {$user->id} is fail" . $result['error']['message']);
@@ -145,9 +199,7 @@ class PayPalProcessor
             $data = $this->getRegistrationMerchantLink($user);
             $result = [
                 "actionUrl" => $data['actionUrl'],
-                'status' => "Not activated",
-                'ppMerchantId' => "",
-                'message' => "Go to PayPal."
+                'status' => self::STATUS_NOT_CONNECTED,
             ];
         }
         return $result;
@@ -157,57 +209,28 @@ class PayPalProcessor
     {
         if (isset($data['merchantId'])) {
             $user = $this->userRepository->where('pp_tracking_id', $data['merchantId'])->first();
-            $this->userRepository->updateUserPpData(
-                [
-                    'merchant_id' => $data['merchantIdInPayPal'],
-                    'account_status' => $data['accountStatus']
-                ], $user->id);
 
-            if ($data['permissionsGranted'] == "true" &&
-                $data['consentStatus'] == "true" &&
-                $data['isEmailConfirmed'] == 'true') {
-                $status = "Active";
-                $message = "Pay Pal is connected";
+            if ($data['permissionsGranted'] == "true" && $data['consentStatus'] == "true" && $data['isEmailConfirmed'] == 'true') {
+                $this->userRepository->updateUserPpData(
+                    [
+                        'merchant_id' => $data['merchantIdInPayPal'],
+                        'account_status' => self::STATUS_ACTIVE
+                    ], $user->id);
+
+                return [ 'status' => self::STATUS_ACTIVE];
+
             } else {
-                $status = "Pending";
-                $message = "Please complete your account setup in PayPal to start receiving the payments";
+                $data = $this->getRegistrationMerchantLink($user);
+                return [
+                    'status' => self::STATUS_SUSPENDED,
+                    "actionUrl" => $data['actionUrl'],
+                ];
             }
-
-            return [
-                'status' => $status,
-                'ppMerchantId' => $data['merchantIdInPayPal'],
-                'message' => $message
-            ];
-
         } else {
             return [
-                'status' => "Not activated",
-                'ppMerchantId' => '',
-                'message' => "incorrect data"
+                'status' => self::STATUS_NOT_CONNECTED,
             ];
         }
-
-    }
-
-
-    protected function parseReferralStatus($data, $user): array
-    {
-//        формування інфи для фронта Статус треба допрацювати і меседж також
-        // тут можна боробити більше інфи про статус інтеграції продавця та які функції йому доступні
-
-        if ($data['payments_receivable'] && $data['primary_email_confirmed']) {
-            $status = "Active";
-            $message = "Pay Pal is connected";
-        } else {
-            $status = "Pending";
-            $message = "Please complete your account setup in PayPal to start receiving the payments";
-        }
-        return [
-            'status' => $status,
-            'ppMerchantId' => $user->pp_merchant_id,
-            'message' => $message,
-            'activePayOutMethods' => $data['products']
-        ];
     }
 
     protected function getRegistrationMerchantLink($user): array
@@ -276,6 +299,7 @@ class PayPalProcessor
                                     "PARTNER_FEE",
                                     "DELAY_FUNDS_DISBURSEMENT",
                                     "ADVANCED_TRANSACTIONS_SEARCH",
+                                    "VAULT"
                                 ],
                             ]
                         ]
@@ -394,6 +418,7 @@ class PayPalProcessor
             "reference_id" => $referenceId,
             "reference_type" => "TRANSACTION_ID"
         ]);
+
     }
 
     public function cancelTransaction($transactionId): bool
@@ -403,7 +428,7 @@ class PayPalProcessor
 
             if (isset($order['purchase_units'][0]['payments']['captures'][0]['id'])) {
                 $merchantId = $order['purchase_units'][0]['payee']['merchant_id'];
-                $this->payPalClient->setRequestHeaders([
+              $this->payPalClient->setRequestHeaders([
                     'PayPal-Request-Id' => $this->getRandomString(),
                     'PayPal-Auth-Assertion' => $this->getAuthAssertionValue($this->getClientId(), $merchantId)
                 ])->refundAllCapturedPayment($order['purchase_units'][0]['payments']['captures'][0]['id']);
@@ -495,7 +520,7 @@ class PayPalProcessor
 
             if (!isset($order['error'])) {
 
-                return $this->payPalClient->setRequestHeaders([
+               return $this->payPalClient->setRequestHeaders([
                     'PayPal-Request-Id' => $this->getRandomString(),
                     'PayPal-Partner-Attribution-Id' => $this->getBnCde()
                 ])->capturePaymentOrder($order['id'], ['payment_source' => $userPaymentSource]);
@@ -664,7 +689,7 @@ class PayPalProcessor
     public function deletePaymentMethod(string $customerId, string $token): bool
     {
         try {
-            $this->payPalClient->deletePaymentSourceToken($token);
+           $this->payPalClient->deletePaymentSourceToken($token);
             return true;
         } catch (Exception $e) {
             Log::channel('paypal')->error("delete Payment method is fail");
