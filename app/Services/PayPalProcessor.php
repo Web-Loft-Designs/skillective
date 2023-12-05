@@ -52,7 +52,7 @@ class PayPalProcessor
     {
         $randomBytes = random_bytes(100);
         $randomString = base64_encode($randomBytes);
-        return substr(str_replace(['/', '+', '='], '', $randomString), 0, 100);
+        return substr(str_replace(['/', '+', '='], '', $randomString), 0, 80);
     }
 
     /**
@@ -82,31 +82,28 @@ class PayPalProcessor
     public function getEnvironmentUrl(): string
     {
         if (config('paypal.mod') == 'live') {
-            $Url = 'https://www.paypal.com/';
+            return 'https://www.paypal.com/';
         } else {
-            $Url = 'https://www.sandbox.paypal.com/';
+            return 'https://www.sandbox.paypal.com/';
         }
-        return $Url;
     }
 
     public function getMasterMerchantId(): string
     {
         if (config('paypal.mod') == 'live') {
-            $string = config('paypal.live.master_partner_id');
+            return config('paypal.live.master_partner_id');
         } else {
-            $string = config('paypal.sandbox.master_partner_id');
+            return config('paypal.sandbox.master_partner_id');
         }
-        return $string;
     }
 
     public function getBnCde(): string
     {
         if (config('paypal.mod') == 'live') {
-            $string = config('paypal.live.bn_code');
+            return config('paypal.live.bn_code');
         } else {
-            $string = config('paypal.sandbox.bn_code');
+            return config('paypal.sandbox.bn_code');
         }
-        return $string;
     }
 
     public function checkMerchantStatus(User $user): void
@@ -672,6 +669,7 @@ class PayPalProcessor
 
         try {
             $response = $this->payPalClient->createPaymentSetupToken($data);
+
             if (!isset($response['error'])) {
                 return $response['id'];
             } else {

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Facades\PayPalProcessor;
 use DateTime;
 use DateTimeZone;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -264,12 +265,12 @@ class Lesson extends Model implements Transformable
             $paymentMethod = UserPaymentMethod::find($request->input('payment_method_token', null));
             if (!$paymentMethod || $paymentMethod->user_id != $student->id) {
                 Log::channel('paypal')->error("Student {$student->id} booking : Payment method not defined" );
-                throw new \Exception('Payment method not defined');
+                throw new Exception('Payment method not defined');
             }
             $paymentMethod = ['token' => $paymentMethod->payment_method_token, 'type' => $paymentMethod->payment_method_type];
         }
         if (!$paymentMethod) {
-            throw new \Exception('Payment method not found');
+            throw new Exception('Payment method not found');
         }
 
         $booking = new Booking();
@@ -317,6 +318,7 @@ class Lesson extends Model implements Transformable
 
     /**
      * @return true
+     * @throws Exception
      */
     public function cancel()
 	{
@@ -333,11 +335,11 @@ class Lesson extends Model implements Transformable
 
     /**
      * @param array $options
-     * @return bool|void
-     * @throws \Exception
+     * @return void
+     * @throws Exception
      */
-    public function save(array $options = [])
-	{
+    public function save(array $options = []): void
+    {
 		if ($this->lesson_type == 'in_person') {
 			$locationDetails = getLocationDetails($this->location);
 			$this->lat = isset($locationDetails['lat']) ? $locationDetails['lat'] : null;

@@ -61,7 +61,7 @@ class SendPossibleNotificationsForTesting extends Command
      * @return void
      */
 
-    private $bookingRepository = null;
+    private BookingRepository $bookingRepository;
     private $faker = null;
 
     public function __construct(BookingRepository $bookingRepository, Faker $faker)

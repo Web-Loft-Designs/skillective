@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Prettus\Repository\Contracts\Transformable;
 
-use Carbon\Carbon;
 
 class LessonRequest extends Model implements Transformable
 {
@@ -196,6 +196,7 @@ class LessonRequest extends Model implements Transformable
     /**
      * @param array $options
      * @return bool|mixed
+     * @throws Exception
      */
     public function saveQuietly(array $options = [])
     {
@@ -207,7 +208,7 @@ class LessonRequest extends Model implements Transformable
     /**
      * @param array $options
      * @return bool|void
-     * @throws \Exception
+     * @throws Exception
      */
     public function save(array $options = [])
 	{
@@ -232,9 +233,10 @@ class LessonRequest extends Model implements Transformable
     /**
      * @param $reason
      * @return true
-     * @throws \Exception
+     * @throws Exception
      */
-    public function cancel($reason = null){
+    public function cancel($reason = null): bool
+    {
         $this->status = self::STATUS_CANCELLED;
         $this->instructor_note = $reason;
         $this->save();
@@ -243,10 +245,11 @@ class LessonRequest extends Model implements Transformable
 
     /**
      * @return true
-     * @throws \Exception
+     * @throws Exception
      */
-    public function autoCancel(){
-        $this->cancel(null);
+    public function autoCancel(): bool
+    {
+        $this->cancel();
         return true;
     }
 }

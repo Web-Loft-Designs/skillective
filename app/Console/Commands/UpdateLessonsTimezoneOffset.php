@@ -3,7 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\Lesson;
-use \App\Repositories\LessonRepository;
+use App\Repositories\LessonRepository;
+use Exception;
 use Illuminate\Console\Command;
 
 class UpdateLessonsTimezoneOffset extends Command
@@ -28,7 +29,7 @@ class UpdateLessonsTimezoneOffset extends Command
      * @return void
      */
 
-    private $lessonRepository = null;
+    private LessonRepository $lessonRepository;
 
     public function __construct(LessonRepository $lessonRepository)
     {
@@ -39,9 +40,10 @@ class UpdateLessonsTimezoneOffset extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
+     * @throws Exception
      */
-    public function handle()
+    public function handle(): void
     {
 		$limit = 100;
 		$this->lessonRepository

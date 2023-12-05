@@ -7,16 +7,19 @@ use App\Http\Requests\UpdateGenreRequest;
 use App\Repositories\GenreCategoryRepository;
 use App\Repositories\GenreRepository;
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Flash;
-use Prettus\Repository\Criteria\RequestCriteria;
-use Response;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Routing\Redirector;
+use Illuminate\View\View;
+use Laracasts\Flash\Flash;
+use Prettus\Repository\Exceptions\RepositoryException;
+use Prettus\Validator\Exceptions\ValidatorException;
 
 class GenreController extends AppBaseController
 {
     /** @var  GenreRepository */
-    private $genreRepository;
+    private GenreRepository $genreRepository;
 
     public function __construct(GenreRepository $genreRepo)
     {
@@ -28,22 +31,23 @@ class GenreController extends AppBaseController
      * Display a listing of the Genre.
      *
      * @param Request $request
-     * @return Response
+     * @return View
+     * @throws RepositoryException
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $genres = $this->genreRepository->presentResponse($this->genreRepository->getGenres($request));
 
-        return view('backend.genres.index')
-            ->with('genres', $genres);
+        return view('backend.genres.index',['genres' => $genres]);
     }
 
     /**
      * Show the form for creating a new Genre.
      *
-     * @return Response
+     * @param GenreCategoryRepository $categoryRepo
+     * @return View
      */
-    public function create( GenreCategoryRepository $categoryRepo )
+    public function create( GenreCategoryRepository $categoryRepo ): View
     {
 		$vars = [
 			'categories' => $categoryRepo->all()
@@ -55,10 +59,10 @@ class GenreController extends AppBaseController
      * Store a newly created Genre in storage.
      *
      * @param CreateGenreRequest $request
-     *
-     * @return Response
+     * @return Application|RedirectResponse|Redirector
+     * @throws ValidatorException
      */
-    public function store(CreateGenreRequest $request)
+    public function store(CreateGenreRequest $request): Redirector|RedirectResponse|Application
     {
         $input = $request->except(['image']);
 
@@ -76,11 +80,11 @@ class GenreController extends AppBaseController
     /**
      * Display the specified Genre.
      *
-     * @param  int $id
+     * @param int $id
      *
-     * @return Response
+     * @return View
      */
-    public function show($id)
+    public function show($id): View
     {
         $genre = $this->genreRepository->findWithoutFail($id);
 
@@ -159,19 +163,6 @@ class GenreController extends AppBaseController
 		Flash::danger('Genre can\'t be deleted.');
 
         return redirect(route('backend.genres.index'));
-//        $genre = $this->genreRepository->findWithoutFail($id);
-//
-//        if (empty($genre)) {
-//            Flash::error('Genre not found');
-//
-//            return redirect(route('backend.genres.index'));
-//        }
-//
-//		$this->genreRepository->deleteOldImage($genre->image);
-//        $this->genreRepository->delete($id);
-//
-//        Flash::success('Genre deleted successfully.');
-//
-//        return redirect(route('backend.genres.index'));
+
     }
 }

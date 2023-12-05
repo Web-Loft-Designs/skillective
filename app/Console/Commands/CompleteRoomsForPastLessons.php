@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Booking;
+use App\Facades\TwilioVideo;
 use App\Models\Lesson;
 use App\Repositories\LessonRepository;
 use Illuminate\Console\Command;
-use TwilioVideo;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class CompleteRoomsForPastLessons extends Command
 {
@@ -57,25 +57,23 @@ class CompleteRoomsForPastLessons extends Command
                     $withExtraTimeFromLessonEndAtLessonTimezone = Carbon::createFromFormat('Y-m-d H:i:s', $lesson->end, $lesson->timezone_id);
                     $withExtraTimeFromLessonEndAtLessonTimezone->addMinutes(Lesson::VIRTUAL_LESSON_EXTRA_TIME_AFTER_END);
 
-//        dd($timeAtLessonTimezone->format('Y-m-d H:i:s'), $withExtraTimeFromLessonEndAtLessonTimezone->format('Y-m-d H:i:s'));
-
                     if ($withExtraTimeFromLessonEndAtLessonTimezone->greaterThanOrEqualTo($timeAtLessonTimezone)){
-                        \Log::channel('twilio')->info("server: try to stop virtual lesson #{$lesson->id}");
+                        Log::channel('twilio')->info("server: try to stop virtual lesson #{$lesson->id}");
                         $lessonRoom = TwilioVideo::getRoom($lesson);
                         if ($lessonRoom){
                             $completed = TwilioVideo::completeRoom($lessonRoom);
                             if($completed){
                                 $lesson->update(['room_completed' => true]);
                             }else{
-                                \Log::channel('twilio')->info("server: can\'t stop virtual lesson #{$lesson->id}");
+                                Log::channel('twilio')->info("server: can\'t stop virtual lesson #{$lesson->id}");
                             }
                         }else{
-                            \Log::channel('twilio')->info("server: virtual lesson #{$lesson->id} already stopped");
+                            Log::channel('twilio')->info("server: virtual lesson #{$lesson->id} already stopped");
                             $lesson->update(['room_completed' => true]);
                         }
                     }
                 }catch (\Exception $e){
-                    \Log::channel('twilio')->error('server: Can\'t stop lesson #'.$lesson->id . ' : ' . $e->getMessage());
+                    Log::channel('twilio')->error('server: Can\'t stop lesson #'.$lesson->id . ' : ' . $e->getMessage());
                 }
             });
 

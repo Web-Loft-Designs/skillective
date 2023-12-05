@@ -38,8 +38,6 @@ class Booking extends Model implements Transformable
         'special_request',
         'lesson_id',
         'disconnected', // wheter room participant was refused from video lesson
-//        'pp_reference_id',
-//        'pp_processor_fee'
     ];
 
     /**
