@@ -220,7 +220,7 @@
           <p>Step 2/2</p>
         </div>
         <div
-          v-if='user != null && userPaymentMethods.length === 1'
+          v-if='user != null && Object.entries(userPaymentMethods).length === 1'
           class='checkbox-wrapper mb-5 has-feedback'
         >
           <div class='mb-4'>Use stored payment information:</div>
@@ -232,12 +232,12 @@
                 type='checkbox'
               />
               <span class='checkmark'></span>
-              {{ userPaymentMethods[0].type }} {{ userPaymentMethods[0].brand || '' }}
+              {{ userPaymentMethods.card.type }} {{ userPaymentMethods.card.brand || '' }}
             </label>
           </div>
         </div>
         <div
-          v-if='user != null && userPaymentMethods.length > 1'
+          v-if='user != null && Object.entries(this.userPaymentMethods).length > 1'
           class='checkbox-wrapper mb-5 has-feedback'
         >
           <div class='mb-4'>Use stored payment information:</div>
@@ -437,7 +437,7 @@ export default {
       return this.useSavedMethod || this.selectedPaymentArr.includes(true)
     },
     lastFour() {
-      return `**** **** **** ${ this.userPaymentMethods.length && this.useSavedMethod ? this.userPaymentMethods[0].last_digits : this.userPaymentMethods[this.selectedPaymentIndex]?.last_digits }`
+      return `**** **** **** ${ this.userPaymentMethods?.card?.last_digits }`
     }
   },
   methods: {
@@ -456,7 +456,7 @@ export default {
           currency: 'USD',
           vault: true,
           disableFunding: ['paylater'],
-          // dataUserIdToken: this.dataUserIdToken,
+          dataUserIdToken: this.dataUserIdToken,
         })
         this.initPaymentMethod()
       } catch (error) {
@@ -464,9 +464,12 @@ export default {
       }
     },
     initPaymentMethod() {
-      if (this.paypal.FUNDING.CARD) this.renderCardForm()
-      // поки кнопки не працюють
-      // if (this.paypal.FUNDING.PAYPAL) this.renderPayPalButton()
+      if (this.userPaymentMethods.card) this.renderCardForm()
+      if (this.userPaymentMethods.venmo) this.renderPayPalButton()
+      if (!this.userPaymentMethods.card && this.userPaymentMethods.venmo) {
+        this.renderCardForm()
+        this.renderPayPalButton()
+      }
     },
       renderPayPalButton() {
           this.paypal.Buttons({
@@ -478,20 +481,17 @@ export default {
                   this.fields.payment_method_nonce = data.vaultSetupToken
                   this.fields.order = this.total
                   this.fields.payment_method_token = null
-
                   await this.apiPost('/api/cart/checkout', {
                       ...this.fields
                   })
               },
               onError: (error) => console.log('Something went wrong:', error),
-
               style: {
                   layout: 'vertical',
                   color: 'gold',
                   shape: 'pill',
                   label: 'paypal'
               }
-
           }).render('#paypal-buttons-container')
       },
     renderCardForm() {
