@@ -516,10 +516,10 @@ class UserRepository extends BaseRepository
 
     public function savePaymentMethod(User $user, string $token, string $type): void
     {
-        $methods = $user->findPaymentMethod()->where('payment_method_type', $type)->get();
+        $methods = $user->findPaymentMethod()->get();
 
         if ($methods->count() > 0) {
-            // удалити усі можливі токени для поточного типу
+            // удалити усі старі методи
             $methods->each(function (UserPaymentMethod $userPaymentMethod) use ($user) {
                $result = PayPalProcessor::deletePaymentMethod($user->pp_customer_id, $userPaymentMethod->payment_method_token);
                if ($result) {
