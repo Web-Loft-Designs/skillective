@@ -11,6 +11,9 @@
 
     <div class="dashboard-page">
         <div class="container">
+            @if($showReminder)
+                <tax-id-reminder-popup></tax-id-reminder-popup>
+            @endif
             <div class="row">
 
                 @if (isset($upcomingLesson))

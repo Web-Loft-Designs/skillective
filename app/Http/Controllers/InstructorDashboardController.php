@@ -57,6 +57,12 @@ class InstructorDashboardController extends Controller
         if ($upcomingLesson && Cookie::get('hiddenUpcomingLessonId')!=$upcomingLesson['id']){
 			$vars['upcomingLesson'] = $lessonRepo->presentResponse($upcomingLesson)['data'];
 		}
+
+        $vars['showReminder'] = false;
+        if (Auth::user()->bt_submerchant_id && !Auth::user()->pp_merchant_id ) {
+            $vars['showReminder'] = true;
+        }
+
         return view('frontend.instructor.dashboard', $vars);
     }
 

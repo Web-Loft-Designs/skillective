@@ -6,14 +6,9 @@
           <button class='close' type='button' @click='closePopup'>&times;</button>
         </div>
         <div class='modal-body px-4 py-4'>
-          Beginning January 1, 2022, the Internal Revenue Service (IRS) implemented new reporting requirements for
-          payments received for goods and services, which will lowers the reporting threshold to $600 for the 2022 tax
-          season. For more information please <a
-          href='https://www.irs.gov/businesses/understanding-your-form-1099-k'
-          class='learn-more' target='_blank'
-        >visit the IRS website</a> to learn more about a 1099-K form.
+            Great news! Skillective has partnered with PayPal to get you easily paid for your work with clients.<br> Please go to your settings and connect your PayPal business account.
         </div>
-        <a href='/profile/edit#re-enter-bank' class='btn enter-tax'>Enter your Tax ID</a>
+        <a href='/profile/edit#paypal-account-trigger' class='btn enter-tax'>Settings page</a>
       </div>
     </div>
   </div>
