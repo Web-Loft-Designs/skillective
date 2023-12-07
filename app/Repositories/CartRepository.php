@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use App\Models\Discount;
 use App\Models\PromoCode;
 
+
 class CartRepository extends BaseRepository
 {
     /**
@@ -208,6 +209,7 @@ class CartRepository extends BaseRepository
     public function getCartSummary($student_id, $guest_cart, $promos, $message = null)
     {
         $cart = $this->getUserCart($student_id, $guest_cart);
+
         $response =  array("count" => 0, "total" => 0, "subtotal" => 0, "fee" => 0, "discount" => 0);
         $discounts = [];
         $promo_codes = [];
@@ -348,39 +350,43 @@ class CartRepository extends BaseRepository
 
     /**
      * @param Request $request
+     * @param bool $isCheckout
      * @return false|JsonResponse
      */
     public function storeGuestCart(Request $request, bool $isCheckout = true)
     {
 
-        if ( !Cookie::has('guest_cart') || !Auth::check() ) return false;
+        if ( !Cookie::has('guest_cart') || !Auth::check() ) {
+            return false;
+        }
 
         $guestCart = json_decode(Cookie::get('guest_cart'));
 
-        foreach ( $guestCart as $item ){
+        foreach ( $guestCart as $item ) {
 
             $check = true;
-            if( isset($item->isPreRecorded) && $item->isPreRecorded )
-            {
-
+            if( isset($item->isPreRecorded) && $item->isPreRecorded ) {
                 $less = Cart::where('student_id', Auth::user()->id)
                     ->where('pre_r_lesson_id', $item->lesson_id)
                     ->first();
 
-                if( $less ) $check = false;
+                if( $less ) {
+                    $check = false;
+                }
 
-            }else{
+            } else {
 
                 $less = Cart::where('student_id', Auth::user()->id)
                     ->where('lesson_id', $item->lesson_id)
                     ->first();
 
-                if( $less ) $check = false;
+                if( $less ) {
+                    $check = false;
+                }
 
             }
 
-            if( $check )
-            {
+            if( $check ) {
 
                 $data = [];
 
@@ -400,7 +406,9 @@ class CartRepository extends BaseRepository
                     $lessonAlreadyPurchased = PurchasedLesson::where('pre_r_lesson_id',  $data['pre_r_lesson_id'])->where('student_id', Auth::user()->id)->first();
                 }
 
-                if(!$lessonAlreadyPurchased) $result = Cart::create($data);
+                if(!$lessonAlreadyPurchased) {
+                    Cart::create($data);
+                }
 
             }else{
                 session()->flash('guestCartCheck', 'We have removed some lessons from the basket, as they were already purchased by you earlier.');

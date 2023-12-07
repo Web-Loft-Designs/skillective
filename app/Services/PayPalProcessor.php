@@ -667,6 +667,11 @@ class PayPalProcessor
                 throw new Exception("create Payment Setup Token for {$user->id} is fail");
         }
 
+
+        if ($user->pp_customer_id) {
+            $data['customer'] = [ 'id' => $user->pp_customer_id];
+        }
+
         try {
             $response = $this->payPalClient->createPaymentSetupToken($data);
 

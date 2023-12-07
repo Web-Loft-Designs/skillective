@@ -98,6 +98,7 @@ class FrontendLoginController extends AppBaseController
 
     public function login(Request $request)
     {
+
         $this->validateLogin($request);
         if ($request->isXmlHttpRequest()){
             if ($this->hasTooManyLoginAttempts($request)) {

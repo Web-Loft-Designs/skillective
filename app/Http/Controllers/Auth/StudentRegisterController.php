@@ -29,7 +29,7 @@ class StudentRegisterController extends Controller
 		$initialFormData = [];
 		$vars = [];
 
-		if (session()->has('submittedStudent')){
+		if (session()->has('submittedStudent')) {
 			$initialFormData = session()->get('submittedStudent');
 			$initialFormData = ( is_array($initialFormData) && count($initialFormData)==1 ) ? $initialFormData[0] : $initialFormData;
 			session()->forget('submittedStudent');
