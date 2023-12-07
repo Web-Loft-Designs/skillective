@@ -236,23 +236,8 @@
             </label>
           </div>
         </div>
-        <div
-            v-if='user != null && Object.entries(this.userPaymentMethods).length > 1'
-            class='checkbox-wrapper mb-5 has-feedback'
-        >
-          <div class='mb-4'>Use stored payment information:</div>
-          <label v-for='(method, index) in userPaymentMethods' :key='index' class='mx-4'>
-            <input
-                v-model='selectedPaymentArr[index]'
-                :value='method.payment_id'
-                type='checkbox'
-                @change='toggleUseSavedMethods(method.payment_id, index)'
-            />
-            {{ method.type }} {{ method.brand || '' }}
-          </label>
-        </div>
-          <div id='paypal-buttons-container'></div>
-        <div>
+        <div id='paypal-buttons-container'></div>
+        <div class='mt-4'>
           <div class='payment-option-header mb-4'>
             <img alt src='/images/card-icon.png'/>
           </div>
@@ -260,9 +245,9 @@
             <div>
               <div>
                 <label>Card number</label>
-                <div v-show='!isSelectedPaymentMethod' id='card-number'></div>
+                <div v-show='!useSavedMethod' id='card-number'></div>
                 <input
-                    v-show='isSelectedPaymentMethod'
+                    v-show='useSavedMethod'
                     :value='lastFour'
                     class='form-control-pp'
                     disabled
@@ -273,9 +258,9 @@
 
               <div>
                 <label>Cardholder name</label>
-                <div v-show='!isSelectedPaymentMethod' id='card-holder-name'></div>
+                <div v-show='!useSavedMethod' id='card-holder-name'></div>
                 <input
-                    v-show='isSelectedPaymentMethod'
+                    v-show='useSavedMethod'
                     class='form-control-pp'
                     disabled
                     type='text'
@@ -285,9 +270,9 @@
 
               <div>
                 <label>Expiry date</label>
-                <div v-show='!isSelectedPaymentMethod' id='expiration-date'></div>
+                <div v-show='!useSavedMethod' id='expiration-date'></div>
                 <input
-                    v-show='isSelectedPaymentMethod'
+                    v-show='useSavedMethod'
                     class='form-control-pp'
                     disabled
                     type='text'
@@ -297,9 +282,9 @@
 
               <div>
                 <label>CVC/CVV</label>
-                <div v-show='!isSelectedPaymentMethod' id='cvv'></div>
+                <div v-show='!useSavedMethod' id='cvv'></div>
                 <input
-                    v-show='isSelectedPaymentMethod'
+                    v-show='useSavedMethod'
                     class='form-control-pp'
                     disabled
                     type='text'
@@ -309,7 +294,7 @@
 
               <div class='form-group'>
                 <button
-                    v-show='!isSelectedPaymentMethod'
+                    v-show='!useSavedMethod'
                     id='onSubmitStepCreditCard2'
                     class='btn btn-block'
                     type='button'
@@ -318,7 +303,7 @@
                   Submit Payment
                 </button>
                 <button
-                    v-show='isSelectedPaymentMethod'
+                    v-show='useSavedMethod'
                     class='btn btn-block'
                     type='button'
                     @click='book()'
@@ -391,9 +376,7 @@ export default {
       booking: null,
       formReadonly: false,
       useSavedMethod: false,
-      selectedPaymentArr: [],
       selectedPaymentId: null,
-      selectedPaymentIndex: null,
       venmoNotSupported: false,
       orderId: null,
       paypal: null,
@@ -433,9 +416,6 @@ export default {
     this.initNewPlacesAutocomplete('lessonLocation')
   },
   computed: {
-    isSelectedPaymentMethod() {
-      return this.useSavedMethod || this.selectedPaymentArr.includes(true)
-    },
     lastFour() {
       return `**** **** **** ${this.userPaymentMethods?.card?.last_digits}`
     }
@@ -445,7 +425,6 @@ export default {
       fetchCartItems: 'fetchCartItems'
     }),
     async initializePaypal() {
-      console.log(this.userPaymentMethods, 'userPaymentMethods')
       try {
         this.paypal = await loadScript({
           clientId: this.ppClientToken,
@@ -457,7 +436,7 @@ export default {
           vault: true,
           disableFunding: ['paylater'],
           enableFunding: ['venmo'],
-          dataUserIdToken: this.dataUserIdToken,
+          // dataUserIdToken: this.dataUserIdToken,
         })
         this.initPaymentMethod()
       } catch (error) {
@@ -465,8 +444,6 @@ export default {
       }
     },
     initPaymentMethod() {
-      console.log(this.userPaymentMethods.card, 'this.userPaymentMethods.card')
-      console.log(this.userPaymentMethods.paypal, 'this.userPaymentMethods.paypal')
       if (this.userPaymentMethods.card) this.renderCardForm()
       if (this.userPaymentMethods.paypal) this.renderPayPalButton()
       if (!this.userPaymentMethods.card && !this.userPaymentMethods.paypal && !this.userPaymentMethods.venmo) {
@@ -583,29 +560,6 @@ export default {
         promo_codes: guestCartHelper.getPromos()
       })
     },
-    toggleUseSavedMethods(value, index) {
-      this.selectedPaymentIndex = index
-      const oldSelectedPaymentId = this.selectedPaymentId
-      this.selectedPaymentArr = this.selectedPaymentArr.map((el, i) => (i === index ? el = true : el = false))
-      this.selectedPaymentId = value
-      if (oldSelectedPaymentId === value) {
-        this.selectedPaymentArr = this.selectedPaymentArr.map((el, i) => (i === index ? el = false : el = false))
-        this.selectedPaymentId = null
-        this.selectedPaymentIndex = null
-      }
-    }
-  },
-  watch: {
-    useSavedMethod() {
-      if (this.useSavedMethod) {
-        console.log(this.userPaymentMethods, 'userPaymentMethods')
-        this.selectedPaymentId = this.userPaymentMethods[0].payment_id
-        console.log(this.selectedPaymentId)
-      } else {
-        this.selectedPaymentId = null
-        console.log(this.selectedPaymentId)
-      }
-    }
   }
 }
 </script>
