@@ -175,11 +175,15 @@ class PayPalProcessor
                 if (!isset($result['error'])) {
 
                     if ($result['payments_receivable'] && $result['primary_email_confirmed'] && isset($result['oauth_integrations'])) {
-                        return [ 'status' => self::STATUS_ACTIVE ];
+                        return [
+                            'status' => self::STATUS_ACTIVE,
+                            'merchantId' => $user->pp_merchant_id,
+                            ];
                     } else {
                         $data = $this->getRegistrationMerchantLink($user);
                         return [
                             'status' => self::STATUS_SUSPENDED,
+                            'merchantId' => $user->pp_merchant_id,
                             "actionUrl" => $data['actionUrl'],
                             ];
                     }
@@ -214,7 +218,10 @@ class PayPalProcessor
                         'account_status' => self::STATUS_ACTIVE
                     ], $user->id);
 
-                return [ 'status' => self::STATUS_ACTIVE];
+                return [
+                    'status' => self::STATUS_ACTIVE,
+                    'merchantId' => $user->pp_merchant_id,
+                    ];
 
             } else {
                 $data = $this->getRegistrationMerchantLink($user);
