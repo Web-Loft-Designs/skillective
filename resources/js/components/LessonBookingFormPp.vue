@@ -457,7 +457,7 @@ export default {
           vault: true,
           disableFunding: ['paylater'],
           enableFunding: ['venmo'],
-          dataUserIdToken: this.dataUserIdToken,
+          // dataUserIdToken: this.dataUserIdToken,
         })
         this.initPaymentMethod()
       } catch (error) {

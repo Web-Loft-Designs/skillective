@@ -142,6 +142,7 @@ class PayPalProcessor
 
     public function getMerchantDetail($user): array
     {
+
         if ($user->pp_referral_id && !$user->pp_merchant_id) {
             try {
                 $result = $this->payPalClient->showReferralData($user->pp_referral_id);
@@ -197,6 +198,7 @@ class PayPalProcessor
                 throw new Exception("show Referral Status PayPal for user {$user->id} is fail");
             }
         } else {
+
             $data = $this->getRegistrationMerchantLink($user);
             $result = [
                 "actionUrl" => $data['actionUrl'],
@@ -237,7 +239,7 @@ class PayPalProcessor
         }
     }
 
-    protected function getRegistrationMerchantLink($user): array
+    protected function getRegistrationMerchantLink(User $user): array
     {
         $ppTrackingId = "pp_tracking_id_" . $user->id;
         $partnerParams = $this->buildPartnerData($ppTrackingId);
@@ -283,17 +285,19 @@ class PayPalProcessor
 
     /**
      * @param string $ppTrackingId
+     * @param string $step
      * @return array
+     * @throws Exception
      */
     protected function buildPartnerData(string $ppTrackingId): array
     {
-        return [
+        $data = [
             "tracking_id" => $ppTrackingId,
             'operations' => [
                 [
                     "operation" => "API_INTEGRATION",
                     "api_integration_preference" => [
-                        "rest_api_integration" => [
+                        "rest_api_integration" =>  [
                             "integration_method" => "PAYPAL",
                             "integration_type" => "THIRD_PARTY",
                             "third_party_details" => [
@@ -327,6 +331,8 @@ class PayPalProcessor
                 "show_add_credit_card" => true
             ]
         ];
+
+        return $data;
     }
 
 
@@ -620,7 +626,6 @@ class PayPalProcessor
 
         try {
             $result = $this->payPalClient->createPaymentSourceToken($data);
-
             if (!isset($result['error'])) {
                 $source = $result['payment_source'][array_key_first($result['payment_source'])];
                 // зберегти або оновити
