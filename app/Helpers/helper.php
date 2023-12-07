@@ -88,9 +88,7 @@ function getStatesAssociativeArray()
 		'WV' => 'West Virginia',
 		'WI' => 'Wisconsin',
 		'WY' => 'Wyoming',
-
 		'AS' => 'American Samoa',
-		'DC' => 'District of Columbia',
 		'FM' => 'Federated States of Micronesia',
 		'GU' => 'Guam',
 		'MH' => 'Marshall Islands',
@@ -98,12 +96,6 @@ function getStatesAssociativeArray()
 		'PW' => 'Palau',
 		'PR' => 'Puerto Rico',
 		'VI' => 'Virgin Islands',
-		//		'AE' => 'Armed Forces Africa',
-		//		'AA' => 'Armed Forces Americas',
-		//		'AE' => 'Armed Forces Canada',
-		//		'AE' => 'Armed Forces Europe',
-		//		'AE' => 'Armed Forces Middle East',
-		//		'AP' => 'Armed Forces Pacific',
 	];
 
 	ksort($stateOptions);
@@ -114,9 +106,6 @@ function getStatesAssociativeArray()
 function getUSStates()
 {
 	$stateOptions = getStatesAssociativeArray();
-
-	//    foreach ($stateOptions as $k=>$v)
-	//        $stateOptions[$k] = ucwords(strtolower($v));
 
 	$states = [];
 	foreach ($stateOptions as $code => $name) {

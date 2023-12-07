@@ -3,7 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\LessonRequest;
-use \App\Repositories\LessonRequestRepository;
+use App\Repositories\LessonRequestRepository;
+use Exception;
 use Illuminate\Console\Command;
 
 class AutoCancelNotApprovedLessonRequests extends Command
@@ -28,7 +29,7 @@ class AutoCancelNotApprovedLessonRequests extends Command
      * @return void
      */
 
-    private $lessonRequestsRepository = null;
+    private LessonRequestRepository $lessonRequestsRepository;
 
     public function __construct(LessonRequestRepository $lessonRequestsRepository)
     {
@@ -39,9 +40,10 @@ class AutoCancelNotApprovedLessonRequests extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
+     * @throws Exception
      */
-    public function handle()
+    public function handle(): void
     {
 		$this->lessonRequestsRepository
 			->getTooLongTimePendingLessonRequests()

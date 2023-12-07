@@ -116,7 +116,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return BelongsToMany
      */
-    public function genres()
+    public function genres(): BelongsToMany
 	{
 		return $this->belongsToMany(Genre::class, 'user_genre')
             ->orderBy('title')
@@ -127,7 +127,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasMany
      */
-    public function regularNotifications()
+    public function regularNotifications(): HasMany
 	{
 		return $this->hasMany(RegularNotification::class, 'user_regular_notifications');
 	}
@@ -135,7 +135,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return BelongsToMany
      */
-    public function clients()
+    public function clients(): BelongsToMany
 	{
 		return $this->belongsToMany(User::class, 'instructor_client', 'instructor_id', 'client_id')->withTimestamps();
 	}
@@ -144,7 +144,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return BelongsToMany
      */
-    public function instructors()
+    public function instructors(): BelongsToMany
 	{
 		return $this->belongsToMany(
             User::class,
@@ -159,7 +159,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasOne
      */
-    public function profile()
+    public function profile(): HasOne
 	{
 		return $this->hasOne(Profile::class);
 	}
@@ -168,7 +168,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasMany
      */
-    public function social()
+    public function social(): HasMany
 	{
 		return $this->hasMany(Social::class);
 	}
@@ -176,7 +176,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasMany
      */
-    public function instructorInvitations()
+    public function instructorInvitations(): HasMany
 	{
 		return $this->hasMany(Invitation::class, 'invited_by')
             ->where('invited_as_instructor', 1);
@@ -185,7 +185,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasMany
      */
-    public function studentInvitations()
+    public function studentInvitations(): HasMany
 	{
 		return $this->hasMany(Invitation::class, 'invited_by')
             ->where('invited_as_instructor', 0);
@@ -195,7 +195,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasMany
      */
-    public function lessons()
+    public function lessons(): HasMany
 	{
 		return $this->hasMany(Lesson::class, 'instructor_id', 'id');
 	}
@@ -203,7 +203,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasMany
      */
-    public function discounts()
+    public function discounts(): HasMany
 	{
 		return $this->hasMany(Discount::class, 'instructor_id', 'id');
 	}
@@ -211,7 +211,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasMany
      */
-    public function bookings()
+    public function bookings(): HasMany
 	{
 		return $this->hasMany(Booking::class, 'student_id', 'id');
 	}
@@ -219,7 +219,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasMany
      */
-    public function myLessonsBookings()
+    public function myLessonsBookings(): HasMany
 	{
 		return $this->hasMany(Booking::class, 'instructor_id', 'id');
 	}
@@ -227,7 +227,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasMany
      */
-    public function purchasedLessons()
+    public function purchasedLessons(): HasMany
 	{
 		return $this->hasMany(PurchasedLesson::class, 'student_id', 'id');
 	}
@@ -235,7 +235,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasMany
      */
-    public function myPreLessonsPurchases()
+    public function myPreLessonsPurchases(): HasMany
 	{
 		return $this->hasMany(PurchasedLesson::class, 'instructor_id', 'id');
 	}
@@ -243,7 +243,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasMany
      */
-    public function findPaymentMethod()
+    public function findPaymentMethod(): HasMany
 	{
 		return $this->hasMany(UserPaymentMethod::class, 'user_id', 'id');
 	}
@@ -251,7 +251,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return HasMany
      */
-    public function geoLocations()
+    public function geoLocations(): HasMany
 	{
 		return $this->hasMany(UserGeoLocation::class);
 	}
@@ -259,7 +259,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
 	{
 		return $this->first_name . ' ' . $this->last_name;
 	}
@@ -267,7 +267,7 @@ class User extends Authenticatable implements HasMedia, Transformable
     /**
      * @return array
      */
-    public function transform()
+    public function transform(): array
 	{
 		return [
 			'id' => $this->id,

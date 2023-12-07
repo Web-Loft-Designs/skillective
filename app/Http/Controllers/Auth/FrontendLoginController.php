@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\View\View;
 
 class FrontendLoginController extends AppBaseController
 {
@@ -75,9 +76,7 @@ class FrontendLoginController extends AppBaseController
 		}
 	}
 
-
-
-    public function showLoginForm()
+    public function showLoginForm(): View
     {
         $page_title = 'Login';
 		session(['prev_page' => url()->previous()]);
@@ -99,6 +98,7 @@ class FrontendLoginController extends AppBaseController
 
     public function login(Request $request)
     {
+
         $this->validateLogin($request);
         if ($request->isXmlHttpRequest()){
             if ($this->hasTooManyLoginAttempts($request)) {

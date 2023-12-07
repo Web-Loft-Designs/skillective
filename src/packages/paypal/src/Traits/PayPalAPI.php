@@ -64,6 +64,31 @@ trait PayPalAPI
     }
 
     /**
+     * @return array|bool|float|int|object|string|null
+     * @throws Throwable
+     */
+    public function getCustomerAccessToken(string $customerId = null)
+    {
+        $this->apiEndPoint = 'v1/oauth2/token';
+
+        $this->setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        $this->options['auth'] = [$this->config['client_id'], $this->config['client_secret']];
+
+        $this->options[$this->httpBodyParam] = [
+            'grant_type'    => 'client_credentials',
+            'response_type' => 'id_token',
+        ];
+
+        if ($customerId) {
+            $this->options[$this->httpBodyParam]['target_customer_id'] = $customerId;
+        }
+
+        return $this->doPayPalRequest();
+
+    }
+
+    /**
      * Set PayPal Rest API access token.
      *
      * @param array $response

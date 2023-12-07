@@ -9,12 +9,18 @@ use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 
+
 class CheckoutController extends Controller
 {
-    public function __construct()
+
+    private CartRepository $cartRepository;
+
+    public function __construct(CartRepository $cartRepo)
     {
         parent::__construct();
+        $this->cartRepository = $cartRepo;
     }
+
 
     /**
      * @param CartRepository $cartRepository
@@ -23,31 +29,34 @@ class CheckoutController extends Controller
      */
     public function index(CartRepository $cartRepository, UserRepository $userRepository): View
     {
-        $userData = null;
-        $user = Auth::user();
-        $total = 0;
-        $lessonsInACart = [];
-        if ($user) {
+
+        if (Auth::check() && Auth::user()->hasRole(User::ROLE_STUDENT)) {
+
             $userData = $userRepository->getUserData(Auth::user()->id);
             $userData = $userRepository->presentResponse($userData)['data'];
             $userData['genres'] = Auth::user()->genres()->pluck('id')->toArray();
             $total = $cartRepository->getCartSummary(Auth::user()->id, null, "[]");
             $lessonsInACart = $cartRepository->getLessonsCountInCart(Auth::user()->id, null);
-        }
+            $vars['page_title']             = 'Checkout';
+            $vars['total']                  = $total;
+            $vars['lessonsCount']           = $lessonsInACart;
+            $vars['user']                   = $userData;
+            $vars['ppClientToken']          = PayPalProcessor::getClientId();
+            $vars['bnCode']                 = PayPalProcessor::getBnCde();
+            $vars['ppUserPaymentMethods']   = PayPalProcessor::getSavedCustomerPaymentMethods(Auth::user());
+            $vars['masterMerchantId']       = PayPalProcessor::getMasterMerchantId();
+            $vars['dataUserIdToken']        = PayPalProcessor::getDataUserIdToken(Auth::user());
 
-        $vars = [
-            'page_title'        => 'Checkout',
-            'total'             => $total,
-            'lessonsCount'      => $lessonsInACart,
-            'user'              => $userData,
-        ];
-
-        $isStudent = ($user && $user->hasRole(User::ROLE_STUDENT));
-        if (!$user || $isStudent) {
-            $vars['ppClientToken'] = PayPalProcessor::getClientId();
-            $vars['bnCode'] = PayPalProcessor::getBnCde();
-            $vars['ppUserPaymentMethods'] = $isStudent ? PayPalProcessor::getSavedCustomerPaymentMethods($user) : [];
-
+        } else {
+            $vars['page_title']             = 'Checkout';
+            $vars['total']                  = null;
+            $vars['lessonsCount']           = null;
+            $vars['user']                   = null;
+            $vars['ppClientToken']          = PayPalProcessor::getClientId();
+            $vars['bnCode']                 = PayPalProcessor::getBnCde();
+            $vars['ppUserPaymentMethods']   = null;
+            $vars['masterMerchantId']       = PayPalProcessor::getMasterMerchantId();
+            $vars['dataUserIdToken']        = null;
         }
 
         return view('frontend.checkout', $vars);

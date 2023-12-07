@@ -11,7 +11,9 @@ use Throwable;
 
 class PayPalProcessor
 {
-
+    const STATUS_ACTIVE = 'active';
+    const STATUS_NOT_CONNECTED = 'not connected';
+    const STATUS_SUSPENDED = 'suspended';
     /**
      * @var UserRepository
      */
@@ -32,20 +34,25 @@ class PayPalProcessor
     }
 
     /**
+     * @return bool
+     * @throws Throwable
+     */
+    public function checkConnect(): bool
+    {
+        $response = $this->payPalClient->getAccessToken();
+        if (!isset($response['error']) && isset($response['access_token']) ) {
+            return true;
+        }
+        return false;
+    }
+    /**
      * @throws Exception
      */
-    protected function getRandomString():string
+    protected function getRandomString(): string
     {
         $randomBytes = random_bytes(100);
         $randomString = base64_encode($randomBytes);
-        return substr(str_replace(['/', '+', '='], '', $randomString), 0, 100);
-    }
-
-    public function getPpAccessToken()
-    {
-        $payPalClient = new PayPalClient();
-        $response = $payPalClient->getAccessToken();
-        return $response['access_token'];
+        return substr(str_replace(['/', '+', '='], '', $randomString), 0, 80);
     }
 
     /**
@@ -75,35 +82,67 @@ class PayPalProcessor
     public function getEnvironmentUrl(): string
     {
         if (config('paypal.mod') == 'live') {
-            $Url = 'https://www.paypal.com/';
+            return 'https://www.paypal.com/';
         } else {
-            $Url = 'https://www.sandbox.paypal.com/';
+            return 'https://www.sandbox.paypal.com/';
         }
-        return $Url;
     }
 
     public function getMasterMerchantId(): string
     {
         if (config('paypal.mod') == 'live') {
-            $string = config('paypal.live.master_partner_id');
+            return config('paypal.live.master_partner_id');
         } else {
-            $string = config('paypal.sandbox.master_partner_id');
+            return config('paypal.sandbox.master_partner_id');
         }
-        return $string;
     }
 
     public function getBnCde(): string
     {
         if (config('paypal.mod') == 'live') {
-            $string = config('paypal.live.bn_code');
+            return config('paypal.live.bn_code');
         } else {
-            $string = config('paypal.sandbox.bn_code');
+            return config('paypal.sandbox.bn_code');
         }
-        return $string;
+    }
+
+    public function checkMerchantStatus(User $user): void
+    {
+        if ($user->pp_merchant_id) {
+            try {
+                $result = $this->payPalClient->showReferralStatus($user->pp_merchant_id);
+                if (!isset($result['error'])) {
+                    if (!$result['payments_receivable']) {
+                        $user->pp_account_status = self::STATUS_SUSPENDED;
+                        $user->bt_submerchant_status_reason = "You have not provided the necessary permissions for Skillective";
+                        $user->save();
+                    } elseif (!$result['primary_email_confirmed']) {
+                        $user->pp_account_status = self::STATUS_SUSPENDED;
+                        $user->bt_submerchant_status_reason = "You have not verified your PaPal account";
+                        $user->save();
+                    }elseif (!isset($result['oauth_integrations'])) {
+                        $user->pp_account_status = self::STATUS_SUSPENDED;
+                        $user->bt_submerchant_status_reason = "You have not provided the necessary permissions for Skillective";
+                        $user->save();
+                    } else {
+                        $user->pp_account_status = self::STATUS_ACTIVE;
+                        $user->bt_submerchant_status_reason = null;
+                        $user->save();
+                    }
+                } else {
+                    Log::channel('paypal')->error("show Referral Status PayPal for user {$user->id} is fail" . $result['error']['message']);
+                    throw new Exception("show Referral Status PayPal for user {$user->id} is fail" . $result['error']['message']);
+                }
+            } catch (Exception $e) {
+                Log::channel('paypal')->error("show Referral Status PayPal for user {$user->id} is fail");
+                throw new Exception("show Referral Status PayPal for user {$user->id} is fail");
+            }
+        }
     }
 
     public function getMerchantDetail($user): array
     {
+
         if ($user->pp_referral_id && !$user->pp_merchant_id) {
             try {
                 $result = $this->payPalClient->showReferralData($user->pp_referral_id);
@@ -119,9 +158,7 @@ class PayPalProcessor
 
                     return [
                         "actionUrl" => $link['actionUrl'],
-                        'status' => "Not activated",
-                        'ppMerchantId' => "",
-                        'message' => "Go to PayPal."
+                        'status' => self::STATUS_NOT_CONNECTED,
                     ];
                 } else {
                     Log::channel('paypal')->error("show Referral Status PayPal for user {$user->id} is fail" . $result['error']['message']);
@@ -138,7 +175,19 @@ class PayPalProcessor
 
                 if (!isset($result['error'])) {
 
-                    return $this->parseReferralStatus($result, $user);
+                    if ($result['payments_receivable'] && $result['primary_email_confirmed'] && isset($result['oauth_integrations'])) {
+                        return [
+                            'status' => self::STATUS_ACTIVE,
+                            'merchantId' => $user->pp_merchant_id,
+                            ];
+                    } else {
+                        $data = $this->getRegistrationMerchantLink($user);
+                        return [
+                            'status' => self::STATUS_SUSPENDED,
+                            'merchantId' => $user->pp_merchant_id,
+                            "actionUrl" => $data['actionUrl'],
+                            ];
+                    }
 
                 } else {
                     Log::channel('paypal')->error("show Referral Status PayPal for user {$user->id} is fail" . $result['error']['message']);
@@ -149,12 +198,11 @@ class PayPalProcessor
                 throw new Exception("show Referral Status PayPal for user {$user->id} is fail");
             }
         } else {
+
             $data = $this->getRegistrationMerchantLink($user);
             $result = [
                 "actionUrl" => $data['actionUrl'],
-                'status' => "Not activated",
-                'ppMerchantId' => "",
-                'message' => "Go to PayPal."
+                'status' => self::STATUS_NOT_CONNECTED,
             ];
         }
         return $result;
@@ -164,60 +212,34 @@ class PayPalProcessor
     {
         if (isset($data['merchantId'])) {
             $user = $this->userRepository->where('pp_tracking_id', $data['merchantId'])->first();
-            $this->userRepository->updateUserPpData(
-                [
-                    'merchant_id' => $data['merchantIdInPayPal'],
-                    'account_status' => $data['accountStatus']
-                ], $user->id);
 
-            if ($data['permissionsGranted'] == "true" &&
-                $data['consentStatus'] == "true" &&
-                $data['isEmailConfirmed'] == 'true') {
-                $status = "Active";
-                $message = "Pay Pal is connected";
+            if ($data['permissionsGranted'] == "true" && $data['consentStatus'] == "true" && $data['isEmailConfirmed'] == 'true') {
+                $this->userRepository->updateUserPpData(
+                    [
+                        'merchant_id' => $data['merchantIdInPayPal'],
+                        'account_status' => self::STATUS_ACTIVE
+                    ], $user->id);
+
+                return [
+                    'status' => self::STATUS_ACTIVE,
+                    'merchantId' => $user->pp_merchant_id,
+                    ];
+
             } else {
-                $status = "Pending";
-                $message = "Please complete your account setup in PayPal to start receiving the payments";
+                $data = $this->getRegistrationMerchantLink($user);
+                return [
+                    'status' => self::STATUS_SUSPENDED,
+                    "actionUrl" => $data['actionUrl'],
+                ];
             }
-
-            return [
-                'status' => $status,
-                'ppMerchantId' => $data['merchantIdInPayPal'],
-                'message' => $message
-            ];
-
         } else {
             return [
-                'status' => "Not activated",
-                'ppMerchantId' => '',
-                'message' => "incorrect data"
+                'status' => self::STATUS_NOT_CONNECTED,
             ];
         }
-
     }
 
-
-    protected function parseReferralStatus($data, $user): array
-    {
-//        формування інфи для фронта Статус треба допрацювати і меседж також
-        // тут можна боробити більше інфи про статус інтеграції продавця та які функції йому доступні
-
-        if ($data['payments_receivable'] && $data['primary_email_confirmed']) {
-            $status = "Active";
-            $message = "Pay Pal is connected";
-        } else {
-            $status = "Pending";
-            $message = "Please complete your account setup in PayPal to start receiving the payments";
-        }
-        return [
-            'status' => $status,
-            'ppMerchantId' => $user->pp_merchant_id,
-            'message' => $message,
-            'activePayOutMethods' => $data['products']
-        ];
-    }
-
-    protected function getRegistrationMerchantLink($user): array
+    protected function getRegistrationMerchantLink(User $user): array
     {
         $ppTrackingId = "pp_tracking_id_" . $user->id;
         $partnerParams = $this->buildPartnerData($ppTrackingId);
@@ -263,17 +285,19 @@ class PayPalProcessor
 
     /**
      * @param string $ppTrackingId
+     * @param string $step
      * @return array
+     * @throws Exception
      */
     protected function buildPartnerData(string $ppTrackingId): array
     {
-        return [
+        $data = [
             "tracking_id" => $ppTrackingId,
             'operations' => [
                 [
                     "operation" => "API_INTEGRATION",
                     "api_integration_preference" => [
-                        "rest_api_integration" => [
+                        "rest_api_integration" =>  [
                             "integration_method" => "PAYPAL",
                             "integration_type" => "THIRD_PARTY",
                             "third_party_details" => [
@@ -283,6 +307,7 @@ class PayPalProcessor
                                     "PARTNER_FEE",
                                     "DELAY_FUNDS_DISBURSEMENT",
                                     "ADVANCED_TRANSACTIONS_SEARCH",
+                                    "VAULT"
                                 ],
                             ]
                         ]
@@ -306,6 +331,8 @@ class PayPalProcessor
                 "show_add_credit_card" => true
             ]
         ];
+
+        return $data;
     }
 
 
@@ -322,7 +349,6 @@ class PayPalProcessor
         $currency = $this->payPalClient->getCurrency();
         $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
         $totalAmount = round($booking->spot_price + $totalServiceFee + $processorFee, 2);
-//        $ppFee = number_format((float)$processorFee, 2, '.', '');
         $sklFee = number_format((float)$totalServiceFee, 2, '.', '');
         $subMerchantId = $booking->instructor->pp_merchant_id;
         $subMerchantEmail = $booking->instructor->email;
@@ -358,6 +384,10 @@ class PayPalProcessor
                     ]
                 ],
             ],
+            "application_context" => [
+                "shipping_preference" => "NO_SHIPPING"
+            ],
+
         ];
         try {
 
@@ -370,7 +400,7 @@ class PayPalProcessor
                 return $this->payPalClient->setRequestHeaders([
                     'PayPal-Request-Id' => $this->getRandomString(),
                     'PayPal-Partner-Attribution-Id' => $this->getBnCde()
-                ])->capturePaymentOrder($order['id'], [ 'payment_source' => $userPaymentSource ]);
+                ])->capturePaymentOrder($order['id'], ['payment_source' => $userPaymentSource]);
 
 
             } else {
@@ -398,6 +428,7 @@ class PayPalProcessor
             "reference_id" => $referenceId,
             "reference_type" => "TRANSACTION_ID"
         ]);
+
     }
 
     public function cancelTransaction($transactionId): bool
@@ -405,9 +436,9 @@ class PayPalProcessor
         try {
             $order = $this->payPalClient->showOrderDetails($transactionId);
 
-            if(isset($order['purchase_units'][0]['payments']['captures'][0]['id'])) {
+            if (isset($order['purchase_units'][0]['payments']['captures'][0]['id'])) {
                 $merchantId = $order['purchase_units'][0]['payee']['merchant_id'];
-                $this->payPalClient->setRequestHeaders([
+              $this->payPalClient->setRequestHeaders([
                     'PayPal-Request-Id' => $this->getRandomString(),
                     'PayPal-Auth-Assertion' => $this->getAuthAssertionValue($this->getClientId(), $merchantId)
                 ])->refundAllCapturedPayment($order['purchase_units'][0]['payments']['captures'][0]['id']);
@@ -418,13 +449,19 @@ class PayPalProcessor
             }
 
         } catch (Exception|Throwable $e) {
-            Log::channel('paypal')->error('Can\'t cancel transaction. Transaction '.$transactionId.' not found');
-            throw new Exception('Can\'t cancel transaction. Transaction '.$transactionId.' not found');
+            Log::channel('paypal')->error('Can\'t cancel transaction. Transaction ' . $transactionId . ' not found');
+            throw new Exception('Can\'t cancel transaction. Transaction ' . $transactionId . ' not found');
         }
 
     }
 
-    protected function getAuthAssertionValue( $clientId, string $sellerPayerId): string
+    /**
+     * @param $clientId
+     * @param string $sellerPayerId
+     * @return string
+     * create jwt token
+     */
+    protected function getAuthAssertionValue($clientId, string $sellerPayerId): string
     {
         $header = [
             "alg" => "none"
@@ -480,6 +517,9 @@ class PayPalProcessor
                     ]
                 ],
             ],
+            "application_context" => [
+                "shipping_preference" => "NO_SHIPPING"
+            ],
         ];
 
         try {
@@ -490,10 +530,10 @@ class PayPalProcessor
 
             if (!isset($order['error'])) {
 
-                return $this->payPalClient->setRequestHeaders([
+               return $this->payPalClient->setRequestHeaders([
                     'PayPal-Request-Id' => $this->getRandomString(),
                     'PayPal-Partner-Attribution-Id' => $this->getBnCde()
-                ])->capturePaymentOrder($order['id'], [ 'payment_source' => $userPaymentSource ]);
+                ])->capturePaymentOrder($order['id'], ['payment_source' => $userPaymentSource]);
 
             } else {
                 Log::channel('paypal')->error('Can\'t create transaction: ' . $order['error']['message']);
@@ -507,75 +547,64 @@ class PayPalProcessor
     }
 
 
-    public function getAllCustomerPaymentMethods(User $user): array
+    public function getSavedCustomerPaymentMethods(User $user): ?array
     {
         if (!$user->pp_customer_id) {
-            return [];
+            return null;
         }
-
-        try {
-
-            $result = $this->payPalClient->setCustomerSource($user->pp_customer_id)->listPaymentSourceTokens(totals: false);
-            dd($result);
-            foreach ($result['payment_tokens'] as $paymentToken) {
-//dd($paymentToken);
-                // звірити з нашою базою даних і також удалити токени
-                $deleteR = $this->payPalClient->deletePaymentSourceToken($paymentToken['id']);
-
-//                dd($deleteR);
-
-            }
-
-
-            dd("stop");
-            return $result;
-
-        } catch (Exception $e) {
-            Log::channel('paypal')->error("found payment method for {$user->id} is fail");
-            throw new Exception("found payment method for {$user->id} is fail");
-        }
-    }
-
-    public function getSavedCustomerPaymentMethods(User $user): array
-    {
-        if (!$user->pp_customer_id) {
-            return [];
-        }
-        $issetTokens = $user->findPaymentMethod()->get();
-        if (!$issetTokens) {
-            return [];
+        $userPaymentMethods = $user->findPaymentMethod()->get();
+        if (!$userPaymentMethods) {
+            return null;
         }
 
         try {
             $methods = [];
-            foreach ($issetTokens as $token) {
-
-                $result = $this->payPalClient->showPaymentSourceTokenDetails($token->payment_method_token);
+            foreach ($userPaymentMethods as $method) {
+                $result = $this->payPalClient->showPaymentSourceTokenDetails($method->payment_method_token);
 
                 foreach ($result['payment_source'] as $key => $source) {
 
                     switch ($key) {
                         case 'card':
-                            $item = [
-                                'payment_id' => $token->id,
+                            $methods['card'] = [
+                                'payment_id' => $method->id,
                                 'type' => $key,
                                 'last_digits' => $source['last_digits'],
                                 'brand' => $source['brand'],
                             ];
                             break;
+                        case 'paypal':
+                            $methods['paypal'] = [
+                                'payment_id' => $method->id,
+                                'type' => $key,
+                                'last_digits' => "",
+                                'brand' => "",
+                                'is_default' => '',
+                                'token' => ""
+                            ];
+                            break;
+                        case 'venmo':
+                            $methods['venmo'] = [
+                                'payment_id' => $method->id,
+                                'type' => $key,
+                                'last_digits' => "",
+                                'brand' => "",
+                                'is_default' => '',
+                                'token' => ""
+                            ];
+                            break;
                         default:
-                            $item = [
-                                'payment_id' => $token->id,
+                            $methods['NaN'] = [
+                                'payment_id' => $method->id,
                                 'type' => $key,
                                 'last_digits' => null,
                                 'brand' => null,
                             ];
                     }
-                    $methods[] = $item;
+
                 }
 
             }
-
             return $methods;
 
         } catch (Exception $e) {
@@ -584,7 +613,7 @@ class PayPalProcessor
         }
     }
 
-    public function createPaymentMethod(User $user, $paymentMethodNonce): array
+    public function createPaymentMethod(User $user, string $paymentMethodNonce): array
     {
         $data = [
             "payment_source" => [
@@ -593,21 +622,19 @@ class PayPalProcessor
                     'type' => "SETUP_TOKEN"
                 ]
             ],
-            'customer' => [
-                'id' => $user->pp_customer_id
-            ],
         ];
 
         try {
-
             $result = $this->payPalClient->createPaymentSourceToken($data);
-
             if (!isset($result['error'])) {
-
-                $paymentMethodType = $this->parseMethodType($result['payment_source']);
-
-                $this->userRepository->savePaymentMethod($user, ['token' => $result['id'], 'type' => $paymentMethodType]);
-                return ['token' => $result['id'], 'type' => $paymentMethodType];
+                $source = $result['payment_source'][array_key_first($result['payment_source'])];
+                // зберегти або оновити
+                $this->userRepository->savePaymentMethod($user, $result['id'], array_key_first($result['payment_source']));
+                // зберегти pp_customer_id
+                $user->pp_customer_id = $result['customer']['id'];
+                $user->save();
+//                повернкти результат
+                return ['token' => $result['id'], 'type' => array_key_first($result['payment_source']), 'source' => $source];
             } else {
                 Log::channel('paypal')->error("create payment method for {$user->id} is fail  " . $result['error']['message']);
                 throw new Exception('Can\'t create payment method: ' . $user->id);
@@ -620,23 +647,47 @@ class PayPalProcessor
 
     }
 
-    public function getVaultSetupToken($user): string
+    public function getVaultSetupToken($user, string $type): string
     {
-        $data = [
-            'customer' => [
-                'id' => 'customer_' . $user->id,
-                "merchant_customer_id" => $user->email,
-            ],
-            'payment_source' => [
-                'card' => (object)[],
-            ]
-        ];
+        switch ($type) {
+            case 'card':
+                $data['payment_source'] = ['card' => (object)[]];
+                break;
+            case 'paypal':
+                $data['payment_source'] = [
+                    'paypal' => [
+                        "usage_type" => "PLATFORM",
+                        "experience_context" => [
+                            "return_url" => config('app.url') . 'profile/edit',
+                            "cancel_url" => config('app.url') . 'profile/edit'
+                        ]
+                    ]
+                ];
+                break;
+            case 'venmo':
+                $data['payment_source'] = [
+                    'venmo' => [
+                        "usage_type" => "PLATFORM",
+                        "experience_context" => [
+                            "return_url" => config('app.url') . 'profile/edit',
+                            "cancel_url" => config('app.url') . 'profile/edit'
+                        ]
+                    ]
+                ];
+                break;
+            default:
+                throw new Exception("create Payment Setup Token for {$user->id} is fail");
+        }
+
+
+        if ($user->pp_customer_id) {
+            $data['customer'] = [ 'id' => $user->pp_customer_id];
+        }
 
         try {
             $response = $this->payPalClient->createPaymentSetupToken($data);
+
             if (!isset($response['error'])) {
-                $user->pp_customer_id = $response['customer']['id'];
-                $user->save();
                 return $response['id'];
             } else {
                 Log::channel('paypal')->error("create Payment Setup Token for {$user->id} is fail  " . $response['error']['message']);
@@ -650,23 +701,38 @@ class PayPalProcessor
 
     }
 
-
-    protected function parseMethodType($data): string
+    public function deletePaymentMethod(string $customerId, string $token): bool
     {
-        foreach ($data as $key => $item) {
-
-            $type = match ($key) {
-                "card" => $item['brand'],
-                'paypal' => "PayPal",
-                'venmo' => 'Venmo',
-                default => "Unknown Method",
-            };
-            break;
-
+        try {
+           $this->payPalClient->deletePaymentSourceToken($token);
+            return true;
+        } catch (Exception $e) {
+            Log::channel('paypal')->error("delete Payment method is fail");
+            throw new Exception("delete Payment method is fail");
         }
-        return $type;
+
     }
 
+
+    /**
+     * @param User $user
+     * @return string
+     * @throws Throwable
+     */
+    public function getDataUserIdToken(User $user): string
+    {
+        try {
+            $client = new PayPalClient();
+            $response = $client->getCustomerAccessToken($user->pp_customer_id ?? null);
+
+            return $response['id_token'];
+
+        } catch (Exception $e) {
+            Log::channel('paypal')->error("get user id token is fail");
+            throw new Exception("get user id token is fail");
+        }
+
+    }
 
 
 }

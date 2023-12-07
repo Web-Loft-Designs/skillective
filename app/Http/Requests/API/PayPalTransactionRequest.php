@@ -2,21 +2,18 @@
 
 namespace App\Http\Requests\API;
 
-use App\Models\Lesson;
+use Illuminate\Support\Facades\Auth;
 use InfyOm\Generator\Request\APIRequest;
-use Auth;
 use App\Models\User;
-use App\Models\Genre;
-use Illuminate\Validation\Rule;
 
-class BraintreeTransactionRequest extends APIRequest
+class PayPalTransactionRequest extends APIRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
 		return Auth::user()->hasRole(User::ROLE_STUDENT);
     }
@@ -26,10 +23,10 @@ class BraintreeTransactionRequest extends APIRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-			'payment_method_nonce'			=> ['required']
+			'payment_method_nonce' => ['required','string','max:255']
 		];
     }
 }
