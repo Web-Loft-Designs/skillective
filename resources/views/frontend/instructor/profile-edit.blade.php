@@ -86,13 +86,6 @@
                                         @endisset
                                     </div>
                                 </div>
-{{--                            <div class="form-wrap" id="merchant-account-trigger">--}}
-{{--                                <braintree-merchant-form--}}
-{{--                                        :saved-merchant-account-details="{{ json_encode($savedMerchantAccountDetails) }}"--}}
-{{--                                        v-bind:us-states="{{  json_encode($usStates) }}"--}}
-{{--                                        v-bind:is-admin-form="{{ $loggedUserIsAdmin ? 'true' : 'false' }}"--}}
-{{--                                ></braintree-merchant-form>--}}
-{{--                            </div>--}}
                             <div class="form-wrap" id="password-change-trigger">
                                 <profile-password-change
                                         @if( $loggedUserIsAdmin )v-bind:user-id="{{ $userProfileData['id'] }}" @endif
@@ -111,7 +104,6 @@
                                 </div>
                             @endif
                         @endif
-                        {{--<profile-simple-gallery v-bind:user-media="{{ json_encode($userMedia) }}" v-bind:instagram-media-queue="{{ isset($loadingInstagramProfileImagesInQueue)?'true':'false' }}"></profile-simple-gallery>--}}
                     </div>
                 </div>
             </div>
@@ -120,17 +112,17 @@
 @endsection
 
 @section('pageSpecificHeadJS')
-    <script src="https://js.braintreegateway.com/web/dropin/1.20.4/js/dropin.min.js"></script>
-                                            <script>
-                                                (function(d, s, id) {
-                                                    let js, ref = d.getElementsByTagName[s](0);
-                                                    if (!d.getElementById(id)) {
-                                                        js = d.createElement(s);
-                                                        js.id = id;
-                                                        js.async = true;
-                                                        js.src = "https://www.paypal.com/webapps/merchantboarding/js/lib/lightbox/partner.js";
-                                                        ref.parentNode.insertBefore(js, ref);
-                                                    }
-                                                }(document, "script", "paypal-js"));
-                                            </script>
+
+<script>
+    (function(d, s, id) {
+        let js, ref = d.getElementsByTagName[s](0);
+        if (!d.getElementById(id)) {
+            js = d.createElement(s);
+            js.id = id;
+            js.async = true;
+            js.src = "https://www.paypal.com/webapps/merchantboarding/js/lib/lightbox/partner.js";
+            ref.parentNode.insertBefore(js, ref);
+        }
+    }(document, "script", "paypal-js"));
+</script>
 @endsection
