@@ -251,6 +251,7 @@
             {{ method.type }} {{ method.brand || '' }}
           </label>
         </div>
+          <div id='paypal-buttons-container'></div>
         <div>
           <div class='payment-option-header mb-4'>
             <img alt src='/images/card-icon.png'/>
@@ -328,7 +329,6 @@
             </div>
           </div>
         </div>
-        <div id='paypal-buttons-container'></div>
       </div>
 
       <!-- Successfull Booking -->
@@ -465,6 +465,8 @@ export default {
       }
     },
     initPaymentMethod() {
+      console.log(this.userPaymentMethods.card, 'this.userPaymentMethods.card')
+      console.log(this.userPaymentMethods.paypal, 'this.userPaymentMethods.paypal')
       if (this.userPaymentMethods.card) this.renderCardForm()
       if (this.userPaymentMethods.paypal) this.renderPayPalButton()
       if (!this.userPaymentMethods.card && !this.userPaymentMethods.paypal && !this.userPaymentMethods.venmo) {
@@ -596,6 +598,7 @@ export default {
   watch: {
     useSavedMethod() {
       if (this.useSavedMethod) {
+        console.log(this.userPaymentMethods, 'userPaymentMethods')
         this.selectedPaymentId = this.userPaymentMethods[0].payment_id
         console.log(this.selectedPaymentId)
       } else {

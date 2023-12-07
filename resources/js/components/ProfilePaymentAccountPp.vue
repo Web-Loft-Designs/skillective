@@ -17,12 +17,13 @@
           </label>
         </div>
       </div>
+
       <div v-show="paymentMethod === 'PayPalButton'">
         <div id='paypal-buttons-container'></div>
       </div>
 
       <div v-show="paymentMethod === 'CreditCard'">
-        <div class='payment-option mt-5 pt-5 active'>
+        <div class='payment-option pt-1 active'>
           <div class='card_container'>
             <div>
               <div>
@@ -76,19 +77,19 @@
 
               <div class='form-group'>
                 <button
-                    v-show='!isSelectedPaymentMethod'
-                    id='onSubmitStepCreditCard'
-                    class='btn btn-primary btn-flat'
-                    type='button'
-                    value='submit'
+                  v-show='!isSelectedPaymentMethod'
+                  id='onSubmitStepCreditCard'
+                  class='btn btn-primary btn-flat cursor-pointer'
+                  type='button'
+                  value='submit'
                 >
                   Save
                 </button>
                 <button
-                    v-show='isSelectedPaymentMethod'
-                    class='btn btn-primary btn-flat'
-                    type='button'
-                    @click='deletePaymentMethod()'
+                  v-show='isSelectedPaymentMethod'
+                  class='btn btn-primary btn-flat cursor-pointer'
+                  type='button'
+                  @click='deletePaymentMethod()'
                 >
                   Delete payment method
                 </button>
@@ -211,13 +212,14 @@ export default {
       const submitButton = document.getElementById('onSubmitStepCreditCard')
       submitButton.addEventListener('click', () => {
         cardFields.submit()
-            .then(() => {
-              this.successText = 'Payment method saved'
-            })
-            .catch((error) => {
-              this.errorText = 'Can\'t process your data.'
-              console.log(error, 'обробити нормальний вивод помилки')
-            })
+          .then(() => {
+            this.getPaymentMethods()
+            this.successText = 'Payment method saved'
+          })
+          .catch((error) => {
+            this.errorText = 'Can\'t process your data.'
+            console.log(error, 'обробити нормальний вивод помилки')
+          })
       })
     },
 
@@ -229,34 +231,50 @@ export default {
     },
 
     componentHandleGetResponse(responseData) {
+      console.log(responseData)
       console.log(responseData, ' HandleGetResponse')
       this.paymentMethods = responseData.data
-      this.setSelectedPaymentMethodObj(this.paymentMethod)
+      console.log(this.paymentMethods, 'this.paymentMethods - 12- -12-')
+      this.isPaymentMethodsCard()
+      console.log(2)
+      if (!this.paymentMethods.length) {
+        console.log('nety')
+        this.isSelectedPaymentMethod = false
+        this.isRadioButton = true
+      }
+      // this.setSelectedPaymentMethodObj(this.paymentMethod)
     },
 
     componentHandleDeleteResponse(responseData) {
+      console.log('componentHandleDeleteResponse')
       this.fields.cardholderName = ''
       this.getPaymentMethods()
     },
 
-    setSelectedPaymentMethodObj(_paymentMethod) {
-      console.log(this.paymentMethods[_paymentMethod], ' setSelectedPaymentMethodObj')
+    // setSelectedPaymentMethodObj(_paymentMethod) {
+    //   console.log(this.paymentMethods[_paymentMethod], ' setSelectedPaymentMethodObj')
+    // },
+    isPaymentMethodsCard() {
+      console.log(2228)
+      if (this.paymentMethods.card) {
+        this.paymentMethod = 'CreditCard'
+        this.lastFour = '**** **** **** ' + this.paymentMethods.card.last_digits
+        this.isRadioButton = false
+        this.currentPaymentId = this.paymentMethods.card.payment_id
+        this.isSelectedPaymentMethod = true
 
+        console.log(this.isSelectedPaymentMethod, 'isSelectedPaymentMethod-228')
+      }
     }
-
 
   },
   created() {
     console.log(this.userPaymentMethods.card, 'this.userPaymentMethods.cart')
-    if (this.userPaymentMethods.card) {
-      this.paymentMethod = 'CreditCard'
-      this.lastFour = '**** **** **** ' + this.userPaymentMethods.card.last_digits
-      this.isRadioButton = false
-      this.currentPaymentId = this.userPaymentMethods.card.payment_id
-    }
     this.paymentMethods = this.userPaymentMethods
+    this.isPaymentMethodsCard()
+
     console.log(this.paymentMethods, 'userPaymentMethods')
-    this.isSelectedPaymentMethod = true
+
     // this.setSelectedPaymentMethodObj(this.paymentMethod)
     this.initializePaypal()
   }
