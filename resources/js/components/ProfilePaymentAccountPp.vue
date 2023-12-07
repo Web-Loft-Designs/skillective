@@ -3,24 +3,22 @@
     <form id='payment-method-form'>
 
       <p class='login-box-msg'>Payment Methods</p>
-      <div v-if='isRadioButton' class='form-group has-feedback mb-5'>
+      <div v-show='isRadioButton' class='form-group has-feedback mb-5'>
         <div class='radio-wrapper'>
           <label class='radio-item' for='isCard'>
             <input id='isCard' v-model='paymentMethod' name='payment_system' type='radio' value='CreditCard'>
             <span class='checkmark'></span>
             Credit Card <img alt='Credit Card' class='ml-2' src='/images/card-icon.png'>
           </label>
-          <label class='radio-item' for='paypalbtn'>
-            <input id='paypalbtn' v-model='paymentMethod' name='payment_system' type='radio' value='PayPalButton'>
+          <label class='radio-item' for='btn'>
+            <input id='btn' v-model='paymentMethod' name='payment_system' type='radio' value='PayPalButton'>
             <span class='checkmark'></span>
             PayPal Button <img alt='Pay Pal' class='ml-2' src='/images/payPal.svg'>
           </label>
         </div>
       </div>
 
-      <div v-show="paymentMethod === 'PayPalButton'">
-        <div id='paypal-buttons-container'></div>
-      </div>
+      <div v-show="paymentMethod === 'PayPalButton'" id='paypal-buttons-container'></div>
 
       <div v-show="paymentMethod === 'CreditCard'">
         <div class='payment-option pt-1 active'>
@@ -30,12 +28,12 @@
                 <label>Card number</label>
                 <div v-show='!isSelectedPaymentMethod' id='card-number'></div>
                 <input
-                    v-show='isSelectedPaymentMethod'
-                    :value='lastFour'
-                    class='form-control-pp'
-                    disabled
-                    placeholder='____ ____ ____ ____'
-                    type='text'
+                  v-show='isSelectedPaymentMethod'
+                  :value='lastFour'
+                  class='form-control-pp'
+                  disabled
+                  placeholder='____ ____ ____ ____'
+                  type='text'
                 />
               </div>
 
@@ -43,23 +41,22 @@
                 <label>Cardholder name</label>
                 <div v-show='!isSelectedPaymentMethod' id='card-holder-name'></div>
                 <input
-                    v-show='isSelectedPaymentMethod'
-                    class='form-control-pp'
-                    disabled
-                    type='text'
-                    value='********** ************'
+                  v-show='isSelectedPaymentMethod'
+                  class='form-control-pp'
+                  disabled
+                  type='text'
+                  value='********** ************'
                 />
               </div>
-
               <div>
                 <label>Expiry date</label>
                 <div v-show='!isSelectedPaymentMethod' id='expiration-date'></div>
                 <input
-                    v-show='isSelectedPaymentMethod'
-                    class='form-control-pp'
-                    disabled
-                    type='text'
-                    value='** / **'
+                  v-show='isSelectedPaymentMethod'
+                  class='form-control-pp'
+                  disabled
+                  type='text'
+                  value='** / **'
                 />
               </div>
 
@@ -67,11 +64,11 @@
                 <label>CVC/CVV</label>
                 <div v-show='!isSelectedPaymentMethod' id='cvv'></div>
                 <input
-                    v-show='isSelectedPaymentMethod'
-                    class='form-control-pp'
-                    disabled
-                    type='text'
-                    value='***'
+                  v-show='isSelectedPaymentMethod'
+                  class='form-control-pp'
+                  disabled
+                  type='text'
+                  value='***'
                 />
               </div>
 
@@ -108,7 +105,7 @@
 </template>
 
 <script>
-import {loadScript} from '@paypal/paypal-js'
+import { loadScript } from '@paypal/paypal-js'
 import siteAPI from '../mixins/siteAPI.js'
 
 export default {
@@ -150,7 +147,7 @@ export default {
           locale: 'en_US',
           components: ['buttons', 'card-fields'],
           vault: true,
-          disableFunding: ['paylater'],
+          disableFunding: ['paylater']
           // dataUserIdToken: this.dataUserIdToken,
         })
 
@@ -171,9 +168,8 @@ export default {
           return result.data.vaultSetupToken
         },
         onApprove: async (data) => {
-          console.log(data, 'onApprove PayPal')
           await axios.post('/api/student/payment-method',
-              {payment_method_nonce: data.vaultSetupToken})
+            { payment_method_nonce: data.vaultSetupToken })
         },
         onError: (error) => console.log('Something went wrong:', error),
 
@@ -193,9 +189,8 @@ export default {
           return result.data.vaultSetupToken
         },
         onApprove: async (data) => {
-          console.log(data, 'onApprove')
           await axios.post('/api/student/payment-method',
-              {payment_method_nonce: data.vaultSetupToken})
+            { payment_method_nonce: data.vaultSetupToken })
         },
         onError: (error) => console.log('Something went wrong:', error)
       })
@@ -206,7 +201,7 @@ export default {
         cardFields.ExpiryField().render('#expiration-date')
         cardFields.CVVField().render('#cvv')
       } else {
-        console.log('обробити нормальний вивод помилки')
+        console.log('Error')
       }
 
       const submitButton = document.getElementById('onSubmitStepCreditCard')
@@ -218,7 +213,7 @@ export default {
           })
           .catch((error) => {
             this.errorText = 'Can\'t process your data.'
-            console.log(error, 'обробити нормальний вивод помилки')
+            console.log(error, 'Error')
           })
       })
     },
@@ -231,59 +226,47 @@ export default {
     },
 
     componentHandleGetResponse(responseData) {
-      console.log(responseData)
-      console.log(responseData, ' HandleGetResponse')
       this.paymentMethods = responseData.data
-      console.log(this.paymentMethods, 'this.paymentMethods - 12- -12-')
-      this.isPaymentMethodsCard()
-      console.log(2)
-      if (!this.paymentMethods.length) {
-        console.log('nety')
+      if (!Object.keys(this.paymentMethods).length) {
         this.isSelectedPaymentMethod = false
         this.isRadioButton = true
-      }
-      // this.setSelectedPaymentMethodObj(this.paymentMethod)
-    },
+        let card = document.getElementById('card-number')
+        card.innerHTML = ''
+        let cardHolderName = document.getElementById('card-holder-name')
+        cardHolderName.innerHTML = ''
+        let expirationDate = document.getElementById('expiration-date')
+        expirationDate.innerHTML = ''
+        let cvv = document.getElementById('cvv')
+        cvv.innerHTML = ''
+        this.renderCardForm()
 
-    componentHandleDeleteResponse(responseData) {
-      console.log('componentHandleDeleteResponse')
+      }
+      if (this.paymentMethods.card) {
+        this.isSelectedPaymentMethod = true
+        this.lastFour = '**** **** **** ' + this.paymentMethods.card.last_digits
+        this.currentPaymentId = this.paymentMethods.card.payment_id
+        this.isRadioButton = false
+      }
+    },
+    componentHandleDeleteResponse() {
       this.fields.cardholderName = ''
       this.getPaymentMethods()
     },
-
-    // setSelectedPaymentMethodObj(_paymentMethod) {
-    //   console.log(this.paymentMethods[_paymentMethod], ' setSelectedPaymentMethodObj')
-    // },
     isPaymentMethodsCard() {
-      console.log(2228)
       if (this.paymentMethods.card) {
         this.paymentMethod = 'CreditCard'
         this.lastFour = '**** **** **** ' + this.paymentMethods.card.last_digits
         this.isRadioButton = false
         this.currentPaymentId = this.paymentMethods.card.payment_id
         this.isSelectedPaymentMethod = true
-
-        console.log(this.isSelectedPaymentMethod, 'isSelectedPaymentMethod-228')
       }
     }
-
   },
   created() {
-    console.log(this.userPaymentMethods.card, 'this.userPaymentMethods.cart')
     this.paymentMethods = this.userPaymentMethods
     this.isPaymentMethodsCard()
-
-    console.log(this.paymentMethods, 'userPaymentMethods')
-
-    // this.setSelectedPaymentMethodObj(this.paymentMethod)
     this.initializePaypal()
-  }
-  // watch: {
-  //   paymentMethod: function (newPaymentMethod, oldPaymentMethod) {
-  //     this.venmoNotSupported = false
-  //     this.setSelectedPaymentMethodObj(newPaymentMethod)
-  //   }
-  // }
+  },
 }
 </script>
 <style lang='scss' scoped>
