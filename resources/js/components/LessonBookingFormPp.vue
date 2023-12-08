@@ -269,7 +269,7 @@
               </div>
 
               <div>
-                <label>Expiry date</label>
+                <label>Expiration date</label>
                 <div v-show='!useSavedMethod' id='expiration-date'></div>
                 <input
                     v-show='useSavedMethod'

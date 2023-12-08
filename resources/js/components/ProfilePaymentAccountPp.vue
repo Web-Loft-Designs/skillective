@@ -13,7 +13,7 @@
           <label class='radio-item' for='btn'>
             <input id='btn' v-model='paymentMethod' name='payment_system' type='radio' value='PayPalButton'>
             <span class='checkmark'></span>
-            PayPal Button <img alt='Pay Pal' class='ml-2' src='/images/payPal.svg'>
+              <img alt='Pay Pal' class='ml-2' src='/images/payPal.svg'>
           </label>
         </div>
       </div>
@@ -49,7 +49,7 @@
                 />
               </div>
               <div>
-                <label>Expiry date</label>
+                <label>Expiration date</label>
                 <div v-show='!isSelectedPaymentMethod' id='expiration-date'></div>
                 <input
                   v-show='isSelectedPaymentMethod'
