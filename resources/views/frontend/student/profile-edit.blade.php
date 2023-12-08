@@ -102,9 +102,3 @@
         </div>
     </div>
 @endsection
-
-{{--@if( !$loggedUserIsAdmin )--}}
-{{--@section('scripts')--}}
-{{--    @include('frontend.partials.payment-processing-scripts')--}}
-{{--@endsection--}}
-{{--@endif--}}
