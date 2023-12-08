@@ -388,7 +388,7 @@ class BookingRepository extends BaseRepository
     public function getHappenedLessonsPayedInEscrowBookings($limit = null)
     {
 
-        $timePastHappened = 8; // hours
+        $timePastHappened = 1; // hours
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
         $escrowStatus = Booking::STATUS_ESCROW;
         $escrowErrorStatus = Booking::STATUS_UNABLE_ESCROW_RELEASE;
@@ -397,7 +397,7 @@ class BookingRepository extends BaseRepository
         $this->model = $this->model
             ->select('bookings.*')
             ->join('lessons', 'bookings.lesson_id', '=', "lessons.id")
-//            ->whereRaw("lessons.start <= DATE_SUB(CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id), INTERVAL $timePastHappened HOUR)")
+            ->whereRaw("lessons.start <= DATE_SUB(CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id), INTERVAL $timePastHappened HOUR)")
             ->whereRaw(" ( bookings.status='$escrowStatus' OR bookings.status='$escrowErrorStatus' ) ")
             ->orderBy('bookings.created_at', 'asc');
         if ($limit) {
