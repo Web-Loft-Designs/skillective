@@ -65,8 +65,8 @@ class StudentPaymentMethodsAPIController extends AppBaseController
 
     }
 
+
     /**
-     * @param Request $request
      * @return JsonResponse
      */
     public function getPpVaultSetupToken(Request $request): JsonResponse

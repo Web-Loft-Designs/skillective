@@ -1,3 +1,4 @@
+<script src="../../../../../../../../Стільниця/example_js_sdk.js"></script>
 <template>
   <div id='password-payment-account'>
     <form id='payment-method-form'>
@@ -114,7 +115,6 @@ export default {
     'clientToken',
     'userPaymentMethods',
     'dataUserIdToken',
-    'masterMerchantId'
   ],
   data() {
     return {
@@ -142,13 +142,12 @@ export default {
       try {
         this.paypal = await loadScript({
           clientId: this.clientToken,
-          merchantId: this.masterMerchantId,
           buyerCountry: 'US',  // удалити при запуску на продакшені !!!!!!!
           locale: 'en_US',
           components: ['buttons', 'card-fields'],
-          vault: true,
-          disableFunding: ['paylater']
-          // dataUserIdToken: this.dataUserIdToken,
+          disableFunding: ['paylater'],
+          enableFunding: ['venmo'],
+          dataUserIdToken: this.dataUserIdToken,
         })
 
         this.initPaymentMethod()
@@ -172,14 +171,12 @@ export default {
             { payment_method_nonce: data.vaultSetupToken })
         },
         onError: (error) => console.log('Something went wrong:', error),
-
         style: {
           layout: 'vertical',
           color: 'gold',
           shape: 'pill',
           label: 'paypal'
         }
-
       }).render('#paypal-buttons-container')
     },
     renderCardForm() {

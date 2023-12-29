@@ -20,7 +20,6 @@ class Booking extends Model implements Transformable
 
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
-
     const STATUS_PENDING = 'pending'; // waiting merchant approval
     const STATUS_APPROVED = 'approved'; // NOT USED  merchant approved booking / payment collected by marketplace account
     const STATUS_ESCROW = 'payment_in_escrow'; // money on marketplace account
@@ -286,7 +285,6 @@ class Booking extends Model implements Transformable
             && !$this->lesson->is_cancelled && $this->status == self::STATUS_PENDING) {
 
             $transaction = PayPalProcessor::createSellBookingTransactionAndHoldInEscrow(
-                $this->payment_method_token,
                 $this,
                 $totalServiceFee,
                 $processorFee
@@ -308,7 +306,7 @@ class Booking extends Model implements Transformable
                 $reason = "Payment already sent";
             elseif ($this->instructor->pp_merchant_id == null)
                 $reason = "No merchant account provided. Please check Profile settings";
-            elseif ($this->instructor->pp_account_status != "BUSINESS_ACCOUNT")
+            elseif ($this->instructor->pp_account_status != \App\Services\PayPalProcessor::STATUS_ACTIVE)
                 $reason = "Merchant account not active";
             elseif ($this->lesson->alreadyStarted())
                 $reason = "Lesson already started";

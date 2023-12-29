@@ -245,6 +245,7 @@ class CartRepository extends BaseRepository
         $cartCount = count($cart);
 
         foreach ($cart as $key => $cartItem) {
+
             if ($cartItem->lesson_id && !$cartItem->pre_r_lesson_id) {
                 $booking = new Booking();
                 $virtual_fee = round($booking->getBookingVirtualFeeAmount($cartItem->lesson), 2);
@@ -290,6 +291,8 @@ class CartRepository extends BaseRepository
                 $response["subtotal"] += round($cartItem->lesson->spot_price, 2);
                 $response["fee"] += $service_fee + $virtual_fee + $processor_fee;
                 $response["total"] += round($finishPrice + $service_fee + $virtual_fee + $processor_fee, 2);
+                $response['merchants'][] = $cartItem->lesson->instructor->pp_merchant_id;
+;
             } else {
                 $preRecordedLesson = new PreRecordedLesson();
                 $finishPrice = $cartItem->preRecordedLesson->price;
@@ -330,6 +333,7 @@ class CartRepository extends BaseRepository
                 $response["subtotal"] += round($cartItem->preRecordedLesson->price, 2);
                 $response["fee"] += $service_fee + $processor_fee;
                 $response["total"] += $finishPrice + $service_fee + $processor_fee;
+                $response['merchants'][] = $cartItem->preRecordedLesson->instructor->pp_merchant_id;
             }
         }
 

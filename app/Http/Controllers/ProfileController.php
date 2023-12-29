@@ -177,7 +177,6 @@ class ProfileController extends Controller
                  // отримати статус та деталі інтеграції з paypal
                  $vars['ppMerchantAccount'] = PayPalProcessor::getMerchantDetail($user);
              }
-
 		}
 
 		if ($isAdmin) {
@@ -186,15 +185,9 @@ class ProfileController extends Controller
 			$vars['countInstructorInvitationsApplied']  = $user->instructorInvitations()->whereNotNull('invited_user_id')->count();
 		}
 		if (!$isAdmin && !$isInstructor) {
-            //  для студента  або покупця
-//			$vars['paymentEnvironment'] = config('services.braintree.environment');
-//			$vars['clientToken'] = BraintreeProcessor::generateClientToken($user);
-//			$vars['paymentMethods'] = BraintreeProcessor::getSavedCustomerPaymentMethods($user);
             $vars['clientToken'] = PayPalProcessor::getClientId();
-            $vars['masterMerchantId'] = PayPalProcessor::getMasterMerchantId();
 			$vars['paymentMethods'] = PayPalProcessor::getSavedCustomerPaymentMethods($user);
 			$vars['dataUserIdToken'] = PayPalProcessor::getDataUserIdToken($user);
-
 		}
 
 		return view("frontend.{$template}.profile-edit", $vars);

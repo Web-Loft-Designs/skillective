@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Facades\PayPalProcessor;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\CartUserInfoRequest;
 use App\Http\Requests\API\CheckoutRequest;
+use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -154,28 +156,19 @@ class CartAPIController extends AppBaseController
      * @param UserRepository $user_repository
      * @return JsonResponse
      * @throws Exception
+     * оплата через карту
      */
     public function checkout(Request $request, UserRepository $user_repository): JsonResponse
     {
         $student = null;
 
-        $guest_cart = $request->input('guest_cart');
         $promos = $request->input('promo_codes', []);
         $nonce = $request->input('payment_method_nonce');
-
         $cart = [];
 
         // отрмання даних з корзини
-        if (Auth::user() == null) {
-            $input = $request->except(['payment_method_token', 'payment_method_nonce']);
-            $srr = new CheckoutRequest($input);
-            $student = UserRegistrator::registerInactiveStudent($srr);
-            $cart = $this->cartRepository->getUserCart(null, json_encode($guest_cart));
-        } else {
-            $student = Auth::user();
-            $cart = $this->cartRepository->getUserCart($student->id, null);
-        }
-
+        $student = Auth::user();
+        $cart = $this->cartRepository->getUserCart($student->id, null);
 
         $promo_codes = [];
 
@@ -244,8 +237,9 @@ class CartAPIController extends AppBaseController
 
                 /**
                  * Approve Booking
-                 * просес створення транзакції
+                 * процес створення транзакції
                  */
+
                 $booking = $lesson->bookPp($user_repository, $request, $nonce ?? "", $student);
                 $booking->approvePp();
 
@@ -298,6 +292,192 @@ class CartAPIController extends AppBaseController
         }
 
         return $this->sendResponse(true);
+    }
+
+    public function createOrder(Request $request, UserRepository $userRepository)
+    {
+        if (!Auth::check()) {
+            return $this->sendError('User data is not valid', 403);
+        }
+
+        $student = $request->user();
+        $cart = $this->cartRepository->getUserCart($student->id, null);
+
+        $promoCodes = [];
+        $request->whenFilled('promo_codes', function (array $input) use(&$promoCodes) {
+            foreach ($input as $key => $promo) {
+                $promo = PromoCode::where('name', '=', $promo)->first();
+
+                if (empty($promo)) {
+                    continue;
+                }
+                $promoCodes[$promo->id] = $promo;
+            }
+        });
+
+        $discounts = [];
+        foreach ($cart as $key => $cartItem) {
+            if ($cartItem->discounts) {
+                foreach ($cartItem->discounts as $discountKey => $discount) {
+                    if ($discount->isActivate) {
+                        $discounts[$discount->id] = $discount;
+                    }
+                }
+            }
+        }
+
+        $productItems = [];
+        foreach ($cart as $key => $cartItem) {
+            if ($cartItem->lesson_id && !$cartItem->pre_r_lesson_id) {
+                $lesson = $cartItem->lesson;
+                foreach ($discounts as $discountKey => $discount) {
+                    if ($discount->lesson_type == "all" || $discount->lesson_type == 'virtual' && $lesson->lesson_type == 'virtual' || $discount->lesson_type == 'in-person' && $lesson->lesson_type == 'in_person') {
+                        if ($discount->discount_type == 'fixed-amount') {
+                            $discountAmount = $discount->discount / count($cart);
+                            $lesson->spot_price -= $discountAmount;
+                        } else if ($discount->discount_type == 'percent') {
+                            $discountAmount = $discount->discount / 100 * $lesson->spot_price;
+                            $lesson->spot_price -= $discountAmount;
+                        }
+                    }
+                }
+                foreach ($promoCodes as $discountKey => $promo) {
+                    if ($promo->lesson_type == "all" || $promo->lesson_type == 'virtual' && $lesson->lesson_type == 'virtual' || $promo->lesson_type == 'in-person' && $lesson->lesson_type == 'in_person') {
+                        if ($promo->discount_type == 'fixed-amount') {
+                            $discountAmount = $promo->discount / count($cart);
+                            $lesson->spot_price -= $discountAmount;
+                        } else if (isset($discount->discount_type) && $discount->discount_type == 'percent') {
+                            $discountAmount = $promo->discount / 100 * $lesson->spot_price;
+                            $lesson->spot_price -= $discountAmount;
+                        }
+                    }
+                }
+                $productItems[] = $lesson;
+
+            } else {
+                $preRLesson = $cartItem->preRecordedLesson;
+                foreach ($discounts as $discountKey => $discount) {
+                    if ($discount->lesson_type == "all" || $discount->lesson_type == 'pre-recorded') {
+                        if ($discount->discount_type == 'fixed-amount') {
+                            $discountAmount = $discount->discount / count($cart);
+                            $preRLesson->price -= $discountAmount;
+                        } else if ($discount->discount_type == 'percent') {
+                            $discountAmount = $discount->discount / 100 * $preRLesson->price;
+                            $preRLesson->price -= $discountAmount;
+                        }
+                    }
+                }
+                foreach ($promoCodes as $discountKey => $promo) {
+                    if ($promo->lesson_type == "all" || $promo->lesson_type == 'pre-recorded') {
+                        if ($promo->discount_type == 'fixed-amount') {
+                            $discountAmount = $promo->discount / count($cart);
+                            $preRLesson->price -= $discountAmount;
+                        } else if ($promo->discount_type == 'percent') {
+                            $discountAmount = $promo->discount / 100 * $preRLesson->price;
+                            $preRLesson->price -= $discountAmount;
+                        }
+                    }
+                }
+                $productItems[] = $preRLesson;
+            }
+            $cartItem->delete();
+        }
+
+        $bookings = $this->buildBook($productItems, $student, $userRepository);
+
+       if ($this->validationLessonBook($bookings)) {
+           $order = PayPalProcessor::createOrder($bookings);
+       }
+       foreach ($bookings as $booking) {
+           $booking->transaction_id = $order['id'];
+           $booking->transaction_status = $order['status'];
+           $booking->setStatusAttribute(Booking::STATUS_ESCROW);
+           $booking->save();
+       }
+
+        return response()->json([ 'orderId' => $order['id']]);
+
+    }
+
+    private function buildBook( array $productItems, User $student, UserRepository $userRepository): array
+    {
+        $bookings = [];
+        $appendedGenres = [];
+        foreach ($productItems as $lesson) {
+          if (get_class($lesson) === Lesson::class) {
+                array_push($appendedGenres, $lesson->genre_id);
+                $booking = new Booking();
+                $booking->lesson_id             = $lesson->id;
+                $booking->spot_price		    = $lesson->spot_price;
+                $booking->instructor_id		    = $lesson->instructor_id;
+                $booking->student_id		    = $student->id;
+                $booking->status			    = Booking::STATUS_PENDING;
+                $service_fee                    = $booking->getBookingServiceFeeAmount($lesson->spot_price);
+                $virtual_fee                    = $booking->getBookingVirtualFeeAmount($lesson);
+                $booking->service_fee           = $service_fee;
+                $booking->virtual_fee           = $virtual_fee;
+                $booking->processor_fee		    = $booking->getBookingPaymentProcessingFeeAmount($lesson->spot_price, $service_fee + $virtual_fee);
+                $booking->save();
+
+              if ($lesson->instructor->clients()->where('client_id', $student->id)->count() == 0) {
+                  $lesson->instructor->clients()->attach($student);
+              }
+              if ($student->instructors()->where('instructor_id', $lesson->instructor_id)->count() == 0) {
+                  $student->instructors()->attach($lesson->instructor);
+              }
+
+              $bookings[] = $booking;
+          } elseif (get_class($lesson) === PreRecordedLesson::class)  {
+              array_push($appendedGenres, $lesson->genre_id);
+              $purchasedLesson = new PurchasedLesson();
+              $purchasedLesson->pre_r_lesson_id         = $lesson->id;
+              $purchasedLesson->student_id              = $student->id;
+              $purchasedLesson->instructor_id           = $lesson->instructor_id;
+              $purchasedLesson->price                   = $lesson->price;
+              $purchasedLesson->status                  = PurchasedLesson::STATUS_PENDING;
+              $service_fee                              = $lesson->getPreRecordedLessonServiceFeeAmount($lesson->price);
+              $purchasedLesson->service_fee             = $service_fee;
+              $purchasedLesson->processor_fee           = $lesson->getPreRecordedLessonPaymentProcessingFeeAmount($lesson->price, $service_fee);
+              $purchasedLesson->save();
+
+              $bookings[] = $purchasedLesson;
+
+          } else {
+              throw new Exception('Error unknown class name');
+          }
+            $userRepository->appendGenres($student->id, $appendedGenres);
+        }
+        return $bookings;
+    }
+
+    protected function validationLessonBook($bookings): bool
+    {
+        foreach ($bookings as $booking) {
+            if ($booking->transaction_id) {
+                throw new Exception('Booking #' . $booking->id . ' can\'t be approved: ' . "Payment already sent", 403);
+            }
+            if ($booking->instructor->pp_merchant_id == null) {
+                throw new Exception('Booking #' . $booking->id . ' can\'t be approved: ' . "No merchant account provided. Please check Profile settings", 403);
+            }
+            if ($booking->instructor->pp_account_status != \App\Services\PayPalProcessor::STATUS_ACTIVE) {
+                throw new Exception('Booking #' . $booking->id . ' can\'t be approved: ' . "Merchant account not active", 403);
+            }
+            if (get_class($booking) === Booking::class && $booking->lesson->alreadyStarted()) {
+                throw new Exception('Booking #' . $booking->id . ' can\'t be approved: ' . "Lesson already started", 403);
+            }
+            if (get_class($booking) === Booking::class && $booking->lesson->is_cancelled) {
+                throw new Exception('Booking #' . $booking->id . ' can\'t be approved: ' . "Lesson already cancelled", 403);
+            }
+            if (get_class($booking) === Booking::class && $booking->status != $booking::STATUS_PENDING) {
+                throw new Exception('Booking #' . $booking->id . ' can\'t be approved: ' . "It is not a pending booking", 403);
+            }
+        }
+        return true;
+    }
+
+    public function captureOrder(Request $request)
+    {
+        dd($request->all());
     }
 
 

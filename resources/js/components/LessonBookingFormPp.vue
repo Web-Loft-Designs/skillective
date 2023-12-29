@@ -224,17 +224,17 @@
             class='checkbox-wrapper mb-5 has-feedback'
         >
           <div class='mb-4'>Use stored payment information:</div>
-          <div class='field'>
-            <label class='mx-4' for='stored-payment-information'>
-              <input
-                  id='stored-payment-information'
-                  v-model='useSavedMethod'
-                  type='checkbox'
-              />
-              <span class='checkmark'></span>
-              {{ userPaymentMethods.card.type }} {{ userPaymentMethods.card.brand || '' }}
-            </label>
-          </div>
+                    <div class='field'>
+                      <label class='mx-4' for='stored-payment-information'>
+                        <input
+                            id='stored-payment-information'
+                            v-model='useSavedMethod'
+                            type='checkbox'
+                        />
+                        <span class='checkmark'></span>
+                        {{ userPaymentMethods.card.type }} {{ userPaymentMethods.card.brand || '' }}
+                      </label>
+                    </div>
         </div>
         <div id='paypal-buttons-container'></div>
         <div class='mt-4'>
@@ -350,7 +350,7 @@ export default {
     ppClientToken: String,
     bnCode: String,
     dataUserIdToken: String,
-    masterMerchantId: String
+    merchantIds: Object
   },
   data() {
     return {
@@ -425,18 +425,18 @@ export default {
       fetchCartItems: 'fetchCartItems'
     }),
     async initializePaypal() {
+        console.log(this.merchantIds, " this.merchantIds")
       try {
         this.paypal = await loadScript({
           clientId: this.ppClientToken,
-          merchantId: this.masterMerchantId,
+          // merchantId: this.masterMerchantId,
           buyerCountry: 'US',  // удалити при запуску на продакшені !!!!!!!
           locale: 'en_US',
           components: ['buttons', 'funding-eligibility', 'marks', 'card-fields'],
           currency: 'USD',
-          vault: true,
           disableFunding: ['paylater'],
-          enableFunding: ['venmo'],
-          // dataUserIdToken: this.dataUserIdToken,
+          enableFunding: 'venmo',
+          dataUserIdToken: this.dataUserIdToken,
         })
         this.initPaymentMethod()
       } catch (error) {
@@ -444,8 +444,11 @@ export default {
       }
     },
     initPaymentMethod() {
+      console.log(this.userPaymentMethods, "this.userPaymentMethods")
+
       if (this.userPaymentMethods.card) this.renderCardForm()
       if (this.userPaymentMethods.paypal) this.renderPayPalButton()
+
       if (!this.userPaymentMethods.card && !this.userPaymentMethods.paypal && !this.userPaymentMethods.venmo) {
         this.renderCardForm()
         this.renderPayPalButton()
@@ -465,6 +468,7 @@ export default {
             ...this.fields
           })
         },
+
         onError: (error) => console.log('Something went wrong:', error),
         style: {
           layout: 'vertical',
@@ -473,45 +477,33 @@ export default {
           label: 'paypal'
         }
       }).render('#paypal-buttons-container')
+
     },
-    renderCardForm() {
-      const cardFields = this.paypal.CardFields({
-        createVaultSetupToken: async () => {
-          const result = await fetch('/api/cart/vault-setup-token?method=card', {
-            method: 'POST'
-          })
-          const {vaultSetupToken} = await result.json()
-          return vaultSetupToken
-        },
-        onApprove: async (data) => {
-          this.fields.payment_method_nonce = data.vaultSetupToken
-          this.fields.order = this.total
-          this.fields.payment_method_token = null
-          await this.apiPost('/api/cart/checkout', {
-            ...this.fields
-          })
-        },
-        onError: (error) => console.error('Something went wrong:', error)
-      })
-      if (cardFields.isEligible()) {
-        cardFields.NameField().render('#card-holder-name')
-        cardFields.NumberField().render('#card-number')
-        cardFields.ExpiryField().render('#expiration-date')
-        cardFields.CVVField().render('#cvv')
-      } else {
-        // Handle the workflow when credit and debit cards are not available
-      }
-      const submitButton = document.getElementById('onSubmitStepCreditCard2')
-      submitButton.addEventListener('click', () => {
-        cardFields.submit()
-            .then(() => {
-              console.log('submit was successful')
-            })
-            .catch((error) => {
-              console.error('submit erred:', error)
-            })
-      })
-    },
+      renderPayPalButton() {
+          this.paypal.Buttons({
+              createVaultSetupToken: async () => {
+                  const result = await axios.post('/api/cart/vault-setup-token?method=paypal')
+                  return result.data.vaultSetupToken;
+              },
+              onApprove: async (data) => {
+                  this.fields.payment_method_nonce = data.vaultSetupToken
+                  this.fields.order = this.total
+                  this.fields.payment_method_token = null
+                  await this.apiPost('/api/cart/checkout', {
+                      ...this.fields
+                  })
+              },
+
+              onError: (error) => console.log('Something went wrong:', error),
+              style: {
+                  layout: 'vertical',
+                  color: 'gold',
+                  shape: 'pill',
+                  label: 'paypal'
+              }
+          }).render('#paypal-buttons-container')
+
+      },
     async onSubmitStep1() {
       if (this.fields.dob) {
         this.fields.dob = moment(this.fields.dob).format('YYYY-MM-DD')

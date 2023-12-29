@@ -2,6 +2,7 @@
 
 @php
  $ppUserPaymentMethods ? $methods = $ppUserPaymentMethods : $methods = (object)[];
+//      dd($merchantIds, $total, );
 @endphp
 
 @section('content')
@@ -19,6 +20,7 @@
                         :bn-code="'{{$bnCode}}'"
                         :data-user-id-token="{{ json_encode($dataUserIdToken) }}"
                         :master-merchant-id="{{ json_encode($masterMerchantId) }}"
+                        :merchant-ids="{{json_encode($merchantIds)}}"
                         >
                         </lesson-booking-form-pp>
                     </checkout>

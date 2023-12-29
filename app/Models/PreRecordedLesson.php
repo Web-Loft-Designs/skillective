@@ -142,6 +142,7 @@ class PreRecordedLesson extends Model
 
         $transaction = PayPalProcessor::createSellPurchasereLessonTransaction(
             $instructorMerchantId,
+            $purchasedLesson->payment_method_type,
             $purchasedLesson->payment_method_token,
             $purchasedLesson,
             $purchasedLesson->service_fee,

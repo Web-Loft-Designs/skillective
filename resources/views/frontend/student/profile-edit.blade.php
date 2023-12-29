@@ -3,7 +3,6 @@
 @section('content')
 	<?php
     $paymentMethods ? $methods = $paymentMethods : $methods = (object)[];
-
 	$loggedUserIsAdmin = ($loggedUserRole==\App\Models\User::ROLE_ADMIN);
 	$pageMeta = $currentPage->getAllMeta();
 	$student_notifications_block_description= isset($pageMeta['student_notifications_block_description']) ? $pageMeta['student_notifications_block_description'] : '';
@@ -71,7 +70,6 @@
                                         :client-token="'{{ $clientToken }}'"
                                         :user-payment-methods="{{ json_encode($methods) }}"
                                         :data-user-id-token="{{ json_encode($dataUserIdToken) }}"
-                                        :master-merchant-id="{{ json_encode($masterMerchantId) }}"
                                 >
                                 </profile-payment-account-pp>
                             </div>
