@@ -31,7 +31,7 @@ class CheckoutController extends Controller
             $total = $cartRepository->getCartSummary(Auth::user()->id, null, "[]");
             $lessonsInACart = $cartRepository->getLessonsCountInCart(Auth::user()->id, null);
             $merchantIds = array_unique((array)$total['merchants']);
-            unset($total['merchants']);
+                unset($total['merchants']);
             $vars['page_title']             = 'Checkout';
             $vars['total']                  = $total;
             $vars['lessonsCount']           = $lessonsInACart;
@@ -39,7 +39,6 @@ class CheckoutController extends Controller
             $vars['ppClientToken']          = PayPalProcessor::getClientId();
             $vars['bnCode']                 = PayPalProcessor::getBnCde();
             $vars['ppUserPaymentMethods']   = PayPalProcessor::getSavedCustomerPaymentMethods(Auth::user());
-            $vars['masterMerchantId']       = PayPalProcessor::getMasterMerchantId();
             $vars['merchantIds']            = $merchantIds;
             $vars['dataUserIdToken']        = PayPalProcessor::getDataUserIdToken(Auth::user());
         } else {

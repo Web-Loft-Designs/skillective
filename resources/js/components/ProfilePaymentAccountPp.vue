@@ -145,9 +145,9 @@ export default {
           buyerCountry: 'US',  // удалити при запуску на продакшені !!!!!!!
           locale: 'en_US',
           components: ['buttons', 'card-fields'],
-          disableFunding: ['paylater'],
-          enableFunding: ['venmo'],
-          dataUserIdToken: this.dataUserIdToken,
+          disableFunding: ['paylater', 'venmo'],
+          // enableFunding: ['venmo'],
+          // dataUserIdToken: this.dataUserIdToken,
         })
 
         this.initPaymentMethod()
@@ -158,7 +158,7 @@ export default {
     },
     initPaymentMethod() {
       this.renderCardForm()
-      this.renderPayPalButton()
+      // this.renderPayPalButton()
     },
     renderPayPalButton() {
       this.paypal.Buttons({

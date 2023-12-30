@@ -391,7 +391,7 @@ class CartAPIController extends AppBaseController
        foreach ($bookings as $booking) {
            $booking->transaction_id = $order['id'];
            $booking->transaction_status = $order['status'];
-           $booking->setStatusAttribute(Booking::STATUS_ESCROW);
+           $booking->setStatusAttribute(Booking::STATUS_PENDING);
            $booking->save();
        }
 
@@ -477,7 +477,58 @@ class CartAPIController extends AppBaseController
 
     public function captureOrder(Request $request)
     {
-        dd($request->all());
+       $data = $request->validate([
+            'orderId' => 'required|string',
+        ]);
+
+        $booking = Booking::where('transaction_id', $data['orderId'])->get();
+        $purchasedLesson = PurchasedLesson::where('transaction_id', $data['orderId'])->get();
+
+        if(!$booking && !$purchasedLesson) {
+            return $this->sendError("unknown order cannot be processed", 422);
+        }
+
+        $order = PayPalProcessor::captureOrder($data['orderId']);
+
+       foreach ($order['purchase_units'] as $unit ) {
+
+           $parts = explode('_', $unit['reference_id']);
+           $type = $parts[0]; // booking або pRlesson
+           $id = $parts[1];
+
+           if ($type === 'booking') {
+
+               $model = Booking::find($id);
+               $model->payment_method_type   =  array_key_first($order['payment_source']);
+               $model->payment_method_token  =  $order['payment_source']['paypal']['attributes']['vault']['id'];
+               $model->status			     = Booking::STATUS_ESCROW;
+               $model->pp_reference_id       = $unit['payments']['captures'][0]['id'];
+               $model->transaction_status    = $unit['payments']['captures'][0]['status'];
+               $model->transaction_created_at =  now();
+               $model->pp_processor_fee      = $unit['payments']['captures'][0]['seller_receivable_breakdown']['paypal_fee']['value'];
+               $model->save();
+
+           } elseif ($type === 'pRlesson') {
+
+               $model = PurchasedLesson::find($id);
+               $model->payment_method_type   =  array_key_first($order['payment_source']);
+               $model->payment_method_token  =  $order['payment_source']['paypal']['attributes']['vault']['id'];
+               $model->status			     = Booking::STATUS_ESCROW;
+               $model->pp_reference_id       = $unit['payments']['captures'][0]['id'];
+               $model->transaction_status    = $unit['payments']['captures'][0]['status'];
+               $model->transaction_created_at =  now();
+               $model->pp_processor_fee      = $unit['payments']['captures'][0]['seller_receivable_breakdown']['paypal_fee']['value'];
+
+               $model->save();
+
+           } else {
+               return $this->sendError("unknown order cannot be processed", 422);
+           }
+
+       }
+
+        return $this->sendResponse(false, 'the transaction is complete');
+
     }
 
 

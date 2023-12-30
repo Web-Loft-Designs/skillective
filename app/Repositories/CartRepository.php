@@ -292,7 +292,6 @@ class CartRepository extends BaseRepository
                 $response["fee"] += $service_fee + $virtual_fee + $processor_fee;
                 $response["total"] += round($finishPrice + $service_fee + $virtual_fee + $processor_fee, 2);
                 $response['merchants'][] = $cartItem->lesson->instructor->pp_merchant_id;
-;
             } else {
                 $preRecordedLesson = new PreRecordedLesson();
                 $finishPrice = $cartItem->preRecordedLesson->price;

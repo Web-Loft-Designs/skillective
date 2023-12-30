@@ -349,6 +349,21 @@ class PayPalProcessor
             "application_context" => [
                 "shipping_preference" => "NO_SHIPPING"
             ],
+            "payment_source" => [
+                "paypal" => [
+                    "attributes" => [
+                        "vault" => [
+                            "store_in_vault" => "ON_SUCCESS",
+                            "usage_type" => "PLATFORM",
+                            "customer_type" => "CONSUMER"
+                        ]
+                    ],
+                    'experience_context' => [
+                        "return_url" => config('app.url') . '/checkout',
+                        "cancel_url" => config('app.url') . '/checkout'
+                    ]
+                ]
+            ],
         ];
 
         foreach ($bookings as $booking) {
@@ -397,10 +412,10 @@ class PayPalProcessor
                 $sklFee = number_format($booking->service_fee, 2);
 
                 $purchaseUnits =  [
-                        'reference_id' => "booking_" . $booking->id,
+                        'reference_id' => "pRlesson_" . $booking->id,
                         'description' => $description,
-                        'custom_id' => "booking_" . $booking->id,
-                        'invoice_id' => "booking_" . $booking->id,
+                        'custom_id' => "pRlesson_" . $booking->id,
+                        'invoice_id' => "pRlesson_" . $booking->id,
                         'soft_descriptor' => "*lesson*" . $booking->pre_r_lesson_id,
                         "amount" => [
                             "currency_code" => $currency,
@@ -451,23 +466,30 @@ class PayPalProcessor
 
     }
 
-    public function createSellBookingTransactionAndHoldInEscrow($booking, $totalServiceFee, $processorFee)
+    public function captureOrder(string $orderId)
     {
-        switch ($booking->payment_method_type) {
-            case 'card':
-                $userPaymentSource = [
-                    'card' => ['vault_id' => $booking->payment_method_token],
-                ];
-                break;
-            case 'paypal':
-                $userPaymentSource = [
-                    'paypal' => [ 'vault_id' => $booking->payment_method_token],
-                ];
-                break;
-            default:
-                throw new Exception('Payment method not found');
+        try {
+            $order = $this->payPalClient->setRequestHeaders([
+                'PayPal-Request-Id' => $this->getRandomString(),
+                'PayPal-Partner-Attribution-Id' => $this->getBnCde()
+            ])->capturePaymentOrder($orderId);
+
+            if (isset($order['error'])) {
+                Log::channel('paypal')->error('Can\'t create transaction: ' . $order);
+                throw new Exception('Can\'t create transaction: ');
+            } else {
+                return $order;
+            }
+
+        } catch (Exception $e) {
+            Log::channel('paypal')->error('Can\'t create transaction: '. json_encode($order));
+            throw new Exception('Can\'t create transaction: ');
         }
 
+    }
+
+    public function createSellBookingTransactionAndHoldInEscrow($booking, $totalServiceFee, $processorFee)
+    {
         $currency = $this->payPalClient->getCurrency();
         $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
         $totalAmount = round($booking->spot_price + $totalServiceFee + $processorFee, 2);
@@ -506,7 +528,11 @@ class PayPalProcessor
                     ]
                 ],
             ],
-            'payment_source' => $userPaymentSource,
+            'payment_source' => [
+                'card' => [
+                    'vault_id' => $booking->payment_method_token
+                ]
+            ],
             "application_context" => [
                 "shipping_preference" => "NO_SHIPPING"
             ],
@@ -595,22 +621,21 @@ class PayPalProcessor
         return $encodedHeader . '.' . $encodedPayload . '.';
     }
 
-    public function createSellPurchasereLessonTransaction($subMerchantId, $paymentMethodVaultToken, $purchasedLesson, $serviceFee, $processorFee)
+    public function createSellPurchasereLessonTransaction($subMerchantId, $purchasedLesson)
     {
-        $userPaymentSource['card'] = ['vault_id' => $paymentMethodVaultToken];
-        $description = "{$purchasedLesson->preRecordedLesson->title} Lesson #{$purchasedLesson->pre_r_lesson_id}, booking #{$purchasedLesson->id}, (instructor #{$purchasedLesson->instructor_id})";
-        $totalAmount = round($purchasedLesson->price + $serviceFee + $processorFee, 2);
+        $description = $purchasedLesson->preRecordedLesson->title . " Lesson #" . $purchasedLesson->pre_r_lesson_id . " purchasedLesson #" . $purchasedLesson->id . " instructor #" . $purchasedLesson->instructor_id;
+        $totalAmount = number_format($purchasedLesson->price + $purchasedLesson->service_fee + $purchasedLesson->processor_fee, 2);
         $currency = $this->payPalClient->getCurrency();
-        $platformFee = number_format((float)$serviceFee, 2, '.', '');
+        $platformFee = number_format((float)$purchasedLesson->service_fee, 2);
 
         $data = [
             "intent" => "CAPTURE",
             "purchase_units" => [
                 [
-                    'reference_id' => "booking_" . $purchasedLesson->id,
+                    'reference_id' => "pRlesson_" . $purchasedLesson->id,
                     'description' => $description,
-                    'custom_id' => "booking_" . $purchasedLesson->id,
-                    'invoice_id' => "booking_" . $purchasedLesson->id,
+                    'custom_id' => "pRlesson_" . $purchasedLesson->id,
+                    'invoice_id' => "pRlesson_" . $purchasedLesson->id,
                     'soft_descriptor' => "*lesson*" . $purchasedLesson->pre_r_lesson_id,
                     "amount" => [
                         "currency_code" => $currency,
@@ -632,6 +657,11 @@ class PayPalProcessor
                     ]
                 ],
             ],
+            'payment_source' => [
+                'card' => [
+                    'vault_id' => $purchasedLesson->payment_method_token
+                ]
+            ],
             "application_context" => [
                 "shipping_preference" => "NO_SHIPPING"
             ],
@@ -643,20 +673,15 @@ class PayPalProcessor
                 'PayPal-Partner-Attribution-Id' => $this->getBnCde()
             ])->createOrder($data);
 
-            if (!isset($order['error'])) {
-
-               return $this->payPalClient->setRequestHeaders([
-                    'PayPal-Request-Id' => $this->getRandomString(),
-                    'PayPal-Partner-Attribution-Id' => $this->getBnCde()
-                ])->capturePaymentOrder($order['id'], ['payment_source' => $userPaymentSource]);
-
-            } else {
-                Log::channel('paypal')->error('Can\'t create transaction: ' . $order['error']['message']);
+            if (isset($order['error'])) {
+                Log::channel('paypal')->error('Can\'t create transaction: ' . $order);
                 throw new Exception('Can\'t create transaction: ');
+            } else {
+                return $order;
             }
 
         } catch (Exception $e) {
-            Log::channel('paypal')->error('Can\'t create transaction: ');
+            Log::channel('paypal')->error('Can\'t create transaction: '. json_encode($order));
             throw new Exception('Can\'t create transaction: ');
         }
     }
@@ -740,7 +765,6 @@ class PayPalProcessor
                 // зберегти pp_customer_id
                 $user->pp_customer_id = $result['customer']['id'];
                 $user->save();
-//                повернкти результат
                 return ['token' => $result['id'], 'type' => array_key_first($result['payment_source']), 'source' => $source];
             } else {
                 Log::channel('paypal')->error("create payment method for {$user->id} is fail  " . $result['error']['message']);
@@ -789,16 +813,13 @@ class PayPalProcessor
             $data['customer'] = [ 'id' => $user->pp_customer_id];
         }
         try {
-                                     // api endpoint 'v3/vault/setup-tokens';
             $response = $this->payPalClient->createPaymentSetupToken($data);
-
             if (!isset($response['error'])) {
                 return $response['id'];
             } else {
                 Log::channel('paypal')->error("create Payment Setup Token for {$user->id} is fail  " . $response['error']['message']);
                 throw new Exception("create Payment Setup Token for {$user->id} is fail");
             }
-
         } catch (Exception $e) {
             Log::channel('paypal')->error("create Payment Setup Token for {$user->id} is fail");
             throw new Exception("create Payment Setup Token for {$user->id} is fail");
