@@ -762,9 +762,7 @@ class PayPalProcessor
                 $source = $result['payment_source'][array_key_first($result['payment_source'])];
                 // зберегти або оновити
                 $this->userRepository->savePaymentMethod($user, $result['id'], array_key_first($result['payment_source']));
-                // зберегти pp_customer_id
-                $user->pp_customer_id = $result['customer']['id'];
-                $user->save();
+
                 return ['token' => $result['id'], 'type' => array_key_first($result['payment_source']), 'source' => $source];
             } else {
                 Log::channel('paypal')->error("create payment method for {$user->id} is fail  " . $result['error']['message']);
@@ -814,6 +812,7 @@ class PayPalProcessor
         }
         try {
             $response = $this->payPalClient->createPaymentSetupToken($data);
+
             if (!isset($response['error'])) {
                 return $response['id'];
             } else {
@@ -849,8 +848,14 @@ class PayPalProcessor
     {
         try {
             $client = new PayPalClient();
-            $response = $client->getCustomerAccessToken($user->pp_customer_id ?? null);
-
+            if(!$user->pp_customer_id) {
+                $data['payment_source'] = ['card' => (object)[]];
+                $response = $this->payPalClient->createPaymentSetupToken($data);
+                // зберегти pp_customer_id
+                $user->pp_customer_id = $response['customer']['id'];
+                $user->save();
+            }
+            $response = $client->getCustomerAccessToken($user->pp_customer_id);
             return $response['id_token'];
 
         } catch (Exception $e) {

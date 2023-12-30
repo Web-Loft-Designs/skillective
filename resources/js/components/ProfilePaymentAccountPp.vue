@@ -112,7 +112,7 @@ import siteAPI from '../mixins/siteAPI.js'
 export default {
   mixins: [siteAPI],
   props: [
-    'clientToken',
+    'clientId',
     'userPaymentMethods',
     'dataUserIdToken',
   ],
@@ -139,15 +139,16 @@ export default {
   },
   methods: {
     async initializePaypal() {
+
       try {
         this.paypal = await loadScript({
-          clientId: this.clientToken,
+          clientId: this.clientId,
           buyerCountry: 'US',  // удалити при запуску на продакшені !!!!!!!
           locale: 'en_US',
           components: ['buttons', 'card-fields'],
-          disableFunding: ['paylater', 'venmo'],
-          // enableFunding: ['venmo'],
-          // dataUserIdToken: this.dataUserIdToken,
+          disableFunding: ['paylater'],
+          enableFunding: ['venmo'],
+          dataUserIdToken: this.dataUserIdToken,
         })
 
         this.initPaymentMethod()
@@ -158,7 +159,7 @@ export default {
     },
     initPaymentMethod() {
       this.renderCardForm()
-      // this.renderPayPalButton()
+      this.renderPayPalButton()
     },
     renderPayPalButton() {
       this.paypal.Buttons({

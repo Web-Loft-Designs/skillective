@@ -424,6 +424,8 @@ export default {
       fetchCartItems: 'fetchCartItems'
     }),
     async initializePaypal() {
+      console.log( this.dataUserIdToken, ' this.dataUserIdToken')
+      console.log(this.merchantIds, 'merchantIds')
       try {
         this.paypal = await loadScript({
           clientId: this.clientId,
@@ -434,7 +436,7 @@ export default {
           currency: 'USD',
           disableFunding: ['paylater'],
           enableFunding: 'venmo',
-          // dataUserIdToken: this.dataUserIdToken,
+          dataUserIdToken: this.dataUserIdToken,
         })
         this.initPaymentMethod()
       } catch (error) {
@@ -450,6 +452,7 @@ export default {
       if (!this.userPaymentMethods.card && !this.userPaymentMethods.paypal && !this.userPaymentMethods.venmo) {
         // якщо нема ніякого збереженого методу рендеремо тільки форму карти
         this.renderCardForm()
+        this.renderPayPalButton()
       }
     },
     renderPayPalButton() {

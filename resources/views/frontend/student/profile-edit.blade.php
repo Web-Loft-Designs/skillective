@@ -67,7 +67,7 @@
                         @if( !$loggedUserIsAdmin )
                             <div class="form-wrap" id="payment-account-trigger">
                                 <profile-payment-account-pp
-                                        :client-token="'{{ $clientToken }}'"
+                                        :client-id="'{{ $clientToken }}'"
                                         :user-payment-methods="{{ json_encode($methods) }}"
                                         :data-user-id-token="{{ json_encode($dataUserIdToken) }}"
                                 >
