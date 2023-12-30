@@ -236,8 +236,8 @@
 <!--                      </label>-->
 <!--                    </div>-->
 <!--        </div>-->
-        <div id='paypal-buttons-container'></div>
-        <div  class='mt-4'>
+        <div  id='paypal-buttons-container'></div>
+        <div v-show='!isBtnPayPalSaved'  class='mt-4'>
           <div class='payment-option-header mb-4'>
             <img alt src='/images/card-icon.png'/>
           </div>
@@ -381,7 +381,8 @@ export default {
       paypal: null,
       setupToken: null,
       checkoutSuccess: false,
-      bookingStep: 1
+      bookingStep: 1,
+      isBtnPayPalSaved: false
     }
   },
   created() {
@@ -428,13 +429,13 @@ export default {
         this.paypal = await loadScript({
           clientId: this.clientId,
           merchantId: this.merchantIds,
-          buyerCountry: 'US',  // удалити при запуску на продакшені !!!!!!!
+          buyerCountry: 'US',
           locale: 'en_US',
           components: ['buttons', 'card-fields'],
           currency: 'USD',
           disableFunding: ['paylater'],
           enableFunding: 'venmo',
-          // dataUserIdToken: this.dataUserIdToken,
+          dataUserIdToken: this.dataUserIdToken,
         })
         this.initPaymentMethod()
       } catch (error) {
@@ -442,14 +443,20 @@ export default {
       }
     },
     initPaymentMethod() {
-      // якщо є збережена карта треба заповнити поля збереженими даними
-      if (this.userPaymentMethods.card) this.renderCardForm()
+      if (this.userPaymentMethods.card) {
+        this.selectedPaymentId = this.userPaymentMethods.card.payment_id
+        this.useSavedMethod = true
+        this.renderCardForm()
+      }
 
-      if (this.userPaymentMethods.paypal) this.renderPayPalButton()
+      if (this.userPaymentMethods.paypal) {
+        this.isBtnPayPalSaved = true
+        this.renderPayPalButton()
+      }
 
       if (!this.userPaymentMethods.card && !this.userPaymentMethods.paypal && !this.userPaymentMethods.venmo) {
-        // якщо нема ніякого збереженого методу рендеремо тільки форму карти
         this.renderCardForm()
+        this.renderPayPalButton()
       }
     },
     renderPayPalButton() {
@@ -460,7 +467,6 @@ export default {
         },
         onApprove: async (data) => {
           this.fields.orderId = data.orderID
-          console.log(this.fields, 'this.fields')
           await this.apiPost('/api/cart/paypal-capture', {
             ...this.fields
           })

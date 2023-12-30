@@ -367,6 +367,7 @@ class PayPalProcessor
         ];
 
         foreach ($bookings as $booking) {
+            $subMerchantId = $booking->instructor->pp_merchant_id;
             if (get_class($booking) === Booking::class) {
                 $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
                 $serviceFee = $booking->getBookingServiceFeeAmount();
@@ -374,9 +375,6 @@ class PayPalProcessor
                 $sklFee = number_format($serviceFee + (float) $virtualLessonFee, 2); ;
                 $processorFee = $booking->getBookingPaymentProcessingFeeAmount($booking->spot_price, $sklFee);
                 $totalAmount = number_format((float) $booking->spot_price + (float) $sklFee + (float) $processorFee, 2);
-                $subMerchantId = $booking->instructor->pp_merchant_id;
-                $subMerchantEmail = $booking->instructor->email;
-
                 $purchaseUnits = [
                         'reference_id' => "booking_" . $booking->id,
                         'description' => $description,
@@ -388,7 +386,6 @@ class PayPalProcessor
                             "value" => $totalAmount,
                         ],
                         'payee' => [
-                            'email_address' => $subMerchantEmail,
                             'merchant_id' => $subMerchantId
                         ],
                         'payment_instruction' => [
@@ -407,8 +404,8 @@ class PayPalProcessor
 
             } elseif (get_class($booking) === PurchasedLesson::class) {
 
-                $description = "{$booking->preRecordedLesson->title} Lesson #{$booking->pre_r_lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
-                $totalAmount = round((float) $booking->price + (float) $booking->service_fee + (float) $processorFee, 2);
+                $description = $booking->preRecordedLesson->title . " Lesson #" . $booking->pre_r_lesson_id . " purchasedLesson #" . $booking->id . " instructor #" . $booking->instructor_id;
+                $totalAmount = number_format((float) $booking->price + (float) $booking->service_fee + (float) $booking->processor_fee, 2);
                 $sklFee = number_format($booking->service_fee, 2);
 
                 $purchaseUnits =  [
@@ -422,7 +419,6 @@ class PayPalProcessor
                             "value" => $totalAmount,
                         ],
                         'payee' => [
-                            'email_address' => $subMerchantEmail,
                             'merchant_id' => $subMerchantId
                         ],
                         'payment_instruction' => [
@@ -436,7 +432,8 @@ class PayPalProcessor
                             ],
                             'disbursement_mode' => "DELAYED",
                         ]
-                    ];
+                ];
+
                 $data['purchase_units'][] = $purchaseUnits;
 
             } else {
@@ -444,7 +441,6 @@ class PayPalProcessor
             }
 
         }  // foreach end
-
 
         try {
             $order = $this->payPalClient->setRequestHeaders([
@@ -495,7 +491,6 @@ class PayPalProcessor
         $totalAmount = round($booking->spot_price + $totalServiceFee + $processorFee, 2);
         $sklFee = number_format((float)$totalServiceFee, 2, '.', '');
         $subMerchantId = $booking->instructor->pp_merchant_id;
-        $subMerchantEmail = $booking->instructor->email;
 
         $data = [
             "intent" => "CAPTURE",
@@ -512,7 +507,6 @@ class PayPalProcessor
 
                     ],
                     'payee' => [
-                        'email_address' => $subMerchantEmail,
                         'merchant_id' => $subMerchantId
                     ],
                     'payment_instruction' => [
@@ -692,6 +686,7 @@ class PayPalProcessor
         if (!$user->pp_customer_id) {
             return null;
         }
+
         $userPaymentMethods = $user->findPaymentMethod()->get();
         if (!$userPaymentMethods) {
             return null;
@@ -762,9 +757,7 @@ class PayPalProcessor
                 $source = $result['payment_source'][array_key_first($result['payment_source'])];
                 // зберегти або оновити
                 $this->userRepository->savePaymentMethod($user, $result['id'], array_key_first($result['payment_source']));
-                // зберегти pp_customer_id
-                $user->pp_customer_id = $result['customer']['id'];
-                $user->save();
+
                 return ['token' => $result['id'], 'type' => array_key_first($result['payment_source']), 'source' => $source];
             } else {
                 Log::channel('paypal')->error("create payment method for {$user->id} is fail  " . $result['error']['message']);
@@ -814,6 +807,7 @@ class PayPalProcessor
         }
         try {
             $response = $this->payPalClient->createPaymentSetupToken($data);
+
             if (!isset($response['error'])) {
                 return $response['id'];
             } else {
@@ -849,8 +843,14 @@ class PayPalProcessor
     {
         try {
             $client = new PayPalClient();
-            $response = $client->getCustomerAccessToken($user->pp_customer_id ?? null);
-
+            if(!$user->pp_customer_id) {
+                $data['payment_source'] = ['card' => (object)[]];
+                $response = $this->payPalClient->createPaymentSetupToken($data);
+                // зберегти pp_customer_id
+                $user->pp_customer_id = $response['customer']['id'];
+                $user->save();
+            }
+            $response = $client->getCustomerAccessToken($user->pp_customer_id);
             return $response['id_token'];
 
         } catch (Exception $e) {

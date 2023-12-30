@@ -1,4 +1,5 @@
-<script src="../../../../../../../../Стільниця/example_js_sdk.js"></script>
+<script src='../../../../../../../../Стільниця/example_js_sdk.js'>
+</script>
 <template>
   <div id='password-payment-account'>
     <form id='payment-method-form'>
@@ -20,6 +21,14 @@
       </div>
 
       <div v-show="paymentMethod === 'PayPalButton'" id='paypal-buttons-container'></div>
+      <button
+        v-show="paymentMethod === 'PayPalButton' && isSelectedPaymentMethod"
+        class='btn btn-primary btn-flat cursor-pointer'
+        type='button'
+        @click='deletePaymentMethod()'
+      >
+        Delete payment method
+      </button>
 
       <div v-show="paymentMethod === 'CreditCard'">
         <div class='payment-option pt-1 active'>
@@ -112,7 +121,7 @@ import siteAPI from '../mixins/siteAPI.js'
 export default {
   mixins: [siteAPI],
   props: [
-    'clientToken',
+    'clientId',
     'userPaymentMethods',
     'dataUserIdToken',
   ],
@@ -139,15 +148,16 @@ export default {
   },
   methods: {
     async initializePaypal() {
+
       try {
         this.paypal = await loadScript({
-          clientId: this.clientToken,
+          clientId: this.clientId,
           buyerCountry: 'US',  // удалити при запуску на продакшені !!!!!!!
           locale: 'en_US',
           components: ['buttons', 'card-fields'],
-          disableFunding: ['paylater', 'venmo'],
-          // enableFunding: ['venmo'],
-          // dataUserIdToken: this.dataUserIdToken,
+          disableFunding: ['paylater'],
+          enableFunding: ['venmo'],
+          dataUserIdToken: this.dataUserIdToken,
         })
 
         this.initPaymentMethod()
@@ -158,7 +168,7 @@ export default {
     },
     initPaymentMethod() {
       this.renderCardForm()
-      // this.renderPayPalButton()
+      this.renderPayPalButton()
     },
     renderPayPalButton() {
       this.paypal.Buttons({
@@ -255,6 +265,12 @@ export default {
         this.lastFour = '**** **** **** ' + this.paymentMethods.card.last_digits
         this.isRadioButton = false
         this.currentPaymentId = this.paymentMethods.card.payment_id
+        this.isSelectedPaymentMethod = true
+      }
+      if (this.paymentMethods.paypal){
+        this.paymentMethod = 'PayPalButton'
+        this.isRadioButton = false
+        this.currentPaymentId = this.paymentMethods.paypal.payment_id
         this.isSelectedPaymentMethod = true
       }
     }
