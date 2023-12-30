@@ -29,11 +29,13 @@ class CartAPIController extends AppBaseController
 {
 
     private CartRepository $cartRepository;
+    private UserRepository $userRepository;
 
-    public function __construct(CartRepository $cartRepo)
+    public function __construct(CartRepository $cartRepo, UserRepository $userRepository)
     {
         parent::__construct();
         $this->cartRepository = $cartRepo;
+        $this->userRepository = $userRepository;
     }
 
 
@@ -489,6 +491,9 @@ class CartAPIController extends AppBaseController
         }
 
         $order = PayPalProcessor::captureOrder($data['orderId']);
+        if (  ! $request->user()->findPaymentMethod()->count() ) {
+            $this->userRepository->savePaymentMethod( $request->user(),  $order['payment_source']['paypal']['attributes']['vault']['id'],  array_key_first($order['payment_source']) );
+        }
 
        foreach ($order['purchase_units'] as $unit ) {
 

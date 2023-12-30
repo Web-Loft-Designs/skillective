@@ -424,8 +424,7 @@ export default {
       fetchCartItems: 'fetchCartItems'
     }),
     async initializePaypal() {
-      console.log( this.dataUserIdToken, ' this.dataUserIdToken')
-      console.log(this.merchantIds, 'merchantIds')
+      console.log(this.userPaymentMethods, 'this.userPaymentMethods')
       try {
         this.paypal = await loadScript({
           clientId: this.clientId,
