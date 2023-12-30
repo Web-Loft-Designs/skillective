@@ -425,12 +425,11 @@ export default {
       fetchCartItems: 'fetchCartItems'
     }),
     async initializePaypal() {
-      console.log(this.userPaymentMethods, 'this.userPaymentMethods')
       try {
         this.paypal = await loadScript({
           clientId: this.clientId,
           merchantId: this.merchantIds,
-          buyerCountry: 'US',  // удалити при запуску на продакшені !!!!!!!
+          buyerCountry: 'US',
           locale: 'en_US',
           components: ['buttons', 'card-fields'],
           currency: 'USD',
@@ -444,8 +443,8 @@ export default {
       }
     },
     initPaymentMethod() {
-      // якщо є збережена карта треба заповнити поля збереженими даними
       if (this.userPaymentMethods.card) {
+        this.selectedPaymentId = this.userPaymentMethods.card.payment_id
         this.useSavedMethod = true
         this.renderCardForm()
       }
@@ -456,7 +455,6 @@ export default {
       }
 
       if (!this.userPaymentMethods.card && !this.userPaymentMethods.paypal && !this.userPaymentMethods.venmo) {
-        // якщо нема ніякого збереженого методу рендеремо тільки форму карти
         this.renderCardForm()
         this.renderPayPalButton()
       }
@@ -469,7 +467,6 @@ export default {
         },
         onApprove: async (data) => {
           this.fields.orderId = data.orderID
-          // console.log(this.fields, 'this.fields')
           await this.apiPost('/api/cart/paypal-capture', {
             ...this.fields
           })

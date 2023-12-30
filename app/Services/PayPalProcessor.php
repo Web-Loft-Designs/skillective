@@ -368,7 +368,6 @@ class PayPalProcessor
 
         foreach ($bookings as $booking) {
             $subMerchantId = $booking->instructor->pp_merchant_id;
-            $subMerchantEmail = $booking->instructor->email;
             if (get_class($booking) === Booking::class) {
                 $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
                 $serviceFee = $booking->getBookingServiceFeeAmount();
@@ -387,7 +386,6 @@ class PayPalProcessor
                             "value" => $totalAmount,
                         ],
                         'payee' => [
-                            'email_address' => $subMerchantEmail,
                             'merchant_id' => $subMerchantId
                         ],
                         'payment_instruction' => [
@@ -421,7 +419,6 @@ class PayPalProcessor
                             "value" => $totalAmount,
                         ],
                         'payee' => [
-                            'email_address' => $subMerchantEmail,
                             'merchant_id' => $subMerchantId
                         ],
                         'payment_instruction' => [
@@ -494,7 +491,6 @@ class PayPalProcessor
         $totalAmount = round($booking->spot_price + $totalServiceFee + $processorFee, 2);
         $sklFee = number_format((float)$totalServiceFee, 2, '.', '');
         $subMerchantId = $booking->instructor->pp_merchant_id;
-        $subMerchantEmail = $booking->instructor->email;
 
         $data = [
             "intent" => "CAPTURE",
@@ -511,7 +507,6 @@ class PayPalProcessor
 
                     ],
                     'payee' => [
-                        'email_address' => $subMerchantEmail,
                         'merchant_id' => $subMerchantId
                     ],
                     'payment_instruction' => [
