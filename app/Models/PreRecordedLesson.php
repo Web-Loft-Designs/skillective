@@ -137,16 +137,9 @@ class PreRecordedLesson extends Model
         $purchasedLesson->service_fee             = $service_fee;
         $purchasedLesson->processor_fee           = $this->getPreRecordedLessonPaymentProcessingFeeAmount($this->price, $service_fee);
         $instructorMerchantId                     = $this->instructor->pp_merchant_id;
-
         $purchasedLesson->save();
 
-        $transaction = PayPalProcessor::createSellPurchasereLessonTransaction(
-            $instructorMerchantId,
-            $purchasedLesson->payment_method_token,
-            $purchasedLesson,
-            $purchasedLesson->service_fee,
-            $purchasedLesson->processor_fee
-        );
+        $transaction = PayPalProcessor::createSellPurchasereLessonTransaction( $instructorMerchantId, $purchasedLesson );
 
         $purchasedLesson->transaction_id            = $transaction['id'];
         $purchasedLesson->pp_reference_id           = $transaction['purchase_units'][0]['payments']['captures'][0]['id'];

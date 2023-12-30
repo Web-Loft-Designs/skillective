@@ -174,6 +174,8 @@ Route::prefix('/cart')->group(function () {
     Route::post('/checkout', [CartAPIController::class, 'checkout']);
     Route::get('/promo/{promo}', [CartAPIController::class, 'checkIsPromoIsValid']);
     Route::post('/validate-user-info', [CartAPIController::class, 'validateUserData']);
+    Route::post('/paypal-order', [CartAPIController::class, 'createOrder']);
+    Route::post('/paypal-capture', [CartAPIController::class, 'captureOrder']);
 });
 
 Route::post('student/instructors', 'StudentInstructorsAPIController@add'); // add many

@@ -50,6 +50,15 @@ trait PaymentMethodsTokens
         return $this->doPayPalRequest();
     }
 
+    public function getCustomerPaymentToken(string $customerId)
+    {
+        $this->apiEndPoint = "v3/vault/payment-tokens?customer_id={$customerId}";
+
+        $this->verb = 'get';
+
+        return $this->doPayPalRequest();
+    }
+
     /**
      * Show details for a payment method token.
      *

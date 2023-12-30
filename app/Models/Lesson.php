@@ -287,9 +287,7 @@ class Lesson extends Model implements Transformable
         $booking->service_fee           = $service_fee;
         $booking->virtual_fee           = $virtual_fee;
         $booking->processor_fee		    = $booking->getBookingPaymentProcessingFeeAmount($this->spot_price, $service_fee + $virtual_fee);
-
         $booking->save();
-
 
         if ($this->lesson_type == 'in_person_client' && $request->input('location')) {
             $this->location = $request->input('location');

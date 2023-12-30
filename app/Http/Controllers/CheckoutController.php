@@ -9,18 +9,12 @@ use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 
-
 class CheckoutController extends Controller
 {
-
-    private CartRepository $cartRepository;
-
-    public function __construct(CartRepository $cartRepo)
+    public function __construct()
     {
         parent::__construct();
-        $this->cartRepository = $cartRepo;
     }
-
 
     /**
      * @param CartRepository $cartRepository
@@ -31,12 +25,13 @@ class CheckoutController extends Controller
     {
 
         if (Auth::check() && Auth::user()->hasRole(User::ROLE_STUDENT)) {
-
             $userData = $userRepository->getUserData(Auth::user()->id);
             $userData = $userRepository->presentResponse($userData)['data'];
             $userData['genres'] = Auth::user()->genres()->pluck('id')->toArray();
             $total = $cartRepository->getCartSummary(Auth::user()->id, null, "[]");
             $lessonsInACart = $cartRepository->getLessonsCountInCart(Auth::user()->id, null);
+            $merchantIds = array_unique((array)$total['merchants']);
+                unset($total['merchants']);
             $vars['page_title']             = 'Checkout';
             $vars['total']                  = $total;
             $vars['lessonsCount']           = $lessonsInACart;
@@ -44,9 +39,8 @@ class CheckoutController extends Controller
             $vars['ppClientToken']          = PayPalProcessor::getClientId();
             $vars['bnCode']                 = PayPalProcessor::getBnCde();
             $vars['ppUserPaymentMethods']   = PayPalProcessor::getSavedCustomerPaymentMethods(Auth::user());
-            $vars['masterMerchantId']       = PayPalProcessor::getMasterMerchantId();
+            $vars['merchantIds']            = $merchantIds;
             $vars['dataUserIdToken']        = PayPalProcessor::getDataUserIdToken(Auth::user());
-
         } else {
             $vars['page_title']             = 'Checkout';
             $vars['total']                  = null;
@@ -55,10 +49,9 @@ class CheckoutController extends Controller
             $vars['ppClientToken']          = PayPalProcessor::getClientId();
             $vars['bnCode']                 = PayPalProcessor::getBnCde();
             $vars['ppUserPaymentMethods']   = null;
-            $vars['masterMerchantId']       = PayPalProcessor::getMasterMerchantId();
+            $vars['merchantIds']            = null;
             $vars['dataUserIdToken']        = null;
         }
-
         return view('frontend.checkout', $vars);
     }
 }

@@ -219,25 +219,25 @@
           <h3 class='custom-padding'>Please Submit Payment</h3>
           <p>Step 2/2</p>
         </div>
-        <div
-            v-if='user != null && Object.entries(userPaymentMethods).length === 1'
-            class='checkbox-wrapper mb-5 has-feedback'
-        >
-          <div class='mb-4'>Use stored payment information:</div>
-          <div class='field'>
-            <label class='mx-4' for='stored-payment-information'>
-              <input
-                  id='stored-payment-information'
-                  v-model='useSavedMethod'
-                  type='checkbox'
-              />
-              <span class='checkmark'></span>
-              {{ userPaymentMethods.card.type }} {{ userPaymentMethods.card.brand || '' }}
-            </label>
-          </div>
-        </div>
+<!--        <div-->
+<!--            v-if='user != null && Object.entries(userPaymentMethods).length === 1'-->
+<!--            class='checkbox-wrapper mb-5 has-feedback'-->
+<!--        >-->
+<!--          <div class='mb-4'>Use stored payment information:</div>-->
+<!--                    <div class='field'>-->
+<!--                      <label class='mx-4' for='stored-payment-information'>-->
+<!--                        <input-->
+<!--                            id='stored-payment-information'-->
+<!--                            v-model='useSavedMethod'-->
+<!--                            type='checkbox'-->
+<!--                        />-->
+<!--                        <span class='checkmark'></span>-->
+<!--                        {{ userPaymentMethods.card.type }} {{ userPaymentMethods.card.brand || '' }}-->
+<!--                      </label>-->
+<!--                    </div>-->
+<!--        </div>-->
         <div id='paypal-buttons-container'></div>
-        <div class='mt-4'>
+        <div  class='mt-4'>
           <div class='payment-option-header mb-4'>
             <img alt src='/images/card-icon.png'/>
           </div>
@@ -347,10 +347,10 @@ export default {
     userPaymentMethods: Object,
     user: Object,
     total: Object,
-    ppClientToken: String,
+    clientId: String,
     bnCode: String,
     dataUserIdToken: String,
-    masterMerchantId: String
+    merchantIds: Array
   },
   data() {
     return {
@@ -370,7 +370,6 @@ export default {
         accept_terms: false,
         payment_method_token: null,
         payment_method_nonce: null,
-        device_data: '',
         lesson_type: ''
       },
       booking: null,
@@ -388,7 +387,7 @@ export default {
   created() {
     if (
         window.location.hash.search(/venmoSuccess=/) !== -1 &&
-        Cookies.get('currentOrderDetails') != undefined
+        Cookies.get('currentOrderDetails') !== undefined
     ) {
       let currentOrderDetails = Cookies.get('currentOrderDetails')
       if (typeof currentOrderDetails == 'string') currentOrderDetails = JSON.parse(currentOrderDetails)
@@ -427,15 +426,14 @@ export default {
     async initializePaypal() {
       try {
         this.paypal = await loadScript({
-          clientId: this.ppClientToken,
-          merchantId: this.masterMerchantId,
+          clientId: this.clientId,
+          merchantId: this.merchantIds,
           buyerCountry: 'US',  // удалити при запуску на продакшені !!!!!!!
           locale: 'en_US',
-          components: ['buttons', 'funding-eligibility', 'marks', 'card-fields'],
+          components: ['buttons', 'card-fields'],
           currency: 'USD',
-          vault: true,
           disableFunding: ['paylater'],
-          enableFunding: ['venmo'],
+          enableFunding: 'venmo',
           // dataUserIdToken: this.dataUserIdToken,
         })
         this.initPaymentMethod()
@@ -444,24 +442,26 @@ export default {
       }
     },
     initPaymentMethod() {
+      // якщо є збережена карта треба заповнити поля збереженими даними
       if (this.userPaymentMethods.card) this.renderCardForm()
+
       if (this.userPaymentMethods.paypal) this.renderPayPalButton()
+
       if (!this.userPaymentMethods.card && !this.userPaymentMethods.paypal && !this.userPaymentMethods.venmo) {
+        // якщо нема ніякого збереженого методу рендеремо тільки форму карти
         this.renderCardForm()
-        this.renderPayPalButton()
       }
     },
     renderPayPalButton() {
       this.paypal.Buttons({
-        createVaultSetupToken: async () => {
-          const result = await axios.post('/api/cart/vault-setup-token?method=paypal')
-          return result.data.vaultSetupToken;
+        createOrder: async () => {
+          const result = await axios.post('/api/cart/paypal-order');
+          return result.data.orderId
         },
         onApprove: async (data) => {
-          this.fields.payment_method_nonce = data.vaultSetupToken
-          this.fields.order = this.total
-          this.fields.payment_method_token = null
-          await this.apiPost('/api/cart/checkout', {
+          this.fields.orderId = data.orderID
+          console.log(this.fields, 'this.fields')
+          await this.apiPost('/api/cart/paypal-capture', {
             ...this.fields
           })
         },
@@ -472,7 +472,9 @@ export default {
           shape: 'pill',
           label: 'paypal'
         }
+
       }).render('#paypal-buttons-container')
+
     },
     renderCardForm() {
       const cardFields = this.paypal.CardFields({
