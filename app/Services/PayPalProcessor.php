@@ -73,29 +73,12 @@ class PayPalProcessor
     /**
      * @return string
      */
-    public function getEnvironment(): string
-    {
-        return config('paypal.mode');
-    }
-
-    /**
-     * @return string
-     */
     public function getEnvironmentUrl(): string
     {
         if (config('paypal.mod') == 'live') {
             return 'https://www.paypal.com/';
         } else {
             return 'https://www.sandbox.paypal.com/';
-        }
-    }
-
-    public function getMasterMerchantId(): string
-    {
-        if (config('paypal.mod') == 'live') {
-            return config('paypal.live.master_partner_id');
-        } else {
-            return config('paypal.sandbox.master_partner_id');
         }
     }
 
