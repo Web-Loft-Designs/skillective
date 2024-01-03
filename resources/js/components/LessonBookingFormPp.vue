@@ -311,10 +311,10 @@
                   Submit Payment
                 </button>
               </div>
-              <div v-if='errorText' class='has-error' v-html='errorText'></div>
             </div>
           </div>
         </div>
+        <div v-if='errorText' class='has-error' v-html='errorText'></div>
       </div>
 
       <!-- Successfull Booking -->
