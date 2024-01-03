@@ -6,14 +6,12 @@ return [
         'client_id'         => env('PAYPAL_SANDBOX_CLIENT_ID', ''),
         'client_secret'     => env('PAYPAL_SANDBOX_CLIENT_SECRET', ''),
         'app_id'            => env('PAYPAL_SANDBOX_APP_ID', ''),
-        'master_partner_id' => env('PAYPAL_SANDBOX_MASTER_PARTNER_ID', ''),
         'bn_code'           => env('PAYPAL_SANDBOX_BN_CODE', '')
     ],
     'live' => [
         'client_id'         => env('PAYPAL_LIVE_CLIENT_ID', ''),
         'client_secret'     => env('PAYPAL_LIVE_CLIENT_SECRET', ''),
         'app_id'            => env('PAYPAL_LIVE_APP_ID', ''),
-        'master_partner_id' => env('PAYPAL_LIVE_MASTER_PARTNER_ID', ''),
         'bn_code'           => env('PAYPAL_LIVE_BN_CODE', '')
     ],
 
