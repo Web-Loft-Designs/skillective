@@ -445,19 +445,21 @@ class PayPalProcessor
         try {
             $order = $this->payPalClient->setRequestHeaders([
                 'PayPal-Request-Id' => $this->getRandomString(),
-                'PayPal-Partner-Attribution-Id' => $this->getBnCde()
+                'PayPal-Partner-Attribution-Id' => $this->getBnCde(),
             ])->createOrder($data);
 
             if (isset($order['error'])) {
-                Log::channel('paypal')->error('Can\'t create order: ' . $order);
-                throw new Exception('payment service is not available try again later');
+                $message = $order['error']['message'] ?? 'An internal server error has occurred Try your request again later.';
+                Log::channel('paypal')->error('Can\'t create order: ' . json_encode($order) );
+                throw new Exception($message);
             } else {
                 return $order;
             }
 
         } catch (Exception $e) {
-            Log::channel('paypal')->error('Can\'t create order: ' . $e->getTraceAsString());
-            throw new Exception('payment service is not available try again later');
+            $message = $order['error']['message'] ?? 'An internal server error has occurred Try your request again later.';
+            Log::channel('paypal')->error('Can\'t create order: ' . json_encode($order));
+            throw new Exception($message);
         }
 
     }
@@ -467,19 +469,21 @@ class PayPalProcessor
         try {
             $order = $this->payPalClient->setRequestHeaders([
                 'PayPal-Request-Id' => $this->getRandomString(),
-                'PayPal-Partner-Attribution-Id' => $this->getBnCde()
+                'PayPal-Partner-Attribution-Id' => $this->getBnCde(),
             ])->capturePaymentOrder($orderId);
 
             if (isset($order['error'])) {
-                Log::channel('paypal')->error('Can\'t create transaction: ' . $order);
-                throw new Exception('Can\'t create transaction: ');
+                $message = $order['error']['message'] ?? 'An internal server error has occurred Try your request again later.';
+                Log::channel('paypal')->error('Can\'t create transaction: ' . json_encode($order));
+                throw new Exception($message);
             } else {
                 return $order;
             }
 
         } catch (Exception $e) {
+            $message = $order['error']['message'] ?? 'An internal server error has occurred Try your request again later.';
             Log::channel('paypal')->error('Can\'t create transaction: '. json_encode($order));
-            throw new Exception('Can\'t create transaction: ');
+            throw new Exception($message);
         }
 
     }
@@ -536,21 +540,21 @@ class PayPalProcessor
 
             $order = $this->payPalClient->setRequestHeaders([
                 'PayPal-Request-Id' => $this->getRandomString(),
-                'PayPal-Partner-Attribution-Id' => $this->getBnCde()
+                'PayPal-Partner-Attribution-Id' => $this->getBnCde(),
             ])->createOrder($data);
 
-            if (!isset($order['error'])) {
-
-             return $order;
-
+            if (isset($order['error'])) {
+                $message = $order['error']['message'] ?? 'An internal server error has occurred Try your request again later.';
+                Log::channel('paypal')->error('Can\'t create transaction: ' .  json_encode($order));
+                throw new Exception($message);
             } else {
-                Log::channel('paypal')->error('Can\'t create transaction: ' . $order);
-                throw new Exception('Can\'t create transaction: ');
+                return $order;
             }
 
         } catch (Exception $e) {
+            $message = $order['error']['message'] ?? 'An internal server error has occurred Try your request again later.';
             Log::channel('paypal')->error('Can\'t create transaction: '. json_encode($order));
-            throw new Exception('Can\'t create transaction: ');
+            throw new Exception($message);
         }
 
     }
@@ -578,7 +582,7 @@ class PayPalProcessor
 
             if (isset($order['purchase_units'][0]['payments']['captures'][0]['id'])) {
                 $merchantId = $order['purchase_units'][0]['payee']['merchant_id'];
-              $this->payPalClient->setRequestHeaders([
+                $this->payPalClient->setRequestHeaders([
                     'PayPal-Request-Id' => $this->getRandomString(),
                     'PayPal-Auth-Assertion' => $this->getAuthAssertionValue($this->getClientId(), $merchantId)
                 ])->refundAllCapturedPayment($order['purchase_units'][0]['payments']['captures'][0]['id']);
@@ -664,19 +668,22 @@ class PayPalProcessor
         try {
             $order = $this->payPalClient->setRequestHeaders([
                 'PayPal-Request-Id' => $this->getRandomString(),
-                'PayPal-Partner-Attribution-Id' => $this->getBnCde()
+                'PayPal-Partner-Attribution-Id' => $this->getBnCde(),
             ])->createOrder($data);
 
+
             if (isset($order['error'])) {
-                Log::channel('paypal')->error('Can\'t create transaction: ' . $order);
-                throw new Exception('Can\'t create transaction: ');
+                $message = $order['error']['message'] ?? 'An internal server error has occurred Try your request again later.';
+                Log::channel('paypal')->error('Can\'t create transaction: ' . json_encode($order));
+                throw new Exception($message);
             } else {
                 return $order;
             }
 
         } catch (Exception $e) {
+            $message = $order['error']['message'] ?? 'An internal server error has occurred Try your request again later.';
             Log::channel('paypal')->error('Can\'t create transaction: '. json_encode($order));
-            throw new Exception('Can\'t create transaction: ');
+            throw new Exception($message);
         }
     }
 
@@ -735,8 +742,8 @@ class PayPalProcessor
             return $methods;
 
         } catch (Exception $e) {
-            Log::channel('paypal')->error("found payment method for {$user->id} is fail");
-            throw new Exception("found payment method for {$user->id} is fail");
+            Log::channel('paypal')->error("found payment method for {$user->id} is fail: " . json_encode($result));
+            return null;
         }
     }
 
