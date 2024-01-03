@@ -11,17 +11,17 @@
         <div class='user-info-title'>
           <h3 class='login-box-msg'>Profile</h3>
           <button
-              v-if='bookingStep === 2'
-              class='prev-step-btn'
-              @click='editUserInformation'
+            v-if='bookingStep === 2'
+            class='prev-step-btn'
+            @click='editUserInformation'
           >
             Edit
           </button>
         </div>
         <form
-            v-if='bookingStep === 1'
-            method='post'
-            @submit.prevent='onSubmitStep1'
+          v-if='bookingStep === 1'
+          method='post'
+          @submit.prevent='onSubmitStep1'
         >
           <div v-if='user === null'>
             <p class='custom-padding'>
@@ -35,19 +35,19 @@
               <label>Your name</label>
             </div>
             <div
-                :class="{ 'has-error': errors.first_name }"
-                class='form-group first-name has-feedback'
+              :class="{ 'has-error': errors.first_name }"
+              class='form-group first-name has-feedback'
             >
 
               <input
-                  v-model='fields.first_name'
-                  :readonly='formReadonly === true'
-                  class='form-control'
-                  name='first_name'
-                  placeholder='First Name'
-                  required
-                  type='text'
-                  value
+                v-model='fields.first_name'
+                :readonly='formReadonly === true'
+                class='form-control'
+                name='first_name'
+                placeholder='First Name'
+                required
+                type='text'
+                value
               />
               <span v-if='errors.first_name' class='help-block'>
                 <strong>{{ errors.first_name[0] }}</strong>
@@ -55,18 +55,18 @@
             </div>
 
             <div
-                :class="{ 'has-error': errors.last_name }"
-                class='form-group last-name has-feedback'
+              :class="{ 'has-error': errors.last_name }"
+              class='form-group last-name has-feedback'
             >
               <input
-                  v-model='fields.last_name'
-                  :readonly='formReadonly === true'
-                  class='form-control'
-                  name='last_name'
-                  placeholder='Last Name'
-                  required
-                  type='text'
-                  value
+                v-model='fields.last_name'
+                :readonly='formReadonly === true'
+                class='form-control'
+                name='last_name'
+                placeholder='Last Name'
+                required
+                type='text'
+                value
               />
               <span v-if='errors.last_name' class='help-block'>
                 <strong>{{ errors.last_name[0] }}</strong>
@@ -74,18 +74,18 @@
             </div>
 
             <div
-                :class="{ 'has-error': errors.zip }"
-                class='form-group w-50 has-feedback'
+              :class="{ 'has-error': errors.zip }"
+              class='form-group w-50 has-feedback'
             >
               <label>ZIP</label>
               <input
-                  v-model='fields.zip'
-                  :readonly='formReadonly === true'
-                  class='form-control'
-                  name='zip'
-                  placeholder='ZIP code'
-                  type='text'
-                  value
+                v-model='fields.zip'
+                :readonly='formReadonly === true'
+                class='form-control'
+                name='zip'
+                placeholder='ZIP code'
+                type='text'
+                value
               />
               <span v-if='errors.zip' class='help-block'>
                 <strong>{{ errors.zip[0] }}</strong>
@@ -93,18 +93,18 @@
             </div>
 
             <div
-                :class="{ 'has-error': errors.dob }"
-                class='form-group w-50 has-feedback'
+              :class="{ 'has-error': errors.dob }"
+              class='form-group w-50 has-feedback'
             >
               <label>Date of Birth</label>
               <dropdown-datepicker
-                  v-model='fields.dob'
-                  :default-date='fields.dob'
-                  :max-year='2021'
-                  :min-year='1940'
-                  :required='true'
-                  display-format='mdy'
-                  submit-format='yyyy-mm-dd'
+                v-model='fields.dob'
+                :default-date='fields.dob'
+                :max-year='2021'
+                :min-year='1940'
+                :required='true'
+                display-format='mdy'
+                submit-format='yyyy-mm-dd'
               ></dropdown-datepicker>
 
               <span v-if='errors.dob' class='help-block'>
@@ -113,19 +113,19 @@
             </div>
 
             <div
-                :class="{ 'has-error': errors.email }"
-                class='form-group w-50 has-feedback'
+              :class="{ 'has-error': errors.email }"
+              class='form-group w-50 has-feedback'
             >
               <label>Email</label>
               <input
-                  v-model='fields.email'
-                  :readonly='formReadonly === true'
-                  class='form-control'
-                  name='email'
-                  placeholder='Email'
-                  required
-                  type='email'
-                  value
+                v-model='fields.email'
+                :readonly='formReadonly === true'
+                class='form-control'
+                name='email'
+                placeholder='Email'
+                required
+                type='email'
+                value
               />
               <span v-if='errors.email' class='help-block'>
                 <strong>{{ errors.email[0] }}</strong>
@@ -133,24 +133,24 @@
             </div>
 
             <div
-                :class="{ 'has-error': errors.mobile_phone }"
-                class='form-group w-50 has-feedback'
+              :class="{ 'has-error': errors.mobile_phone }"
+              class='form-group w-50 has-feedback'
             >
               <label>Phone number</label>
 
               <masked-input
-                  v-if='formReadonly === false'
-                  v-model='fields.mobile_phone'
-                  :class="'form-control'"
-                  :placeholder="'(___) ___ ____'"
-                  mask='(111) 111 1111'
+                v-if='formReadonly === false'
+                v-model='fields.mobile_phone'
+                :class="'form-control'"
+                :placeholder="'(___) ___ ____'"
+                mask='(111) 111 1111'
               />
               <input
-                  v-if='formReadonly === true'
-                  v-model='fields.mobile_phone'
-                  class='form-control'
-                  readonly
-                  type='text'
+                v-if='formReadonly === true'
+                v-model='fields.mobile_phone'
+                class='form-control'
+                readonly
+                type='text'
               />
               <span v-if='errors.mobile_phone' class='help-block'>
                 <strong>{{ errors.mobile_phone[0] }}</strong>
@@ -158,33 +158,33 @@
             </div>
 
             <div
-                v-if="lesson_type === 'in_person_client'"
-                :class="{ 'has-error': errors.location }"
-                class='form-group has-feedback'
+              v-if="lesson_type === 'in_person_client'"
+              :class="{ 'has-error': errors.location }"
+              class='form-group has-feedback'
             >
 
               <label>Location</label>
               <input
-                  ref='lessonLocation'
-                  v-model='fields.location'
-                  class='form-control'
-                  name='location'
-                  required
-                  type='text'
-                  value
+                ref='lessonLocation'
+                v-model='fields.location'
+                class='form-control'
+                name='location'
+                required
+                type='text'
+                value
               />
             </div>
             <div
-                :class="{ 'has-error': errors.accept_terms }"
-                class='checkout-terms form-group checkbox-wrapper has-feedback'
+              :class="{ 'has-error': errors.accept_terms }"
+              class='checkout-terms form-group checkbox-wrapper has-feedback'
             >
               <div class='field'>
                 <label for='accept-terms'>
                   <input
-                      id='accept-terms'
-                      v-model='fields.accept_terms'
-                      :value='1'
-                      type='checkbox'
+                    id='accept-terms'
+                    v-model='fields.accept_terms'
+                    :value='1'
+                    type='checkbox'
                   />
                   <span class='checkmark'></span>
                   I agree to the
@@ -202,9 +202,9 @@
 
             <div class='form-group'>
               <button
-                  :disabled='!fields.accept_terms'
-                  class='btn btn-block'
-                  type='submit'
+                :disabled='!fields.accept_terms'
+                class='btn btn-block'
+                type='submit'
               >
                 Continue to Payment
               </button>
@@ -219,25 +219,25 @@
           <h3 class='custom-padding'>Please Submit Payment</h3>
           <p>Step 2/2</p>
         </div>
-<!--        <div-->
-<!--            v-if='user != null && Object.entries(userPaymentMethods).length === 1'-->
-<!--            class='checkbox-wrapper mb-5 has-feedback'-->
-<!--        >-->
-<!--          <div class='mb-4'>Use stored payment information:</div>-->
-<!--                    <div class='field'>-->
-<!--                      <label class='mx-4' for='stored-payment-information'>-->
-<!--                        <input-->
-<!--                            id='stored-payment-information'-->
-<!--                            v-model='useSavedMethod'-->
-<!--                            type='checkbox'-->
-<!--                        />-->
-<!--                        <span class='checkmark'></span>-->
-<!--                        {{ userPaymentMethods.card.type }} {{ userPaymentMethods.card.brand || '' }}-->
-<!--                      </label>-->
-<!--                    </div>-->
-<!--        </div>-->
-        <div  id='paypal-buttons-container'></div>
-        <div v-show='!isBtnPayPalSaved'  class='mt-4'>
+        <!--        <div-->
+        <!--            v-if='user != null && Object.entries(userPaymentMethods).length === 1'-->
+        <!--            class='checkbox-wrapper mb-5 has-feedback'-->
+        <!--        >-->
+        <!--          <div class='mb-4'>Use stored payment information:</div>-->
+        <!--                    <div class='field'>-->
+        <!--                      <label class='mx-4' for='stored-payment-information'>-->
+        <!--                        <input-->
+        <!--                            id='stored-payment-information'-->
+        <!--                            v-model='useSavedMethod'-->
+        <!--                            type='checkbox'-->
+        <!--                        />-->
+        <!--                        <span class='checkmark'></span>-->
+        <!--                        {{ userPaymentMethods.card.type }} {{ userPaymentMethods.card.brand || '' }}-->
+        <!--                      </label>-->
+        <!--                    </div>-->
+        <!--        </div>-->
+        <div id='paypal-buttons-container'></div>
+        <div v-show='!isBtnPayPalSaved' class='mt-4'>
           <div class='payment-option-header mb-4'>
             <img alt src='/images/card-icon.png'/>
           </div>
@@ -247,12 +247,12 @@
                 <label>Card number</label>
                 <div v-show='!useSavedMethod' id='card-number'></div>
                 <input
-                    v-show='useSavedMethod'
-                    :value='lastFour'
-                    class='form-control-pp'
-                    disabled
-                    placeholder='____ ____ ____ ____'
-                    type='text'
+                  v-show='useSavedMethod'
+                  :value='lastFour'
+                  class='form-control-pp'
+                  disabled
+                  placeholder='____ ____ ____ ____'
+                  type='text'
                 />
               </div>
 
@@ -260,11 +260,11 @@
                 <label>Cardholder name</label>
                 <div v-show='!useSavedMethod' id='card-holder-name'></div>
                 <input
-                    v-show='useSavedMethod'
-                    class='form-control-pp'
-                    disabled
-                    type='text'
-                    value='********** ************'
+                  v-show='useSavedMethod'
+                  class='form-control-pp'
+                  disabled
+                  type='text'
+                  value='********** ************'
                 />
               </div>
 
@@ -272,11 +272,11 @@
                 <label>Expiration date</label>
                 <div v-show='!useSavedMethod' id='expiration-date'></div>
                 <input
-                    v-show='useSavedMethod'
-                    class='form-control-pp'
-                    disabled
-                    type='text'
-                    value='** / **'
+                  v-show='useSavedMethod'
+                  class='form-control-pp'
+                  disabled
+                  type='text'
+                  value='** / **'
                 />
               </div>
 
@@ -284,33 +284,34 @@
                 <label>CVC/CVV</label>
                 <div v-show='!useSavedMethod' id='cvv'></div>
                 <input
-                    v-show='useSavedMethod'
-                    class='form-control-pp'
-                    disabled
-                    type='text'
-                    value='***'
+                  v-show='useSavedMethod'
+                  class='form-control-pp'
+                  disabled
+                  type='text'
+                  value='***'
                 />
               </div>
 
               <div class='form-group'>
                 <button
-                    v-show='!useSavedMethod'
-                    id='onSubmitStepCreditCard2'
-                    class='btn btn-block'
-                    type='button'
-                    value='submit'
+                  v-show='!useSavedMethod'
+                  id='onSubmitStepCreditCard2'
+                  class='btn btn-block'
+                  type='button'
+                  value='submit'
                 >
                   Submit Payment
                 </button>
                 <button
-                    v-show='useSavedMethod'
-                    class='btn btn-block'
-                    type='button'
-                    @click='book()'
+                  v-show='useSavedMethod'
+                  class='btn btn-block'
+                  type='button'
+                  @click='book()'
                 >
                   Submit Payment
                 </button>
               </div>
+              <div v-if='errorText' class='has-error' v-html='errorText'></div>
             </div>
           </div>
         </div>
@@ -327,8 +328,8 @@
 
 <script>
 import MaskedInput from 'vue-masked-input'
-import {loadScript} from '@paypal/paypal-js'
-import {mapActions} from 'vuex'
+import { loadScript } from '@paypal/paypal-js'
+import { mapActions } from 'vuex'
 import DropdownDatepicker from 'vue-dropdown-datepicker'
 import siteAPI from '../mixins/siteAPI.js'
 import skillectiveHelper from '../mixins/skillectiveHelper'
@@ -382,13 +383,13 @@ export default {
       setupToken: null,
       checkoutSuccess: false,
       bookingStep: 1,
-      isBtnPayPalSaved: false
+      isBtnPayPalSaved: false,
     }
   },
   created() {
     if (
-        window.location.hash.search(/venmoSuccess=/) !== -1 &&
-        Cookies.get('currentOrderDetails') !== undefined
+      window.location.hash.search(/venmoSuccess=/) !== -1 &&
+      Cookies.get('currentOrderDetails') !== undefined
     ) {
       let currentOrderDetails = Cookies.get('currentOrderDetails')
       if (typeof currentOrderDetails == 'string') currentOrderDetails = JSON.parse(currentOrderDetails)
@@ -417,7 +418,7 @@ export default {
   },
   computed: {
     lastFour() {
-      return `**** **** **** ${this.userPaymentMethods?.card?.last_digits}`
+      return `**** **** **** ${ this.userPaymentMethods?.card?.last_digits }`
     }
   },
   methods: {
@@ -435,7 +436,7 @@ export default {
           currency: 'USD',
           disableFunding: ['paylater'],
           enableFunding: 'venmo',
-          dataUserIdToken: this.dataUserIdToken,
+          dataUserIdToken: this.dataUserIdToken
         })
         this.initPaymentMethod()
       } catch (error) {
@@ -462,16 +463,26 @@ export default {
     renderPayPalButton() {
       this.paypal.Buttons({
         createOrder: async () => {
-          const result = await axios.post('/api/cart/paypal-order');
-          return result.data.orderId
+          try {
+            const result = await axios.post('/api/cart/paypal-order')
+            return result.data.orderId
+          } catch (error) {
+            this.errorText = error.response.data.message
+          }
         },
         onApprove: async (data) => {
-          this.fields.orderId = data.orderID
-          await this.apiPost('/api/cart/paypal-capture', {
-            ...this.fields
-          })
+          try {
+            this.fields.orderId = data.orderID
+            await this.apiPost('/api/cart/paypal-capture', {
+              ...this.fields
+            })
+          } catch (error) {
+            this.errorText = error.response.data.message
+          }
         },
-        onError: (error) => console.log('Something went wrong:', error),
+        onError: (error) => {
+          console.log('Error:', error)
+        },
         style: {
           layout: 'vertical',
           color: 'gold',
@@ -488,7 +499,7 @@ export default {
           const result = await fetch('/api/cart/vault-setup-token?method=card', {
             method: 'POST'
           })
-          const {vaultSetupToken} = await result.json()
+          const { vaultSetupToken } = await result.json()
           return vaultSetupToken
         },
         onApprove: async (data) => {
@@ -512,12 +523,12 @@ export default {
       const submitButton = document.getElementById('onSubmitStepCreditCard2')
       submitButton.addEventListener('click', () => {
         cardFields.submit()
-            .then(() => {
-              console.log('submit was successful')
-            })
-            .catch((error) => {
-              console.error('submit erred:', error)
-            })
+          .then(() => {
+            console.log('submit was successful')
+          })
+          .catch((error) => {
+            console.error('submit erred:', error)
+          })
       })
     },
     async onSubmitStep1() {
@@ -533,11 +544,11 @@ export default {
         'address'
       ])
       google.maps.event.addListener(
-          autocomplete,
-          'place_changed',
-          function (e) {
-            thisComponent.fields.location = thisComponent.$refs[_ref].value
-          }
+        autocomplete,
+        'place_changed',
+        function (e) {
+          thisComponent.fields.location = thisComponent.$refs[_ref].value
+        }
       )
     },
     editUserInformation() {
@@ -567,7 +578,7 @@ export default {
         guest_cart: guestCartHelper.getProducts(),
         promo_codes: guestCartHelper.getPromos()
       })
-    },
+    }
   }
 }
 </script>

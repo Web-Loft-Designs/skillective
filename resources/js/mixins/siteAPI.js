@@ -62,7 +62,10 @@ let siteAPIMixin =  {
 						this.componentHandlePostResponse(response.data)
 					}
 				})
-				.catch(error => this.apiHandleError(error))
+				.catch(error => {
+					this.errorText = error.response.data.message
+					this.apiHandleResponse(error)
+				})
 		},
 		apiPut : function(action, data){
 			this.apiPreSend();
