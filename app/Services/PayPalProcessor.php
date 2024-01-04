@@ -42,11 +42,12 @@ class PayPalProcessor
     public function checkConnect(): bool
     {
         $response = $this->payPalClient->getAccessToken();
-        if (!isset($response['error']) && isset($response['access_token']) ) {
+        if (!isset($response['error']) && isset($response['access_token'])) {
             return true;
         }
         return false;
     }
+
     /**
      * @throws Exception
      */
@@ -105,7 +106,7 @@ class PayPalProcessor
                         $user->pp_account_status = self::STATUS_SUSPENDED;
                         $user->bt_submerchant_status_reason = "You have not verified your PaPal account";
                         $user->save();
-                    }elseif (!isset($result['oauth_integrations'])) {
+                    } elseif (!isset($result['oauth_integrations'])) {
                         $user->pp_account_status = self::STATUS_SUSPENDED;
                         $user->bt_submerchant_status_reason = "You have not provided the necessary permissions for Skillective";
                         $user->save();
@@ -164,14 +165,14 @@ class PayPalProcessor
                         return [
                             'status' => self::STATUS_ACTIVE,
                             'merchantId' => $user->pp_merchant_id,
-                            ];
+                        ];
                     } else {
                         $data = $this->getRegistrationMerchantLink($user);
                         return [
                             'status' => self::STATUS_SUSPENDED,
                             'merchantId' => $user->pp_merchant_id,
                             "actionUrl" => $data['actionUrl'],
-                            ];
+                        ];
                     }
 
                 } else {
@@ -208,7 +209,7 @@ class PayPalProcessor
                 return [
                     'status' => self::STATUS_ACTIVE,
                     'merchantId' => $user->pp_merchant_id,
-                    ];
+                ];
 
             } else {
                 $data = $this->getRegistrationMerchantLink($user);
@@ -282,7 +283,7 @@ class PayPalProcessor
                 [
                     "operation" => "API_INTEGRATION",
                     "api_integration_preference" => [
-                        "rest_api_integration" =>  [
+                        "rest_api_integration" => [
                             "integration_method" => "PAYPAL",
                             "integration_type" => "THIRD_PARTY",
                             "third_party_details" => [
@@ -355,66 +356,98 @@ class PayPalProcessor
                 $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
                 $serviceFee = $booking->getBookingServiceFeeAmount();
                 $virtualLessonFee = $booking->getBookingVirtualFeeAmount();
-                $sklFee = number_format($serviceFee + (float) $virtualLessonFee, 2); ;
+                $sklFee = number_format($serviceFee + (float)$virtualLessonFee, 2);;
                 $processorFee = $booking->getBookingPaymentProcessingFeeAmount($booking->spot_price, $sklFee);
-                $totalAmount = number_format((float) $booking->spot_price + (float) $sklFee + (float) $processorFee, 2);
+                $totalAmount = number_format((float)$booking->spot_price + (float)$sklFee + (float)$processorFee, 2);
                 $purchaseUnits = [
-                        'reference_id' => "booking_" . $booking->id,
-                        'description' => $description,
-                        'custom_id' => "booking_" . $booking->id,
-                        'invoice_id' => "booking_" . $booking->id,
-                        'soft_descriptor' => "*lesson*" . $booking->lesson_id,
-                        "amount" => [
-                            "currency_code" => $currency,
-                            "value" => $totalAmount,
-                        ],
-                        'payee' => [
-                            'merchant_id' => $subMerchantId
-                        ],
-                        'payment_instruction' => [
-                            'platform_fees' => [
-                                [
-                                    'amount' => [
-                                        "currency_code" => $currency,
-                                        "value" => $sklFee,
-                                    ],
-                                ]
-                            ],
-                            'disbursement_mode' => "DELAYED",
+                    'reference_id' => "booking_" . $booking->id,
+                    'description' => $description,
+                    'custom_id' => "booking_" . $booking->id,
+                    'invoice_id' => "booking_" . $booking->id,
+                    'soft_descriptor' => "*lesson*" . $booking->lesson_id,
+                    'items' => [
+                        [
+                            'name' => "Lesson: " . $booking->lesson->genre->title,
+                            'quantity' => 1,
+                            'unit_amount' => [
+                                "currency_code" => $currency,
+                                "value" => $totalAmount,
+                            ]
                         ]
-                    ];
+                    ],
+                    "amount" => [
+                        "currency_code" => $currency,
+                        "value" => $totalAmount,
+                        "breakdown" => [
+                            "item_total" => [
+                                "currency_code" => $currency,
+                                "value" => $totalAmount,
+                            ]
+                        ]
+                    ],
+                    'payee' => [
+                        'merchant_id' => $subMerchantId
+                    ],
+                    'payment_instruction' => [
+                        'platform_fees' => [
+                            [
+                                'amount' => [
+                                    "currency_code" => $currency,
+                                    "value" => $sklFee,
+                                ],
+                            ]
+                        ],
+                        'disbursement_mode' => "DELAYED",
+                    ]
+                ];
                 $data['purchase_units'][] = $purchaseUnits;
 
             } elseif (get_class($booking) === PurchasedLesson::class) {
 
                 $description = $booking->preRecordedLesson->title . " Lesson #" . $booking->pre_r_lesson_id . " purchasedLesson #" . $booking->id . " instructor #" . $booking->instructor_id;
-                $totalAmount = number_format((float) $booking->price + (float) $booking->service_fee + (float) $booking->processor_fee, 2);
+                $totalAmount = number_format((float)$booking->price + (float)$booking->service_fee + (float)$booking->processor_fee, 2);
                 $sklFee = number_format($booking->service_fee, 2);
 
-                $purchaseUnits =  [
-                        'reference_id' => "pRlesson_" . $booking->id,
-                        'description' => $description,
-                        'custom_id' => "pRlesson_" . $booking->id,
-                        'invoice_id' => "pRlesson_" . $booking->id,
-                        'soft_descriptor' => "*lesson*" . $booking->pre_r_lesson_id,
-                        "amount" => [
-                            "currency_code" => $currency,
-                            "value" => $totalAmount,
-                        ],
-                        'payee' => [
-                            'merchant_id' => $subMerchantId
-                        ],
-                        'payment_instruction' => [
-                            'platform_fees' => [
-                                [
-                                    'amount' => [
-                                        "currency_code" => $currency,
-                                        "value" => $sklFee,
-                                    ],
-                                ]
-                            ],
-                            'disbursement_mode' => "DELAYED",
+                $purchaseUnits = [
+                    'reference_id' => "pRlesson_" . $booking->id,
+                    'description' => $description,
+                    'custom_id' => "pRlesson_" . $booking->id,
+                    'invoice_id' => "pRlesson_" . $booking->id,
+                    'soft_descriptor' => "*lesson*" . $booking->pre_r_lesson_id,
+                    'items' => [
+                        [
+                            'name' => "Lesson: " . $booking->preRecordedLesson->title,
+                            'quantity' => 1,
+                            'unit_amount' => [
+                                "currency_code" => $currency,
+                                "value" => $totalAmount,
+                            ]
                         ]
+                    ],
+                    "amount" => [
+                        "currency_code" => $currency,
+                        "value" => $totalAmount,
+                        "breakdown" => [
+                            "item_total" => [
+                                "currency_code" => $currency,
+                                "value" => $totalAmount,
+                            ]
+                        ]
+                    ],
+                    'payee' => [
+                        'merchant_id' => $subMerchantId
+                    ],
+                    'payment_instruction' => [
+                        'platform_fees' => [
+                            [
+                                'amount' => [
+                                    "currency_code" => $currency,
+                                    "value" => $sklFee,
+                                ],
+                            ]
+                        ],
+                        'disbursement_mode' => "DELAYED",
+                    ]
                 ];
 
                 $data['purchase_units'][] = $purchaseUnits;
@@ -433,7 +466,7 @@ class PayPalProcessor
 
             if (isset($order['error'])) {
                 $message = $order['error']['message'] ?? 'An internal server error has occurred Try your request again later.';
-                Log::channel('paypal')->error('Can\'t create order: ' . json_encode($order) );
+                Log::channel('paypal')->error('Can\'t create order: ' . json_encode($order));
                 throw new Exception($message);
             } else {
                 return $order;
@@ -465,7 +498,7 @@ class PayPalProcessor
 
         } catch (Exception $e) {
             $message = $order['error']['message'] ?? 'An internal server error has occurred Try your request again later.';
-            Log::channel('paypal')->error('Can\'t create transaction: '. json_encode($order));
+            Log::channel('paypal')->error('Can\'t create transaction: ' . json_encode($order));
             throw new Exception($message);
         }
 
@@ -488,10 +521,25 @@ class PayPalProcessor
                     'custom_id' => "booking_" . $booking->id,
                     'invoice_id' => "booking_" . $booking->id,
                     'soft_descriptor' => "*lesson*" . $booking->lesson_id,
+                    'items' => [
+                        [
+                            'name' => "Lesson: " . $booking->lesson->genre->title,
+                            'quantity' => 1,
+                            'unit_amount' => [
+                                "currency_code" => $currency,
+                                "value" => $totalAmount,
+                            ]
+                        ]
+                    ],
                     "amount" => [
                         "currency_code" => $currency,
                         "value" => $totalAmount,
-
+                        "breakdown" => [
+                            "item_total" => [
+                                "currency_code" => $currency,
+                                "value" => $totalAmount,
+                            ]
+                        ]
                     ],
                     'payee' => [
                         'merchant_id' => $subMerchantId
@@ -528,7 +576,7 @@ class PayPalProcessor
 
             if (isset($order['error'])) {
                 $message = $order['error']['message'] ?? 'An internal server error has occurred Try your request again later.';
-                Log::channel('paypal')->error('Can\'t create transaction: ' .  json_encode($order));
+                Log::channel('paypal')->error('Can\'t create transaction: ' . json_encode($order));
                 throw new Exception($message);
             } else {
                 return $order;
@@ -536,7 +584,7 @@ class PayPalProcessor
 
         } catch (Exception $e) {
             $message = $order['error']['message'] ?? 'An internal server error has occurred Try your request again later.';
-            Log::channel('paypal')->error('Can\'t create transaction: '. json_encode($order));
+            Log::channel('paypal')->error('Can\'t create transaction: ' . json_encode($order));
             throw new Exception($message);
         }
 
@@ -618,9 +666,25 @@ class PayPalProcessor
                     'custom_id' => "pRlesson_" . $purchasedLesson->id,
                     'invoice_id' => "pRlesson_" . $purchasedLesson->id,
                     'soft_descriptor' => "*lesson*" . $purchasedLesson->pre_r_lesson_id,
+                    'items' => [
+                        [
+                            'name' => "Lesson: " . $purchasedLesson->preRecordedLesson->title,
+                            'quantity' => 1,
+                            'unit_amount' => [
+                                "currency_code" => $currency,
+                                "value" => $totalAmount,
+                            ]
+                        ]
+                    ],
                     "amount" => [
                         "currency_code" => $currency,
                         "value" => $totalAmount,
+                        "breakdown" => [
+                            "item_total" => [
+                                "currency_code" => $currency,
+                                "value" => $totalAmount,
+                            ]
+                        ]
                     ],
                     'payee' => [
                         'merchant_id' => $subMerchantId
@@ -665,7 +729,7 @@ class PayPalProcessor
 
         } catch (Exception $e) {
             $message = $order['error']['message'] ?? 'An internal server error has occurred Try your request again later.';
-            Log::channel('paypal')->error('Can\'t create transaction: '. json_encode($order));
+            Log::channel('paypal')->error('Can\'t create transaction: ' . json_encode($order));
             throw new Exception($message);
         }
     }
@@ -769,14 +833,14 @@ class PayPalProcessor
                 break;
             case 'paypal':
                 $data['payment_source'] = [
-                                'paypal' => [
-                                    "usage_type" => "PLATFORM",
-                                    "experience_context" => [
-                                        "return_url" => config('app.url') . 'profile/edit',
-                                        "cancel_url" => config('app.url') . 'profile/edit'
-                                    ]
-                                ]
-                            ];
+                    'paypal' => [
+                        "usage_type" => "PLATFORM",
+                        "experience_context" => [
+                            "return_url" => config('app.url') . 'profile/edit',
+                            "cancel_url" => config('app.url') . 'profile/edit'
+                        ]
+                    ]
+                ];
                 break;
             case 'venmo':
                 $data['payment_source'] = [
@@ -793,7 +857,7 @@ class PayPalProcessor
                 throw new Exception("create Payment Setup Token for {$user->id} is fail");
         }
         if ($user->pp_customer_id) {
-            $data['customer'] = [ 'id' => $user->pp_customer_id];
+            $data['customer'] = ['id' => $user->pp_customer_id];
         }
         try {
             $response = $this->payPalClient->createPaymentSetupToken($data);
@@ -814,7 +878,7 @@ class PayPalProcessor
     public function deletePaymentMethod(string $customerId, string $token): bool
     {
         try {
-           $this->payPalClient->deletePaymentSourceToken($token);
+            $this->payPalClient->deletePaymentSourceToken($token);
             return true;
         } catch (Exception $e) {
             Log::channel('paypal')->error("delete Payment method is fail");
@@ -833,7 +897,7 @@ class PayPalProcessor
     {
         try {
             $client = new PayPalClient();
-            if(!$user->pp_customer_id) {
+            if (!$user->pp_customer_id) {
                 $data['payment_source'] = ['card' => (object)[]];
                 $response = $this->payPalClient->createPaymentSetupToken($data);
                 // зберегти pp_customer_id
