@@ -128,20 +128,17 @@ class PayPalProcessor
 
     public function getMerchantDetail($user): array
     {
-
         if ($user->pp_referral_id && !$user->pp_merchant_id) {
             try {
                 $result = $this->payPalClient->showReferralData($user->pp_referral_id);
 
                 if (!isset($result['error'])) {
-
                     $link = [];
                     foreach ($result['links'] as $item) {
                         if ($item['rel'] == "action_url") {
                             $link['actionUrl'] = $item['href'];
                         }
                     }
-
                     return [
                         "actionUrl" => $link['actionUrl'],
                         'status' => self::STATUS_NOT_CONNECTED,
@@ -158,20 +155,31 @@ class PayPalProcessor
         } elseif ($user->pp_merchant_id) {
             try {
                 $result = $this->payPalClient->showReferralStatus($user->pp_merchant_id);
-
                 if (!isset($result['error'])) {
 
-                    if ($result['payments_receivable'] && $result['primary_email_confirmed'] && isset($result['oauth_integrations'])) {
+                    if ( !$result['payments_receivable']) {
                         return [
-                            'status' => self::STATUS_ACTIVE,
+                            'status' => self::STATUS_SUSPENDED,
+                            'reason' => "payments_receivable_false",
                             'merchantId' => $user->pp_merchant_id,
                         ];
-                    } else {
+                    } elseif (! $result['primary_email_confirmed'] ) {
+                        return [
+                            'status' => self::STATUS_SUSPENDED,
+                            'reason' => "primary_email_confirmed_false",
+                            'merchantId' => $user->pp_merchant_id,
+                        ];
+                    } elseif (! isset($result['oauth_integrations'])) {
                         $data = $this->getRegistrationMerchantLink($user);
                         return [
                             'status' => self::STATUS_SUSPENDED,
                             'merchantId' => $user->pp_merchant_id,
                             "actionUrl" => $data['actionUrl'],
+                        ];
+                    } else {
+                        return [
+                            'status' => self::STATUS_ACTIVE,
+                            'merchantId' => $user->pp_merchant_id,
                         ];
                     }
 
@@ -189,6 +197,7 @@ class PayPalProcessor
             $result = [
                 "actionUrl" => $data['actionUrl'],
                 'status' => self::STATUS_NOT_CONNECTED,
+                'reason' => ''
             ];
         }
         return $result;
@@ -198,26 +207,32 @@ class PayPalProcessor
     {
         if (isset($data['merchantId'])) {
             $user = $this->userRepository->where('pp_tracking_id', $data['merchantId'])->first();
+            $this->userRepository->updateUserPpMerchantId($data['merchantIdInPayPal'], $user->id);
 
-            if ($data['permissionsGranted'] == "true" && $data['consentStatus'] == "true" && $data['isEmailConfirmed'] == 'true') {
-                $this->userRepository->updateUserPpData(
-                    [
-                        'merchant_id' => $data['merchantIdInPayPal'],
-                        'account_status' => self::STATUS_ACTIVE
-                    ], $user->id);
-
+            if ( $data['consentStatus'] != "true") {
                 return [
-                    'status' => self::STATUS_ACTIVE,
-                    'merchantId' => $user->pp_merchant_id,
+                    'status' => self::STATUS_SUSPENDED,
+                    'reason' => "payments_receivable_false",
                 ];
-
-            } else {
+            } elseif ( $data['isEmailConfirmed'] != 'true' ) {
+                return [
+                    'status' => self::STATUS_SUSPENDED,
+                    'reason' => "primary_email_confirmed_false",
+                ];
+            } elseif ($data['permissionsGranted'] != "true") {
                 $data = $this->getRegistrationMerchantLink($user);
                 return [
                     'status' => self::STATUS_SUSPENDED,
                     "actionUrl" => $data['actionUrl'],
+                    'reason' => ''
+                ];
+            } else {
+                return [
+                    'status' => self::STATUS_ACTIVE,
+                    'merchantId' => $user->pp_merchant_id,
                 ];
             }
+
         } else {
             return [
                 'status' => self::STATUS_NOT_CONNECTED,

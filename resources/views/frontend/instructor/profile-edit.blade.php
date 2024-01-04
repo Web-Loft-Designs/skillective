@@ -66,6 +66,16 @@
 
                                         @if($ppMerchantAccount['status'] === 'suspended')
                                             <p>Your account is deactivated.</p>
+                                            @if($ppMerchantAccount['reason'] === 'payments_receivable_false')
+                                                <p>Attention: You currently cannot receive payments due to restriction on your PayPal account.
+                                                    Please reach out to PayPal Customer Support or connect to <a href="https://www.paypal.com">PayPal</a> for more information.
+                                                </p>
+                                            @endif
+                                            @if($ppMerchantAccount['reason'] === 'primary_email_confirmed_false')
+                                                <p>Attention: Please confirm your email address on  <a href="https://www.paypal.com/businessprofile/settings">PayPal</a>  in order to receive payments! <br>
+                                                    You currently cannot receive payments.
+                                                </p>
+                                            @endif
                                         @endif
 
                                         @isset($ppMerchantAccount['merchantId'])
