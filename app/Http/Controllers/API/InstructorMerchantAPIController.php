@@ -78,4 +78,12 @@ class InstructorMerchantAPIController extends AppBaseController
 		return $this->sendResponse(true, 'Merchant account updated');
 	}
 
+    public function disablePaypal(Request $request)
+    {
+        $user = $request->user();
+        $user->resetPayPalData();
+
+        return $this->sendResponse(true, 'Merchant account disable');
+    }
+
 }
