@@ -80,6 +80,7 @@
 
                                         @isset($ppMerchantAccount['merchantId'])
                                         <p class="login-box"><b>PayPal Merchant ID:</b> {{$ppMerchantAccount['merchantId']}}</p>
+                                        <drope-integrate-merchant></drope-integrate-merchant>
                                         @endisset
 
                                         @isset($ppMerchantAccount['actionUrl'])
