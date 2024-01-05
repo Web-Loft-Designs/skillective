@@ -2,8 +2,10 @@
 
 @section('content')
 	<?php
-    $paymentMethods ? $methods = $paymentMethods : $methods = (object)[];
 	$loggedUserIsAdmin = ($loggedUserRole==\App\Models\User::ROLE_ADMIN);
+	if(!$loggedUserIsAdmin) {
+	$paymentMethods ? $methods = $paymentMethods : $methods = (object)[];
+	}
 	$pageMeta = $currentPage->getAllMeta();
 	$student_notifications_block_description= isset($pageMeta['student_notifications_block_description']) ? $pageMeta['student_notifications_block_description'] : '';
 	$student_geolocation_block_title= isset($pageMeta['student_geolocation_block_title']) ? $pageMeta['student_geolocation_block_title'] : '';

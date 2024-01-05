@@ -250,6 +250,10 @@ Vue.component(
     require("./components/ProfileNotificationsUpdateForm.vue").default
 );
 Vue.component(
+  "drope-integrate-merchant",
+  require("./components/DropeIntegrateMerchant.vue").default
+)
+Vue.component(
     "profile-password-change",
     require("./components/ProfilePasswordChange.vue").default
 );
