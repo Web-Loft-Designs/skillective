@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\CartAPIController;
 use App\Http\Controllers\API\InstructorBookingsAPIController;
 use App\Http\Controllers\API\InstructorMerchantAPIController;
+use App\Http\Controllers\API\InstructorsAPIController;
 use App\Http\Controllers\API\PreRLessonsAPIController;
 use App\Http\Controllers\API\StudentBookingsAPIController;
 use App\Http\Controllers\API\StudentPaymentMethodsAPIController;
@@ -223,7 +224,7 @@ Route::group(['middleware' => ['role:Student']], function () {
 
 
 Route::get('featured-instructors', 'InstructorsAPIController@getFeaturedInstructors');
-Route::get('relation-instructors/{instructor}', 'InstructorsAPIController@getRelationInstructors'); // get relation instructors
+Route::get('relation-instructors/{instructor}', [InstructorsAPIController::class, 'getRelationInstructors']); // get relation instructors
 
 
 Route::group(['middleware' => ['role:Admin|Instructor']], function () {
