@@ -531,6 +531,15 @@ class User extends Authenticatable implements HasMedia, Transformable
 		$this->save();
 	}
 
+    public function resetPayPalData()
+    {
+        $this->pp_tracking_id = null;
+        $this->pp_merchant_id = null;
+        $this->pp_referral_id = null;
+        $this->pp_account_status = null;
+        $this->save();
+    }
+
     /**
      * @param MerchantAccount $merchantAccountId
      * @return void
@@ -577,7 +586,7 @@ class User extends Authenticatable implements HasMedia, Transformable
 	{
         // TODO перевірка чи може інструктор створити урок
 		return (
-           ($this->pp_merchant_id != null )
+           ($this->pp_merchant_id != null && $this->pp_account_status === "active")
 			&& ($this->hasMedia('website_images') || $this->hasMedia('instagram'))
 			&& ($this->profile->avatar != '' && $this->profile->avatar != null)
         );

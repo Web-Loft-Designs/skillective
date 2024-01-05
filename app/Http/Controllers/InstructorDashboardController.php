@@ -36,10 +36,8 @@ class InstructorDashboardController extends Controller
 			$clients = ['data'=>[]];
 		}
 
-    	$galleryLimit = 4;
         $vars = [
-            'page_title'	=> 'Dashboard',
-			'userMedia'		=> Auth::user()->getGalleryMedia($galleryLimit),
+//			'userMedia'		=> Auth::user()->getGalleryMedia(4),//  disabled
 			'siteGenres'	=> $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
 			'userGenres'	=> $genreRepository->presentResponse(Auth::user()->genres)['data'],
 			'clients'		=> $clients,

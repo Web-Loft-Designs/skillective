@@ -1,7 +1,6 @@
 @extends('layouts.app-frontend')
 
 @section('content')
-
     <?php
     $pageMeta = $currentPage->getAllMeta();
     $invitation_form_title= isset($pageMeta['invitation_form_title']) ? $pageMeta['invitation_form_title'] : '';
@@ -52,8 +51,7 @@
                         :current-user-can-book="{{ $currentUserCanBook?'true':'false' }}"
                         :instructor-id="{{ Auth::user()->id }}"
                         v-bind:user-genres="{{  json_encode($userGenres) }}"
-                        v-bind:site-genres="{{  json_encode($siteGenres) }}"
-                    />
+                        v-bind:site-genres="{{  json_encode($siteGenres) }}"></colendar-add-lesson>
                 </div>
 
                 <div class="col-12">
@@ -63,33 +61,37 @@
                         :logged-in-student="false"
                         :booking-fees-description="'{{ isset($booking_fees_description) ? preg_replace('/\n|\r/', '', addslashes($booking_fees_description)) : '' }}'"
                     ></request-lesson-form>
-                    <instructor-dashboard-bookings-clients :clients="{{ json_encode($clients['data']) }}" :bookings="{{ json_encode($bookings) }}" :bookings-meta="{{ isset($bookings['meta'])?json_encode($bookings['meta']):'[]' }}"></instructor-dashboard-bookings-clients>
+                    <instructor-dashboard-bookings-clients
+                            :clients="{{ json_encode($clients['data']) }}"
+                            :bookings="{{ json_encode($bookings) }}"
+                            :bookings-meta="{{ isset($bookings['meta'])?json_encode($bookings['meta']):'[]' }}">
+                    </instructor-dashboard-bookings-clients>
 
                     <send-notification-form :is-student="false" v-bind:available-notification-methods="{{  json_encode($availableNotificationMethods) }}"></send-notification-form>
                 </div>
 
-<!--              <div class="col-12">
-                    <div class="dashboard-gallery">
-                        <dashboard-media-gallery v-bind:user-media="{{ json_encode($userMedia) }}" v-bind:instagram-media-queue="{{ isset($loadingInstagramProfileImagesInQueue)?'true':'false' }}"></dashboard-media-gallery>
-                        <a href="{{ route('instructor.gallery') }}" class="btn btn-secondary btn-block">View Gallery</a>
-                    </div>
-                </div>
--->
-<!--
-                <div class="col-12">
-                    <div class="invite-block" style="background-image: url('{{asset('images/invide-bg.jpg')}}')">
-                        <div>
-                            @if($invitation_form_title)
-                                <h2>{{ $invitation_form_title }}</h2>
-                            @endif
-                            @if($invitation_form_description)
-                                <p>{{ $invitation_form_description }}</p>
-                            @endif
-                            <client-invitation-form :count-invitations-sent="{{ Auth::user()->studentInvitations()->count() }}" :max-invites-enabled="{{ $settings['max_allowed_student_invites'] }}"></client-invitation-form>
-                        </div>
-                    </div>
-                </div>
--->
+{{--                <div class="col-12">--}}
+{{--                    <div class="dashboard-gallery">--}}
+{{--                        <dashboard-media-gallery v-bind:user-media="{{ json_encode($userMedia) }}" v-bind:instagram-media-queue="{{ isset($loadingInstagramProfileImagesInQueue)?'true':'false' }}"></dashboard-media-gallery>--}}
+{{--                        <a href="{{ route('instructor.gallery') }}" class="btn btn-secondary btn-block">View Gallery</a>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+
+
+{{--                <div class="col-12">--}}
+{{--                    <div class="invite-block" style="background-image: url('{{asset('images/invide-bg.jpg')}}')">--}}
+{{--                        <div>--}}
+{{--                            @if($invitation_form_title)--}}
+{{--                                <h2>{{ $invitation_form_title }}</h2>--}}
+{{--                            @endif--}}
+{{--                            @if($invitation_form_description)--}}
+{{--                                <p>{{ $invitation_form_description }}</p>--}}
+{{--                            @endif--}}
+{{--                            <client-invitation-form :count-invitations-sent="{{ Auth::user()->studentInvitations()->count() }}" :max-invites-enabled="{{ $settings['max_allowed_student_invites'] }}"></client-invitation-form>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+
             </div>
         </div>
     </div>

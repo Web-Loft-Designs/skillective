@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\API\CartAPIController;
 use App\Http\Controllers\API\InstructorBookingsAPIController;
+use App\Http\Controllers\API\InstructorMerchantAPIController;
+use App\Http\Controllers\API\InstructorsAPIController;
 use App\Http\Controllers\API\PreRLessonsAPIController;
 use App\Http\Controllers\API\StudentBookingsAPIController;
 use App\Http\Controllers\API\StudentPaymentMethodsAPIController;
@@ -154,9 +156,10 @@ Route::group(['middleware' => ['role:Instructor']], function () {
 	Route::post('instructor/clients/remove', 'InstructorClientsAPIController@removeMany');
 	Route::delete('instructor/client/{client}', 'InstructorClientsAPIController@remove'); // remove client
 
-	Route::get('instructor/merchant', 'InstructorMerchantAPIController@get'); // current instructor clients
-	Route::post('instructor/merchant', 'InstructorMerchantAPIController@create');
-	Route::put('instructor/merchant', 'InstructorMerchantAPIController@update');
+	Route::get('instructor/merchant', [InstructorMerchantAPIController::class, 'get']);
+	Route::post('instructor/merchant', [InstructorMerchantAPIController::class, 'create']);
+	Route::put('instructor/merchant', [InstructorMerchantAPIController::class,' update']);
+    Route::post('instructor/disable-paypal', [InstructorMerchantAPIController::class, 'disablePaypal']);
 
 	Route::get('students', 'StudentsAPIController@index'); // get students list to add as instructor clients
 
@@ -221,7 +224,7 @@ Route::group(['middleware' => ['role:Student']], function () {
 
 
 Route::get('featured-instructors', 'InstructorsAPIController@getFeaturedInstructors');
-Route::get('relation-instructors/{instructor}', 'InstructorsAPIController@getRelationInstructors'); // get relation instructors
+Route::get('relation-instructors/{instructor}', [InstructorsAPIController::class, 'getRelationInstructors']); // get relation instructors
 
 
 Route::group(['middleware' => ['role:Admin|Instructor']], function () {
