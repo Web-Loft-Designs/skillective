@@ -130,7 +130,9 @@ class PayPalProcessor
     {
         if ($user->pp_referral_id && !$user->pp_merchant_id) {
             try {
-                $result = $this->payPalClient->showReferralData($user->pp_referral_id);
+                $result = $this->payPalClient
+                    ->setRequestHeader('PayPal-Partner-Attribution-Id', $this->getBnCde())
+                    ->showReferralData($user->pp_referral_id);
 
                 if (!isset($result['error'])) {
                     $link = [];
@@ -246,7 +248,9 @@ class PayPalProcessor
         $partnerParams = $this->buildPartnerData($ppTrackingId);
 
         try {
-            $result = $this->payPalClient->createPartnerReferral($partnerParams);
+            $result = $this->payPalClient
+                ->setRequestHeader('PayPal-Partner-Attribution-Id', $this->getBnCde())
+                ->createPartnerReferral($partnerParams);
 
             if (isset($result['error'])) {
                 Log::channel('paypal')->error("createPartnerReferral for {$user->id} is fail", $result['error']['message']);
