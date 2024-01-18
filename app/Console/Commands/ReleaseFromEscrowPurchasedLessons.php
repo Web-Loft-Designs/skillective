@@ -3,10 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Models\PurchasedLesson;
-use \App\Repositories\PurchasedLessonRepository;
+use App\Repositories\PurchasedLessonRepository;
 use Illuminate\Console\Command;
 use App\Facades\BraintreeProcessor;
-use Log;
+use Illuminate\Support\Facades\Log;
+
 
 class ReleaseFromEscrowPurchasedLessons extends Command
 {

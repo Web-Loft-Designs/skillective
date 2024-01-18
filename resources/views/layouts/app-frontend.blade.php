@@ -94,9 +94,8 @@
 
     <div id="page-content-wrapper">
         <div class="container-fluid">
-
-            <div class="clearfix"></div>
             @include('flash::message')
+            <div class="clearfix"> </div>
 
             @include('frontend/partials/merchant-status')
 

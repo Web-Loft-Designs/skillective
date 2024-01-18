@@ -3,7 +3,9 @@
 @section('content')
 	<?php
 	$loggedUserIsAdmin = ($loggedUserRole==\App\Models\User::ROLE_ADMIN);
-
+	if(!$loggedUserIsAdmin) {
+	$paymentMethods ? $methods = $paymentMethods : $methods = (object)[];
+	}
 	$pageMeta = $currentPage->getAllMeta();
 	$student_notifications_block_description= isset($pageMeta['student_notifications_block_description']) ? $pageMeta['student_notifications_block_description'] : '';
 	$student_geolocation_block_title= isset($pageMeta['student_geolocation_block_title']) ? $pageMeta['student_geolocation_block_title'] : '';
@@ -66,11 +68,12 @@
                         </div>
                         @if( !$loggedUserIsAdmin )
                             <div class="form-wrap" id="payment-account-trigger">
-                                <profile-payment-account
-                                        :client-token="'{{ $clientToken }}'"
-                                        :user-payment-methods="{{ json_encode($paymentMethods) }}"
-                                        :payment-environment="'{{ $paymentEnvironment }}'">
-                                </profile-payment-account>
+                                <profile-payment-account-pp
+                                        :client-id="'{{ $clientToken }}'"
+                                        :user-payment-methods="{{ json_encode($methods) }}"
+                                        :data-user-id-token="{{ json_encode($dataUserIdToken) }}"
+                                >
+                                </profile-payment-account-pp>
                             </div>
                         @endif
                          @if( !Auth::user()->hasFakeEmail() )
@@ -101,9 +104,3 @@
         </div>
     </div>
 @endsection
-
-@if( !$loggedUserIsAdmin )
-@section('scripts')
-    @include('frontend.partials.payment-processing-scripts')
-@endsection
-@endif

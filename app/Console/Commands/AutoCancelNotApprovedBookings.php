@@ -3,8 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Booking;
-use App\Models\Lesson;
-use \App\Repositories\BookingRepository;
+use App\Repositories\BookingRepository;
 use Illuminate\Console\Command;
 
 class AutoCancelNotApprovedBookings extends Command
@@ -29,7 +28,7 @@ class AutoCancelNotApprovedBookings extends Command
      * @return void
      */
 
-    private $bookingRepository = null;
+    private BookingRepository $bookingRepository;
 
     public function __construct(BookingRepository $bookingRepository)
     {
@@ -40,9 +39,9 @@ class AutoCancelNotApprovedBookings extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
 		$limit = 50;
 		$this->bookingRepository

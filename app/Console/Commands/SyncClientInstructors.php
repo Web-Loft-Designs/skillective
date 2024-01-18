@@ -2,17 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Booking;
 use App\Models\User;
-use App\Models\Profile;
-use App\Models\Lesson;
-use App\Models\Invitation;
 use \App\Repositories\UserRepository;
 use Illuminate\Console\Command;
 use Faker\Generator as Faker;
 use Illuminate\Http\Request;
-use Notification;
-use Log;
 
 
 class SyncClientInstructors extends Command
@@ -81,7 +75,7 @@ class SyncClientInstructors extends Command
                         $student->instructors()->attach($purchases->instructor);
                     }
                 }
-                
+
                 foreach ($student->bookings as $booking) {
 
                     if ($student->instructors()->where('instructor_id', $booking->instructor_id)->count() == 0) {
@@ -93,7 +87,7 @@ class SyncClientInstructors extends Command
             $r2 = new Request();
 
             foreach ($this->userRepository->getInstructors($r2) as $instructor){
-              
+
                 foreach ($instructor->myPreLessonsPurchases as $purchases2) {
                     if ($instructor->clients()->where('client_id', $purchases2->student_id)->count() == 0) {
                         $instructor->clients()->attach($purchases2->student);

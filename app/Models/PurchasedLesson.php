@@ -29,7 +29,7 @@ class PurchasedLesson extends Model
     /**
      * @return BelongsTo
      */
-    public function preRecordedLesson()
+    public function preRecordedLesson(): BelongsTo
     {
         return $this->belongsTo(PreRecordedLesson::class, 'pre_r_lesson_id');
 	}
@@ -37,7 +37,7 @@ class PurchasedLesson extends Model
     /**
      * @return BelongsTo
      */
-    public function instructor()
+    public function instructor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'instructor_id');
     }
@@ -46,7 +46,7 @@ class PurchasedLesson extends Model
     /**
      * @return BelongsTo
      */
-    public function student()
+    public function student(): BelongsTo
 	{
 		return $this->belongsTo(User::class, 'student_id');
 	}

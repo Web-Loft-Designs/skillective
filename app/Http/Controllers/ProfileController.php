@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\PayPalProcessor;
 use App\Models\Booking;
-use Braintree\MerchantAccount;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -15,6 +16,7 @@ use App\Repositories\UserRepository;
 use App\Repositories\LessonRepository;
 use App\Models\UserGeoLocation;
 use Illuminate\Support\Facades\Auth;
+use Laracasts\Flash\Flash;
 use Prettus\Repository\Exceptions\RepositoryException;
 use Spatie\Permission\Models\Role;
 use App\Facades\BraintreeProcessor;
@@ -22,30 +24,28 @@ use App\Facades\BraintreeProcessor;
 class ProfileController extends Controller
 {
 	/** @var  GenreRepository */
-	private $genreRepository;
+	private GenreRepository $genreRepository;
 
 	/** @var  UserRepository */
-	private $userRepository;
+	private UserRepository $userRepository;
 
 	/** @var  LessonRepository */
-	private $lessonRepository;
+	private LessonRepository $lessonRepository;
 
 	public function __construct(GenreRepository $genreRepo, UserRepository $userRepo, LessonRepository $lessonRepo)
 	{
 		$this->genreRepository	= $genreRepo;
 		$this->userRepository	= $userRepo;
 		$this->lessonRepository	= $lessonRepo;
-
 		parent::__construct();
 	}
 
-
     /**
      * @param User $user
-     * @return Application|Factory|View|never
+     * @return View
      * @throws RepositoryException
      */
-    public function show(User $user)
+    public function show(User $user): View
     {
         if( !$user->id ) {
             $user = Auth::user();
@@ -126,8 +126,9 @@ class ProfileController extends Controller
     /**
      * @param User|null $user
      * @return Application|Factory|View|never
+     * @throws Exception
      */
-    public function edit(User $user = null)
+    public function edit(Request $request, User $user = null)
 	{
 		$isAdmin = false;
 		if (!Auth::user()->hasRole(User::ROLE_ADMIN)){
@@ -160,32 +161,33 @@ class ProfileController extends Controller
 			'page_title'		=> "User Profile",
 			'userProfileData'	=> $userData,
 			'userGeoLocations'	=> $user->geoLocations()->get()->toArray(),
-			'availableLimits' => UserGeoLocation::getAvailableLimits(),
+			'availableLimits'   => UserGeoLocation::getAvailableLimits(),
 			'categorizedGenres' => $this->genreRepository->getCategorizedGenres(),
-			'userMedia'	=> $user->getGalleryMedia(),
-			'siteGenres'	=> $this->genreRepository->presentResponse($this->genreRepository->getSiteGenres())['data'],
-            'userGenres'	=> $this->genreRepository->presentResponse(Auth::user()->genres)['data']
+			'userMedia'	        => $user->getGalleryMedia(),
+			'siteGenres'	    => $this->genreRepository->presentResponse($this->genreRepository->getSiteGenres())['data'],
+            'userGenres'	    => $this->genreRepository->presentResponse(Auth::user()->genres)['data']
 		];
 
-		if ($isInstructor){
-			$savedMerchantAccountDetails = BraintreeProcessor::getMerchantAccountDetails($user);
-			// useful for local site which doesn't receive webhook notifications
-			if ($savedMerchantAccountDetails!=null && $savedMerchantAccountDetails['status']=='active' && $user->bt_submerchant_status=='pending'){
-				$this->userRepository->updateUserSubMerchantStatus( $user->bt_submerchant_id, MerchantAccount::STATUS_ACTIVE );
-			}
-            $savedMerchantAccountDetails['taxId'] = Auth::user()->tax_id;
-            $savedMerchantAccountDetails['legalName'] = Auth::user()->legal_name;
-			$vars['savedMerchantAccountDetails']  = $savedMerchantAccountDetails;
+		if ($isInstructor) {
+            $refererUrl = PayPalProcessor::getEnvironmentUrl();
+             if ($request->hasHeader('referer') &&  $request->header('referer') == $refererUrl) {
+                 //перехват запиту з першого редіректа з пайпалу
+                 $vars['ppMerchantAccount'] = PayPalProcessor::handleRegisterMerchant($request->all());
+              } else {
+                 // отримати статус та деталі інтеграції з paypal
+                 $vars['ppMerchantAccount'] = PayPalProcessor::getMerchantDetail($user);
+             }
 		}
-		if ($isAdmin){
+
+		if ($isAdmin) {
 			$vars['defaultMaxAllowedInstructorInvites']  = Setting::getValue('max_allowed_instructor_invites');
 			$vars['countInstructorInvitationsSent']  = $user->instructorInvitations()->count();
 			$vars['countInstructorInvitationsApplied']  = $user->instructorInvitations()->whereNotNull('invited_user_id')->count();
 		}
-		if (!$isAdmin && !$isInstructor){
-			$vars['clientToken'] = BraintreeProcessor::generateClientToken($user);
-			$vars['paymentMethods'] = BraintreeProcessor::getSavedCustomerPaymentMethods($user);
-			$vars['paymentEnvironment'] = config('services.braintree.environment');
+		if (!$isAdmin && !$isInstructor) {
+            $vars['clientToken'] = PayPalProcessor::getClientId();
+			$vars['paymentMethods'] = PayPalProcessor::getSavedCustomerPaymentMethods($user);
+			$vars['dataUserIdToken'] = PayPalProcessor::getDataUserIdToken($user);
 		}
 
 		return view("frontend.{$template}.profile-edit", $vars);

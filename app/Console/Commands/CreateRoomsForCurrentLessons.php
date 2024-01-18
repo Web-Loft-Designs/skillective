@@ -2,11 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Booking;
-use App\Models\Lesson;
-use \App\Repositories\LessonRepository;
+use App\Repositories\LessonRepository;
 use Illuminate\Console\Command;
-use TwilioVideo;
 
 class CreateRoomsForCurrentLessons extends Command
 {
@@ -25,7 +22,7 @@ class CreateRoomsForCurrentLessons extends Command
      * @return void
      */
 
-    private $lessonRepository = null;
+    private LessonRepository $lessonRepository;
 
     public function __construct(LessonRepository $lessonRepository)
     {

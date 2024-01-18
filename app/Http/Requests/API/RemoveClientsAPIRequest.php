@@ -2,12 +2,10 @@
 
 namespace App\Http\Requests\API;
 
-use App\Models\Lesson;
+use Illuminate\Support\Facades\Auth;
 use InfyOm\Generator\Request\APIRequest;
-use Auth;
 use App\Models\User;
-use App\Models\Genre;
-use Illuminate\Validation\Rule;
+
 
 class RemoveClientsAPIRequest extends APIRequest
 {
@@ -16,7 +14,7 @@ class RemoveClientsAPIRequest extends APIRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
 		return Auth::user()->hasRole(User::ROLE_INSTRUCTOR);
     }
@@ -26,11 +24,11 @@ class RemoveClientsAPIRequest extends APIRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
-        $rules = [
+        return [
 			'clients' => ['required', 'array'],
 		];
-		return $rules;
+
     }
 }

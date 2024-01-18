@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\BookingRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -19,15 +18,13 @@ class InstructorDashboardController extends Controller
 {
 
     /**
-     * @param Request $request
      * @param LessonRepository $lessonRepo
      * @param GenreRepository $genreRepository
      * @param UserRepository $userRepository
-     * @param BookingRepository $bookingRepository
      * @return Application|Factory|View
      * @throws RepositoryException
      */
-    public function index(Request $request, LessonRepository $lessonRepo, GenreRepository $genreRepository, UserRepository $userRepository)
+    public function index( LessonRepository $lessonRepo, GenreRepository $genreRepository, UserRepository $userRepository): View|Factory|Application
     {
 		try{
 			$request = new Request([
@@ -39,15 +36,12 @@ class InstructorDashboardController extends Controller
 			$clients = ['data'=>[]];
 		}
 
-    	$galleryLimit = 4;
         $vars = [
-            'page_title'	=> 'Dashboard',
-			'userMedia'		=> Auth::user()->getGalleryMedia($galleryLimit),
+//			'userMedia'		=> Auth::user()->getGalleryMedia(4),//  disabled
 			'siteGenres'	=> $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
 			'userGenres'	=> $genreRepository->presentResponse(Auth::user()->genres)['data'],
 			'clients'		=> $clients,
 			'bookings'		=> [], //  disabled
-            'tax_id'        => Auth::user()->tax_id
         ];
 
 		$lessonRepo->setPresenter("App\\Presenters\\LessonSinglePresenter");
@@ -61,6 +55,11 @@ class InstructorDashboardController extends Controller
         if ($upcomingLesson && Cookie::get('hiddenUpcomingLessonId')!=$upcomingLesson['id']){
 			$vars['upcomingLesson'] = $lessonRepo->presentResponse($upcomingLesson)['data'];
 		}
+
+        $vars['showReminder'] = false;
+        if (Auth::user()->bt_submerchant_id && !Auth::user()->pp_merchant_id ) {
+            $vars['showReminder'] = true;
+        }
 
         return view('frontend.instructor.dashboard', $vars);
     }

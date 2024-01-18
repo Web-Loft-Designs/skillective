@@ -19,7 +19,7 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param Schedule $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
@@ -35,13 +35,12 @@ class Kernel extends ConsoleKernel
         $schedule->command('bookings:auto_cancel_pending')
             ->everyFiveMinutes()
             ->withoutOverlapping();
-        //release payments for happened lessons from braintree merketplace escrow after 2 hours after lesson started
-        $schedule->command('bookings:release_payments_from_escrow')
+        //release payments for happened lessons from braintree marketplace escrow after 8 hours after lesson started
+        $schedule->command('bookings:release_payments_from_pp_escrow')
             ->hourly()
             ->withoutOverlapping();
-        //release payments for happened lessons from braintree merketplace escrow after 2 hours after lesson started
         $schedule->command('purchased_lessons:release_payments_from_escrow')
-            ->everyFourHours()
+            ->hourly()
             ->withoutOverlapping();
         // close rooms for past lessons
         $schedule->command('past_lessons_rooms:complete')
@@ -66,7 +65,7 @@ class Kernel extends ConsoleKernel
      *
      * @return void
      */
-    protected function commands()
+    protected function commands(): void
     {
         $this->load(__DIR__.'/Commands');
 
