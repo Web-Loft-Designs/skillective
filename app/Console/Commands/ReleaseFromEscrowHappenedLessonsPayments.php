@@ -3,11 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Models\Booking;
-use App\Models\Lesson;
-use \App\Repositories\BookingRepository;
+use App\Repositories\BookingRepository;
 use Illuminate\Console\Command;
 use App\Facades\BraintreeProcessor;
-use Log;
+use Illuminate\Support\Facades\Log;
+
 
 class ReleaseFromEscrowHappenedLessonsPayments extends Command
 {

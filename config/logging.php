@@ -104,6 +104,11 @@ return [
             'driver' => 'errorlog',
             'level' => 'debug',
         ],
+
+        'paypal' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/paypal_' . now()->format("Y-m-d") .'.log'),
+        ],
     ],
 
 ];

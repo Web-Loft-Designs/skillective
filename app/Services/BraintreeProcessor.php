@@ -41,6 +41,8 @@ class BraintreeProcessor
             if($user && $user->braintree_customer_id)
                 $options["customerId"] = $user->braintree_customer_id;
             $token = $this->gateway->clientToken()->generate($options);
+//            dd($options, $token);
+
             return $token;
         } catch(\InvalidArgumentException $e) {
             Log::channel('braintree')->info($e->getMessage());
@@ -252,6 +254,7 @@ class BraintreeProcessor
      */
     public function createPaymentMethod(User $user, $paymentMethodNonce, $deviceData = null)
     {
+
         if(!$user->braintree_customer_id) {
             $user = self::createCustomer($user);
         }
@@ -261,7 +264,9 @@ class BraintreeProcessor
         ];
         if($deviceData)
             $options['deviceData'] = $deviceData;
+
         $result = $this->gateway->paymentMethod()->create($options);
+
         if($result->success == true) {
 
             return ['token' => $result->paymentMethod->token, 'type' => $this->_getPaymentMethodType($result->paymentMethod)];

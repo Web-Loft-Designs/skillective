@@ -361,7 +361,8 @@ class BookingRepository extends BaseRepository
      * @param $limit
      * @return Builder|\Illuminate\Database\Eloquent\Collection
      */
-    public function getTooLongTimePendingBookings($limit = null){
+    public function getTooLongTimePendingBookings($limit = null)
+    {
 
         $timeToApprove = Setting::getValue('time_to_approve_booking', 48);
 
@@ -384,9 +385,10 @@ class BookingRepository extends BaseRepository
      * @param $limit
      * @return Builder|\Illuminate\Database\Eloquent\Collection
      */
-    public function getHappenedLessonsPayedInEscrowBookings($limit = null){
+    public function getHappenedLessonsPayedInEscrowBookings($limit = null)
+    {
 
-        $timePastHappened = 8; // hours
+        $timePastHappened = 1; // hours
         $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
         $escrowStatus = Booking::STATUS_ESCROW;
         $escrowErrorStatus = Booking::STATUS_UNABLE_ESCROW_RELEASE;
@@ -398,8 +400,9 @@ class BookingRepository extends BaseRepository
             ->whereRaw("lessons.start <= DATE_SUB(CONVERT_TZ('$nowOnServer', 'GMT', lessons.timezone_id), INTERVAL $timePastHappened HOUR)")
             ->whereRaw(" ( bookings.status='$escrowStatus' OR bookings.status='$escrowErrorStatus' ) ")
             ->orderBy('bookings.created_at', 'asc');
-        if ($limit)
+        if ($limit) {
             $this->model = $this->model->limit($limit);
+        }
 
         return $this->model->with(['lesson'])->get();
     }
@@ -409,7 +412,8 @@ class BookingRepository extends BaseRepository
      * @param Request $request
      * @return LengthAwarePaginator|Collection|mixed
      */
-    public function getInstructorPayouts($instructorId, Request $request){
+    public function getInstructorPayouts($instructorId, Request $request)
+    {
         $this->resetCriteria();
         $this->resetScope();
 

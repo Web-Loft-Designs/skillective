@@ -6,20 +6,15 @@ use App\Models\Booking;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
-use DB;
-use Auth;
-use Log;
 use Illuminate\Http\Request;
 use App\Repositories\BookingRepository;
 
 class BookingsPaymentsExport implements FromCollection, WithHeadings, ShouldAutoSize, WithEvents, WithMapping
 {
-	private $bookingsRepository		= null;
-    private $request		= null;
+	private BookingRepository $bookingsRepository;
+    private Request $request;
 
     public function __construct(BookingRepository $bookingsRepo, Request $request)
     {

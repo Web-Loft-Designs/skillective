@@ -221,6 +221,10 @@ Vue.component(
     require("./components/LessonBookingForm.vue").default
 );
 Vue.component(
+  "lesson-booking-form-pp",
+  require("./components/LessonBookingFormPp.vue").default
+);
+Vue.component(
     "location-modal",
     require("./components/SearchLessonDetailsModal.vue").default
 );
@@ -246,6 +250,10 @@ Vue.component(
     require("./components/ProfileNotificationsUpdateForm.vue").default
 );
 Vue.component(
+  "drope-integrate-merchant",
+  require("./components/DropeIntegrateMerchant.vue").default
+)
+Vue.component(
     "profile-password-change",
     require("./components/ProfilePasswordChange.vue").default
 );
@@ -253,7 +261,10 @@ Vue.component(
     "profile-payment-account",
     require("./components/ProfilePaymentAccount").default
 );
-
+Vue.component(
+    "profile-payment-account-pp",
+    require("./components/ProfilePaymentAccountPp.vue").default
+);
 Vue.component(
     "braintree-merchant-form",
     require("./components/BraintreeMerchantForm.vue").default

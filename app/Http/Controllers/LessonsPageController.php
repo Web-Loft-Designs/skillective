@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Log;
 
 class LessonsPageController extends Controller
 {
-
     /**
      * @param LessonsFilterRequest $request
      * @param LessonRepository $lessonRepository

@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Facades\PayPalProcessor;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\CartUserInfoRequest;
 use App\Http\Requests\API\CheckoutRequest;
 use App\Models\User;
-use Braintree\MerchantAccount;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\PromoCode;
@@ -20,21 +21,21 @@ use App\Repositories\UserRepository;
 use App\Repositories\CartRepository;
 use App\Facades\UserRegistrator;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
-
 
 
 class CartAPIController extends AppBaseController
 {
 
-    private $cartRepository;
+    private CartRepository $cartRepository;
+    private UserRepository $userRepository;
 
-    public function __construct(cartRepository $cartRepo)
+    public function __construct(CartRepository $cartRepo, UserRepository $userRepository)
     {
         parent::__construct();
         $this->cartRepository = $cartRepo;
+        $this->userRepository = $userRepository;
     }
 
 
@@ -56,11 +57,12 @@ class CartAPIController extends AppBaseController
 
         $this->cartRepository->setPresenter("App\\Presenters\\CartListPresenter");
         $cart = $this->cartRepository->presentResponse($cart);
-        return  $this->sendResponse($cart);
+        return $this->sendResponse($cart);
     }
 
 
     /**
+     * /**
      * @return JsonResponse
      */
     public function isCartHasItems()
@@ -74,9 +76,9 @@ class CartAPIController extends AppBaseController
         $cartItems = $this->cartRepository->getUserCart($student_id, null);
 
         if (is_array($cartItems) && count($cartItems) > 0) {
-            return  $this->sendResponse(true);
+            return $this->sendResponse(true);
         } else {
-            return  $this->sendResponse(false);
+            return $this->sendResponse(false);
         }
     }
 
@@ -87,43 +89,34 @@ class CartAPIController extends AppBaseController
      */
     public function getCartSummary(Request $request)
     {
+
         $student_id = null;
         $guest_cart = $request->query('guest_cart');
         $promo_codes = $request->query('promo_codes');
         $message = null;
 
-        if (Auth::user())
-        {
+        if (Auth::user()) {
             $student_id = Auth::user()->id;
 
         }
 
-        /**
-         * Guest Cart
-         */
         $guestCart = json_decode($guest_cart, true);
-        if( count($guestCart) <> 0 )
-        {
-            if (!Auth::user())
-            {
+        if (count($guestCart) <> 0) {
+            if (!Auth::user()) {
                 Cookie::queue('guest_cart', $guest_cart, 84600);
             }
 
-        }else{
+        } else {
 
-            if( Cookie::has('guest_cart') )
-            {
-
+            if (Cookie::has('guest_cart')) {
                 $guestCart = json_decode(Cookie::get('guest_cart'), true);
                 $ids = Arr::pluck($guestCart, 'lesson_id');
-
                 $cart = Cart::where('is_guest', 0)
-                    ->where('student_id',  Auth::user()->id)
+                    ->where('student_id', Auth::user()->id)
                     ->whereIn('lesson_id', $ids)
                     ->delete();
 
-                if( $cart )
-                {
+                if ($cart) {
                     $message = 'One or more lessons have been removed from your cart because you have already purchased them.';
                 }
 
@@ -134,7 +127,7 @@ class CartAPIController extends AppBaseController
 
         $response = $this->cartRepository->getCartSummary($student_id, $guest_cart, $promo_codes, $message);
 
-        return  $this->sendResponse($response);
+        return $this->sendResponse($response);
     }
 
 
@@ -143,7 +136,7 @@ class CartAPIController extends AppBaseController
      * @param $promo
      * @return JsonResponse
      */
-    public function checkIsPromoIsValid(Request $request, $promo)
+    public function checkIsPromoIsValid(Request $request, $promo): JsonResponse
     {
         $promo = PromoCode::where('name', '=', $promo)->first();
 
@@ -153,49 +146,10 @@ class CartAPIController extends AppBaseController
 
         $nowOnServer = Carbon::now();
 
-        if($nowOnServer->greaterThan($promo->finish)){
+        if ($nowOnServer->greaterThan($promo->finish)) {
             return $this->sendError('Promo Code expiried');
         }
-        return  $this->sendResponse('Promo Code Valid');
-    }
-
-
-    /**
-     * @return string
-     */
-    private function _checkForLessonAvailability()
-    {
-//         if ( $lesson->getCountFreeSpots()==0 ){
-//         	return 'No free spots left';
-//         }
-//         if ($lesson->private_for_student_id && $lesson->private_for_student_id!=Auth::id()){
-//             return 'You can\'t book this Private Lesson';
-//         }
-//         if ( $lesson->is_cancelled ){
-//         	return 'Lesson cancelled';
-//         }
-//         if ($lesson->alreadyStarted()){
-//         	return 'Lesson already started. Booking disabled.';
-//         }
-//
-//         if (!currentUserCanBook()) {
-//             return 'You have no permissions to book lessons';
-//         }
-//
-//         if (!$lesson->isBookableNowByCurrentUser()){
-//         	return 'Lesson can\'t be booked';
-//         }
-//
-//         if (config('app.env')=='prod'
-//         	&& (
-//         		$lesson->instructor->bt_submerchant_id==null
-//         		|| $lesson->instructor->bt_submerchant_status!=MerchantAccount::STATUS_ACTIVE
-//         		|| $lesson->instructor->status != User::STATUS_ACTIVE
-//         	)
-//         ){
-//         		return 'Instructor not active or doesn\'t have a merchant account';
-//         }
-        return '';
+        return $this->sendResponse('Promo Code Valid');
     }
 
 
@@ -203,31 +157,24 @@ class CartAPIController extends AppBaseController
      * @param Request $request
      * @param UserRepository $user_repository
      * @return JsonResponse
-     * @throws \Exception
+     * @throws Exception
+     * оплата через карту
      */
-    public function checkout(Request $request, UserRepository $user_repository)
+    public function checkout(Request $request, UserRepository $user_repository): JsonResponse
     {
         $student = null;
 
-        $guest_cart = $request->input('guest_cart');
         $promos = $request->input('promo_codes', []);
-
+        $nonce = $request->input('payment_method_nonce');
         $cart = [];
 
-        if (Auth::user() == null) {
-            $input = $request->except(['payment_method_token', 'payment_method_nonce']);
-            $srr = new CheckoutRequest($input);
-            $student = UserRegistrator::registerInactiveStudent($srr);
-            $cart = $this->cartRepository->getUserCart(null, json_encode($guest_cart));
-        } else {
-            $student = Auth::user();
-            $cart = $this->cartRepository->getUserCart($student->id, null);
-        }
-
+        // отрмання даних з корзини
+        $student = Auth::user();
+        $cart = $this->cartRepository->getUserCart($student->id, null);
 
         $promo_codes = [];
 
-        foreach($promos as $key => $promo){
+        foreach ($promos as $key => $promo) {
             $promo = PromoCode::where('name', '=', $promo)->first();
 
             if (empty($promo)) {
@@ -237,9 +184,7 @@ class CartAPIController extends AppBaseController
             $promo_codes[$promo->id] = $promo;
         }
 
-        $cartCount = count($cart);
 
-        $nonce = $request->input('payment_method_nonce');
         $appendedGenres = array();
 
         $discounts = [];
@@ -257,7 +202,9 @@ class CartAPIController extends AppBaseController
 
         $cartCount = count($cart);
 
+        //  початок побудови платежа для кожної позицїї в корзині
         foreach ($cart as $key => $cartItem) {
+
             if ($cartItem->lesson_id && !$cartItem->pre_r_lesson_id) {
                 array_push($appendedGenres, $cartItem->lesson->genre_id);
 
@@ -283,19 +230,20 @@ class CartAPIController extends AppBaseController
                         if ($promo->discount_type == 'fixed-amount') {
                             $discountAmount = $promo->discount / $cartCount;
                             $lesson->spot_price -= $discountAmount;
-                        } else if ( isset($discount->discount_type) && $discount->discount_type == 'percent') {
+                        } else if (isset($discount->discount_type) && $discount->discount_type == 'percent') {
                             $discountAmount = $promo->discount / 100 * $lesson->spot_price;
                             $lesson->spot_price -= $discountAmount;
                         }
                     }
                 }
 
-
-
                 /**
                  * Approve Booking
+                 * процес створення транзакції
                  */
-                $lesson->book($user_repository, $request, $nonce ? $nonce[$key] : "", $student)->approve();
+
+                $booking = $lesson->bookPp($user_repository, $request, $nonce ?? "", $student);
+                $booking->approvePp();
 
             } else {
                 array_push($appendedGenres, $cartItem->preRecordedLesson->genre_id);
@@ -303,35 +251,36 @@ class CartAPIController extends AppBaseController
                 $preRLesson = new PreRecordedLesson(json_decode(json_encode($cartItem->preRecordedLesson), true));
                 $request->request->add(['pre_r_lesson_id' => $cartItem->preRecordedLesson->id]);
 
-
-
-                foreach($discounts as $discountKey => $discount){
-                    if($discount->lesson_type == "all" || $discount->lesson_type == 'pre-recorded'){
-                        if($discount->discount_type == 'fixed-amount'){
+                foreach ($discounts as $discountKey => $discount) {
+                    if ($discount->lesson_type == "all" || $discount->lesson_type == 'pre-recorded') {
+                        if ($discount->discount_type == 'fixed-amount') {
                             $discountAmount = $discount->discount / $cartCount;
                             $preRLesson->price -= $discountAmount;
-                        }
-                        else if($discount->discount_type == 'percent'){
+                        } else if ($discount->discount_type == 'percent') {
                             $discountAmount = $discount->discount / 100 * $preRLesson->price;
                             $preRLesson->price -= $discountAmount;
                         }
                     }
                 }
 
-                foreach($promo_codes as $discountKey => $promo){
-                    if($promo->lesson_type == "all" || $promo->lesson_type == 'pre-recorded'){
-                        if($promo->discount_type == 'fixed-amount'){
+                foreach ($promo_codes as $discountKey => $promo) {
+                    if ($promo->lesson_type == "all" || $promo->lesson_type == 'pre-recorded') {
+                        if ($promo->discount_type == 'fixed-amount') {
                             $discountAmount = $promo->discount / $cartCount;
                             $preRLesson->price -= $discountAmount;
-                        }
-                        else if($promo->discount_type == 'percent'){
+                        } else if ($promo->discount_type == 'percent') {
                             $discountAmount = $promo->discount / 100 * $preRLesson->price;
                             $preRLesson->price -= $discountAmount;
                         }
                     }
                 }
 
-                $preRLesson->purchareLesson($user_repository, $request, $nonce ? $nonce[$key] : "", $student);
+                /**
+                 * Approve Booking
+                 * просес створення транзакції preRLesson
+                 */
+
+                $preRLesson->purchaseLessonPp($user_repository, $request, $nonce ?? "", $student);
             }
 
             if (Auth::user() != null) {
@@ -347,21 +296,267 @@ class CartAPIController extends AppBaseController
         return $this->sendResponse(true);
     }
 
+    public function createOrder(Request $request, UserRepository $userRepository)
+    {
+        if (!Auth::check()) {
+            return $this->sendError('User data is not valid', 403);
+        }
+
+        $student = $request->user();
+        $cart = $this->cartRepository->getUserCart($student->id, null);
+
+        $promoCodes = [];
+        $request->whenFilled('promo_codes', function (array $input) use(&$promoCodes) {
+            foreach ($input as $key => $promo) {
+                $promo = PromoCode::where('name', '=', $promo)->first();
+
+                if (empty($promo)) {
+                    continue;
+                }
+                $promoCodes[$promo->id] = $promo;
+            }
+        });
+
+        $discounts = [];
+        foreach ($cart as $key => $cartItem) {
+            if ($cartItem->discounts) {
+                foreach ($cartItem->discounts as $discountKey => $discount) {
+                    if ($discount->isActivate) {
+                        $discounts[$discount->id] = $discount;
+                    }
+                }
+            }
+        }
+
+        $productItems = [];
+        foreach ($cart as $key => $cartItem) {
+            if ($cartItem->lesson_id && !$cartItem->pre_r_lesson_id) {
+                $lesson = $cartItem->lesson;
+                foreach ($discounts as $discountKey => $discount) {
+                    if ($discount->lesson_type == "all" || $discount->lesson_type == 'virtual' && $lesson->lesson_type == 'virtual' || $discount->lesson_type == 'in-person' && $lesson->lesson_type == 'in_person') {
+                        if ($discount->discount_type == 'fixed-amount') {
+                            $discountAmount = $discount->discount / count($cart);
+                            $lesson->spot_price -= $discountAmount;
+                        } else if ($discount->discount_type == 'percent') {
+                            $discountAmount = $discount->discount / 100 * $lesson->spot_price;
+                            $lesson->spot_price -= $discountAmount;
+                        }
+                    }
+                }
+                foreach ($promoCodes as $discountKey => $promo) {
+                    if ($promo->lesson_type == "all" || $promo->lesson_type == 'virtual' && $lesson->lesson_type == 'virtual' || $promo->lesson_type == 'in-person' && $lesson->lesson_type == 'in_person') {
+                        if ($promo->discount_type == 'fixed-amount') {
+                            $discountAmount = $promo->discount / count($cart);
+                            $lesson->spot_price -= $discountAmount;
+                        } else if (isset($discount->discount_type) && $discount->discount_type == 'percent') {
+                            $discountAmount = $promo->discount / 100 * $lesson->spot_price;
+                            $lesson->spot_price -= $discountAmount;
+                        }
+                    }
+                }
+                $productItems[] = $lesson;
+
+            } else {
+                $preRLesson = $cartItem->preRecordedLesson;
+                foreach ($discounts as $discountKey => $discount) {
+                    if ($discount->lesson_type == "all" || $discount->lesson_type == 'pre-recorded') {
+                        if ($discount->discount_type == 'fixed-amount') {
+                            $discountAmount = $discount->discount / count($cart);
+                            $preRLesson->price -= $discountAmount;
+                        } else if ($discount->discount_type == 'percent') {
+                            $discountAmount = $discount->discount / 100 * $preRLesson->price;
+                            $preRLesson->price -= $discountAmount;
+                        }
+                    }
+                }
+                foreach ($promoCodes as $discountKey => $promo) {
+                    if ($promo->lesson_type == "all" || $promo->lesson_type == 'pre-recorded') {
+                        if ($promo->discount_type == 'fixed-amount') {
+                            $discountAmount = $promo->discount / count($cart);
+                            $preRLesson->price -= $discountAmount;
+                        } else if ($promo->discount_type == 'percent') {
+                            $discountAmount = $promo->discount / 100 * $preRLesson->price;
+                            $preRLesson->price -= $discountAmount;
+                        }
+                    }
+                }
+                $productItems[] = $preRLesson;
+            }
+            $cartItem->delete();
+        }
+
+        $bookings = $this->buildBook($productItems, $student, $userRepository);
+
+       if ($this->validationLessonBook($bookings)) {
+           $order = PayPalProcessor::createOrder($bookings);
+       }
+       foreach ($bookings as $booking) {
+           $booking->transaction_id = $order['id'];
+           $booking->transaction_status = $order['status'];
+           $booking->setStatusAttribute(Booking::STATUS_PENDING);
+           $booking->save();
+       }
+
+        return response()->json([ 'orderId' => $order['id']]);
+
+    }
+
+    private function buildBook( array $productItems, User $student, UserRepository $userRepository): array
+    {
+        $bookings = [];
+        $appendedGenres = [];
+        foreach ($productItems as $lesson) {
+          if (get_class($lesson) === Lesson::class) {
+                array_push($appendedGenres, $lesson->genre_id);
+                $booking = new Booking();
+                $booking->lesson_id             = $lesson->id;
+                $booking->spot_price		    = $lesson->spot_price;
+                $booking->instructor_id		    = $lesson->instructor_id;
+                $booking->student_id		    = $student->id;
+                $booking->status			    = Booking::STATUS_PENDING;
+                $service_fee                    = $booking->getBookingServiceFeeAmount($lesson->spot_price);
+                $virtual_fee                    = $booking->getBookingVirtualFeeAmount($lesson);
+                $booking->service_fee           = $service_fee;
+                $booking->virtual_fee           = $virtual_fee;
+                $booking->processor_fee		    = $booking->getBookingPaymentProcessingFeeAmount($lesson->spot_price, $service_fee + $virtual_fee);
+                $booking->save();
+
+              if ($lesson->instructor->clients()->where('client_id', $student->id)->count() == 0) {
+                  $lesson->instructor->clients()->attach($student);
+              }
+              if ($student->instructors()->where('instructor_id', $lesson->instructor_id)->count() == 0) {
+                  $student->instructors()->attach($lesson->instructor);
+              }
+
+              $bookings[] = $booking;
+          } elseif (get_class($lesson) === PreRecordedLesson::class)  {
+              array_push($appendedGenres, $lesson->genre_id);
+              $purchasedLesson = new PurchasedLesson();
+              $purchasedLesson->pre_r_lesson_id         = $lesson->id;
+              $purchasedLesson->student_id              = $student->id;
+              $purchasedLesson->instructor_id           = $lesson->instructor_id;
+              $purchasedLesson->price                   = $lesson->price;
+              $purchasedLesson->status                  = PurchasedLesson::STATUS_PENDING;
+              $service_fee                              = $lesson->getPreRecordedLessonServiceFeeAmount($lesson->price);
+              $purchasedLesson->service_fee             = $service_fee;
+              $purchasedLesson->processor_fee           = $lesson->getPreRecordedLessonPaymentProcessingFeeAmount($lesson->price, $service_fee);
+              $purchasedLesson->save();
+
+              $bookings[] = $purchasedLesson;
+
+          } else {
+              throw new Exception('Error unknown class name');
+          }
+            $userRepository->appendGenres($student->id, $appendedGenres);
+        }
+        return $bookings;
+    }
+
+    protected function validationLessonBook($bookings): bool
+    {
+        foreach ($bookings as $booking) {
+            if ($booking->transaction_id) {
+                throw new Exception('Booking #' . $booking->id . ' can\'t be approved: ' . "Payment already sent", 403);
+            }
+            if ($booking->instructor->pp_merchant_id == null) {
+                throw new Exception('Booking #' . $booking->id . ' can\'t be approved: ' . "No merchant account provided. Please check Profile settings", 403);
+            }
+            if ($booking->instructor->pp_account_status != \App\Services\PayPalProcessor::STATUS_ACTIVE) {
+                throw new Exception('Booking #' . $booking->id . ' can\'t be approved: ' . "Merchant account not active", 403);
+            }
+            if (get_class($booking) === Booking::class && $booking->lesson->alreadyStarted()) {
+                throw new Exception('Booking #' . $booking->id . ' can\'t be approved: ' . "Lesson already started", 403);
+            }
+            if (get_class($booking) === Booking::class && $booking->lesson->is_cancelled) {
+                throw new Exception('Booking #' . $booking->id . ' can\'t be approved: ' . "Lesson already cancelled", 403);
+            }
+            if (get_class($booking) === Booking::class && $booking->status != $booking::STATUS_PENDING) {
+                throw new Exception('Booking #' . $booking->id . ' can\'t be approved: ' . "It is not a pending booking", 403);
+            }
+        }
+        return true;
+    }
+
+    public function captureOrder(Request $request)
+    {
+       $data = $request->validate([
+            'orderId' => 'required|string',
+        ]);
+
+        $booking = Booking::where('transaction_id', $data['orderId'])->get();
+        $purchasedLesson = PurchasedLesson::where('transaction_id', $data['orderId'])->get();
+
+        if(!$booking && !$purchasedLesson) {
+            return $this->sendError("unknown order cannot be processed", 422);
+        }
+
+        $order = PayPalProcessor::captureOrder($data['orderId']);
+        if (  ! $request->user()->findPaymentMethod()->count() ) {
+            $this->userRepository->savePaymentMethod( $request->user(),  $order['payment_source']['paypal']['attributes']['vault']['id'],  array_key_first($order['payment_source']) );
+        }
+
+       foreach ($order['purchase_units'] as $unit ) {
+
+           $parts = explode('_', $unit['reference_id']);
+           $type = $parts[0]; // booking або pRlesson
+           $id = $parts[1];
+
+           if ($type === 'booking') {
+
+               $model = Booking::find($id);
+               $model->payment_method_type   =  array_key_first($order['payment_source']);
+               $model->payment_method_token  =  $order['payment_source']['paypal']['attributes']['vault']['id'];
+               $model->status			     = Booking::STATUS_ESCROW;
+               $model->pp_reference_id       = $unit['payments']['captures'][0]['id'];
+               $model->transaction_status    = $unit['payments']['captures'][0]['status'];
+               $model->transaction_created_at =  now();
+               $model->pp_processor_fee      = $unit['payments']['captures'][0]['seller_receivable_breakdown']['paypal_fee']['value'];
+               $model->save();
+
+           } elseif ($type === 'pRlesson') {
+
+               $model = PurchasedLesson::find($id);
+               $model->payment_method_type   =  array_key_first($order['payment_source']);
+               $model->payment_method_token  =  $order['payment_source']['paypal']['attributes']['vault']['id'];
+               $model->status			     = Booking::STATUS_ESCROW;
+               $model->pp_reference_id       = $unit['payments']['captures'][0]['id'];
+               $model->transaction_status    = $unit['payments']['captures'][0]['status'];
+               $model->transaction_created_at =  now();
+               $model->pp_processor_fee      = $unit['payments']['captures'][0]['seller_receivable_breakdown']['paypal_fee']['value'];
+
+               $model->save();
+
+           } else {
+               return $this->sendError("unknown order cannot be processed", 422);
+           }
+
+       }
+
+        return $this->sendResponse(false, 'the transaction is complete');
+
+    }
+
 
     /**
      * @param CartUserInfoRequest $request
      * @return JsonResponse
+     * Перевіряємо дані користувача який купує
      */
-    public function validateUserData(CartUserInfoRequest $request)
+    public function validateUserData(CartUserInfoRequest $request): JsonResponse
     {
-        if (($error = $this->_checkForLessonAvailability()) != '') {
-            return $this->sendError($error, 400);
+        if (Auth::check()) {
+            return $this->sendResponse(false, 'User data valid');
         }
+        $student = UserRegistrator::registerInactiveStudent($request);
+        Auth::login($student);
 
-        $settingsModel = App::make('App\Models\Setting');
-        $settingsModel->incrementValue('report_count_payment_form_views');
+        if (Auth::check()) {
+            $this->cartRepository->storeGuestCart($request);
 
-        return $this->sendResponse(false, 'User data valid');
+            return $this->sendResponse(false, 'User data valid');
+        } else {
+            return $this->sendError("the request cannot be processed", 403);
+        }
     }
 
     /**
@@ -379,7 +574,7 @@ class CartAPIController extends AppBaseController
                 return $this->sendError('Product already in cart', 400);
             }
 
-            $lessonAlreadyPurchased = PurchasedLesson::where('pre_r_lesson_id',  $request->input('lesson_id'))->where('student_id', Auth::user()->id)->first();
+            $lessonAlreadyPurchased = PurchasedLesson::where('pre_r_lesson_id', $request->input('lesson_id'))->where('student_id', Auth::user()->id)->first();
 
 
             if ($lessonAlreadyPurchased) {
@@ -392,7 +587,7 @@ class CartAPIController extends AppBaseController
             $data['student_id'] = Auth::user()->id;
             $data['pre_r_lesson_id'] = $request->input('lesson_id');
 
-            $lesson = PreRecordedLesson::where('id',  $request->input('lesson_id'))->first();
+            $lesson = PreRecordedLesson::where('id', $request->input('lesson_id'))->first();
 
             $data['instructor_id'] = $lesson->instructor_id;
             $data['description'] = $request->input('description');
@@ -412,7 +607,7 @@ class CartAPIController extends AppBaseController
             $data['student_id'] = Auth::user()->id;
             $data['lesson_id'] = $request->input('lesson_id');
 
-            $lesson = Lesson::where('id',  $request->input('lesson_id'))->first();
+            $lesson = Lesson::where('id', $request->input('lesson_id'))->first();
 
             if ($lesson->getCountFreeSpots() == 0) {
                 return $this->sendError('No free spots left', 400);
@@ -434,7 +629,7 @@ class CartAPIController extends AppBaseController
 
             $result = Cart::create($data);
 
-            return  $this->sendResponse($result);
+            return $this->sendResponse($result);
         }
     }
 
@@ -454,6 +649,8 @@ class CartAPIController extends AppBaseController
 
         $deletedCartItem = $cartItem->delete();
 
-        return  $this->sendResponse($deletedCartItem);
+        return $this->sendResponse($deletedCartItem);
     }
+
+
 }

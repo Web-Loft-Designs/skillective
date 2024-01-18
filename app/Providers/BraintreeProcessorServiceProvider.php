@@ -8,10 +8,10 @@ class BraintreeProcessorServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-
+        //
     }
 
-    public function register()
+    public function register(): void
     {
         $this->app->bind('BraintreeProcessor', \App\Services\BraintreeProcessor::class);
         parent::register();
