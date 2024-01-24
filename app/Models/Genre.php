@@ -18,7 +18,7 @@ use Prettus\Repository\Contracts\Transformable;
  * @package App\Models
  * @version July 22, 2019, 12:41 pm UTC
  *
- * @property \Illuminate\Database\Eloquent\Collection 
+ * @property \Illuminate\Database\Eloquent\Collection
  * @property \Illuminate\Database\Eloquent\Collection users
  * @property string title
  * @property string image
@@ -29,7 +29,7 @@ class Genre extends Model implements Transformable
     use SoftDeletes;
 
     public $table = 'genres';
-    
+
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
@@ -117,8 +117,7 @@ class Genre extends Model implements Transformable
     /**
      * @return string
      */
-    public function getImageUrl(){
-// TODO test 'https://skillective.com'
+    public function getImageUrl() {
         if(config('app.env') == 'local') {
             if($this->image)
                 return '/storage/' . self::IMAGES_PATH . $this->image;

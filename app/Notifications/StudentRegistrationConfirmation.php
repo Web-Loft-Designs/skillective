@@ -10,7 +10,7 @@ class StudentRegistrationConfirmation extends AbstractCustomNotification
     public function variables()
     {
         return [
-            'get_started_url'  => config('app.url') . 'student/dashboard',
+            'get_started_url'  => config('app.url') . '/student/dashboard',
         ];
     }
 
