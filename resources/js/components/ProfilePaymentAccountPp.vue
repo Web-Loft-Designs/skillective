@@ -151,7 +151,6 @@ export default {
       try {
         this.paypal = await loadScript({
           clientId: this.clientId,
-          buyerCountry: 'US',  // удалити при запуску на продакшені !!!!!!!
           locale: 'en_US',
           components: ['buttons', 'card-fields'],
           disableFunding: ['paylater'],
