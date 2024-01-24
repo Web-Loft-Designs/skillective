@@ -63,7 +63,7 @@ class PayPalProcessor
      */
     public function getClientId(): string
     {
-        if (config('paypal.mod') == 'live') {
+        if (config('paypal.mode') == 'live') {
             $string = config('paypal.live.client_id');
         } else {
             $string = config('paypal.sandbox.client_id');
@@ -76,7 +76,7 @@ class PayPalProcessor
      */
     public function getEnvironmentUrl(): string
     {
-        if (config('paypal.mod') == 'live') {
+        if (config('paypal.mode') == 'live') {
             return 'https://www.paypal.com/';
         } else {
             return 'https://www.sandbox.paypal.com/';
@@ -85,7 +85,7 @@ class PayPalProcessor
 
     public function getBnCde(): string
     {
-        if (config('paypal.mod') == 'live') {
+        if (config('paypal.mode') == 'live') {
             return config('paypal.live.bn_code');
         } else {
             return config('paypal.sandbox.bn_code');

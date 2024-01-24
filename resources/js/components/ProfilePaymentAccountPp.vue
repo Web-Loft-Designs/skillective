@@ -1,5 +1,4 @@
-<script src='../../../../../../../../Стільниця/example_js_sdk.js'>
-</script>
+
 <template>
   <div id='password-payment-account'>
     <form id='payment-method-form'>
