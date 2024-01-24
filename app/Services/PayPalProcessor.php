@@ -334,9 +334,9 @@ class PayPalProcessor
             ],
             "partner_config_override" => [
                 "partner_logo_url" => asset('uploads/favicon.png'),
-                "return_url" => config('app.url') . 'profile/edit',
+                "return_url" => config('app.url') . '/profile/edit',
                 "return_url_description" => "return to the profile .",
-                "action_renewal_url" => config('app.url') . 'profile/edit',
+                "action_renewal_url" => config('app.url') . '/profile/edit',
                 "show_add_credit_card" => true
             ]
         ];
@@ -855,8 +855,8 @@ class PayPalProcessor
                     'paypal' => [
                         "usage_type" => "PLATFORM",
                         "experience_context" => [
-                            "return_url" => config('app.url') . 'profile/edit',
-                            "cancel_url" => config('app.url') . 'profile/edit'
+                            "return_url" => config('app.url') . '/profile/edit',
+                            "cancel_url" => config('app.url') . '/profile/edit'
                         ]
                     ]
                 ];
@@ -866,8 +866,8 @@ class PayPalProcessor
                     'venmo' => [
                         "usage_type" => "PLATFORM",
                         "experience_context" => [
-                            "return_url" => config('app.url') . 'profile/edit',
-                            "cancel_url" => config('app.url') . 'profile/edit'
+                            "return_url" => config('app.url') . '/profile/edit',
+                            "cancel_url" => config('app.url') . '/profile/edit'
                         ]
                     ]
                 ];
