@@ -430,7 +430,6 @@ export default {
         this.paypal = await loadScript({
           clientId: this.clientId,
           merchantId: this.merchantIds,
-          buyerCountry: 'US',
           locale: 'en_US',
           components: ['buttons', 'card-fields'],
           currency: 'USD',
