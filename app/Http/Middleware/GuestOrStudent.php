@@ -3,8 +3,8 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Auth;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class GuestOrStudent
 {

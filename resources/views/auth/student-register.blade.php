@@ -4,24 +4,26 @@
 
 	<?php
 	$pageMeta = (isset($currentPage) && $currentPage instanceof App\Models\Page) ? $currentPage->getAllMeta() : [];
-
 	$_image_form_block_bg= isset($pageMeta['_image_form_block_bg']) ? $pageMeta['_image_form_block_bg'] : '';
 	$form_block_welcome= isset($pageMeta['form_block_welcome']) ? $pageMeta['form_block_welcome'] : '';
 	$form_block_text= isset($pageMeta['form_block_text']) ? $pageMeta['form_block_text'] : '';
 	$form_block_benefits = isset($pageMeta['form_benefits']) ? $pageMeta['form_benefits'] : '';
-
 	$_image_testimonial_block_bg= isset($pageMeta['_image_testimonial_block_bg']) ? $pageMeta['_image_testimonial_block_bg'] : '';
 	$testimonial_block_name= isset($pageMeta['testimonial_block_name']) ? $pageMeta['testimonial_block_name'] : '';
 	$testimonial_block_position= isset($pageMeta['testimonial_block_position']) ? $pageMeta['testimonial_block_position'] : '';
 	$testimonial_block_text= isset($pageMeta['testimonial_block_text']) ? $pageMeta['testimonial_block_text'] : '';
-
-	$benefits               = isset($pageMeta['benefits']) ? $pageMeta['benefits'] : [];
+	$benefits = isset($pageMeta['benefits']) ? $pageMeta['benefits'] : [];
 	?>
-
         <section class="register-banner register-banner-v2" @if($_image_form_block_bg) style="background-image: url({{ asset($_image_form_block_bg) }});" @endif>
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-12">
+
+                        <div class="d-flex justify-content-between" >
+                            <h3>Become a client on Skillective to join our SkillSquad community! </h3>
+                            <div style="max-width: 100px; width: 100%; margin-left: 16px;"><img style="width: 100%; border-radius: 12px;" src="{{ asset("images/become_client.jpeg") }}" ></div>
+                        </div>
+
                         @if($form_block_welcome)
                             <h1 class="page-title">{{ $form_block_welcome }}</h1>
                         @endif
@@ -111,7 +113,6 @@
             </div>
         </section>
 @endif
-
     @if($testimonial_block_text)
         <section class="single-testimonial single-testimonial-inverse" @if($_image_testimonial_block_bg) style="background-image: url({{ asset($_image_testimonial_block_bg) }});" @endif>
             <div class="container">
@@ -131,5 +132,4 @@
             </div>
         </section>
     @endif
-
 @endsection
