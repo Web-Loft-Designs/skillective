@@ -177,6 +177,7 @@ class PayPalProcessor
                             'status' => self::STATUS_SUSPENDED,
                             'merchantId' => $user->pp_merchant_id,
                             "actionUrl" => $data['actionUrl'],
+                            'reason' => "payments_receivable_false",
                         ];
                     } else {
                         return [
@@ -207,11 +208,12 @@ class PayPalProcessor
 
     public function handleRegisterMerchant($data): array
     {
+
         if (isset($data['merchantId'])) {
             $user = $this->userRepository->where('pp_tracking_id', $data['merchantId'])->first();
             $this->userRepository->updateUserPpMerchantId($data['merchantIdInPayPal'], $user->id);
 
-            if ( $data['consentStatus'] != "true") {
+            if ( isset($data['consentStatus']) && $data['consentStatus'] != "true") {
                 return [
                     'status' => self::STATUS_SUSPENDED,
                     'reason' => "payments_receivable_false",
@@ -221,12 +223,12 @@ class PayPalProcessor
                     'status' => self::STATUS_SUSPENDED,
                     'reason' => "primary_email_confirmed_false",
                 ];
-            } elseif ($data['permissionsGranted'] != "true") {
+            } elseif ( isset($data['consentStatus']) && $data['permissionsGranted'] != "true") {
                 $data = $this->getRegistrationMerchantLink($user);
                 return [
                     'status' => self::STATUS_SUSPENDED,
                     "actionUrl" => $data['actionUrl'],
-                    'reason' => ''
+                    'reason' => "payments_receivable_false",
                 ];
             } else {
                 return [
