@@ -170,6 +170,7 @@ class ProfileController extends Controller
 
 		if ($isInstructor) {
             $refererUrl = PayPalProcessor::getEnvironmentUrl();
+
              if ($request->hasHeader('referer') &&  $request->header('referer') == $refererUrl) {
                  //перехват запиту з першого редіректа з пайпалу
                  $vars['ppMerchantAccount'] = PayPalProcessor::handleRegisterMerchant($request->all());
