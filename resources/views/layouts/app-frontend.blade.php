@@ -111,7 +111,8 @@
                     @endif
 
                     @if ( (Auth::user() && $loggedUserRole == \App\Models\User::ROLE_INSTRUCTOR && \Request::is('instructor/*'))
-                            || (Auth::user() && $loggedUserRole == \App\Models\User::ROLE_INSTRUCTOR  && \Request::is('profile')))
+                        || (Auth::user() && $loggedUserRole == \App\Models\User::ROLE_INSTRUCTOR  && \Request::is('profile'))
+                        || (Auth::user() && $loggedUserRole == \App\Models\User::ROLE_INSTRUCTOR  && \Request::is('profile/edit')))
 
 
                         <profile-lesson-form v-bind:user-genres="{{ json_encode($userGenres) }}"
