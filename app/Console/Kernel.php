@@ -35,11 +35,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('bookings:auto_cancel_pending')
             ->everyFiveMinutes()
             ->withoutOverlapping();
-        //release payments for happened lessons from braintree marketplace escrow after 8 hours after lesson started
+        //release payments for happened lessons from paypal marketplace escrow after 8 hours after lesson started
         $schedule->command('bookings:release_payments_from_pp_escrow')
             ->hourly()
             ->withoutOverlapping();
-        $schedule->command('purchased_lessons:release_payments_from_escrow')
+        $schedule->command('purchased_lessons:pp_release_payments_from_escrow')
             ->hourly()
             ->withoutOverlapping();
         // close rooms for past lessons
