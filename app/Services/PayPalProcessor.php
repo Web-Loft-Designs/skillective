@@ -530,7 +530,7 @@ class PayPalProcessor
         $currency = $this->payPalClient->getCurrency();
         $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
         $totalAmount = round($booking->spot_price + $totalServiceFee + $processorFee, 2);
-        $sklFee = round((float)$totalServiceFee, 2, '.', '');
+        $sklFee = round((float)$totalServiceFee, 2);
         $subMerchantId = $booking->instructor->pp_merchant_id;
 
         $data = [
