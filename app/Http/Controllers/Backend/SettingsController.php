@@ -5,12 +5,11 @@ namespace App\Http\Controllers\Backend;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use App\Http\Controllers\AppBaseController;
-use App\Models\Setting;
 use App\Http\Requests\UpdateSettingsRequest;
-use App;
-use File;
-use URL;
-use Image;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\URL;
+use Intervention\Image\Facades\Image;
 
 class SettingsController extends AppBaseController
 {
@@ -69,7 +68,7 @@ class SettingsController extends AppBaseController
                         $settings_value = '/' . $destination . '/' . $newName;//url(str_replace('\\', '/', $path));
                     }
                 }
-				
+
                 // uploading Images
                 if ( isset($images[$settings_name])){ // handle uploaded images
                     if ($settings_value instanceof UploadedFile && $settings_value->isFile()){

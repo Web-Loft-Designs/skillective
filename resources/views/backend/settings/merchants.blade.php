@@ -1,6 +1,5 @@
 <div class="form-wrap profile-tab-content"  data-tab="merchants">
 
-
         <p class="login-box-msg">Merchants/Payments/Bookings</p>
 
         <div class="d-flex flex-wrap">
@@ -9,42 +8,78 @@
             <div class="form-group has-feedback">
                 <div class=field">
                     <label>Skillective pre recorded fee ($)</label>
-                    <input type="number" step=".01" min="0" required class="form-control" name="settings[skillective_service_pre_r_fixed]" value="@if (isset($settings['skillective_service_pre_r_fixed'])){{ $settings['skillective_service_pre_r_fixed'] }}@endif"/>
+                    <input type="number"
+                           step=".01"
+                           min="0"
+                           required
+                           class="form-control"
+                           name="settings[skillective_service_pre_r_fixed]"
+                           value="@if (isset($settings['skillective_service_pre_r_fixed'])){{ $settings['skillective_service_pre_r_fixed'] }}@endif"/>
                 </div>
             </div>
 
             <div class="form-group has-feedback">
                 <div class=field">
                     <label>Skillective pre recorded fee (%)</label>
-                    <input type="number" step=".01" min="0" required class="form-control" name="settings[skillective_service_pre_r_percent]" value="@if (isset($settings['skillective_service_pre_r_percent'])){{ $settings['skillective_service_pre_r_percent'] }}@endif"/>
+                    <input type="number"
+                           step=".01"
+                           min="0"
+                           required
+                           class="form-control"
+                           name="settings[skillective_service_pre_r_percent]"
+                           value="@if (isset($settings['skillective_service_pre_r_percent'])){{ $settings['skillective_service_pre_r_percent'] }}@endif"/>
                 </div>
             </div>
 
             <div class="form-group has-feedback">
                 <div class=field">
                     <label>Skillective service fee ($)</label>
-                    <input type="number" step=".01" min="0" required class="form-control" name="settings[skillective_service_fee_fixed]" value="@if (isset($settings['skillective_service_fee_fixed'])){{ $settings['skillective_service_fee_fixed'] }}@endif"/>
+                    <input type="number"
+                           step=".01"
+                           min="0"
+                           required
+                           class="form-control"
+                           name="settings[skillective_service_fee_fixed]"
+                           value="@if (isset($settings['skillective_service_fee_fixed'])){{ $settings['skillective_service_fee_fixed'] }}@endif"/>
                 </div>
             </div>
 
             <div class="form-group has-feedback">
                 <div class=field">
                     <label>Skillective service fee (%)</label>
-                    <input type="number" step=".01" min="0" required class="form-control" name="settings[skillective_service_fee_percent]" value="@if (isset($settings['skillective_service_fee_percent'])){{ $settings['skillective_service_fee_percent'] }}@endif"/>
+                    <input type="number"
+                           step=".01"
+                           min="0"
+                           required
+                           class="form-control"
+                           name="settings[skillective_service_fee_percent]"
+                           value="@if (isset($settings['skillective_service_fee_percent'])){{ $settings['skillective_service_fee_percent'] }}@endif"/>
                 </div>
             </div>
 
             <div class="form-group has-feedback">
                 <div class=field">
-                    <label>Braintree processing fee (%)</label>
-                    <input type="number" step=".01" min="2.9" required class="form-control" name="settings[braintree_processing_fee]" value="@if (isset($settings['braintree_processing_fee'])){{ $settings['braintree_processing_fee'] }}@endif"/>
+                    <label>PayPal processing fee (%)</label>
+                    <input type="number"
+                           step=".01"
+                           min="0.1"
+                           required
+                           class="form-control"
+                           name="settings[braintree_processing_fee]"
+                           value="@if (isset($settings['braintree_processing_fee'])){{ $settings['braintree_processing_fee'] }}@endif"/>
                 </div>
             </div>
 
             <div class="form-group has-feedback">
                 <div class=field">
-                    <label>Braintree transaction fee ($)</label>
-                    <input type="number" step=".01" min="0.3" required class="form-control" name="settings[braintree_transaction_fee]" value="@if (isset($settings['braintree_transaction_fee'])){{ $settings['braintree_transaction_fee'] }}@endif"/>
+                    <label>PayPal transaction fee ($)</label>
+                    <input type="number"
+                           step=".01"
+                           min="0.1"
+                           required
+                           class="form-control"
+                           name="settings[braintree_transaction_fee]"
+                           value="@if (isset($settings['braintree_transaction_fee'])){{ $settings['braintree_transaction_fee'] }}@endif"/>
                 </div>
             </div>
 
@@ -123,7 +158,5 @@
                 </div>
             </div>
         </div>
-
-
 
 </div>
