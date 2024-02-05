@@ -59,74 +59,6 @@
                                         @endif
                                     </div>
 
-                                    {{--<div class="form-group  has-feedback">--}}
-                                        {{--<div class="field field-files field-images">--}}
-                                            {{--<label>Website Logo</label>--}}
-                                            {{--<span class="wrapper-file-input">--}}
-                                                {{--<span class="input-file">--}}
-                                                    {{--@if (isset($settings['sitelogo']) && ''!=$settings['sitelogo'])--}}
-
-
-                                                        {{--<span class="name"><img src="@if (isset($settings['sitelogo'])){{ $settings['sitelogo'] }}@endif" />{{ $settings['sitelogo'] }}</span>--}}
-                                                    {{--@else--}}
-                                                        {{--<span class="name"></span>--}}
-                                                    {{--@endif--}}
-                                                {{--</span>--}}
-                                                {{--<input id="website-logo" type="file" name="settings[sitelogo]" title="Browse">--}}
-                                            {{--</span>--}}
-                                        {{--</div>--}}
-                                        {{--@if (isset($settings['sitelogo']) && ''!=$settings['sitelogo'])--}}
-                                            {{--<div class="row-uploads">--}}
-                                                {{--<div class="uploads">--}}
-                                                    {{--<img src="@if (isset($settings['sitelogo'])){{ $settings['sitelogo'] }}@endif" />--}}
-                                                {{--</div>--}}
-                                                {{--<div class="field mt-2 field-checkbox checkbox-wrapper">--}}
-                                                    {{--<label for="remove-sitelogo">--}}
-                                                        {{--<input type="checkbox" value="1" name="page_meta[_remove_sitelogo]" id="remove-sitelogo"/>--}}
-                                                        {{--<span class="checkmark"></span>--}}
-                                                        {{--Remove Uploaded Image--}}
-                                                    {{--</label>--}}
-                                                {{--</div>--}}
-                                            {{--</div>--}}
-                                        {{--@endif--}}
-                                    {{--</div>--}}
-
-
-                                    {{--<div class="form-group  has-feedback">--}}
-                                            {{--<div class="field field-files field-images">--}}
-                                                {{--<label>Website Logo (Mobile)</label>--}}
-                                                {{--<span class="wrapper-file-input">--}}
-                                                {{--<span class="input-file">--}}
-                                                    {{--@if (isset($settings['sitelogo-mobile']) && ''!=$settings['sitelogo-mobile'])--}}
-
-                                                        {{--<span class="name"><img src="@if (isset($settings['sitelogo-mobile'])){{ $settings['sitelogo-mobile'] }}@endif" />{{ $settings['sitelogo-mobile'] }}</span>--}}
-                                                    {{--@else--}}
-                                                        {{--<span class="name"></span>--}}
-                                                    {{--@endif--}}
-                                                {{--</span>--}}
-                                                {{--<input id="website-logo" type="file" name="settings[sitelogo-mobile]" title="Browse">--}}
-                                                {{--</span>--}}
-                                            {{--</div>--}}
-                                            {{--@if (isset($settings['sitelogo-mobile']) && ''!=$settings['sitelogo-mobile'])--}}
-                                                {{--<div class="row-uploads">--}}
-                                                    {{--<div class="uploads">--}}
-                                                        {{--<img src="@if (isset($settings['sitelogo-mobile'])){{ $settings['sitelogo-mobile'] }}@endif" />--}}
-                                                    {{--</div>--}}
-                                                    {{--<div class="field field-checkbox">--}}
-                                                        {{--<input type="checkbox" value="1" name="page_meta[_remove_sitelogo-mobile]" id="remove-sitelogo-mobile"/>--}}
-                                                        {{--<label for="remove-sitelogo-mobile">Remove Uploaded Image</label>--}}
-                                                    {{--</div>--}}
-                                                    {{--<div class="field mt-2 field-checkbox checkbox-wrapper">--}}
-                                                        {{--<label for="remove-sitelogo-mobile">--}}
-                                                            {{--<input type="checkbox" value="1" name="page_meta[_remove_sitelogo-mobile]" id="remove-sitelogo-mobile"/>--}}
-                                                            {{--<span class="checkmark"></span>--}}
-                                                            {{--Remove Uploaded Image--}}
-                                                        {{--</label>--}}
-                                                    {{--</div>--}}
-                                                {{--</div>--}}
-                                            {{--@endif--}}
-                                    {{--</div>--}}
-
                                     <div class="form-group  has-feedback">
                                         <div class="">
                                             <div class="field field-files field-images">
@@ -146,9 +78,6 @@
                                             </div>
                                             @if (isset($settings['default_profile_image']) && ''!=$settings['default_profile_image'])
                                                 <div class="row-uploads">
-                                                    {{--<div class="uploads">--}}
-                                                        {{--<img src="@if (isset($settings['default_profile_image'])){{ $settings['default_profile_image'] }}@endif" />--}}
-                                                    {{--</div>--}}
                                                     <div class="field mt-2 field-checkbox checkbox-wrapper">
                                                         <label for="remove-default-profile-image">
                                                             <input type="checkbox" value="1" name="page_meta[_remove_default_profile_image]" id="remove-default-profile-image"/>
@@ -180,9 +109,6 @@
                                             </div>
                                             @if (isset($settings['default_genre_image']) && ''!=$settings['default_genre_image'])
                                                 <div class="row-uploads">
-                                                    {{--<div class="uploads">--}}
-                                                        {{--<img src="@if (isset($settings['default_genre_image'])){{ $settings['default_genre_image'] }}@endif" />--}}
-                                                    {{--</div>--}}
                                                     <div class="field mt-2 field-checkbox checkbox-wrapper">
                                                         <label for="remove-default-genre-image">
                                                             <input type="checkbox" value="1" name="page_meta[_remove_default_genre_image]" id="remove-default-genre-image"/>
@@ -215,8 +141,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-
 
                         </div>
 
