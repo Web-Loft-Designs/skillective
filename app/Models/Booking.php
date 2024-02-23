@@ -230,11 +230,12 @@ class Booking extends Model implements Transformable
         if ($spotPrice == null) {
             $spotPrice = $this->spot_price;
         }
-        $braintreeProcessingFee = (float)Setting::getValue('braintree_processing_fee', 2.99); // %
-        $braintreeTransactionFee = (float)Setting::getValue('braintree_transaction_fee', 0.49); // $
-        $processorFee = (($spotPrice + $serviceFees) / 100) * $braintreeProcessingFee + $braintreeTransactionFee;
+        $payPalProcessingFee = (float)Setting::getValue('braintree_processing_fee', 3.49); // %
+        $payPalTransactionFee = (float)Setting::getValue('braintree_transaction_fee', 0.49); // $
+//        $processorFee = (($spotPrice + $serviceFees) / 100) * $braintreeProcessingFee + $braintreeTransactionFee;
+        $processorFee =( $spotPrice + $serviceFees + $payPalTransactionFee ) / ( 1 - $payPalProcessingFee / 100) - $spotPrice ;
 
-        return number_format((float)$processorFee, 2, '.', '');
+        return $processorFee;
     }
 
     public function getBookingVirtualFeeAmount(Lesson $lesson = null)
@@ -276,7 +277,7 @@ class Booking extends Model implements Transformable
 
         $serviceFee = $this->getBookingServiceFeeAmount();
         $virtualLessonFee = $this->getBookingVirtualFeeAmount();
-        $totalServiceFee = (float) $serviceFee + (float) $virtualLessonFee;
+        $totalServiceFee = $serviceFee + (float) $virtualLessonFee;
         $processorFee = $this->getBookingPaymentProcessingFeeAmount($this->spot_price, $totalServiceFee);
 
         // few checks to prevent not desired transactions , just an assurance

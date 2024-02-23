@@ -78,9 +78,7 @@ class PreRecordedLesson extends Model
 
         $serviceFeeFixed = (float)Setting::getValue('skillective_service_pre_r_fixed', 0); // $
         $serviceFeePercent = (float)Setting::getValue('skillective_service_pre_r_percent', 0); // $
-
         $serviceFeePercent = ($price / 100) * $serviceFeePercent;
-
         $serviceFee = $serviceFeeFixed + $serviceFeePercent;
 
         return number_format((float)$serviceFee, 2, '.', '');
@@ -93,15 +91,15 @@ class PreRecordedLesson extends Model
      */
     public function getPreRecordedLessonPaymentProcessingFeeAmount($price = null, $serviceFees = 0)
     {
-        if ($price == null)
+        if ($price == null) {
             $price = $this->price;
+        }
 
-        $braintreeProcessingFee = (float)Setting::getValue('braintree_processing_fee', 2.9); // %
-        $braintreeTransactionFee = (float)Setting::getValue('braintree_transaction_fee', 0.3); // $
-
-        $processorFee = (($price + $serviceFees) / 100) * $braintreeProcessingFee + $braintreeTransactionFee;
-
-        return number_format((float)$processorFee, 2, '.', '');
+        $payPalProcessingFee = (float)Setting::getValue('braintree_processing_fee', 3.49); // %
+        $payPalTransactionFee = (float)Setting::getValue('braintree_transaction_fee', 0.49); // $
+//        $processorFee = (($price + $serviceFees) / 100) * $braintreeProcessingFee + $braintreeTransactionFee;
+        $processorFee =( $price + $serviceFees + $payPalTransactionFee ) / ( 1 - $payPalProcessingFee / 100) - $price ;
+        return $processorFee;
     }
 
 
