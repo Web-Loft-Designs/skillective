@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Facades\BraintreeProcessor;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -36,8 +35,10 @@ class InstructorPayoutsController extends Controller
 			'siteGenres'	=> $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
             'userGenres'	=> $genreRepository->presentResponse(Auth::user()->genres)['data']
 		];
-		$vars['savedMerchantAccountDetails']  = BraintreeProcessor::getMerchantAccountDetails(Auth::user());
 
+		$vars['savedMerchantAccountDetails']  = Auth::user()->pp_merchant_id ?  [
+            'pp_merchant_id' => Auth::user()->pp_merchant_id,
+        ] : null;
         return view('frontend.instructor.payouts', $vars);
     }
 

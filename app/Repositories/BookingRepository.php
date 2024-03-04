@@ -172,7 +172,8 @@ class BookingRepository extends BaseRepository
      * @return LengthAwarePaginator|Collection|mixed
      * @throws RepositoryException
      */
-    public function getBookings(Request $request) {
+    public function getBookings(Request $request)
+    {
         $this->resetCriteria();
         $this->resetScope();
 
@@ -418,10 +419,10 @@ class BookingRepository extends BaseRepository
         $this->resetScope();
 
         $this->scopeQuery(function($query) use ($instructorId){
-            $query = $query->select(DB::raw('SUM(bookings.spot_price) as totalPayoutsAmount'), DB::raw("DATE(bookings.updated_at) as payoutsPeriod"))
+            $query = $query->select(DB::raw('SUM(bookings.spot_price - bookings.virtual_fee - bookings.service_fee  - bookings.disconnected - COALESCE(bookings.pp_processor_fee, 0) ) as totalPayoutsAmount'), DB::raw("DATE(bookings.updated_at) as payoutsPeriod"))
                 ->groupBy(DB::raw('DATE(bookings.updated_at)'))
                 ->where('bookings.instructor_id', $instructorId)
-                ->whereIn('bookings.status', [Booking::STATUS_COMPLETE])// , Booking::STATUS_ESCROW_RELEASED
+                ->whereIn('bookings.status', [Booking::STATUS_COMPLETE, Booking::STATUS_ESCROW_RELEASED])
                 ->orderBy('bookings.updated_at' , 'DESC');
             return $query;
         });
@@ -443,15 +444,15 @@ class BookingRepository extends BaseRepository
         $this->resetCriteria();
         $this->resetScope();
 
-        $this->scopeQuery(function($query) use ($instructorId, $period){
+        $this->scopeQuery(function($query) use ($instructorId, $period) {
             $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
 
-            if ($period=='')
-                $query = $query->select(DB::raw('SUM(bookings.spot_price) as sumEarnedInPeriod'), DB::raw("YEAR(lessons.start) as lessonsPeriod"));
-            else
-                $query = $query->select(DB::raw('SUM(bookings.spot_price) as sumEarnedInPeriod'), DB::raw("MONTH(lessons.start) as lessonsPeriod"))
+            if ($period == '') {
+                $query = $query->select(DB::raw('SUM(bookings.spot_price - bookings.virtual_fee - bookings.service_fee  - bookings.disconnected - COALESCE(bookings.pp_processor_fee, 0) ) as sumEarnedInPeriod'), DB::raw("YEAR(lessons.start) as lessonsPeriod"));
+            } else {
+                $query = $query->select(DB::raw('SUM(bookings.spot_price - bookings.virtual_fee - bookings.service_fee  - bookings.disconnected - COALESCE(bookings.pp_processor_fee, 0) ) as sumEarnedInPeriod'), DB::raw("MONTH(lessons.start) as lessonsPeriod"))
                     ->whereRaw("YEAR(lessons.start) = $period");
-
+            }
             $query = $query->groupBy(DB::raw('lessonsPeriod'))
                 ->join('lessons', 'bookings.lesson_id', '=', "lessons.id")
                 ->where('lessons.instructor_id', $instructorId)
@@ -477,11 +478,11 @@ class BookingRepository extends BaseRepository
         $this->resetCriteria();
         $this->resetScope();
         $this->scopeQuery(function($query) use ($instructorId){
-            $query = $query->select(DB::raw('SUM(bookings.spot_price) as totalPayoutYTD'), DB::raw("DATE(bookings.updated_at) as payoutsPeriod"))
+            $query = $query->select(DB::raw('SUM(bookings.spot_price - bookings.virtual_fee - bookings.service_fee  - bookings.disconnected - COALESCE(bookings.pp_processor_fee, 0) ) as totalPayoutYTD'), DB::raw("DATE(bookings.updated_at) as payoutsPeriod"))
                 ->groupBy(DB::raw('DATE(bookings.updated_at)'))
                 ->where('bookings.instructor_id', $instructorId)
                 ->where(DB::raw('YEAR(created_at)'), '=',  now()->year)
-                ->whereIn('bookings.status', [Booking::STATUS_COMPLETE])// , Booking::STATUS_ESCROW_RELEASED
+                ->whereIn('bookings.status', [Booking::STATUS_COMPLETE, Booking::STATUS_ESCROW_RELEASED])
                 ->orderBy('bookings.updated_at' , 'DESC');
             return $query;
         });
@@ -508,9 +509,9 @@ class BookingRepository extends BaseRepository
             $nowOnServer = Carbon::now()->format('Y-m-d H:i:s'); // UTC
 
             if ($period=='')
-                $query = $query->select(DB::raw('SUM(bookings.spot_price) as sumEarnedInPeriod'), DB::raw("YEAR(lessons.start) as lessonsPeriod"));
+                $query = $query->select(DB::raw('SUM(bookings.spot_price - bookings.virtual_fee - bookings.disconnected  - bookings.disconnected - COALESCE(bookings.pp_processor_fee, 0)) as sumEarnedInPeriod'), DB::raw("YEAR(lessons.start) as lessonsPeriod"));
             else
-                $query = $query->select(DB::raw('SUM(bookings.spot_price) as sumEarnedInPeriod'), DB::raw("MONTH(lessons.start) as lessonsPeriod"))
+                $query = $query->select(DB::raw('SUM(bookings.spot_price - bookings.virtual_fee - bookings.disconnected  - bookings.disconnected - COALESCE(bookings.pp_processor_fee, 0) ) as sumEarnedInPeriod'), DB::raw("MONTH(lessons.start) as lessonsPeriod"))
                     ->whereRaw("YEAR(lessons.start) = $period");
 
             $query = $query->groupBy(DB::raw('lessonsPeriod'))

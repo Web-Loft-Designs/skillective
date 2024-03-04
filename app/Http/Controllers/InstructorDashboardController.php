@@ -37,7 +37,6 @@ class InstructorDashboardController extends Controller
 		}
 
         $vars = [
-//			'userMedia'		=> Auth::user()->getGalleryMedia(4),//  disabled
 			'siteGenres'	=> $genreRepository->presentResponse($genreRepository->getSiteGenres())['data'],
 			'userGenres'	=> $genreRepository->presentResponse(Auth::user()->genres)['data'],
 			'clients'		=> $clients,

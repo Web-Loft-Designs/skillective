@@ -21,6 +21,9 @@ class BookingsPaymentsListTransformer extends TransformerAbstract
      */
     public function transform(Booking $model)
     {
+
+        $processorFee = $model->pp_processor_fee ?? 0;
+
 		return [
 			'id'				=> $model->id,
 			'instructor_id'		=> $model->instructor_id,
@@ -29,8 +32,8 @@ class BookingsPaymentsListTransformer extends TransformerAbstract
 			'student_name'		=> $model->student?->getName(),
 			'instructor_name'	=> $model->instructor?->getName(),
 			'spot_price'		=> $model->spot_price,
-			'amount_to_pay'		=> array_sum([$model->spot_price, $model->service_fee, $model->processor_fee, $model->virtual_fee]),
-			'fees_amount'		=> round(array_sum([$model->service_fee, $model->processor_fee, $model->virtual_fee]),2),
+			'amount_to_pay'		=> array_sum([$model->spot_price, $model->service_fee, $model->virtual_fee]),
+			'fees_amount'		=> round(array_sum([$model->service_fee, $processorFee, $model->virtual_fee]),2),
 			'status'			=> Booking::getStatusTitle($model->status),
 			'created_at'		=> $model->created_at->format('M d, Y, h:i a'),
 			'transaction_created_at' => $model->transaction_created_at?$model->transaction_created_at->format('M d, Y, h:i a') : '',
