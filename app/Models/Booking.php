@@ -232,7 +232,6 @@ class Booking extends Model implements Transformable
         }
         $payPalProcessingFee = (float)Setting::getValue('braintree_processing_fee', 3.49); // %
         $payPalTransactionFee = (float)Setting::getValue('braintree_transaction_fee', 0.49); // $
-//        $processorFee = (($spotPrice + $serviceFees) / 100) * $braintreeProcessingFee + $braintreeTransactionFee;
         $processorFee =( $spotPrice + $serviceFees + $payPalTransactionFee ) / ( 1 - $payPalProcessingFee / 100) - $spotPrice ;
 
         return $processorFee;
@@ -278,27 +277,19 @@ class Booking extends Model implements Transformable
         $serviceFee = $this->getBookingServiceFeeAmount();
         $virtualLessonFee = $this->getBookingVirtualFeeAmount();
         $totalServiceFee = $serviceFee + (float) $virtualLessonFee;
-        $processorFee = $this->getBookingPaymentProcessingFeeAmount($this->spot_price, $totalServiceFee);
 
         // few checks to prevent not desired transactions , just an assurance
         if (!$this->transaction_id && ($this->instructor->pp_merchant_id) != null
             && $this->instructor->pp_account_status == \App\Services\PayPalProcessor::STATUS_ACTIVE && !$this->lesson->alreadyStarted()
             && !$this->lesson->is_cancelled && $this->status == self::STATUS_PENDING) {
 
-            $transaction = PayPalProcessor::createSellBookingTransactionAndHoldInEscrow(
-                $this,
-                $totalServiceFee,
-                $processorFee
-            );
+            $transaction = PayPalProcessor::createSellBookingTransactionAndHoldInEscrow($this, $totalServiceFee);
 
             $this->transaction_id = $transaction['id'];
             $this->transaction_status = $transaction['status'];
             $this->transaction_created_at = now();
-            $this->service_fee = $serviceFee;
-            $this->processor_fee = $processorFee;  //  налог прогнозований
             $this->pp_reference_id = $transaction['purchase_units'][0]['payments']['captures'][0]['id'];
-            $this->pp_processor_fee = $transaction['purchase_units'][0]['payments']['captures'][0]['seller_receivable_breakdown']['paypal_fee']['value']; // налог отриманий фактичний
-            $this->virtual_fee = $virtualLessonFee;
+            $this->pp_processor_fee = $transaction['purchase_units'][0]['payments']['captures'][0]['seller_receivable_breakdown']['paypal_fee']['value']; // налог який зняв PayPal
             $this->setStatusAttribute(self::STATUS_ESCROW);
             $this->save();
         } else {

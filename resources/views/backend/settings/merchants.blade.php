@@ -59,32 +59,6 @@
 
             <div class="form-group has-feedback">
                 <div class=field">
-                    <label>PayPal processing fee (%)</label>
-                    <input type="number"
-                           step=".01"
-                           min="0.1"
-                           required
-                           class="form-control"
-                           name="settings[braintree_processing_fee]"
-                           value="@if (isset($settings['braintree_processing_fee'])){{ $settings['braintree_processing_fee'] }}@endif"/>
-                </div>
-            </div>
-
-            <div class="form-group has-feedback">
-                <div class=field">
-                    <label>PayPal transaction fee ($)</label>
-                    <input type="number"
-                           step=".01"
-                           min="0.1"
-                           required
-                           class="form-control"
-                           name="settings[braintree_transaction_fee]"
-                           value="@if (isset($settings['braintree_transaction_fee'])){{ $settings['braintree_transaction_fee'] }}@endif"/>
-                </div>
-            </div>
-
-            <div class="form-group has-feedback">
-                <div class=field">
                     <label>Twilio "Small Group Room" price per participant per minute (for virtual lessons) ($)</label>
                     <input type="number" step=".001" min="0.004" required class="form-control" name="settings[twilio_small_group_fee]" value="@if (isset($settings['twilio_small_group_fee'])){{ $settings['twilio_small_group_fee'] }}@endif"/>
                 </div>

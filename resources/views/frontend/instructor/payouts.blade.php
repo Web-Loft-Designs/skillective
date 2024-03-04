@@ -1,4 +1,5 @@
 @extends('layouts.app-frontend')
+
 @section('content')
     <div class="payouts-page">
         <div class="container">
@@ -13,11 +14,7 @@
                             <div class="card-payouts">
                                 @if($savedMerchantAccountDetails)
                                 <div>
-                                    {{--<img src="{{ asset('images/paypal.svg') }}" alt="">--}}
-                                    {{--<a href="mailto:whatever@email.com">Whatever@email.com</a>--}}
-                                    {{--<span>Added: 01 Mar 2018</span>--}}
-                                    <span>Account Number: {{ $savedMerchantAccountDetails['funding_accountNumber'] }}</span>
-                                    <span>Routing Number: {{ $savedMerchantAccountDetails['funding_routingNumber'] }}</span>
+                                    <span>PayPal Merchant ID: {{ $savedMerchantAccountDetails['pp_merchant_id'] }}</span>
                                 </div>
                                 @endif
                                 <div class="link-container"><a href="{{ route('profile.edit') }}#merchant-account-trigger">Update</a></div>

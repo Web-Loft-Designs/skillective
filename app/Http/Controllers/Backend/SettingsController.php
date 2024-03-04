@@ -18,7 +18,8 @@ class SettingsController extends AppBaseController
      * @param Request $request
      * @return \Illuminate\View\View
      */
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $settings = app::make('App\Models\Setting')->getAllAssociative();
         return view('backend.settings.list', [
             'settings' => $settings,

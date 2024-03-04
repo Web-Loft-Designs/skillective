@@ -131,9 +131,7 @@ class PreRecordedLesson extends Model
         $purchasedLesson->status                  = PurchasedLesson::STATUS_PENDING;
         $purchasedLesson->payment_method_token    = $paymentMethod['token'];
         $purchasedLesson->payment_method_type     = $paymentMethod['type'];
-        $service_fee                              = $this->getPreRecordedLessonServiceFeeAmount($this->price);
-        $purchasedLesson->service_fee             = $service_fee;
-        $purchasedLesson->processor_fee           = $this->getPreRecordedLessonPaymentProcessingFeeAmount($this->price, $service_fee);
+        $purchasedLesson->service_fee             = $this->getPreRecordedLessonServiceFeeAmount($this->price);
         $instructorMerchantId                     = $this->instructor->pp_merchant_id;
         $purchasedLesson->save();
 

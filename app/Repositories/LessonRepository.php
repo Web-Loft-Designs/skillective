@@ -695,6 +695,7 @@ class LessonRepository extends BaseRepository
      */
     public function getCountBookedLessonsForPeriod($instructorId, $period = '')
     {
+
         $this->resetCriteria();
         $this->resetScope();
         $this->scopeQuery(function($query) use ($instructorId, $period) {
@@ -714,9 +715,11 @@ class LessonRepository extends BaseRepository
             return $query;
         });
         $count = [];
+
         $this->get(['countBookedInPeriod', 'lessonsPeriod'])->each(function($item) use (&$count) {
             $count[$item->lessonsPeriod] = $item->countBookedInPeriod;
         });
+
         return $count;
     }
 
