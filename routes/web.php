@@ -16,6 +16,8 @@ use App\Http\Controllers\Backend\GenreController;
 use App\Http\Controllers\Backend\InstructorController;
 use App\Http\Controllers\Backend\LessonController;
 use App\Http\Controllers\Backend\LoginAsController;
+use App\Http\Controllers\Backend\PaymentsController;
+use App\Http\Controllers\Backend\SettingsController;
 use App\Http\Controllers\Backend\StudentController;
 use App\Http\Controllers\Backend\TestimonialController;
 use App\Http\Controllers\CartController;
@@ -155,14 +157,14 @@ Route::prefix('backend')->middleware(['rememberHttpReferer', 'role:Admin'])->gro
 	Route::post('/page/{page}', 'Backend\PageController@update')->name('backend.page.update');
 	Route::delete('/page/{page}', 'Backend\PageController@destroy')->name('backend.page.delete');
 
-	Route::get('/settings', 'Backend\SettingsController@index')->name('backend.settings');
-	Route::post('/settings', 'Backend\SettingsController@update')->name('backend.settings.update');
+	Route::get('/settings', [SettingsController::class, 'index'])->name('backend.settings');
+	Route::post('/settings', [SettingsController::class, 'update'])->name('backend.settings.update');
 
 	Route::resource('notifications', 'Backend\NotificationController', [
 		'as'    =>  'backend'
 	]);
 
-	Route::get('/payments', 'Backend\PaymentsController@index')->name('backend.payments.index');
+	Route::get('/payments', [PaymentsController::class, 'index'])->name('backend.payments.index');
 
 	// Reports
 	Route::get('/reports/demographic', 'Backend\ReportsController@demographic')->name('backend.reports.demographic');
@@ -174,11 +176,5 @@ Route::prefix('backend')->middleware(['rememberHttpReferer', 'role:Admin'])->gro
 
 	Route::get('/profile/edit', 'Backend\ProfileController@edit')->name('admin.profile.edit');
 });
-
-//Route::group(['middleware' => ['role:Admin']], function () {
-//	Route::get('/laravel-filemanager', '\UniSharp\LaravelFilemanager\Controllers\LfmController@show');
-//	Route::post('/laravel-filemanager/upload', '\UniSharp\LaravelFilemanager\Controllers\UploadController@upload');
-//	// list all lfm routes here...
-//});
 
 Route::any('{all}', 'PageController@index')->where('all', '.*');

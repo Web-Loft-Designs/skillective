@@ -25,10 +25,11 @@ class Setting extends Model
     /**
      * @return array
      */
-    public function getAllAssociative(){
+    public function getAllAssociative()
+    {
         $settings = [];
         $all = $this->all();
-        foreach ($all as $s){
+        foreach ($all as $s) {
             $settings[$s->name] = (preg_match('/-menu$/', $s->name))?unserialize($s->value):$s->value;
         }
         return $settings;
@@ -39,7 +40,8 @@ class Setting extends Model
      * @param $settings_value
      * @return void
      */
-    public function updateValue($settings_name, $settings_value){
+    public function updateValue($settings_name, $settings_value)
+    {
         $all = $this->all();
         $setting = null;
         foreach ($all as $s){
@@ -61,7 +63,8 @@ class Setting extends Model
      * @param $settings_name
      * @return void
      */
-    public function incrementValue($settings_name){
+    public function incrementValue($settings_name)
+    {
 		$setting = self::where('name', $settings_name)->first();
 		if ($setting && is_numeric($setting->value)){
 			$newValue = $setting->value + 1;
@@ -94,7 +97,8 @@ class Setting extends Model
     /**
      * @return void
      */
-    public function putAllToCache(){
+    public function putAllToCache()
+    {
     	$all = $this->getAllAssociative();
     	foreach ($all as $key=>$value){
 			Cache::forever("settings.{$key}", $value);
@@ -104,7 +108,8 @@ class Setting extends Model
     /**
      * @return void
      */
-    public function removeAllFromCache(){
+    public function removeAllFromCache()
+    {
 		$all = $this->getAllAssociative();
 		foreach ($all as $key=>$value){
 			Cache::forget("settings.{$key}");

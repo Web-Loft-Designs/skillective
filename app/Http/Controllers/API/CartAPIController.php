@@ -414,11 +414,8 @@ class CartAPIController extends AppBaseController
                 $booking->instructor_id		    = $lesson->instructor_id;
                 $booking->student_id		    = $student->id;
                 $booking->status			    = Booking::STATUS_PENDING;
-                $service_fee                    = $booking->getBookingServiceFeeAmount($lesson->spot_price);
-                $virtual_fee                    = $booking->getBookingVirtualFeeAmount($lesson);
-                $booking->service_fee           = $service_fee;
-                $booking->virtual_fee           = $virtual_fee;
-                $booking->processor_fee		    = $booking->getBookingPaymentProcessingFeeAmount($lesson->spot_price, $service_fee + $virtual_fee);
+                $booking->service_fee           = $booking->getBookingServiceFeeAmount($lesson->spot_price);
+                $booking->virtual_fee           = $booking->getBookingVirtualFeeAmount($lesson);
                 $booking->save();
 
               if ($lesson->instructor->clients()->where('client_id', $student->id)->count() == 0) {
@@ -437,11 +434,8 @@ class CartAPIController extends AppBaseController
               $purchasedLesson->instructor_id           = $lesson->instructor_id;
               $purchasedLesson->price                   = $lesson->price;
               $purchasedLesson->status                  = PurchasedLesson::STATUS_PENDING;
-              $service_fee                              = $lesson->getPreRecordedLessonServiceFeeAmount($lesson->price);
-              $purchasedLesson->service_fee             = $service_fee;
-              $purchasedLesson->processor_fee           = $lesson->getPreRecordedLessonPaymentProcessingFeeAmount($lesson->price, $service_fee);
+              $purchasedLesson->service_fee             =  $lesson->getPreRecordedLessonServiceFeeAmount($lesson->price);
               $purchasedLesson->save();
-
               $bookings[] = $purchasedLesson;
 
           } else {

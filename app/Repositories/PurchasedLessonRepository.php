@@ -99,9 +99,9 @@ class PurchasedLessonRepository extends BaseRepository
 		$this->resetScope();
 		$this->scopeQuery(function ($query) use ($instructorId, $period) {
 			if ($period == '')
-				$query = $query->select(DB::raw('SUM(purchased_lessons.price) as sumEarnedInPeriod'), DB::raw("YEAR(purchased_lessons.created_at) as lessonsPeriod"));
+				$query = $query->select(DB::raw('SUM(purchased_lessons.price - purchased_lessons.service_fee - COALESCE(purchased_lessons.pp_processor_fee, 0) ) as sumEarnedInPeriod'), DB::raw("YEAR(purchased_lessons.created_at) as lessonsPeriod"));
 			else
-				$query = $query->select(DB::raw('SUM(purchased_lessons.price) as sumEarnedInPeriod'), DB::raw("MONTH(purchased_lessons.created_at) as lessonsPeriod"))
+				$query = $query->select(DB::raw('SUM(purchased_lessons.price - purchased_lessons.service_fee - COALESCE(purchased_lessons.pp_processor_fee, 0)) as sumEarnedInPeriod'), DB::raw("MONTH(purchased_lessons.created_at) as lessonsPeriod"))
 					->whereRaw("YEAR(purchased_lessons.created_at) = $period");
 			$query = $query->groupBy(DB::raw('lessonsPeriod'))
 				->join('pre_r_lessons', 'purchased_lessons.pre_r_lesson_id', '=', "pre_r_lessons.id")
