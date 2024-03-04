@@ -3,8 +3,8 @@
         <div class="col-12">
             <h2 class="page-title">Incomes</h2>
             <div class="breadcrumb-custom">
-                    <a href="#" @click.prevent="changePeriod('')" :class="{ 'active' : (''==selectedYear) }">All Time</a>
-                    <a href="#" v-for="year in yearOptions" @click.prevent="changePeriod(year)" :class="{ 'active' : (year==selectedYear) }"> / {{ year }}</a>
+                    <a href="#" @click.prevent="changePeriod('')" :class="{ 'active' : (''===selectedYear) }">All Time</a>
+                    <a href="#" v-for="year in yearOptions" @click.prevent="changePeriod(year)" :class="{ 'active' : (year===selectedYear) }"> / {{ year }}</a>
             </div>
             <chart-dashboard-2
                     :initial-goal-value="initialGoalValue"
@@ -60,7 +60,7 @@
 		methods: {
 			getIncomes() {
 				var _api = '/api/instructor/incomes';
-				if (this.selectedYear!='')
+				if (this.selectedYear!=='')
 					_api += ('/' + this.selectedYear);
 				this.apiGet(_api);
 			},
@@ -75,7 +75,7 @@
                 }
             },
             getPeriodNameFromPeriodStartDate(periodDate){
-				if (this.selectedYear=='')
+				if (this.selectedYear==='')
 					return moment(periodDate, "YYYY-MM-DD").format('YYYY');
                 else
 					return moment(periodDate, "YYYY-MM-DD").format('MMMM');

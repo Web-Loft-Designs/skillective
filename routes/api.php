@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\CartAPIController;
 use App\Http\Controllers\API\InstructorBookingsAPIController;
+use App\Http\Controllers\API\InstructorIncomesAPIController;
 use App\Http\Controllers\API\InstructorMerchantAPIController;
 use App\Http\Controllers\API\InstructorsAPIController;
 use App\Http\Controllers\API\PreRLessonsAPIController;
@@ -163,7 +164,7 @@ Route::group(['middleware' => ['role:Instructor']], function () {
 
 	Route::get('students', 'StudentsAPIController@index'); // get students list to add as instructor clients
 
-	Route::get('instructor/incomes/{year?}', 'InstructorIncomesAPIController@index');
+	Route::get('instructor/incomes/{year?}', [InstructorIncomesAPIController::class, 'index']);
 
 	Route::get('instructor/payouts', 'InstructorPayoutsAPIController@index');
 });
@@ -184,7 +185,7 @@ Route::prefix('/cart')->group(function () {
 Route::post('student/instructors', 'StudentInstructorsAPIController@add'); // add many
 
 Route::group(['middleware' => ['role:Student']], function () {
-	Route::post('cart', 'CartAPIController@store');
+	Route::post('cart', [CartAPIController::class, 'store']);
 	Route::delete('cart/{cart}', 'CartAPIController@delete');
 
 	Route::post('lesson-request', 'LessonRequestAPIController@store');
