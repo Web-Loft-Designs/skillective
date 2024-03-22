@@ -208,6 +208,12 @@ class Booking extends Model implements Transformable
         $this->cancel($cancelledBy);
     }
 
+    //  повертає загальну суму зборів SKILLECTIVE
+    public function getBookingTotalServiceFeeAmount($spotPrice, $virtualFee = 0): float
+    {
+        $total = ($spotPrice + $virtualFee + 2.5) * 1.036;
+        return  number_format($total - $spotPrice, 2) ;
+    }
 
     public function getBookingServiceFeeAmount($spotPrice = null): float
     {
@@ -262,7 +268,7 @@ class Booking extends Model implements Transformable
 
     public function getBookingTotalFeeAmount(Lesson $lesson = null, $spotPrice = null)
     {
-        $serviceFee = $this->getBookingServiceFeeAmount($spotPrice);
+        $serviceFee = $this->getBookingTotalServiceFeeAmount($spotPrice);
         $virtualLessonFee = $this->getBookingVirtualFeeAmount($lesson);
 
         $processorFee = $this->getBookingPaymentProcessingFeeAmount($spotPrice, ($serviceFee + $virtualLessonFee));
@@ -273,10 +279,8 @@ class Booking extends Model implements Transformable
 
     public function approvePp(): bool
     {
-
-        $serviceFee = $this->getBookingServiceFeeAmount();
         $virtualLessonFee = $this->getBookingVirtualFeeAmount();
-        $totalServiceFee = $serviceFee + (float) $virtualLessonFee;
+        $totalServiceFee = $this->getBookingTotalServiceFeeAmount($this->spot_price, $virtualLessonFee);
 
         // few checks to prevent not desired transactions , just an assurance
         if (!$this->transaction_id && ($this->instructor->pp_merchant_id) != null

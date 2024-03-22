@@ -69,7 +69,7 @@ class IncomesCalculator
 					'startDate' => "$y-01-01",
 					'countBookedLessons' => isset($countBookedLessons[$y]) ? $countBookedLessons[$y] : 0,
 					'countHeldLessons' => isset($countHeldLessons[$y]) ? $countHeldLessons[$y] : 0,
-					'amountEarned' => isset($amountEarned[$y]) ? $amountEarned[$y] + $earnedByPreR : 0 + $earnedByPreR,
+					'amountEarned' => isset($amountEarned[$y]) ? round($amountEarned[$y] + $earnedByPreR, 2) : 0 + $earnedByPreR,
 					'amountBooked' => isset($amountBooked[$y]) ? $amountBooked[$y] : 0,
 					'preRPurchases' => isset($preRCount[$y]) ? $preRCount[$y] : 0,
 				];
@@ -86,7 +86,7 @@ class IncomesCalculator
 					'startDate' => "$period-$month-01",
 					'countBookedLessons' => isset($countBookedLessons[$m]) ? $countBookedLessons[$m] : 0,
 					'countHeldLessons' => isset($countHeldLessons[$m]) ? $countHeldLessons[$m] : 0,
-					'amountEarned' => isset($amountEarned[$m]) ? $amountEarned[$m] + $earnedByPreR : 0 + $earnedByPreR,
+					'amountEarned' => isset($amountEarned[$m]) ? round($amountEarned[$m] + $earnedByPreR, 2 ): 0 + $earnedByPreR,
 					'amountBooked' => isset($amountBooked[$m]) ? $amountBooked[$m] : 0,
 					'preRPurchases' => isset($preRCount[$m]) ? $preRCount[$m] : 0,
 				];

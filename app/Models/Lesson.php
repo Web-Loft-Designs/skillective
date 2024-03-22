@@ -283,7 +283,7 @@ class Lesson extends Model implements Transformable
         $booking->status			    = Booking::STATUS_PENDING;
         $booking->payment_method_token	= $paymentMethod['token'];
         $booking->payment_method_type	= $paymentMethod['type'];
-        $booking->service_fee           = $booking->getBookingServiceFeeAmount($this->spot_price);
+        $booking->service_fee           = $booking->getBookingTotalServiceFeeAmount($this->spot_price);
         $booking->virtual_fee           = $booking->getBookingVirtualFeeAmount($this);
         $booking->save();
 
