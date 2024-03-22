@@ -27,6 +27,7 @@ class InstructorIncomesAPIController extends AppBaseController
 
         $user = Auth::user();
         $incomes = IncomesCalculator::getInstructorIncomes($user, $year, $booking_repository, $lesson_repository, $preRPurshRepo);
+
         return $this->sendResponse($incomes);
     }
 }

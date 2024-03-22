@@ -67,6 +67,17 @@ class PreRecordedLesson extends Model
         return config('app.url') . '/storage/' . 'videos/' . $this->instructor_id . '/' . $this->video;
     }
 
+
+    /**
+     * @param $price
+     * @return float
+     */
+    public function getPreRecordedLessonTotalServiceFeeAmount($price): float
+    {
+        $total = ($price + 2.5) * 1.036;
+        return number_format($total - $price, 2);
+    }
+
     /**
      * @param $price
      * @return string
@@ -131,7 +142,7 @@ class PreRecordedLesson extends Model
         $purchasedLesson->status                  = PurchasedLesson::STATUS_PENDING;
         $purchasedLesson->payment_method_token    = $paymentMethod['token'];
         $purchasedLesson->payment_method_type     = $paymentMethod['type'];
-        $purchasedLesson->service_fee             = $this->getPreRecordedLessonServiceFeeAmount($this->price);
+        $purchasedLesson->service_fee             = $this->getPreRecordedLessonTotalServiceFeeAmount($this->price);
         $instructorMerchantId                     = $this->instructor->pp_merchant_id;
         $purchasedLesson->save();
 
