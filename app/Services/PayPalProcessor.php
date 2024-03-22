@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Booking;
 use App\Models\PurchasedLesson;
+use App\Models\Setting;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Exception;
@@ -376,10 +377,10 @@ class PayPalProcessor
             $subMerchantId = $booking->instructor->pp_merchant_id;
             if (get_class($booking) === Booking::class) {
                 $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
-                $serviceFee = $booking->getBookingServiceFeeAmount();
                 $virtualLessonFee = $booking->getBookingVirtualFeeAmount();
-                $sklFee = round($serviceFee + (float)$virtualLessonFee, 2);
-                $totalAmount = round((float)$booking->spot_price + $sklFee, 2);
+                $totalSklFee = $booking->getBookingTotalServiceFeeAmount($booking->spot_price, $virtualLessonFee);
+                $totalAmount = round((float)$booking->spot_price + $totalSklFee, 2);
+                $sklFee = (float)Setting::getValue('skillective_service_fee_fixed', 2); // $
 
                 $purchaseUnits = [
                     'reference_id' => "booking_" . $booking->id,
@@ -426,8 +427,9 @@ class PayPalProcessor
 
             } elseif (get_class($booking) === PurchasedLesson::class) {
                 $description = $booking->preRecordedLesson->title . " Lesson #" . $booking->pre_r_lesson_id . " purchasedLesson #" . $booking->id . " instructor #" . $booking->instructor_id;
-                $sklFee = round($booking->service_fee, 2);
-                $totalAmount = round((float)$booking->price + $sklFee, 2);
+                $sklFee = (float)Setting::getValue('skillective_service_pre_r_fixed', 2); // $
+                $totalSklFee = round($booking->service_fee, 2);
+                $totalAmount = round((float)$booking->price + $totalSklFee, 2);
 
                 $purchaseUnits = [
                     'reference_id' => "pRlesson_" . $booking->id,
@@ -530,8 +532,9 @@ class PayPalProcessor
 
         $currency = $this->payPalClient->getCurrency();
         $description = "{$booking->lesson->genre->title} Lesson #{$booking->lesson_id}, booking #{$booking->id}, (instructor #{$booking->instructor_id})";
-        $sklFee = round((float)$totalServiceFee, 2);
-        $totalAmount = round($booking->spot_price + $sklFee, 2);
+        $sklFee = (float)Setting::getValue('skillective_service_fee_fixed', 2); // $
+        $totalSklFee = round((float)$totalServiceFee, 2);
+        $totalAmount = round($booking->spot_price + $totalSklFee, 2);
         $subMerchantId = $booking->instructor->pp_merchant_id;
 
         $data = [
@@ -675,8 +678,9 @@ class PayPalProcessor
     public function createSellPurchasereLessonTransaction($subMerchantId, $purchasedLesson)
     {
         $description = $purchasedLesson->preRecordedLesson->title . " Lesson #" . $purchasedLesson->pre_r_lesson_id . " purchasedLesson #" . $purchasedLesson->id . " instructor #" . $purchasedLesson->instructor_id;
-        $platformFee = round((float)$purchasedLesson->service_fee, 2);
-        $totalAmount = round($purchasedLesson->price + $platformFee, 2);
+        $sklFee = (float)Setting::getValue('skillective_service_pre_r_fixed', 2); // $
+        $totalSklFee = round((float)$purchasedLesson->service_fee, 2);
+        $totalAmount = round($purchasedLesson->price + $totalSklFee, 2);
         $currency = $this->payPalClient->getCurrency();
 
         $data = [
@@ -716,7 +720,7 @@ class PayPalProcessor
                             [
                                 'amount' => [
                                     "currency_code" => $currency,
-                                    "value" => $platformFee,
+                                    "value" => $sklFee,
                                 ],
                             ]
                         ],
