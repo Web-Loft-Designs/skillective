@@ -285,12 +285,11 @@ class CartRepository extends BaseRepository
                     }
                 }
 
-                $service_fee = round($booking->getBookingServiceFeeAmount($finishPrice), 2);
-                $processor_fee = round($service_fee + $virtual_fee, 2);
+                $serviceFee = round($booking->getBookingTotalServiceFeeAmount($finishPrice, $virtual_fee), 2);
                 $response["count"] += 1;
                 $response["subtotal"] += round($finishPrice, 2);
-                $response["fee"] += $processor_fee;
-                $response["total"] += round($finishPrice + $processor_fee, 2);
+                $response["fee"] += $serviceFee;
+                $response["total"] += round($finishPrice + $serviceFee, 2);
                 $response['merchants'][] = $cartItem->lesson->instructor->pp_merchant_id;
             } else {
                 $preRecordedLesson = new PreRecordedLesson();
@@ -323,12 +322,14 @@ class CartRepository extends BaseRepository
                         }
                     }
                 }
-                $service_fee = round($preRecordedLesson->getPreRecordedLessonServiceFeeAmount($finishPrice), 2);
+
+                $serviceFee = $preRecordedLesson->getPreRecordedLessonTotalServiceFeeAmount($finishPrice);
                 $response["count"] += 1;
                 $response["subtotal"] += round($cartItem->preRecordedLesson->price, 2);
-                $response["fee"] += $service_fee;
-                $response["total"] += $finishPrice + $service_fee;
+                $response["fee"] += $serviceFee;
+                $response["total"] += $finishPrice + $serviceFee;
                 $response['merchants'][] = $cartItem->preRecordedLesson->instructor->pp_merchant_id;
+
             }
         }
 
