@@ -36,3 +36,4 @@ yarn-error.log
 /public/storage
 /database/seeds/TestSeeder.php
 /htdocs
+.DS_store
